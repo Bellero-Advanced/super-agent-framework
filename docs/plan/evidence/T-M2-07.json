@@ -1,14 +1,134 @@
 {
   "id": "T-M2-07",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T19:31:17.634Z",
     "base": "1a8a31285286f6bf5ef173fe9f9700740e1ce1e3",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-07",
-  "worktree": ".claude/worktrees/T-M2-07"
+  "worktree": ".claude/worktrees/T-M2-07",
+  "verified": {
+    "at": "2026-11-23T19:32:58.921Z",
+    "head": "bcc673bf9e84913d1e9c005e3c63c84c6c635d20",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 267,
+        "tail": [
+          "> super-agent-framework@0.1.0 spec:matrix",
+          "> node tools/saf/bin/saf.mjs spec-matrix --check",
+          "| Scenario | Spec | Cards | Test | Status |",
+          "|---|---|---|---|---|",
+          "| TMODE-AC-01 | test-mode:114 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-02 | test-mode:115 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-03 | test-mode:116 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-04 | test-mode:117 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:118 | T-M2-07 (in progress) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:119 | T-M2-07 (in progress) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:120 | T-M2-07 (in progress) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:121 | T-M2-07 (in progress) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:122 | T-M2-08 (not started) | — | ✗ gap |",
+          "| TMODE-AC-10 | test-mode:123 | T-M2-08 (not started) | — | ✗ gap |",
+          "| TMODE-AC-11 | test-mode:124 | T-M2-09 (not started) | — | ✗ gap |",
+          "| TMODE-AC-12 | test-mode:125 | T-M2-09 (not started) | — | ✗ gap |",
+          "| TMODE-AC-13 | test-mode:126 | T-M2-09 (not started) | — | ✗ gap |",
+          "13 scenario(s) in 1 spec(s) · with test 8 · gaps 5 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 256,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 203 markdown file(s) · 57 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/test-mode-verify.test.mjs'",
+        "exit": 0,
+        "ms": 2221,
+        "tail": [
+          "ok 7 - TMODE-AC-08 every-card mode: criteria run exactly as written, nothing deferred",
+          "  ---",
+          "  duration_ms: 178.878875",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-05 a card with no full-suite command runs as written in every mode (rule 14)",
+          "ok 8 - TMODE-AC-05 a card with no full-suite command runs as written in every mode (rule 14)",
+          "  ---",
+          "  duration_ms: 174.694667",
+          "  type: 'test'",
+          "  ...",
+          "1..8",
+          "# tests 8",
+          "# suites 0",
+          "# pass 8",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2167.11975"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/lib/testmode.mjs",
+        "kit/tools-saf/lib/text.mjs",
+        "test/unit/test-mode-verify.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/plan.mjs": "b044f83868938bc440605788226d595cb2834b18",
+        "kit/tools-saf/lib/task.mjs": "bb2f67bef228817286062934e46ae03eb5ecc5b0",
+        "kit/tools-saf/lib/testmode.mjs": "4ae679a20d757d951ba7b40622c75a7e4d2c4b10",
+        "kit/tools-saf/lib/text.mjs": "9e9104c67b6b930a4d3a02148b445a8dfce48424",
+        "test/unit/test-mode-verify.test.mjs": "e2d775e9c5a6a91fe6e1f9d12665dcd97eca0a73"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "TMODE-AC-05",
+        "TMODE-AC-06",
+        "TMODE-AC-07",
+        "TMODE-AC-08"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 82,
+        "cap": 150
+      },
+      "test": {
+        "lines": 140,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/test-mode-verify.test.mjs"
+      ]
+    }
+  }
 }
