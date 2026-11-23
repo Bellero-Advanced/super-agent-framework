@@ -117,7 +117,8 @@ export function templateData(config, detected, opts = {}) {
   const isTh = config.people.docLanguage === "th";
   const dl = config.people.docLanguage;
   const goal = config.firstMilestone.goal.trim();
-  const firstLine = goal.split(/[\n.。]/)[0].trim();
+  // first sentence: a line break, "。", or a dot followed by a space or the end ("v0.1.0" stays whole)
+  const firstLine = goal.split(/\n|。|\.(?=\s|$)/)[0].trim();
   // long goals are cut at a word boundary, never mid-word
   const m1Title = (firstLine.length > 80 ? `${firstLine.slice(0, 80).replace(/\s+\S*$/, "")}…` : firstLine) || "First milestone";
   const today = (opts.now ?? new Date()).toISOString().slice(0, 10);
