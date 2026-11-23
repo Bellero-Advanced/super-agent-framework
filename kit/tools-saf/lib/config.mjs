@@ -11,6 +11,7 @@ import { validate } from "./schema.mjs";
  */
 
 export const CONFIG_FILE = "saf.config.json";
+export const LOCAL_CONFIG_FILE = "saf.config.local.json";
 export const SAF_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
 export const SCHEMA_FILE = join(SAF_DIR, "schema", "saf.config.schema.json");
 
@@ -20,6 +21,15 @@ export const MODELS = {
   sonnet: "claude-sonnet-5-5",
   haiku: "claude-haiku-5-5",
 };
+
+/** Test mode: when the full test suite runs (docs/specs/test-mode.md). Keep TEST_MODES and the schema enum in step. */
+export const TEST_MODES = ["every-card", "targeted", "milestone"];
+export const DEFAULT_TEST_MODE = "milestone";
+export const TEST_MODE_ENV = "SAF_TEST_MODE";
+/** Keys saf.config.local.json (per machine, not tracked) may set — any other key is an error. */
+export const LOCAL_KEYS = ["workflow.testMode"];
+/** `stack.commands` keys whose command is "the full test suite". */
+export const FULL_SUITE_KEYS = ["test", "e2e"];
 
 /** Planner/reviewer roles get `planner`; builder roles get `builder`. Effort is set per role, not per preset. */
 export const MODEL_PRESETS = {
@@ -249,15 +259,48 @@ export function findRoot(start = process.cwd()) {
   }
 }
 
-export function loadConfig(root) {
-  const file = join(root, CONFIG_FILE);
-  let raw;
+function readJsonFile(root, name) {
   try {
-    raw = JSON.parse(readFileSync(file, "utf8"));
+    return JSON.parse(readFileSync(join(root, name), "utf8"));
   } catch (e) {
-    throw new ConfigError(`${CONFIG_FILE}: cannot read JSON (${e instanceof Error ? e.message : e})`);
+    throw new ConfigError(`${name}: cannot read JSON (${e instanceof Error ? e.message : e})`);
   }
+}
+
+/** Dotted paths in `obj` that are not in `allowed` (an allowed path may be a parent of nothing but itself). */
+function disallowedPaths(obj, allowed, prefix = "") {
+  const out = [];
+  for (const [k, v] of Object.entries(obj)) {
+    const path = prefix ? `${prefix}.${k}` : k;
+    if (allowed.includes(path)) continue;
+    if (v !== null && typeof v === "object" && !Array.isArray(v) && allowed.some((a) => a.startsWith(`${path}.`))) out.push(...disallowedPaths(v, allowed, path));
+    else out.push(path);
+  }
+  return out;
+}
+
+/** Engine runs only: the config plus the per-machine test mode (env > saf.config.local.json > saf.config.json > default). */
+export function loadConfig(root, env = process.env) {
+  const raw = readJsonFile(root, CONFIG_FILE);
   const errors = validateConfig(raw);
   if (errors.length) throw new ConfigError([`${CONFIG_FILE} is invalid:`, ...errors.map((e) => `  ✗ ${e}`)].join("\n"));
-  return resolveConfig(raw);
+  const config = resolveConfig(raw);
+  let mode = DEFAULT_TEST_MODE;
+  let source = "default";
+  if (raw.workflow?.testMode) [mode, source] = [raw.workflow.testMode, "repo"];
+  if (existsSync(join(root, LOCAL_CONFIG_FILE))) {
+    const local = readJsonFile(root, LOCAL_CONFIG_FILE);
+    const bad = local !== null && typeof local === "object" && !Array.isArray(local) ? disallowedPaths(local, LOCAL_KEYS) : ["$"];
+    const lerrors = [...bad.map((k) => `${k} is not allowed here (allowed: ${LOCAL_KEYS.join(", ")})`), ...validateConfig(local)];
+    if (lerrors.length) throw new ConfigError([`${LOCAL_CONFIG_FILE} is invalid:`, ...lerrors.map((e) => `  ✗ ${e}`)].join("\n"));
+    if (local.workflow?.testMode) [mode, source] = [local.workflow.testMode, "local"];
+  }
+  const fromEnv = env[TEST_MODE_ENV];
+  if (fromEnv) {
+    if (!TEST_MODES.includes(fromEnv)) throw new ConfigError(`${TEST_MODE_ENV}=${fromEnv} is not a test mode — use one of: ${TEST_MODES.join(", ")}`);
+    [mode, source] = [fromEnv, "env"];
+  }
+  config.workflow.testMode = mode;
+  config.workflow.testModeSource = source;
+  return config;
 }

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
+import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { scriptOf } from "./docs.mjs";
 import { loadPlan } from "./plan.mjs";
@@ -291,7 +291,7 @@ function mergeSettings(root, report) {
   report.written.push(".claude/settings.json (merged)");
 }
 
-export const GITIGNORE_LINES = [".claude/settings.local.json", ".saf-lane.json", ".saf/memory/", ".env", ".env.local", ".env.*.local"];
+export const GITIGNORE_LINES = [".claude/settings.local.json", ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
 
 export function mergeGitignore(root, config, report) {
   const file = join(root, ".gitignore");

@@ -1,14 +1,134 @@
 {
   "id": "T-M2-06",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T19:27:24.279Z",
     "base": "58e915fc1958363f56ef98442612e3803249d255",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-06",
-  "worktree": ".claude/worktrees/T-M2-06"
+  "worktree": ".claude/worktrees/T-M2-06",
+  "verified": {
+    "at": "2026-11-23T19:28:41.133Z",
+    "head": "e3126d1a302b6250dd523a157fd2a90e676a635a",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 282,
+        "tail": [
+          "> super-agent-framework@0.1.0 spec:matrix",
+          "> node tools/saf/bin/saf.mjs spec-matrix --check",
+          "| Scenario | Spec | Cards | Test | Status |",
+          "|---|---|---|---|---|",
+          "| TMODE-AC-01 | test-mode:114 | T-M2-06 (in progress) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-02 | test-mode:115 | T-M2-06 (in progress) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-03 | test-mode:116 | T-M2-06 (in progress) | test/unit/test-mode-config.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-04 | test-mode:117 | T-M2-06 (in progress) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:118 | T-M2-07 (not started) | — | ✗ gap |",
+          "| TMODE-AC-06 | test-mode:119 | T-M2-07 (not started) | — | ✗ gap |",
+          "| TMODE-AC-07 | test-mode:120 | T-M2-07 (not started) | — | ✗ gap |",
+          "| TMODE-AC-08 | test-mode:121 | T-M2-07 (not started) | — | ✗ gap |",
+          "| TMODE-AC-09 | test-mode:122 | T-M2-08 (not started) | — | ✗ gap |",
+          "| TMODE-AC-10 | test-mode:123 | T-M2-08 (not started) | — | ✗ gap |",
+          "| TMODE-AC-11 | test-mode:124 | T-M2-09 (not started) | — | ✗ gap |",
+          "| TMODE-AC-12 | test-mode:125 | T-M2-09 (not started) | — | ✗ gap |",
+          "| TMODE-AC-13 | test-mode:126 | T-M2-09 (not started) | — | ✗ gap |",
+          "13 scenario(s) in 1 spec(s) · with test 4 · gaps 9 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm test",
+        "exit": 0,
+        "ms": 18784,
+        "tail": [
+          "ok 70 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "  ---",
+          "  duration_ms: 202.572708",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 71 - this repo pins targeted with a testFiles command and ignores the local file",
+          "  ---",
+          "  duration_ms: 0.676209",
+          "  type: 'test'",
+          "  ...",
+          "1..71",
+          "# tests 71",
+          "# suites 0",
+          "# pass 70",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 18517.438042"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 479,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 203 markdown file(s) · 56 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 582,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 399 scanned file(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".gitignore",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/schema/saf.config.schema.json",
+        "saf.config.json",
+        "test/unit/test-mode-config.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".gitignore": "1d7bb806d44660c30f7ce1062f0d82a79b8f06ec",
+        "kit/tools-saf/lib/config.mjs": "fd982becf742e21308dba4adb314c253d191aa7d",
+        "kit/tools-saf/lib/generate.mjs": "6db4329823ec17b0df759d020a62b93a6f39ba2f",
+        "kit/tools-saf/schema/saf.config.schema.json": "5a4be692c0f224960affc32ddd51f975ed288f9a",
+        "saf.config.json": "6ef67b45ef19966c8d1c584255685bf7c1a7af6e",
+        "test/unit/test-mode-config.test.mjs": "06dd0ab5cd8891c0589ceeac9f3e33a58f390b21"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "TMODE-AC-01",
+        "TMODE-AC-02",
+        "TMODE-AC-03",
+        "TMODE-AC-04"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 72,
+        "cap": 150
+      },
+      "test": {
+        "lines": 93,
+        "cap": 250
+      },
+      "over": []
+    }
+  }
 }
