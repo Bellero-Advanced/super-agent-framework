@@ -584,7 +584,11 @@ export async function verifyMilestone(ctx, mid) {
   const after = loadPlan(ctx.root, ctx.config);
   writeGenerated(ctx.root, after);
   const openCards = m.cards.filter((id) => !isDone(cardStatus(after, id)));
-  return { evidence, pass: gates.every((g) => g.pass !== false) && !openCards.length, openCards };
+  // rule 21: a failed gate that runs a full-suite command, with cards whose full suite was deferred → name the next step
+  const suiteFailed = gates.some((g) => g.pass === false && g.commands.some((c) => isFullSuite(ctx.config, c.cmd)));
+  const hint = suiteFailed && deferredCards.length ? `${cmd(ctx.config, "task:culprit", m.id)} — finds the card that broke the full suite (deferred from: ${deferredCards.join(", ")})` : null;
+  if (hint) ctx.log?.(`  ! next step: ${hint}`);
+  return { evidence, pass: gates.every((g) => g.pass !== false) && !openCards.length, openCards, hint };
 }
 
 // ── merge (lane → main branch, one at a time) ──────────────────────────────

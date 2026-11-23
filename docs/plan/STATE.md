@@ -2,9 +2,9 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 5/17
+## M2 Roadmap: next — cards done 6/17
 
-- In progress: **T-M2-09** task:culprit finds the card that broke the deferred full suite — started 2026-11-23 19:55 · not verified yet · lane 1 · .claude/worktrees/T-M2-09
+- In progress: none
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
 
 | Card | Work | Status | Evidence |
@@ -17,7 +17,7 @@
 | [T-M2-06](tasks/M2/T-M2-06.md) | Choose how often the full test suite runs, per project and per machine (workflow.testMode) | ✓ passed | [T-M2-06.json](evidence/T-M2-06.json) · passed 2026-11-23 19:28 (4 commands) |
 | [T-M2-07](tasks/M2/T-M2-07.md) | task:verify runs the card's own tests instead of the full suite when the test mode defers it | ✓ passed | [T-M2-07.json](evidence/T-M2-07.json) · passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate |
 | [T-M2-08](tasks/M2/T-M2-08.md) | task:merge skips the deferred full suite and the milestone gate always runs it | ✓ passed | [T-M2-08.json](evidence/T-M2-08.json) · passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate |
-| [T-M2-09](tasks/M2/T-M2-09.md) | task:culprit finds the card that broke the deferred full suite | ▶ in progress | [T-M2-09.json](evidence/T-M2-09.json) · started 2026-11-23 19:55 · not verified yet |
+| [T-M2-09](tasks/M2/T-M2-09.md) | task:culprit finds the card that broke the deferred full suite | ✓ passed | [T-M2-09.json](evidence/T-M2-09.json) · passed 2026-11-23 20:03 (3 commands) · full suite deferred to gate |
 | [T-M2-10](tasks/M2/T-M2-10.md) | /saf-setup asks for the test mode and the docs explain the three modes and task:culprit | · not started | – |
 | [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | ✓ passed | [T-M2-11.json](evidence/T-M2-11.json) · passed 2026-11-23 19:17 (4 commands) |
 | [T-M2-12](tasks/M2/T-M2-12.md) | saf choices --not-asked lists every setting the interview does not ask, and where to change it | · not started | – |
@@ -37,7 +37,7 @@
 
 ## Latest evidence
 
-- T-M2-09 task:culprit finds the card that broke the deferred full suite — started 2026-11-23 19:55 · not verified yet
+- T-M2-09 task:culprit finds the card that broke the deferred full suite — passed 2026-11-23 20:03 (3 commands) · full suite deferred to gate
 - T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it — passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate
 - T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it — passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate
 - T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) — passed 2026-11-23 19:28 (4 commands)

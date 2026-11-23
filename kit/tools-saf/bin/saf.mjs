@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { CONFIG_FILE, ConfigError, findRoot, loadConfig, scriptCommand, validateConfig } from "../lib/config.mjs";
+import { culpritLines, findCulprit } from "../lib/culprit.mjs";
 import { detectProject } from "../lib/detect.mjs";
 import { docsInputFor, runDocsCheck } from "../lib/docs.mjs";
 import { listRepoFiles } from "../lib/git.mjs";
@@ -42,6 +43,7 @@ import {
  *   task abandon <id> · task merge <id>    (merge exit 3 refused · 4 conflict · 5 merge checks failed)
  *   task state [--check] · task next [--parallel] [--json] · task probe [--bin <claude>] · task env · task report <M>
  *     (task next lists the active milestone's cards first, then side cards of planned milestones — --json has a `side` list)
+ *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -100,11 +102,11 @@ async function task(sub, rest) {
     const i = rest.indexOf(n);
     return i >= 0 ? rest[i + 1] : undefined;
   };
-  const positional = () => rest.find((a, i) => !a.startsWith("--") && !["--base", "--bin"].includes(rest[i - 1] ?? ""));
+  const positional = () => rest.find((a, i) => !a.startsWith("--") && !["--base", "--bin", "--cmd"].includes(rest[i - 1] ?? ""));
   const c = (s, a) => scriptCommand(config.stack.packageManager, s, a);
   const requireId = () => {
     const id = positional();
-    if (!id) throw new TaskError(`give an id, e.g. ${c(`task:${sub}`, sub === "report" ? "M1" : "T-M1-01")}`);
+    if (!id) throw new TaskError(`give an id, e.g. ${c(`task:${sub}`, ["report", "culprit"].includes(sub) ? "M1" : "T-M1-01")}`);
     return id;
   };
   const ctx = ctxFor(root, config, flag("--verbose"));
@@ -233,8 +235,13 @@ async function task(sub, rest) {
       out(`wrote ${reportPath(id)}`);
       return 0;
     }
+    case "culprit": {
+      const r = await findCulprit(ctx, requireId(), { cmd: option("--cmd") });
+      culpritLines(r).forEach(out);
+      return r.exit;
+    }
     default:
-      err("usage: task start|verify|abandon|merge|state|next|probe|env|report — see docs/plan/README.md");
+      err("usage: task start|verify|abandon|merge|state|next|probe|env|report|culprit — see docs/plan/README.md");
       return 2;
   }
 }
