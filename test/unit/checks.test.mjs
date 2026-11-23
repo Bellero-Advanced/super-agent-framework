@@ -104,10 +104,18 @@ test("measure lock: second holder waits then exits 75; lock is released", async 
 
 test("probe: passes when hooks answer and the hook-less control does not", async () => {
   const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", title: "first" }] });
-  const bin = join(tmp(), "fake-claude");
-  const script = `#!/bin/sh\nfor a in "$@"; do if [ "$a" = "--settings" ]; then echo unknown; exit 0; fi; done\necho "M1 done 0/1 · none"\n`;
-  writeFileSync(bin, script);
-  chmodSync(bin, 0o755);
+  const dir = tmp();
+  const js = join(dir, "fake-claude.js");
+  writeFileSync(js, `console.log(process.argv.includes("--settings") ? "unknown" : "M1 done 0/1 · none");\n`);
+  let bin;
+  if (process.platform === "win32") {
+    bin = join(dir, "fake-claude.cmd");
+    writeFileSync(bin, `@echo off\r\n"${process.execPath}" "${js}" %*\r\n`);
+  } else {
+    bin = join(dir, "fake-claude");
+    writeFileSync(bin, `#!/bin/sh\nexec "${process.execPath}" "${js}" "$@"\n`);
+    chmodSync(bin, 0o755);
+  }
   const r = await runProbe(fakeCtx(root, config), { bin, timeoutMs: 10_000 });
   assert.equal(r.pass, true, JSON.stringify(r));
 });
