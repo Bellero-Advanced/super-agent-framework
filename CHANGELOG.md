@@ -5,7 +5,7 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
-## 0.1.0
+## 0.1.0 — 2026-11-23
 
 First public release. MIT license.
 
