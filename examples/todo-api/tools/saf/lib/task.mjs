@@ -56,7 +56,7 @@ import {
 } from "./plan.mjs";
 import { IS_WINDOWS, RUN_LIMITS, quoteWindowsArg } from "./run.mjs";
 import { findScenarioTests, isTestFile } from "./scenarios.mjs";
-import { defersAtVerify, isFullSuite, targetedCommand, targetedFiles } from "./testmode.mjs";
+import { defersAtVerify, gatesWithFullSuite, isFullSuite, mergeChecksFor, targetedCommand, targetedFiles } from "./testmode.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -567,7 +567,7 @@ export async function verifyMilestone(ctx, mid) {
   const m = plan.milestones.find((x) => x.id === mid);
   if (!m) throw new TaskError(`no milestone ${mid} in ${MILESTONE_DIR}/`);
   const gates = [];
-  for (const g of m.gates) {
+  for (const g of gatesWithFullSuite(ctx.config, m.gates)) {
     if (!g.run.length) {
       ctx.log?.(`■ gate ${g.id} ${g.text} — no command (manual check)`);
       gates.push({ id: g.id, pass: null, commands: [] });
@@ -577,7 +577,9 @@ export async function verifyMilestone(ctx, mid) {
     const commands = await runAll(ctx, g.run);
     gates.push({ id: g.id, pass: commands.every((c) => c.exit === 0), commands });
   }
-  const evidence = { id: m.id, kind: "milestone", verified: { at: nowIso(ctx), head: resolveCommit(ctx.root, "HEAD") ?? "", gates } };
+  const testMode = { mode: ctx.config.workflow.testMode ?? null, source: ctx.config.workflow.testModeSource ?? null };
+  const deferredCards = m.cards.filter((id) => plan.evidence.get(id)?.verified?.deferred?.length);
+  const evidence = { id: m.id, kind: "milestone", verified: { at: nowIso(ctx), head: resolveCommit(ctx.root, "HEAD") ?? "", testMode, deferredCards, gates } };
   writeJson(ctx.root, evidencePath(m.id), evidence);
   const after = loadPlan(ctx.root, ctx.config);
   writeGenerated(ctx.root, after);
@@ -628,11 +630,12 @@ function precheck(ctx, id) {
 }
 
 /**
- * @param {{checks?:string[]}} opts checks default to workflow.mergeChecks
+ * @param {{checks?:string[]}} opts checks default to workflow.mergeChecks, without the full-suite commands when the test mode defers them to the exit gate
  */
 export async function mergeCard(ctx, id, opts = {}) {
   const root = ctx.root;
-  const checks = opts.checks ?? ctx.config.workflow.mergeChecks;
+  const checks = opts.checks ?? mergeChecksFor(ctx.config);
+  const skipped = opts.checks ? [] : (ctx.config.workflow.mergeChecks ?? []).filter((c) => !checks.includes(c));
   let pre;
   try {
     pre = precheck(ctx, id);
@@ -682,6 +685,7 @@ export async function mergeCard(ctx, id, opts = {}) {
     const lockish = inst?.cmd && Object.keys(merged).some((f) => inst.files.includes(f.split("/").pop()));
     const all = lockish ? [inst.cmd, ...checks] : checks;
     ctx.log?.(`merged ${branch} (not committed) → ${all.length} merge check(s)`);
+    if (skipped.length) ctx.log?.(`  ! skipped (full suite deferred to gate): ${skipped.join(" · ")}`);
     for (const c of all) {
       ctx.log?.(`▶ ${c}`);
       if (lockish && c === inst.cmd) installed = true;
@@ -714,7 +718,7 @@ export async function mergeCard(ctx, id, opts = {}) {
   }
   const after = loadPlan(root, ctx.config);
   const m = activeMilestone(after);
-  return { commit, checks, warnings, next: m ? pickParallel(after, m) : null };
+  return { commit, checks, skipped, warnings, next: m ? pickParallel(after, m) : null };
 }
 
 // ── hooks ───────────────────────────────────────────────────────────────────

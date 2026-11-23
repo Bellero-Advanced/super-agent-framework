@@ -1,14 +1,130 @@
 {
   "id": "T-M2-08",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T19:46:16.597Z",
     "base": "f116547181f64e46d519b17ac674d9287f72fc69",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-08",
-  "worktree": ".claude/worktrees/T-M2-08"
+  "worktree": ".claude/worktrees/T-M2-08",
+  "verified": {
+    "at": "2026-11-23T19:47:29.874Z",
+    "head": "083f119d860a8554c2b2a29e6efdb31ec33bf271",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 351,
+        "tail": [
+          "| SETUP-AC-03 | setup-choices:122 | T-M2-12 (not started) | — | ✗ gap |",
+          "| SETUP-AC-04 | setup-choices:123 | T-M2-13 (not started) | — | ✗ gap |",
+          "| SETUP-AC-05 | setup-choices:124 | T-M2-13 (not started) | — | ✗ gap |",
+          "| SETUP-AC-06 | setup-choices:125 | T-M2-14 (not started) | — | ✗ gap |",
+          "| SETUP-AC-07 | setup-choices:126 | T-M2-15 (not started) | — | ✗ gap |",
+          "| SETUP-AC-08 | setup-choices:127 | T-M2-15 (not started) | — | ✗ gap |",
+          "| TMODE-AC-01 | test-mode:114 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-02 | test-mode:115 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-03 | test-mode:116 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-04 | test-mode:117 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:118 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:119 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:120 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:121 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:122 | T-M2-08 (in progress) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:123 | T-M2-08 (in progress) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:124 | T-M2-09 (not started) | — | ✗ gap |",
+          "| TMODE-AC-12 | test-mode:125 | T-M2-09 (not started) | — | ✗ gap |",
+          "| TMODE-AC-13 | test-mode:126 | T-M2-09 (not started) | — | ✗ gap |",
+          "21 scenario(s) in 2 spec(s) · with test 10 · gaps 11 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 318,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 208 markdown file(s) · 70 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/test-mode-gate.test.mjs'",
+        "exit": 0,
+        "ms": 3913,
+        "tail": [
+          "ok 7 - TMODE-AC-10 no extra gate when a gate already runs a full-suite command, or in another mode",
+          "  ---",
+          "  duration_ms: 301.634125",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-10 the full-suite gate decides pass or fail like any gate",
+          "ok 8 - TMODE-AC-10 the full-suite gate decides pass or fail like any gate",
+          "  ---",
+          "  duration_ms: 108.400166",
+          "  type: 'test'",
+          "  ...",
+          "1..8",
+          "# tests 8",
+          "# suites 0",
+          "# pass 8",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3861.781917"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/lib/testmode.mjs",
+        "test/unit/test-mode-gate.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/task.mjs": "ef04974807b4c25a38f9599717560b99ab76e178",
+        "kit/tools-saf/lib/testmode.mjs": "8c2a06dda3eef5c500becaf7e9a269e1f2e540e6",
+        "test/unit/test-mode-gate.test.mjs": "b58c09b82c410d6668e828f5ff5821bd1ecabf55"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "TMODE-AC-09",
+        "TMODE-AC-10"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 50,
+        "cap": 150
+      },
+      "test": {
+        "lines": 136,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/test-mode-gate.test.mjs"
+      ]
+    }
+  }
 }

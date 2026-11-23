@@ -47,7 +47,7 @@ interview that explains every option and shows every setting it does not ask.
 - [ ] T-M2-05 Evidence viewer: a static HTML page from docs/plan/evidence/
 - [x] T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) — passed 2026-11-23 19:28 (4 commands)
 - [x] T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it — passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate
-- [ ] T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it — started 2026-11-23 19:46 · not verified yet · lane 1 · .claude/worktrees/T-M2-08
+- [x] T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it — passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate
 - [ ] T-M2-09 task:culprit finds the card that broke the deferred full suite
 - [ ] T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit
 - [x] T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again) — passed 2026-11-23 19:17 (4 commands)
