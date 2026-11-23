@@ -21,7 +21,7 @@ outside feedback is read and sorted into fixes and roadmap items.
 
 ## Task List
 - [x] T-M1-01 Publish super-agent-framework and create-saf 0.1.0 to npm — passed 2026-11-23 18:52 (2 commands)
-- [ ] T-M1-02 Tag v0.1.0 and publish the GitHub release
+- [x] T-M1-02 Tag v0.1.0 and publish the GitHub release — passed 2026-11-23 19:09 (2 commands)
 - [x] T-M1-03 Upload the social preview image — passed 2026-11-23 19:09 (1 commands)
 - [ ] T-M1-04 Sort the first trial feedback into fixes and roadmap items
 

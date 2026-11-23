@@ -2,15 +2,15 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M1 v0.1.0 public release — cards done 2/4
+## M1 v0.1.0 public release — cards done 3/4
 
 - In progress: none
-- Next: T-M1-02 Tag v0.1.0 and publish the GitHub release · T-M1-04 Sort the first trial feedback into fixes and roadmap items
+- Next: T-M1-04 Sort the first trial feedback into fixes and roadmap items
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
 | [T-M1-01](tasks/M1/T-M1-01.md) | Publish super-agent-framework and create-saf 0.1.0 to npm | ✓ passed | [T-M1-01.json](evidence/T-M1-01.json) · passed 2026-11-23 18:52 (2 commands) |
-| [T-M1-02](tasks/M1/T-M1-02.md) | Tag v0.1.0 and publish the GitHub release | · not started | – |
+| [T-M1-02](tasks/M1/T-M1-02.md) | Tag v0.1.0 and publish the GitHub release | ✓ passed | [T-M1-02.json](evidence/T-M1-02.json) · passed 2026-11-23 19:09 (2 commands) |
 | [T-M1-03](tasks/M1/T-M1-03.md) | Upload the social preview image | ✓ passed | [T-M1-03.json](evidence/T-M1-03.json) · passed 2026-11-23 19:09 (1 commands) |
 | [T-M1-04](tasks/M1/T-M1-04.md) | Sort the first trial feedback into fixes and roadmap items | · not started | – |
 
@@ -39,6 +39,7 @@
 
 ## Latest evidence
 
+- T-M1-02 Tag v0.1.0 and publish the GitHub release — passed 2026-11-23 19:09 (2 commands)
 - T-M1-03 Upload the social preview image — passed 2026-11-23 19:09 (1 commands)
 - T-M1-01 Publish super-agent-framework and create-saf 0.1.0 to npm — passed 2026-11-23 18:52 (2 commands)
 - T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
