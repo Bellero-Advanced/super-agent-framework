@@ -1,14 +1,135 @@
 {
   "id": "T-M2-19",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T21:33:17.274Z",
     "base": "30dcdc61d9e3a8e7590fcbc54cde54560b344499",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-19",
-  "worktree": ".claude/worktrees/T-M2-19"
+  "worktree": ".claude/worktrees/T-M2-19",
+  "verified": {
+    "at": "2026-11-23T21:34:09.692Z",
+    "head": "e1e8d07a106e0608807fd3d86f620ad2005ea7c4",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 308,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "32 scenario(s) in 3 spec(s) · with test 32 · gaps 0 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/templates/agents/release-operator.md','utf8');if(!/\\{\\{#if pushOwner\\}\\}[^\\n]*\\{\\{else\\}\\}/.test(s))process.exit(1)\"",
+        "exit": 0,
+        "ms": 44,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 268,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 214 markdown file(s) · 100 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/generate.test.mjs'",
+        "exit": 0,
+        "ms": 867,
+        "tail": [
+          "ok 11 - generated CLAUDE.md lists task:culprit in en and th, and the plan README names the test mode",
+          "  ---",
+          "  duration_ms: 58.588959",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
+          "ok 12 - SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
+          "  ---",
+          "  duration_ms: 59.819708",
+          "  type: 'test'",
+          "  ...",
+          "1..12",
+          "# tests 12",
+          "# suites 0",
+          "# pass 12",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 813.567209"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/templates/agents/release-operator.md",
+        "test/unit/generate.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/choices.mjs": "e044e0bc16c840dfad2bd39fa98de92cad7dadbc",
+        "kit/tools-saf/templates/agents/release-operator.md": "9c17209fb69a74364faa86aa074a2ef7b2fc9fce",
+        "test/unit/generate.test.mjs": "bab79fcc374ce3f4b322080b67d8d5bc5fe05197"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-10"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 6,
+        "cap": 150
+      },
+      "test": {
+        "lines": 25,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/generate.test.mjs"
+      ]
+    }
+  }
 }
