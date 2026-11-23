@@ -7,19 +7,19 @@
     "base": "5229b0b0e5dd2830f9048a451545d95cc3866389",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-14",
   "worktree": ".claude/worktrees/T-M2-14",
   "verified": {
-    "at": "2026-11-23T21:11:21.932Z",
-    "head": "2f257e04ed493a617e6d974998582d5b65373d72",
+    "at": "2026-11-23T21:18:46.456Z",
+    "head": "42c9b96cc89604a3edf165b265e4e6a988ec1116",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 317,
+        "ms": 286,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,7 +46,7 @@
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group 6 --lang th",
         "exit": 0,
-        "ms": 66,
+        "ms": 67,
         "tail": [
           "- every-card",
           "    คืออะไร: ชุดทดสอบเต็มรันตอน verify ของทุกการ์ด และรันอีกครั้งตอน merge การ์ดจาก lane ถ้าเช็กตอน merge มีมัน",
@@ -66,14 +66,14 @@
           "## stack.commands.testFiles",
           "    คืออะไร: คำสั่งที่รันเฉพาะบางไฟล์เทสต์ ตัวแทนรายชื่อไฟล์จะถูกแทนด้วยพาธที่ใส่เครื่องหมายคำพูดแล้ว โหมด targeted และ milestone ใช้ตอน verify",
           "    เหมาะกับ: verify ของการ์ดรันเฉพาะเทสต์ที่การ์ดแก้หรือที่ระบุตาม scenario ไม่ใช่ทั้งชุด",
-          "    ข้อเสีย: คำสั่งที่รับชื่อไฟล์ไม่ได้ทำให้การ์ดไม่ผ่าน ถ้าเว้นว่างหรือไม่พบไฟล์เทสต์ verify จะรันชุดเต็ม",
+          "    ข้อเสีย: ถ้าไม่มี {files} เว้นว่าง หรือไม่พบไฟล์เทสต์ verify จะถอยไปรันชุดเต็ม และคำสั่งที่รับชื่อไฟล์ไม่ได้ทำให้การ์ดไม่ผ่าน",
           "    เลือกเมื่อ: ใช้โหมด targeted หรือ milestone และตัวรันเทสต์รับชื่อไฟล์ได้"
         ]
       },
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group flow --lang en",
         "exit": 0,
-        "ms": 66,
+        "ms": 71,
         "tail": [
           "    What it is: On first setup, old agent files, commands, rules and plan files that SAF did not write move into docs/archive/pre-saf; nothing is deleted.",
           "    Good for: A clean SAF layout with no old plan or agent files mixed in, and the old ones kept as history.",
@@ -100,7 +100,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 298,
+        "ms": 269,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -110,17 +110,17 @@
       {
         "cmd": "node --test 'test/unit/setup-choices.test.mjs'",
         "exit": 0,
-        "ms": 2239,
+        "ms": 2197,
         "tail": [
           "ok 9 - SETUP-AC-06 every choice question of every group has entries for all its values, every value question exactly one, identity none, and the flow group is adopt and commit",
           "  ---",
-          "  duration_ms: 0.825875",
+          "  duration_ms: 0.811083",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-06 choices --group prints every entry of groups 5-8 and flow in both languages",
           "ok 10 - SETUP-AC-06 choices --group prints every entry of groups 5-8 and flow in both languages",
           "  ---",
-          "  duration_ms: 911.725875",
+          "  duration_ms: 889.948",
           "  type: 'test'",
           "  ...",
           "1..10",
@@ -131,7 +131,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2185.812625"
+          "# duration_ms 2138.819834"
         ]
       }
     ],
@@ -143,7 +143,7 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "kit/tools-saf/lib/choices.mjs": "f99eeffef941e04a3b5eac0c9cff72e682ed9345",
+        "kit/tools-saf/lib/choices.mjs": "0055e1103f2c87614000e128b8eac7a70fe54e95",
         "test/unit/setup-choices.test.mjs": "9bf71b26c0c10096dc591a3ce51dd71246e884fb"
       }
     },
