@@ -26,7 +26,7 @@ outside feedback is read and sorted into fixes and roadmap items.
 - [ ] T-M1-04 Sort the first trial feedback into fixes and roadmap items
 
 ## Side lane (M2)
-- [ ] T-M2-04 task:verify reports changed code and test lines against the card's size cap
+- [ ] T-M2-04 task:verify reports changed code and test lines against the card's size cap — started 2026-11-23 18:35 · not verified yet · lane 1 · .claude/worktrees/T-M2-04
 
 ## Risks
 - `create-saf` depends on `super-agent-framework@0.1.0` — publish the main package first or `npx create-saf` fails

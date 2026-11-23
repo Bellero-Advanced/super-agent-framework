@@ -25,15 +25,16 @@
 
 ## Side lane M2 Roadmap: next — cards done 0/1
 
-- In progress: none
-- Next: T-M2-04 task:verify reports changed code and test lines against the card's size cap
+- In progress: **T-M2-04** task:verify reports changed code and test lines against the card's size cap — started 2026-11-23 18:35 · not verified yet · lane 1 · .claude/worktrees/T-M2-04
+- Next: none — only cards in progress remain
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
-| [T-M2-04](tasks/M2/T-M2-04.md) | task:verify reports changed code and test lines against the card's size cap | · not started | – |
+| [T-M2-04](tasks/M2/T-M2-04.md) | task:verify reports changed code and test lines against the card's size cap | ▶ in progress | [T-M2-04.json](evidence/T-M2-04.json) · started 2026-11-23 18:35 · not verified yet |
 
 ## Latest evidence
 
+- T-M2-04 task:verify reports changed code and test lines against the card's size cap — started 2026-11-23 18:35 · not verified yet
 - T-M0-01 SAF self-checks pass through the real card loop — passed 2026-11-23 17:34 (3 commands)
 
 ## Other milestones
