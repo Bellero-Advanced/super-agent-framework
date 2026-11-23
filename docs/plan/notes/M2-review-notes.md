@@ -28,3 +28,13 @@ line with the card id or "dropped (reason)". Blocking findings never wait here �
 4. test gaps: BOM keeping · schema-invalid `saf.config.json` · non-object root or `scripts` · "unchanged" asserted only on `scripts`, not on other top-level keys
 5. pre-existing: `upgrade()` still calls `JSON.parse` on `saf.config.json` unguarded (install.mjs ~157) — an invalid config warns, then crashes
 6. `docs/specs/upgrade-scripts.md` header still says D-010 "(proposed)" — it is decided
+
+## T-M2-10 (review FAIL → fixed → merged) — notes for the designer
+
+A. `docs/card-lifecycle.md` describes the T-M2-16 behaviour (gate covers every full-suite command no declared gate runs; id reserved) before T-M2-16 has merged — re-check if T-M2-16 slips
+B. (fixed) "this repo itself uses targeted" in shipped docs → "SAF's own repository"
+C. `examples/todo-api/.claude/skills/saf-setup/**` is stale against kit — add it to `workflow.alwaysAllowed` with a dogfood-test pair, or refresh it with a card
+D. plan README §1 says the evidence says "full suite deferred to gate"; the evidence JSON carries `deferred`/`targeted`, the words appear in verify output, STATE.md and the session summary
+E. several new doc lines run past the ~120-column wrap (README.md:54, README.th.md:53, docs/plan/README.md §1, plan README templates line 33, docs/setup-questions.md §6)
+F. the `testFiles` row lists `jest {files}` beyond the card's examples (harmless)
+G. the test-mode explanation table in questions.md may overlap T-M2-13/14 (`saf choices --group`) — decide which is the source of truth
