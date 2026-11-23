@@ -1,12 +1,33 @@
 {
   "name": "super-agent-framework",
   "version": "0.1.0",
-  "description": "SAF \u2014 a card-and-milestone workflow for Claude Code: roles, gates, evidence and a setup interview for any project",
+  "description": "A card-and-milestone workflow for Claude Code: proof before \"done\", a reviewer that is not the builder, and plans that big work cannot drift from.",
+  "keywords": [
+    "claude",
+    "claude-code",
+    "ai-agents",
+    "agentic-workflow",
+    "workflow",
+    "milestones",
+    "tdd",
+    "code-review",
+    "developer-tools",
+    "cli"
+  ],
+  "homepage": "https://github.com/Bellero-Advanced/super-agent-framework#readme",
+  "bugs": {
+    "url": "https://github.com/Bellero-Advanced/super-agent-framework/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bellero-Advanced/super-agent-framework.git"
+  },
+  "license": "MIT",
+  "author": "Bellero Advanced",
   "type": "module",
-  "private": true,
   "bin": {
-    "super-agent-framework": "bin/cli.mjs",
-    "saf": "bin/cli.mjs"
+    "saf": "bin/cli.mjs",
+    "super-agent-framework": "bin/cli.mjs"
   },
   "files": [
     "bin/",
@@ -15,7 +36,7 @@
     "README.md",
     "README.th.md",
     "CHANGELOG.md",
-    "docs/"
+    "LICENSE"
   ],
   "engines": {
     "node": ">=20"
@@ -23,7 +44,7 @@
   "scripts": {
     "test": "node scripts/test.mjs",
     "test:unit": "node scripts/test.mjs unit",
-    "test:e2e": "node scripts/test.mjs e2e"
-  },
-  "license": "MIT"
+    "test:e2e": "node scripts/test.mjs e2e",
+    "test:package": "node scripts/test.mjs package"
+  }
 }

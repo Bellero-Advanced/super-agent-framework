@@ -1,0 +1,16 @@
+{
+  "name": "create-saf",
+  "version": "0.1.0",
+  "description": "Set up SAF (Super Agent Framework) in a project: npx create-saf · npm create saf",
+  "keywords": ["claude", "claude-code", "ai-agents", "create", "scaffold", "workflow"],
+  "homepage": "https://github.com/Bellero-Advanced/super-agent-framework#readme",
+  "bugs": { "url": "https://github.com/Bellero-Advanced/super-agent-framework/issues" },
+  "repository": { "type": "git", "url": "git+https://github.com/Bellero-Advanced/super-agent-framework.git", "directory": "packages/create-saf" },
+  "license": "MIT",
+  "author": "Bellero Advanced",
+  "type": "module",
+  "bin": { "create-saf": "index.mjs" },
+  "files": ["index.mjs", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "dependencies": { "super-agent-framework": "0.1.0" }
+}

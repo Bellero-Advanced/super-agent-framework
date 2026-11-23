@@ -6,13 +6,16 @@ import { init, kitVersion, upgrade } from "../src/install.mjs";
 const HELP = `SAF — Super Agent Framework
 
 usage:
-  super-agent-framework init [--dir <path>] [--answers <file.json>] [--adopt | --no-adopt]
-  super-agent-framework upgrade [--dir <path>]
-  super-agent-framework version
+  saf init [--dir <path>] [--answers <file.json>] [--adopt | --no-adopt]
+  saf upgrade [--dir <path>]
+  saf version
+
+  (npx create-saf [dir] and npm create saf run "saf init")
 
 init      copy the SAF engine (tools/saf/) and the /saf-setup skill into the project, then
           open \`claude\` and type /saf-setup — or pass --answers to set up without the interview
-upgrade   replace the vendored engine and the setup skill; project content is not touched
+upgrade   replace the vendored engine and the setup skill, refresh the /saf commands and skills
+          SAF ships (unless edited); project docs and the plan are not touched
 `;
 
 const argv = process.argv.slice(2).filter((a) => a !== "--");

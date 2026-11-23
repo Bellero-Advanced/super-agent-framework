@@ -3,7 +3,7 @@
  * Test runner that works the same on every OS: lists the test files itself (no shell globbing — cmd.exe does not expand
  * `*`) and hands them to `node --test`.
  *
- *   node scripts/test.mjs            unit + e2e
+ *   node scripts/test.mjs            unit + e2e + package
  *   node scripts/test.mjs unit       one suite (unit · e2e · package)
  */
 import { spawnSync } from "node:child_process";
@@ -12,7 +12,7 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
-const suites = process.argv.slice(2).length ? process.argv.slice(2) : ["unit", "e2e"];
+const suites = process.argv.slice(2).length ? process.argv.slice(2) : ["unit", "e2e", "package"];
 const files = suites.flatMap((s) =>
   readdirSync(join(ROOT, "test", s))
     .filter((f) => f.endsWith(".test.mjs"))
