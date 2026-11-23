@@ -2,7 +2,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { LANGS, languageFor, notAskedText } from "../lib/choices.mjs";
+import { GROUPS, LANGS, groupText, languageFor, notAskedText } from "../lib/choices.mjs";
 import { CONFIG_FILE, ConfigError, findRoot, loadConfig, scriptCommand, validateConfig } from "../lib/config.mjs";
 import { culpritLines, findCulprit } from "../lib/culprit.mjs";
 import { detectProject } from "../lib/detect.mjs";
@@ -49,7 +49,8 @@ import {
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
  *   setup --answers <file.json> [--adopt|--no-adopt] · detect · config --check · version
- *   choices --not-asked [--lang en|th]     settings the setup interview does not ask, and where to change them (exit 2 usage)
+ *   choices --group <1-8|flow> [--lang en|th]   what each option of an interview group means (exit 2 usage)
+ *   choices --not-asked [--lang en|th]          settings the setup interview does not ask, and where to change them (exit 2 usage)
  *
  * A lone `--` (npm passes arguments after it) is ignored everywhere except `measure`, where it separates the command.
  */
@@ -373,13 +374,15 @@ async function main() {
     }
     case "choices": {
       const rest = [sub, ...more];
-      const li = rest.indexOf("--lang");
-      const lang = li >= 0 ? rest[li + 1] : undefined;
-      if (!rest.includes("--not-asked") || rest.includes("--group") || (li >= 0 && !LANGS.includes(lang))) {
-        err(`usage: choices --not-asked [--lang ${LANGS.join("|")}]`);
+      const value = (flag) => (rest.includes(flag) ? (rest[rest.indexOf(flag) + 1] ?? "") : undefined);
+      const [lang, group] = [value("--lang"), value("--group")];
+      const bad = (lang !== undefined && !LANGS.includes(lang)) || rest.includes("--group") === rest.includes("--not-asked") || (group !== undefined && !GROUPS.map(String).includes(group));
+      if (bad) {
+        err(`usage: choices --group <${GROUPS.join("|")}> [--lang ${LANGS.join("|")}] | choices --not-asked [--lang ${LANGS.join("|")}]`);
         return 2;
       }
-      out(notAskedText(languageFor(process.cwd(), lang)));
+      const chosen = languageFor(process.cwd(), lang);
+      out(group === undefined ? notAskedText(chosen) : groupText(group, chosen));
       return 0;
     }
     case "detect":
