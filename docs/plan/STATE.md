@@ -4,7 +4,7 @@
 
 ## M2 Roadmap: next — cards done 10/18
 
-- In progress: none
+- In progress: **T-M2-12** saf choices --not-asked lists every setting the interview does not ask, and where to change it — started 2026-11-23 20:39 · not verified yet · lane 1 · .claude/worktrees/T-M2-12
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
 
 | Card | Work | Status | Evidence |
@@ -20,7 +20,7 @@
 | [T-M2-09](tasks/M2/T-M2-09.md) | task:culprit finds the card that broke the deferred full suite | ✓ passed | [T-M2-09.json](evidence/T-M2-09.json) · passed 2026-11-23 20:03 (3 commands) · full suite deferred to gate |
 | [T-M2-10](tasks/M2/T-M2-10.md) | /saf-setup asks for the test mode and the docs explain the three modes and task:culprit | ✓ passed | [T-M2-10.json](evidence/T-M2-10.json) · passed 2026-11-23 20:28 (4 commands) · full suite deferred to gate |
 | [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | ✓ passed | [T-M2-11.json](evidence/T-M2-11.json) · passed 2026-11-23 19:17 (4 commands) |
-| [T-M2-12](tasks/M2/T-M2-12.md) | saf choices --not-asked lists every setting the interview does not ask, and where to change it | · not started | – |
+| [T-M2-12](tasks/M2/T-M2-12.md) | saf choices --not-asked lists every setting the interview does not ask, and where to change it | ▶ in progress | [T-M2-12.json](evidence/T-M2-12.json) · started 2026-11-23 20:39 · not verified yet |
 | [T-M2-13](tasks/M2/T-M2-13.md) | saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th | · not started | – |
 | [T-M2-14](tasks/M2/T-M2-14.md) | Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one | · not started | – |
 | [T-M2-15](tasks/M2/T-M2-15.md) | /saf-setup shows the four lines for every option and lists the settings it did not ask before generating | · not started | – |
@@ -38,11 +38,11 @@
 
 ## Latest evidence
 
+- T-M2-12 saf choices --not-asked lists every setting the interview does not ask, and where to change it — started 2026-11-23 20:39 · not verified yet
 - T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate
 - T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved — passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate
 - T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit — passed 2026-11-23 20:28 (4 commands) · full suite deferred to gate
 - T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate
-- T-M2-09 task:culprit finds the card that broke the deferred full suite — passed 2026-11-23 20:03 (3 commands) · full suite deferred to gate
 
 ## Other milestones
 
