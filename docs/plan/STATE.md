@@ -4,14 +4,14 @@
 
 ## M1 v0.1.0 public release — cards done 1/4
 
-- In progress: **T-M1-03** Upload the social preview image — started 2026-11-23 18:58 · not verified yet
-- Next: T-M1-02 Tag v0.1.0 and publish the GitHub release · T-M1-04 Sort the first trial feedback into fixes and roadmap items
+- In progress: none
+- Next: T-M1-02 Tag v0.1.0 and publish the GitHub release · T-M1-03 Upload the social preview image · T-M1-04 Sort the first trial feedback into fixes and roadmap items
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
 | [T-M1-01](tasks/M1/T-M1-01.md) | Publish super-agent-framework and create-saf 0.1.0 to npm | ✓ passed | [T-M1-01.json](evidence/T-M1-01.json) · passed 2026-11-23 18:52 (2 commands) |
 | [T-M1-02](tasks/M1/T-M1-02.md) | Tag v0.1.0 and publish the GitHub release | · not started | – |
-| [T-M1-03](tasks/M1/T-M1-03.md) | Upload the social preview image | ▶ in progress | [T-M1-03.json](evidence/T-M1-03.json) · started 2026-11-23 18:58 · not verified yet |
+| [T-M1-03](tasks/M1/T-M1-03.md) | Upload the social preview image | · not started | – |
 | [T-M1-04](tasks/M1/T-M1-04.md) | Sort the first trial feedback into fixes and roadmap items | · not started | – |
 
 ### Exit gates of M1 (checked with `npm run task:verify -- M1`)
@@ -39,7 +39,6 @@
 
 ## Latest evidence
 
-- T-M1-03 Upload the social preview image — started 2026-11-23 18:58 · not verified yet
 - T-M1-01 Publish super-agent-framework and create-saf 0.1.0 to npm — passed 2026-11-23 18:52 (2 commands)
 - T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
 - T-M0-01 SAF self-checks pass through the real card loop — passed 2026-11-23 17:34 (3 commands)
