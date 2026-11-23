@@ -1,0 +1,48 @@
+{
+  "id": "T-M1-03",
+  "milestone": "M1",
+  "status": "done",
+  "started": {
+    "at": "2026-11-23T19:09:17.961Z",
+    "base": "1620366e85a6904e2cfe24a4567fe7c09279ebbe",
+    "dirty": {}
+  },
+  "attempts": 1,
+  "verified": {
+    "at": "2026-11-23T19:09:19.120Z",
+    "head": "1620366e85a6904e2cfe24a4567fe7c09279ebbe",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node scripts/release-check.mjs social",
+        "exit": 0,
+        "ms": 836,
+        "tail": [
+          "✓ custom social preview uploaded (Settings → General → Social preview)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {}
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 0,
+        "cap": 150
+      },
+      "test": {
+        "lines": 0,
+        "cap": 250
+      },
+      "over": []
+    }
+  }
+}
