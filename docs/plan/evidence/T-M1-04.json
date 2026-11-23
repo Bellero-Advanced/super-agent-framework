@@ -1,0 +1,62 @@
+{
+  "id": "T-M1-04",
+  "milestone": "M1",
+  "status": "done",
+  "started": {
+    "at": "2026-11-23T19:09:27.260Z",
+    "base": "47a15144ebc7d00af2a593915d34d3acbb9fb62b",
+    "dirty": {}
+  },
+  "attempts": 1,
+  "verified": {
+    "at": "2026-11-23T19:09:59.995Z",
+    "head": "47a15144ebc7d00af2a593915d34d3acbb9fb62b",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 322,
+        "tail": [
+          "✓ docs:check passed — 202 markdown file(s) · 57 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 365,
+        "tail": [
+          "✓ check-secrets: <redacted> findings in 394 scanned file(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "ROADMAP.md",
+        "docs/plan/feedback/v0.1.0.md"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "ROADMAP.md": "679c199d0692f2419ba54fabc04e90d42f6ebd17",
+        "docs/plan/feedback/v0.1.0.md": "b29e8a0d5d2c692be9408d5f8cb904900825159c"
+      }
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 12,
+        "cap": 150
+      },
+      "test": {
+        "lines": 0,
+        "cap": 250
+      },
+      "over": []
+    }
+  }
+}

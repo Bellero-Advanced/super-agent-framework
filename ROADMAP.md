@@ -12,6 +12,8 @@ Gates, not dates — an item ships when its tests and docs are done. Ideas and v
 - **Skill packs from the community** — a documented format so a pack can live in its own repository and be picked in setup
 - **Card size check** — `task:verify` reports changed code and test lines against the card's size cap
 - **Evidence viewer** — a static HTML page generated from `docs/plan/evidence/` for people who do not read JSON
+- **Setup suggestions** — during `/saf-setup`, propose ideas for scope and direction, each with its reason, drawn from
+  the owner's own interview answers, before the first milestone is written
 
 ## Later
 
