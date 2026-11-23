@@ -57,6 +57,7 @@ Agents live in `.claude/agents/` (model + effort fixed per role — `{{cmd.docsC
 {{cmd.taskState}}            # rebuild STATE.md + .saf/plan.md (--check = verify only)
 {{cmd.taskProbe}}            # prove a fresh session knows the current card from the hook
 {{cmd.taskReport}}           # milestone report from evidence
+{{cmd.taskCulprit}}          # the exit gate's full suite failed: find the card that broke it (--cmd "<command>" picks the command)
 {{cmd.docsCheck}}            # links · commands · paths in agent docs · agents · settings
 {{cmd.specMatrix}}           # acceptance scenarios ↔ tests (--check = started cards must have tests)
 {{cmd.checkSecrets}}         # no secret values in tracked files

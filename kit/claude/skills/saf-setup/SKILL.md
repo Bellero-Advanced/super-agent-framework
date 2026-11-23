@@ -32,9 +32,14 @@ detection (say what you detected instead):
 3. **Stack** — package manager · confirm the detected commands · database · monorepo / submodules
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model
 5. **Roles and skills** — optional roles (multi-select) · custom role? · report language · optional skill packs (multi-select)
-6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · measure lock · performance budgets file
+6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · **test mode** (how often the full suite runs — show the pros/cons table of [questions.md](questions.md#test-mode--explain-each-choice-before-asking), recommend `milestone`) and the command that runs only some test files · measure lock · performance budgets file
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")
+
+Test mode is also a per-machine choice. When the person says their machine is slow (or fast), offer to write an untracked
+`saf.config.local.json` with only `{ "workflow": { "testMode": "<mode>" } }` — never other keys (the engine refuses
+anything outside `LOCAL_KEYS`, `$schema` included). The installer already git-ignores that file. `SAF_TEST_MODE` does the
+same for one shell. Neither changes generated files.
 
 Free-text answers (name, pitch, users, goal, paths, services): ask them in one plain message per group, listing what you
 already know, instead of forcing them into options.

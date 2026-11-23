@@ -28,6 +28,11 @@
 การ์ด **เสร็จ** เมื่อ `task:verify` ผ่านเท่านั้น · ไม่ผ่าน = การ์ดยังเปิดและบันทึกเหตุผล (คำสั่งที่ล้ม · ไฟล์นอก `touch` ·
 ไฟล์ใน `dont_touch` · ฉากที่ไม่มี test)
 
+ความถี่ที่ test **ทั้งชุด** รันคือ `workflow.testMode` (`every-card` · `targeted` · `milestone` · ค่าเริ่มต้น `milestone`) ·
+ในโหมดที่เลื่อน การ์ดพิสูจน์ตัวเองด้วย test ของมันเอง หลักฐานจะมีคำว่า "full suite deferred to gate" (เลื่อนไปที่ประตู) และประตูออก
+milestone รัน test ทั้งชุดเสมอ (ถ้าล้ม `{{cmd.taskCulprit}}` หาการ์ดที่ทำให้ล้ม) · แต่ละคนเปลี่ยนโหมดในเครื่องตัวเองได้ด้วย `SAF_TEST_MODE` หรือไฟล์ `saf.config.local.json`
+ที่ git ไม่ track (ใส่ได้เฉพาะ `workflow.testMode` · key `$schema` ในไฟล์นี้ถูกปฏิเสธ)
+
 ## 2. รูปแบบการ์ด
 
 คัดลอก [tasks/_template.md](tasks/_template.md) · ช่องใน frontmatter:
@@ -93,6 +98,7 @@ git worktree ของตัวเองใต้ `{{workflow.worktreeDir}}/` �
 - ในสาย: ทำงาน แล้ว `{{cmd.taskVerify}}` (เขียนหลักฐานบน branch ของสายเท่านั้น) · `{{cmd.taskEnv}}` บอกพอร์ตของสาย
 - กลับโฟลเดอร์หลัก: `{{cmd.taskMerge}}` รวมทีละใบ รันตรวจตอนรวม ({{mergeChecksText}}) แล้วสร้างสถานะใหม่ ·
   exit 3 = ปฏิเสธ (ยังไม่ผ่าน / โฟลเดอร์หลักไม่สะอาด) · 4 = ชน (ย้อนการรวมแล้ว) · 5 = ตรวจตอนรวมล้ม (ย้อนการรวมแล้ว)
+- เมื่อ `workflow.testMode` = `milestone` การตรวจตอนรวมข้าม test ทั้งชุด (ประตูออกเป็นคนรัน) · ถ้าประตูล้ม `{{cmd.taskCulprit}}` หาการ์ดที่ทำให้ล้ม
 {{/if}}
 {{#if measureOn}}
 

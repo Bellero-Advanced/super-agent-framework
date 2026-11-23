@@ -110,6 +110,36 @@ side_cards: [T-M3-01]          # must also be in cards
   milestone becomes active.
 - **Heavy runs** of a side lane (e2e, perf) go through the same measure lock as everything else.
 
+## Test mode
+
+`workflow.testMode` decides how often the **full** test suite runs ([spec](specs/test-mode.md#2-rules)). A card never
+passes without a real test run when its "Done when" names one; the mode only moves the full run to a later step.
+
+| Mode | Main-folder card verify | Lane card verify | `task:merge` | Milestone exit gate |
+|---|---|---|---|---|
+| `every-card` | all criteria | all criteria | all merge checks | gates as written |
+| `targeted` | all criteria | full suite deferred, targeted run instead | all merge checks | gates as written |
+| `milestone` (default) | full suite deferred, targeted run instead | full suite deferred, targeted run instead | merge checks without the full suite | gates plus the full suite |
+
+- **What a deferred card carries.** The card's own tests (the test files it changed and the files that name its scenarios,
+  run with `stack.commands.testFiles`) run instead of the full suite. Its evidence records the mode and where it came from,
+  the commands not run and the files tested, and every place the result appears says "full suite deferred to gate". With no
+  `testFiles` command or no targeted files, nothing is deferred: the full suite runs and the evidence says why.
+- **The gate always runs the full suite.** In `milestone` mode `task:verify <M>` adds a `full-suite` gate for any full-suite
+  command the declared gates do not run (the id `full-suite` is reserved). Whoever runs the gate, in whatever mode, the
+  suite runs.
+- **When the gate fails**, `task:culprit <M>` finds the card: it tests the milestone's committed history in a temporary
+  worktree (binary search, the main folder is never touched, nothing is written in `docs/plan/`) and names the card and commit.
+  Exit **0** found · **2** already failing before the first card · **3** passes at HEAD (flaky, or already fixed) · **1** error
+  (for example no card of the milestone has started). `--cmd "<command>"` picks another command.
+- **Per machine.** Pick a mode for your own machine without touching tracked files: `SAF_TEST_MODE=<mode>` for one shell, or an
+  untracked `saf.config.local.json` holding only `workflow.testMode` ([config-reference.md](config-reference.md#safconfiglocaljson)).
+  Order: env, local file, `saf.config.json`, default. Generated files never depend on either.
+
+Which mode to pick (what it is, good for, cost, pick when) is in the setup question:
+[questions.md](../kit/claude/skills/saf-setup/questions.md#test-mode--explain-each-choice-before-asking). This repo itself
+uses `targeted`, because its cards change the engine that writes the evidence.
+
 ## Measure lock
 
 `measure <name> -- <command>` runs heavy commands (full test suite, e2e, perf) one at a time per machine, across all

@@ -27,6 +27,7 @@ validates; every engine command validates on load. Missing keys get the defaults
 |---|---|---|
 | `packageManager` | `npm` | pnpm · npm · yarn · bun · none — decides how every command is written |
 | `commands.typecheck/lint/test/e2e/build` | "" | the project checks; only commands whose scripts exist are used |
+| `commands.testFiles` | "" | runs only some test files; `{files}` becomes the quoted file paths (`node --test {files}` · `vitest run {files}` · `pytest {files}`); empty = cards fall back to the full suite |
 | `database` · `monorepo` · `submodules` · `summary` | none · false · false · "" | `database` ≠ none adds the database rule |
 
 ## models · roles
@@ -59,6 +60,20 @@ See [model-presets.md](model-presets.md) and [roles.md](roles.md): `models.prese
 | `perfBudgets` | "" | path shown to qa-runner |
 | `alwaysAllowed` | [] | extra globs never counted as card changes |
 | `commandTimeoutMs` | 30 min | per criteria command |
+| `testMode` | `milestone` | how often the full test suite runs: `every-card` · `targeted` · `milestone` — [card-lifecycle.md](card-lifecycle.md#test-mode); a person can override it, see [`saf.config.local.json`](#safconfiglocaljson) |
+
+## `saf.config.local.json`
+
+An optional file in the project root, **not tracked by git** (the installer adds it to `.gitignore`), for choices that belong
+to one machine. Today it may hold only `workflow.testMode`:
+
+```json
+{ "workflow": { "testMode": "every-card" } }
+```
+
+Any other key is an error that names the key — including `$schema`, so leave it out. The file is checked with the same schema
+as `saf.config.json`. The test mode is the first source that sets it: environment variable `SAF_TEST_MODE` → this file →
+`saf.config.json` → the default. Only engine runs (`task:*`) read it; generated files never do.
 
 ## policies
 

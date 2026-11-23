@@ -28,6 +28,11 @@ owner says Go on a milestone
 A card is **done** only when `task:verify` passes. A failed verify keeps the card open and records why (failed commands ·
 files outside `touch` · files in `dont_touch` · scenarios without a test).
 
+How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default `milestone`).
+In the deferred modes a card proves itself with its own tests, its evidence says "full suite deferred to gate", and the
+milestone exit gate always runs the full suite (when it fails, `npm run task:culprit -- <M>` finds the card that broke it). Each person can override the mode with `SAF_TEST_MODE` or an untracked
+`saf.config.local.json` (only `workflow.testMode`; a `$schema` key there is refused).
+
 ## 2. Card format
 
 Copy [tasks/_template.md](tasks/_template.md). Frontmatter fields:
@@ -92,6 +97,8 @@ Other cards run in the main folder, one at a time.
 - inside the lane: work, then `npm run task:verify -- <id>` (writes evidence on the lane branch only) · `npm run task:env` prints the lane's ports
 - back in the main folder: `npm run task:merge -- <id>` merges one card, runs the merge checks (`npm test` · `npm run check-secrets` · `npm run docs:check`) and refreshes status.
   Exit 3 = refused (not passed / dirty main) · 4 = conflict (merge rolled back) · 5 = merge checks failed (merge rolled back)
+- with `workflow.testMode` = `milestone` the merge checks skip the full test suite (the gate runs it); when the gate fails,
+  `npm run task:culprit -- <M>` finds the card that broke it
 
 ## 7. Evidence rules
 
