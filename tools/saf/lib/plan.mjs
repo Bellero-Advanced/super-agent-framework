@@ -353,6 +353,15 @@ function gateMark(plan, m, g) {
   return r.pass ? t.gatePass(timeOf(plan, ev.verified.at)) : t.gateFail;
 }
 
+/** Rules 29-30: the gates of the milestone evidence that the milestone file does not declare, in evidence order (no evidence = none). */
+export function undeclaredGates(plan, m) {
+  const t = T(plan);
+  const declared = new Set(m.gates.map((g) => g.id));
+  return (plan.gateEvidence.get(m.id)?.verified?.gates ?? [])
+    .filter((g) => !declared.has(g.id))
+    .map((g) => ({ id: g.id, text: g.id === FULL_SUITE_GATE.id ? t.fullSuiteGate : t.undeclaredGate, pass: g.pass ?? null }));
+}
+
 /** Heading · in progress · next · card table for `m.cards` (the active milestone, or one milestone's side cards). */
 function stateBlock(plan, m, heading, side = false) {
   const t = T(plan);
@@ -385,9 +394,12 @@ export function renderState(plan) {
     out.push(t.noActive, "");
   } else {
     out.push(...stateBlock(plan, m, `${m.id} ${m.title}`));
-    if (m.gates.length) {
+    const extra = undeclaredGates(plan, m);
+    if (m.gates.length || extra.length) {
       out.push("", t.gatesTitle(m.id, c("task:verify", m.id)), "", t.gatesTable, "|---|---|---|");
       for (const g of m.gates) out.push(`| ${g.id} | ${cell(g.text)} | ${gateMark(plan, m, g)} |`);
+      const at = plan.gateEvidence.get(m.id)?.verified?.at;
+      for (const g of extra) out.push(`| ${g.id} | ${cell(g.text)} | ${g.pass === null ? t.gateManual : g.pass ? t.gatePass(timeOf(plan, at)) : t.gateFail} |`);
     }
     out.push("");
   }
@@ -426,6 +438,7 @@ export function renderMirror(plan) {
     const r = plan.gateEvidence.get(m.id)?.verified.gates.find((x) => x.id === g.id);
     out.push(`- [${r?.pass ? "x" : " "}] ${g.id} ${g.text}${g.run.length ? "" : t.manualSuffix}`);
   }
+  for (const g of undeclaredGates(plan, m)) out.push(`- [${g.pass ? "x" : " "}] ${g.id} ${g.text}`);
   const tasks = (x, ids) => {
     for (const id of ids) {
       const s = cardStatus(plan, id);
