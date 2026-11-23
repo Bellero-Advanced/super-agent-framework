@@ -190,3 +190,77 @@ test("SETUP-AC-06 choices --group prints every entry of groups 5-8 and flow in b
     }
   }
 });
+
+const read = (...p) => readFileSync(join(REPO, ...p), "utf8");
+const lines = (text) => text.split(/\r?\n/);
+/** GitHub heading anchor: lowercase, punctuation dropped (letters, digits, `-`, `_` stay), spaces to `-`; repeated headings get `-1`, `-2`. */
+const slug = (heading) => heading.toLowerCase().replace(/[^\p{L}\p{N}\p{M} _-]/gu, "").replace(/ /g, "-");
+/** `## ` sections of a markdown file outside code fences: heading text, GitHub anchor and body. */
+function sections(text) {
+  const out = [];
+  const seen = new Map();
+  let fenced = false;
+  for (const line of lines(text)) {
+    if (line.startsWith("```")) fenced = !fenced;
+    const h = !fenced && /^#{1,6} (.+)$/.exec(line);
+    if (h) {
+      const base = slug(h[1].trim());
+      const n = seen.get(base) ?? 0;
+      seen.set(base, n + 1);
+      out.push({ level: h[0].indexOf(" "), heading: h[1], anchor: n ? `${base}-${n}` : base, body: [] });
+    } else out.at(-1)?.body.push(line);
+  }
+  return out.map((s) => ({ ...s, body: s.body.join("\n") }));
+}
+/** Text of one `## Step n` of the skill, up to the next `## `. */
+const step = (skill, n) => sections(skill).find((s) => s.heading.startsWith(`Step ${n}`))?.body ?? "";
+
+test("SETUP-AC-07 config-reference names every schema leaf in the section of its top-level key, and every printed anchor is a lowercase heading anchor", () => {
+  const sec = sections(read("docs", "config-reference.md")).filter((s) => s.level === 2);
+  assert.equal(slug("`saf.config.local.json`"), "safconfiglocaljson");
+  assert.equal(slug("tokenSaving · firstMilestone"), "tokensaving--firstmilestone", "the helper follows GitHub: a dropped middle dot leaves two hyphens");
+  const problems = [];
+  for (const leaf of schemaLeaves(loadSchema()).filter((k) => !INTERNAL_KEYS.includes(k))) {
+    const [top, ...rest] = leaf.split(".");
+    const body = sec.find((s) => s.anchor === top.toLowerCase())?.body;
+    if (body === undefined) problems.push(`${leaf}: no section "${top.toLowerCase()}"`);
+    else if (![...body.matchAll(/`([^`]+)`/g)].some((m) => m[1] === rest.at(-1))) problems.push(`${leaf}: \`${rest.at(-1)}\` not named in backticks`);
+  }
+  assert.deepEqual(problems, []);
+  const anchors = new Set(sec.map((s) => s.anchor));
+  for (const lang of ["en", "th"]) {
+    const printed = [...run(tmp(), "--not-asked", "--lang", lang).stdout.matchAll(/ · (https:\/\/\S+)/g)].map((m) => m[1]);
+    assert.equal(printed.length, Object.keys(NOT_ASKED).length);
+    for (const url of printed) {
+      const [base, anchor] = url.split("#");
+      assert.equal(base, DOCS_URL);
+      assert.equal(anchor, anchor.toLowerCase(), `${url} is lowercase`);
+      assert.ok(anchors.has(anchor), `${url}: no heading with this anchor`);
+    }
+  }
+});
+
+test("SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2", () => {
+  const skill = read("kit", "claude", "skills", "saf-setup", "SKILL.md");
+  const one = step(skill, 1);
+  assert.ok(one.includes("node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>"));
+  assert.ok(/pick it when/i.test(one) && /option · what it is · good for · cost · pick it when/.test(one), "the compact table and the description line");
+  assert.ok(/offer[^\n]*only (when|if) (the person|they|asked)/i.test(one.replace(/\s+/g, " ")), "skipped questions explain only on request");
+  const two = step(skill, 2);
+  assert.ok(two.includes("node tools/saf/bin/saf.mjs choices --not-asked --lang <chat language>"));
+  for (const option of ["Generate (recommended)", "Change an answer", "Adjust a setting that was not asked"]) assert.ok(two.includes(option), option);
+  assert.ok(two.includes(".saf/setup-answers.json"));
+});
+
+test("SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables", () => {
+  const skill = read("kit", "claude", "skills", "saf-setup", "SKILL.md");
+  const one = step(skill, 1).replace(/\s+/g, " ");
+  assert.ok(/adopt: true/.test(one) && /keep the old docs as history/.test(one) && one.includes("choices --group flow"));
+  assert.ok(/new project[^.]*skip/i.test(one), "a new project skips the question and says so");
+  const three = step(skill, 3).replace(/\s+/g, " ");
+  assert.ok(three.includes("--adopt") && three.includes("--no-adopt") && /exactly one/.test(three));
+  assert.ok(/--adopt[^\n]*yes/i.test(three) && /--no-adopt[^\n]*(no|skipped)/i.test(three));
+  const flow = sections(read("kit", "claude", "skills", "saf-setup", "questions.md")).find((s) => /^Setup flow/.test(s.heading));
+  assert.ok(flow && !/^\|/m.test(flow.body), "a list, not a table");
+  assert.ok(/adopt[^\n]*recommended[^\n]*yes/i.test(flow.body) && /commit[^\n]*recommended[^\n]*yes/i.test(flow.body));
+});

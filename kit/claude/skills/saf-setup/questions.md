@@ -1,6 +1,8 @@
 # SAF setup questions
 
 Every question, the `saf.config.json` key it sets, the options, and the recommended default.
+What each option means (what it is · good for · cost · pick it when) is not here: it comes from
+`node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>` (SKILL.md, Step 1).
 "detected" = from `node tools/saf/bin/saf.mjs detect`.
 
 ## 1. Language and people
@@ -132,6 +134,13 @@ Always on (not asked): no time estimates — gates, not dates · "done" needs re
 
 M0 (the setup gate) is always created and active. M1 is created as `planned` from the goal; the designer fills its cards;
 work starts when the user says Go.
+
+## Setup flow
+
+Not config keys (no Key column): these change what `setup` and the first commit do.
+
+- Keep the old docs as history (`adopt`) — asked only for an existing project (`detect` reports `adopt: true`) that is not a re-run. Options: yes · no. Recommended: yes. Step 3 passes `--adopt` for yes and `--no-adopt` for no or a skipped question.
+- Commit the setup locally now (`commit`) — Options: yes · no. Recommended: yes. Never push.
 
 ## Example answers file
 

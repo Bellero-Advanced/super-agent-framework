@@ -278,7 +278,7 @@ export function languageFor(cwd, lang) {
 /** Output of `choices --not-asked`: every NOT_ASKED key with its summary and link, then the per-machine block. */
 export function notAskedText(lang) {
   const L = LABELS[lang];
-  const keys = Object.entries(NOT_ASKED).map(([k, v]) => `  ${k} — ${v[lang]} · ${DOCS_URL}#${k.split(".")[0]}`);
+  const keys = Object.entries(NOT_ASKED).map(([k, v]) => `  ${k} — ${v[lang]} · ${DOCS_URL}#${k.split(".")[0].toLowerCase()}`);
   const machine = Object.entries(MACHINE_SWITCHES).map(([k, v]) => `  ${k} — ${v[lang]}`);
   return [`${L.head}\n${L.where}`, ...keys, "", `${L.machine}:`, ...machine].join("\n");
 }
