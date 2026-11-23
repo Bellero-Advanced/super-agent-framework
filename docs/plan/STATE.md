@@ -2,9 +2,9 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 12/18
+## M2 Roadmap: next — cards done 13/18
 
-- In progress: **T-M2-14** Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one — started 2026-11-23 21:02 · not verified yet · lane 1 · .claude/worktrees/T-M2-14
+- In progress: none
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
 
 | Card | Work | Status | Evidence |
@@ -22,7 +22,7 @@
 | [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | ✓ passed | [T-M2-11.json](evidence/T-M2-11.json) · passed 2026-11-23 19:17 (4 commands) |
 | [T-M2-12](tasks/M2/T-M2-12.md) | saf choices --not-asked lists every setting the interview does not ask, and where to change it | ✓ passed | [T-M2-12.json](evidence/T-M2-12.json) · passed 2026-11-23 20:48 (4 commands) · full suite deferred to gate |
 | [T-M2-13](tasks/M2/T-M2-13.md) | saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th | ✓ passed | [T-M2-13.json](evidence/T-M2-13.json) · passed 2026-11-23 21:00 (5 commands) · full suite deferred to gate |
-| [T-M2-14](tasks/M2/T-M2-14.md) | Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one | ▶ in progress | [T-M2-14.json](evidence/T-M2-14.json) · started 2026-11-23 21:02 · not verified yet |
+| [T-M2-14](tasks/M2/T-M2-14.md) | Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one | ✓ passed | [T-M2-14.json](evidence/T-M2-14.json) · passed 2026-11-23 21:18 (5 commands) · full suite deferred to gate |
 | [T-M2-15](tasks/M2/T-M2-15.md) | /saf-setup shows the four lines for every option and lists the settings it did not ask before generating | · not started | – |
 | [T-M2-16](tasks/M2/T-M2-16.md) | The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved | ✓ passed | [T-M2-16.json](evidence/T-M2-16.json) · passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate |
 | [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | ✓ passed | [T-M2-17.json](evidence/T-M2-17.json) · passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate |
@@ -38,7 +38,7 @@
 
 ## Latest evidence
 
-- T-M2-14 Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one — started 2026-11-23 21:02 · not verified yet
+- T-M2-14 Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one — passed 2026-11-23 21:18 (5 commands) · full suite deferred to gate
 - T-M2-13 saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th — passed 2026-11-23 21:00 (5 commands) · full suite deferred to gate
 - T-M2-12 saf choices --not-asked lists every setting the interview does not ask, and where to change it — passed 2026-11-23 20:48 (4 commands) · full suite deferred to gate
 - T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate

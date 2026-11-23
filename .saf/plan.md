@@ -69,7 +69,7 @@ interview that explains every option and shows every setting it does not ask.
 - [x] T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again) — passed 2026-11-23 19:17 (4 commands)
 - [x] T-M2-12 saf choices --not-asked lists every setting the interview does not ask, and where to change it — passed 2026-11-23 20:48 (4 commands) · full suite deferred to gate
 - [x] T-M2-13 saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th — passed 2026-11-23 21:00 (5 commands) · full suite deferred to gate
-- [ ] T-M2-14 Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one — started 2026-11-23 21:02 · not verified yet · lane 1 · .claude/worktrees/T-M2-14
+- [x] T-M2-14 Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one — passed 2026-11-23 21:18 (5 commands) · full suite deferred to gate
 - [ ] T-M2-15 /saf-setup shows the four lines for every option and lists the settings it did not ask before generating
 - [x] T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved — passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate
 - [x] T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate

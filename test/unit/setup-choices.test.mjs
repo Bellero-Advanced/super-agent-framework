@@ -156,11 +156,37 @@ test("SETUP-AC-05 every explanation has four short fields in en and th, no numbe
       }
     }
   }
-  for (const q of QUESTIONS.filter((x) => [1, 2, 3, 4].includes(x.group))) {
-    const entries = entriesOf(q.id);
-    if (q.kind === "identity") assert.equal(entries.length, 0, q.id);
-    else if (q.kind === "value") assert.deepEqual(entries.map((e) => e.values), [[]], `${q.id}: exactly one entry`);
-    else assert.deepEqual(entries.flatMap((e) => e.values).sort(), [...q.options].sort(), `${q.id}: every option covered exactly once`);
+  for (const q of QUESTIONS.filter((x) => entriesOf(x.id).length && x.kind === "choice")) {
+    assert.deepEqual(entriesOf(q.id).flatMap((e) => e.values).sort(), [...q.options].sort(), `${q.id}: every option covered exactly once`);
   }
   assert.deepEqual(CHOICES.filter((e) => !QUESTIONS.some((q) => q.id === e.question)), []);
+});
+
+test("SETUP-AC-06 every choice question of every group has entries for all its values, every value question exactly one, identity none, and the flow group is adopt and commit", () => {
+  for (const q of QUESTIONS) {
+    const entries = entriesOf(q.id);
+    if (q.kind === "identity") assert.equal(entries.length, 0, `${q.id}: identity has no explanation`);
+    else if (q.kind === "value") assert.deepEqual(entries.map((e) => e.values), [[]], `${q.id}: exactly one entry`);
+    else {
+      assert.ok(Array.isArray(q.options) && q.options.length, `${q.id}: choice question lists its options`);
+      assert.deepEqual(entries.flatMap((e) => e.values).sort(), [...q.options].sort(), `${q.id}: every option covered exactly once`);
+    }
+  }
+  const flow = QUESTIONS.filter((q) => q.group === "flow");
+  assert.deepEqual(flow.map((q) => [q.id, q.kind, q.keys]), [["adopt", "choice", []], ["commit", "choice", []]]);
+  for (const g of GROUPS) assert.ok(QUESTIONS.some((q) => String(q.group) === String(g) && entriesOf(q.id).length), `group ${g} explains at least one question`);
+});
+
+test("SETUP-AC-06 choices --group prints every entry of groups 5-8 and flow in both languages", () => {
+  const root = tmp();
+  for (const lang of ["en", "th"]) {
+    assert.ok(/^## adopt$/m.test(run(root, "--group", "flow", "--lang", lang).stdout) && /^## commit$/m.test(run(root, "--group", "flow", "--lang", lang).stdout), "flow questions are named");
+    for (const g of [5, 6, 7, 8, "flow"]) {
+      const r = run(root, "--group", String(g), "--lang", lang);
+      assert.equal(r.status, 0, r.stderr);
+      for (const q of QUESTIONS.filter((x) => String(x.group) === String(g) && x.kind !== "identity")) {
+        for (const e of entriesOf(q.id)) for (const f of TEXT_FIELDS) assert.ok(r.stdout.includes(e[lang][f]), `${g} ${lang} ${q.id} ${e.values} ${f}`);
+      }
+    }
+  }
 });
