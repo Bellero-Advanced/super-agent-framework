@@ -1,14 +1,143 @@
 {
   "id": "T-M2-15",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T21:23:24.140Z",
     "base": "0ee8c4134540038918126351db35939bcfa16521",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-15",
-  "worktree": ".claude/worktrees/T-M2-15"
+  "worktree": ".claude/worktrees/T-M2-15",
+  "verified": {
+    "at": "2026-11-23T21:32:02.558Z",
+    "head": "6e09a7e5b97780c85afeb6fdb66328d95c8e75fb",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 318,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "32 scenario(s) in 3 spec(s) · with test 31 · gaps 1 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/claude/skills/saf-setup/SKILL.md','utf8');if(!s.includes('choices --group')||!s.includes('choices --not-asked')||!s.includes('--no-adopt'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 42,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 282,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 214 markdown file(s) · 99 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-choices.test.mjs'",
+        "exit": 0,
+        "ms": 2399,
+        "tail": [
+          "ok 12 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 0.751083",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 13 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 0.82025",
+          "  type: 'test'",
+          "  ...",
+          "1..13",
+          "# tests 13",
+          "# suites 0",
+          "# pass 13",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2340.074375"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/config-reference.md",
+        "docs/setup-questions.md",
+        "kit/claude/skills/saf-setup/SKILL.md",
+        "kit/claude/skills/saf-setup/questions.md",
+        "kit/tools-saf/lib/choices.mjs",
+        "test/unit/setup-choices.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/config-reference.md": "a348a267190e473b07cf115624d1612a8d0d23e0",
+        "docs/setup-questions.md": "0532688bb70674780062c747edca60ce8b574916",
+        "kit/claude/skills/saf-setup/SKILL.md": "2c0863bec340ded3a6b5f7d9c8dda6a6c780f376",
+        "kit/claude/skills/saf-setup/questions.md": "c527d09e610e4adf73befd61325f0cd4e9ce14f1",
+        "kit/tools-saf/lib/choices.mjs": "41c31097e6870cb1dbaa24de6bed5cfd26cf4972",
+        "test/unit/setup-choices.test.mjs": "fb46be973185bbe330446c955af168b3d663e9d7"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-07",
+        "SETUP-AC-08",
+        "SETUP-AC-09"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 126,
+        "cap": 150
+      },
+      "test": {
+        "lines": 74,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-choices.test.mjs"
+      ]
+    }
+  }
 }

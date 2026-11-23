@@ -26,14 +26,30 @@ validates; every engine command validates on load. Missing keys get the defaults
 | Key | Default | Notes |
 |---|---|---|
 | `packageManager` | `npm` | pnpm · npm · yarn · bun · none — decides how every command is written |
-| `commands.typecheck/lint/test/e2e/build` | "" | the project checks; only commands whose scripts exist are used |
-| `commands.testFiles` | "" | runs only some test files; `{files}` becomes the quoted file paths (`node --test {files}` · `vitest run {files}` · `pytest {files}`); empty = cards fall back to the full suite |
+| `commands`: `typecheck` · `lint` · `test` · `e2e` · `build` | "" | the project checks; only commands whose scripts exist are used |
+| `commands`: `testFiles` | "" | runs only some test files; `{files}` becomes the quoted file paths (`node --test {files}` · `vitest run {files}` · `pytest {files}`); empty = cards fall back to the full suite |
 | `database` · `monorepo` · `submodules` · `summary` | none · false · false · "" | `database` ≠ none adds the database rule |
 
-## models · roles
+## models
 
-See [model-presets.md](model-presets.md) and [roles.md](roles.md): `models.preset/planner/builder/sessionDefault/overrides`,
-`roles.enabled/custom/reportLanguage`.
+See [model-presets.md](model-presets.md).
+
+| Key | Default | Notes |
+|---|---|---|
+| `preset` | `balanced` | max · balanced · economy · custom — picks the planner and builder models |
+| `planner` · `builder` | from the preset | full model ids; a non-empty value replaces the preset's model for every preset, and `custom` has no models of its own |
+| `sessionDefault` | the builder model | the model the generated CLAUDE.md tells a session opened without `--model` to start with; nothing enforces it |
+| `overrides` | {} | per role, `{ "<role>": { "model": …, "effort": … } }` — e.g. `{"qa-runner": {"effort": "low"}}`; not asked by the interview |
+
+## roles
+
+See [roles.md](roles.md).
+
+| Key | Default | Notes |
+|---|---|---|
+| `enabled` | the core roles | optional library roles to add; the core roles are always on |
+| `custom` | [] | your own roles, each with `name` and `description` |
+| `reportLanguage` | `en` | `en` or `th`; the language agents report in |
 
 ## skills
 
@@ -47,19 +63,23 @@ See [model-presets.md](model-presets.md) and [roles.md](roles.md): `models.prese
 |---|---|---|
 | `sizes` · `testCaps` | from rigor | `{ "S": 150, "M": 400 }` changed code lines |
 | `review` | from rigor | m-cards · every-card · every-card+security |
-| `worktrees` · `lanes` | true · `{ code: 3, main: 1 }` | parallel lanes; with worktrees off all cards run in the main folder |
-| `sideLanes` | `{ enabled: true, max: 1 }` | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` in progress at once — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
+| `worktrees` | true | parallel lanes; with worktrees off all cards run in the main folder |
+| `lanes`: `code` · `main` | 3 · 1 | how many cards may run at once in the code lane and in the main lane |
+| `sideLanes`: `enabled` · `max` | true · 1 | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` in progress at once — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
 | `worktreeDir` · `branchPrefix` | `.claude/worktrees` · `card/` | |
 | `solo` | [] | globs whose cards run alone in the code lane (e.g. migrations) |
 | `laneInstall` | from the package manager | run in a new lane (`npm ci`, `pnpm install --frozen-lockfile`, …) |
-| `lanePorts` | `{ base: 3000, step: 10, env: ["PORT"] }` | `task:env` exports `PORT=base+step×lane` |
+| `lanePorts`: `base` · `step` · `env` | 3000 · 10 · `["PORT"]` | `task:env` exports each variable named in `env` as `base+step×lane` (`PORT=base+step×lane` by default) |
 | `laneDb` | "" | test database pattern, `{n}` = lane, `{name}` = project name |
 | `mergeChecks` | from rigor + check-secrets + docs:check | commands `task:merge` runs before committing |
 | `mergeInstall` | from the package manager | `{ cmd, files }` — reinstall when these files change in a merge |
-| `measure` | enabled, 20 min wait, 0.5 load/core | `names`: `{ test: {idle:false}, e2e: …, perf: {idle:true}, adhoc: … }` |
+| `measure`: `enabled` | true | the measure lock: one measured command at a time across every worktree |
+| `measure`: `waitMs` | 1200000 (20 min) | how long a command waits for the lock or a quiet machine before it gives up with exit 75 |
+| `measure`: `maxLoadPerCore` | 0.5 | a command whose name has `idle: true` starts only when the machine load per core is at or under this |
+| `measure`: `names` | `{ test: {idle:false}, e2e: {idle:false}, perf: {idle:true}, adhoc: {idle:true} }` | the command names the lock knows; `idle: true` also waits for a quiet machine |
 | `perfBudgets` | "" | path shown to qa-runner |
 | `alwaysAllowed` | [] | extra globs never counted as card changes |
-| `commandTimeoutMs` | 30 min | per criteria command |
+| `commandTimeoutMs` | 1800000 (30 min) | time limit for each command of card verify, merge checks and culprit runs |
 | `testMode` | `milestone` | how often the full test suite runs: `every-card` · `targeted` · `milestone` — [card-lifecycle.md](card-lifecycle.md#test-mode); a person can override it, see [`saf.config.local.json`](#safconfiglocaljson) |
 
 ## `saf.config.local.json`
@@ -80,15 +100,18 @@ as `saf.config.json`. The test mode is the first source that sets it: environmen
 | Key | Default |
 |---|---|
 | `push` | `owner-order` (or `allowed`) |
-| `deploy` | `{ mode: "owner-order", target: "", exceptions: "" }` (mode `allowed` or `none`) |
+| `deploy`: `mode` · `target` · `exceptions` | `owner-order` · "" · "" (`mode` may also be `allowed` or `none`) |
 | `protectedBranches` · `autoDeployBranches` | `["main"]` · [] |
 | `noForcePush` | true |
-| `secrets` | `{ envFiles: [".env", ".env.local", ".env.*.local"], extraPatterns: [] }` — extra regexes for `check-secrets` |
+| `secrets`: `envFiles` · `extraPatterns` | `[".env", ".env.local", ".env.*.local"]` · [] — `extraPatterns` are extra regular expressions that `check-secrets` treats as secrets |
 | `forbiddenPaths` · `ownerOnlyPaths` | [] — copied into each card's `dont_touch` and CLAUDE.md |
 | `externalServices` | [] |
 | `noTimeEstimates` · `evidenceRequired` | true · true |
 
-## tokenSaving · firstMilestone
+## tokenSaving
 
-`tokenSaving`: `enabled`, `silentInterim`, `batchReviewerNotes`, `reviewerDiff`, `fixFlakyFirst` (all true).
-`firstMilestone.goal`: text; non-empty → M1 is drafted as `planned`.
+`enabled` · `silentInterim` · `batchReviewerNotes` · `reviewerDiff` · `fixFlakyFirst` (all true).
+
+## firstMilestone
+
+`goal`: text; non-empty → M1 is drafted as `planned`.

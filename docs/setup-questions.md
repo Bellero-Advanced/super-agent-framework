@@ -19,6 +19,10 @@ The interview `/saf-setup` runs, grouped in this order — each question shows a
 
 Always on, not asked: no time estimates (gates, not dates) · "done" needs real run evidence.
 
+Every option comes with four short lines — what it is · good for · cost · pick it when — printed by
+`node tools/saf/bin/saf.mjs choices --group <1-8|flow> --lang <en|th>`, and the confirm step lists every setting the
+interview did not ask, with where to change it, from `node tools/saf/bin/saf.mjs choices --not-asked --lang <en|th>`.
+
 The complete table — every question, the `saf.config.json` key it sets, the options and the recommended default — lives in
 one place, the skill's own reference: [`kit/claude/skills/saf-setup/questions.md`](../kit/claude/skills/saf-setup/questions.md).
 
