@@ -166,7 +166,7 @@ export function sections(src) {
 /** First section whose heading starts with any of the given prefixes (case-insensitive). */
 export function findSection(map, prefixes) {
   for (const [k, v] of map) {
-    const low = k.toLowerCase();
+    const low = k.replace(/^\d+[.)]\s*/, "").toLowerCase();
     if (prefixes.some((p) => low.startsWith(p.toLowerCase()))) return v;
   }
   return undefined;

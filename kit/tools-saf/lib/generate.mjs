@@ -82,6 +82,16 @@ function sessionRows(roles, docLang) {
   return [...by.values()].map((r) => ({ model: r.model, roles: r.roles.map((n) => `\`${n}\``).join(" · "), work: work(r.tiers) }));
 }
 
+/** Align trailing `# comments` inside ```bash blocks so command lists read as a table. */
+export function alignShellComments(md) {
+  return md.replace(/(```(?:bash|sh)\n)([\s\S]*?)(```)/g, (_, open, body, close) => {
+    const lines = body.split("\n");
+    const split = lines.map((l) => l.match(/^(\S.*?)\s{2,}(# .*)$/));
+    const width = Math.max(0, ...split.filter(Boolean).map((m) => m[1].length));
+    return open + lines.map((l, i) => (split[i] ? `${split[i][1].padEnd(width + 2)}${split[i][2]}` : l)).join("\n") + close;
+  });
+}
+
 export function templateData(config, detected, opts = {}) {
   const pm = config.stack.packageManager;
   const c = (s, a) => scriptCommand(pm, s, a);
@@ -187,12 +197,12 @@ function plannedFiles(config, data, detected) {
   ];
   if (data.m1) files.push([L("docs/plan/milestones/M1.md"), "docs/plan/milestones/M1.md"]);
   for (const name of ["saf", "saf-plan", "saf-fix", "saf-test", "saf-protect", "saf-help"]) files.push([L(`commands/${name}.md`), `.claude/commands/${name}.md`]);
-  const out = files.map(([src, dest]) => ({ dest, content: render(readFileSync(src, "utf8"), data) }));
+  const out = files.map(([src, dest]) => ({ dest, content: alignShellComments(render(readFileSync(src, "utf8"), data)) }));
   const aliasT = readFileSync(L("commands/_alias.md"), "utf8");
   for (const [alias, target] of Object.entries(ALIASES)) out.push({ dest: `.claude/commands/${alias}.md`, content: render(aliasT, { ...data, alias, target }) });
   for (const role of data.roles) {
     const src = role.custom ? join(TEMPLATES, "agents", "_custom.md") : join(TEMPLATES, "agents", `${role.name}.md`);
-    out.push({ dest: `.claude/agents/${role.name}.md`, content: render(readFileSync(src, "utf8"), { ...data, role }) });
+    out.push({ dest: `.claude/agents/${role.name}.md`, content: render(readFileSync(src, "utf8"), { ...data, role: { ...role, summaryYaml: JSON.stringify(role.summary || role.name) } }) });
   }
   for (const rule of ruleSet(config, detected)) {
     out.push({ dest: `.claude/rules/${rule.name}.md`, content: render(readFileSync(join(TEMPLATES, "rules", `${rule.name}.md`), "utf8"), { ...data, rulePathsYaml: rule.paths.map((p) => `  - ${JSON.stringify(p)}`).join("\n") }) });
@@ -297,7 +307,9 @@ export function generate(root, answers, opts = {}) {
     const abs = join(root, rel);
     return manifest.files[rel] && existsSync(abs) && sha(readFileSync(abs, "utf8")) === manifest.files[rel];
   };
-  const adopt = opts.adopt ?? detected.adopt;
+  // a project SAF already set up (manifest present) is a re-run: never archive in bulk, only replace files one by one
+  const rerun = existsSync(join(root, MANIFEST));
+  const adopt = !rerun && (opts.adopt ?? detected.adopt);
 
   // 1. adopt: move pre-existing agent docs and plan files that SAF did not write into the archive
   if (adopt) {
@@ -343,6 +355,7 @@ export function generate(root, answers, opts = {}) {
   }
   mkdirSync(join(root, "docs/plan/evidence"), { recursive: true });
   if (!existsSync(join(root, "docs/plan/evidence/.gitkeep"))) writeFileSync(join(root, "docs/plan/evidence/.gitkeep"), "");
+  next.files["docs/plan/evidence/.gitkeep"] = sha(readFileSync(join(root, "docs/plan/evidence/.gitkeep"), "utf8"));
   mergeSettings(root, report);
 
   // 4. generated status files

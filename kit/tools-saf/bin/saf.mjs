@@ -342,7 +342,14 @@ async function main() {
         err("usage: setup --answers <file.json> [--adopt|--no-adopt]");
         return 2;
       }
-      const root = existsSync(join(process.cwd(), CONFIG_FILE)) ? process.cwd() : findRoot();
+      let root = process.cwd();
+      if (!existsSync(join(root, CONFIG_FILE))) {
+        try {
+          root = findRoot();
+        } catch {
+          root = process.cwd();
+        }
+      }
       const { generate } = await import("../lib/generate.mjs");
       const answers = JSON.parse(readFileSync(resolve(file), "utf8"));
       const adopt = rawArgv.includes("--adopt") ? true : rawArgv.includes("--no-adopt") ? false : undefined;

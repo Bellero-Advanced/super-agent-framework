@@ -1,0 +1,91 @@
+# แผนทำงานอย่างไร — milestone · การ์ด · หลักฐาน
+
+สถานะไม่เคยพิมพ์ด้วยมือ คำนวณจากไฟล์สามชนิด:
+
+| ไฟล์ | เก็บอะไร | ใครเขียน |
+|---|---|---|
+| `docs/plan/milestones/M<n>.md` | เป้าหมาย · ขอบเขต · ประตูออก · ลำดับการ์ด · `status` (`active` ได้ทีละอัน) | designer · {{owner}}อนุมัติ |
+| `docs/plan/tasks/M<n>/T-M<n>-<nn>.md` | การ์ดหนึ่งใบ: frontmatter + หัวข้อ "เกณฑ์ผ่าน" ที่ทุกข้อเป็นคำสั่ง | designer |
+| `docs/plan/evidence/<id>.json` | จุดเริ่ม · ผลของคำสั่ง · ไฟล์ที่เปลี่ยน | เครื่องมือเท่านั้น (`task:start` · `task:verify`) |
+
+`docs/plan/STATE.md` และ `.saf/plan.md` สร้างจากไฟล์ข้างบน (`{{cmd.taskState}}`) · ห้ามแก้ด้วยมือ
+
+## 1. รอบการ์ด
+
+```
+{{owner}}กด Go ที่ milestone
+  → designer เขียนการ์ด (+ สเปกพร้อมฉากยอมรับ)                         /saf-plan
+  → ทีละการ์ดตามลำดับ:
+      {{cmd.taskStart}}                       บันทึก commit เริ่มต้นและไฟล์ที่ค้างอยู่ก่อน
+      implementer ทำการ์ด (แตะเฉพาะไฟล์ใน touch)
+      {{cmd.taskVerify}}                      รันทุกคำสั่งใน "เกณฑ์ผ่าน" · ไฟล์ที่เปลี่ยนอยู่ใน touch · มี test ของฉากยอมรับ
+      spec-reviewer เทียบงานกับสเปก (อ่านอย่างเดียว)
+      qa-runner รัน test จริงเมื่อการ์ดแตะ UI / multiplayer / ประสิทธิภาพ
+      commit (หรือ {{cmd.taskMerge}} สำหรับการ์ดสาย)
+  → {{cmd.taskVerifyM}}                       ประตูออก → รายงาน → {{owner}}ปิด milestone
+```
+
+การ์ด **เสร็จ** เมื่อ `task:verify` ผ่านเท่านั้น · ไม่ผ่าน = การ์ดยังเปิดและบันทึกเหตุผล (คำสั่งที่ล้ม · ไฟล์นอก `touch` ·
+ไฟล์ใน `dont_touch` · ฉากที่ไม่มี test)
+
+## 2. รูปแบบการ์ด
+
+คัดลอก [tasks/_template.md](tasks/_template.md) · ช่องใน frontmatter:
+
+| ช่อง | ความหมาย |
+|---|---|
+| `id` · `milestone` · `title` | `T-M1-01` · `M1` · หนึ่งบรรทัด · ชื่อไฟล์ = id · โฟลเดอร์ = milestone |
+| `spec` | ไฟล์สเปกที่การ์ดนี้ทำ (`docs/specs/…`) |
+| `depends` | การ์ดที่ต้องผ่านก่อน |
+| `size` | `S` (≤ {{sizeS}} บรรทัดโค้ด · test ≤ {{testS}}) หรือ `M` (≤ {{sizeM}} · test ≤ {{testM}}) — ใหญ่กว่านี้แตก |
+| `role` | ใครทำ: {{roleNames}} |
+| `repo` | `.` (ค่าเริ่มต้น) หรือ path ของ git submodule — หนึ่ง submodule ต่อการ์ด |
+| `touch` | glob ของไฟล์ที่การ์ดแก้ได้ (บังคับ) |
+| `dont_touch` | glob ที่ต้องไม่เปลี่ยนแม้ `touch` ครอบ |
+| `scenarios` | รหัสฉากยอมรับ (`AUTH-AC-01`) — แต่ละรหัสต้องมี test ที่มีรหัสในชื่อ |
+
+หัวข้อ "เกณฑ์ผ่าน": ทุกข้อเป็นหนึ่งคำสั่ง (คำสั่งใน backtick ต้นข้อ หรือทั้งบรรทัด) · ต้อง exit 0 ทุกข้อ
+
+## 3. milestone และประตูออก
+
+ไฟล์ milestone มี `status: planned | active | paused | done` · `cards:` (ลำดับ = ลำดับทำ) และ `gates:`
+แต่ละประตูมี `id` · `text` · `run:` (ไม่บังคับ) — ประตูที่ไม่มีคำสั่ง = {{owner}}ตรวจเอง
+`{{cmd.taskVerifyM}}` รันทุกประตูแล้วเขียน `docs/plan/evidence/<M>.json` · `{{cmd.taskReport}}` เขียนรายงาน
+
+มีแต่{{owner}}ที่เปลี่ยน milestone เป็น `active` (กด Go) หรือ `done`
+
+## 4. สเปกและฉากยอมรับ
+
+สเปกอยู่ใน `docs/specs/` (คัดลอก [../specs/_template.md](../specs/_template.md)) · หัวข้อ "ฉากยอมรับ" มีรหัสแบบ `AUTH-AC-01`
+`{{cmd.specMatrix}}` จับคู่ฉากกับ test · `{{cmd.specMatrixCheck}}` ล้มเมื่อการ์ดที่เริ่มแล้วขาด test ของฉากใด
+{{#if lanesOn}}
+
+## 5. สายขนาน
+
+การ์ดของบทบาทที่ทำงานใน **สายโค้ด** ({{#each roles}}{{#eq .lane "code"}}`{{.name}}` {{/eq}}{{/each}}) ทำขนานได้ แต่ละใบอยู่ใน
+git worktree ของตัวเองใต้ `{{workflow.worktreeDir}}/` บน branch `{{workflow.branchPrefix}}<id>` · การ์ดอื่นทำในโฟลเดอร์หลักทีละใบ
+
+- `{{cmd.taskNext}}` บอกชุดการ์ดที่เริ่มพร้อมกันได้ (`touch` ไม่ทับกัน · เพดาน: สายโค้ด {{workflow.lanes.code}} · โฟลเดอร์หลัก {{workflow.lanes.main}}{{#if workflow.solo}} · path ที่ต้องทำเดี่ยว {{workflow.solo}}{{/if}}) และเหตุผลของใบที่ต้องรอ
+- `{{cmd.taskStartLane}}` เปิดสาย: ไฟล์การ์ดต้อง commit แล้ว · หลักฐานถูก commit บน branch หลัก ·
+  ขั้น 3–5 ล้ม = exit 6 — แก้ต้นเหตุแล้วรันใหม่ด้วย `--resume`
+- ในสาย: ทำงาน แล้ว `{{cmd.taskVerify}}` (เขียนหลักฐานบน branch ของสายเท่านั้น) · `{{cmd.taskEnv}}` บอกพอร์ตของสาย
+- กลับโฟลเดอร์หลัก: `{{cmd.taskMerge}}` รวมทีละใบ รันตรวจตอนรวม ({{mergeChecksText}}) แล้วสร้างสถานะใหม่ ·
+  exit 3 = ปฏิเสธ (ยังไม่ผ่าน / โฟลเดอร์หลักไม่สะอาด) · 4 = ชน (ย้อนการรวมแล้ว) · 5 = ตรวจตอนรวมล้ม (ย้อนการรวมแล้ว)
+{{/if}}
+{{#if measureOn}}
+
+## 6. กุญแจวัดผล
+
+คำสั่งหนัก (test ทั้งชุด · e2e · perf) ต่อคิวทีละตัวทั้งเครื่อง: `{{cmd.measure}}`
+exit 75 = กุญแจไม่ว่างและยังไม่ได้วัด — รันใหม่ภายหลัง · `{{cmd.measureStatus}}` บอกว่าใครถืออยู่
+{{/if}}
+
+## 7. กฎของหลักฐาน
+
+- "เสร็จ" = รันจริง แนบผลของคำสั่ง ห้ามคาดเดาหรือติ๊กช่อง
+- `docs/plan/evidence/` เครื่องมือเขียนเอง ห้ามแก้หรือลบด้วยมือ
+- test ที่ผลไม่นิ่ง ให้แก้ความไม่นิ่งก่อน — ห้ามรันซ้ำจนเขียวแล้วเรียกว่าเสร็จ
+{{#if pmNpm}}
+
+npm ส่งอาร์กิวเมนต์หลัง `--`: `npm run task:start -- T-M1-01`
+{{/if}}

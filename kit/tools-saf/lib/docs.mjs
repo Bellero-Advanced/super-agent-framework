@@ -32,7 +32,7 @@ export const FULL_MODEL_ID = /^claude-[a-z]+(?:-\d+)+$/;
 const SETTINGS_FILE = /(^|\/)\.claude\/settings(\.[\w-]+)?\.json$/;
 const PM_BUILTINS = new Set(["install", "i", "ci", "add", "remove", "rm", "uninstall", "exec", "dlx", "create", "init", "update", "up", "upgrade", "outdated", "why", "list", "ls", "store", "publish", "pack", "link", "unlink", "rebuild", "audit", "config", "env", "help", "import", "prune", "patch", "setup", "x", "npx", "info", "view", "version", "-v", "--version", "set", "workspace", "workspaces"]);
 
-const isVendor = (f) => f.includes("node_modules/") || f.startsWith(".claude/skills/") || f.startsWith(".claude/agent-memory/");
+const isVendor = (f) => f.includes("node_modules/") || f.startsWith("tools/saf/") || f.startsWith(".claude/skills/") || f.startsWith(".claude/agent-memory/");
 
 export function isAgentLoaded(f) {
   if (isVendor(f) || !f.endsWith(".md")) return false;
