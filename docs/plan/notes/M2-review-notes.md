@@ -89,3 +89,11 @@ N4. engine enforces NOTHING of push / deploy / protectedBranches / noForcePush /
 N5. token saving: only `tokenSaving.enabled` gates the CLAUDE.md line; the habit flags are separate and `off` does not clear them — decide whether `off` should set them false
 N6. `deploy allowed`: the release-operator file still describes an order step
 N7. `measure` is used only by the `measure` script (task:verify and merge checks never take the lock); `lane ports` / `lane db` only print exports; `perf budgets` only named in qa-runner.md
+
+## T-M2-15 (review FAIL → fixed → merged) — notes for the designer
+
+N1. AC-07: the lowercase change of `DOCS_URL` is never exercised — all current `NOT_ASKED` top-level keys are already lowercase; the test passes without `.toLowerCase()` until a camelCase key (`tokenSaving`, `firstMilestone`) joins `NOT_ASKED`
+N2. AC-09 regexes are weak: `/--adopt[^\n]*yes/` on whitespace-collapsed text spans the whole step and `--adopt` also matches inside `--no-adopt`; `/--no-adopt[^\n]*(no|skipped)/` matches almost any later "no…"; AC-08 does not check the word "before" ("before each group")
+N3. SKILL: the chat-language question is asked before the language is known, so its options never show the four lines first (gap in spec rule 16); not said whether to skip that table when group 1's output is shown afterwards
+N6. the skill and the engine detect a re-run differently (skill: `saf.config.json` holds a full config; engine: `.saf/manifest.json` exists) — if the engine sees a re-run and the skill does not, the adopt question is asked and "yes" archives nothing
+G (decided here). the test-mode table in `questions.md` was removed (pointer to `saf choices --group 6` kept under the same heading so card-lifecycle's anchor works); the safety facts live in docs/card-lifecycle.md "Test mode"
