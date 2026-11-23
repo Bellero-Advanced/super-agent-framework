@@ -27,6 +27,11 @@ outside feedback is read and sorted into fixes and roadmap items.
 
 ## Side lane (M2)
 - [x] T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
+- [ ] T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode)
+- [ ] T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it
+- [ ] T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it
+- [ ] T-M2-09 task:culprit finds the card that broke the deferred full suite
+- [ ] T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit
 
 ## Risks
 - `create-saf` depends on `super-agent-framework@0.1.0` — publish the main package first or `npx create-saf` fails
