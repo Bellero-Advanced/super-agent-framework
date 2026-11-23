@@ -2,7 +2,7 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 5/15
+## M2 Roadmap: next — cards done 5/17
 
 - In progress: none
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
@@ -24,6 +24,8 @@
 | [T-M2-13](tasks/M2/T-M2-13.md) | saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th | · not started | – |
 | [T-M2-14](tasks/M2/T-M2-14.md) | Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one | · not started | – |
 | [T-M2-15](tasks/M2/T-M2-15.md) | /saf-setup shows the four lines for every option and lists the settings it did not ask before generating | · not started | – |
+| [T-M2-16](tasks/M2/T-M2-16.md) | The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved | · not started | – |
+| [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 

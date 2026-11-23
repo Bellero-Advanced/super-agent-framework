@@ -1,6 +1,6 @@
 # Spec — setup choices (what each option means, and every setting the interview does not ask)
 
-Decision: [D-009](../DECISIONS.md) (proposed). Cards: T-M2-12 … T-M2-15. Builds on the test-mode questions that
+Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15. Builds on the test-mode questions that
 T-M2-10 adds to the interview.
 
 ## 1. Purpose

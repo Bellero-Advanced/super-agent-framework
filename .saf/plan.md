@@ -14,11 +14,11 @@ interview that explains every option and shows every setting it does not ask.
   `npm run saf:refresh` rewrites, so it may run in a side lane while M1 is active. It also fixes the lane guard that
   refuses a SAF project in a subfolder (`examples/todo-api`) inside any lane worktree — without that fix `npm test`
   cannot pass in a lane, and a separate card could not start (one side lane at a time, same `touch` files)
-- T-M2-06 … T-M2-10 (test mode, [spec](../../specs/test-mode.md), decision D-008 proposed) let each person choose how
+- T-M2-06 … T-M2-10 (test mode, [spec](../../specs/test-mode.md), decision D-008 decided) let each person choose how
   often the full test suite runs; the default runs it once, at the milestone exit gate, and `task:culprit` finds the
   card that broke it. They are **side cards** in a chain (each depends on the one before, so one side lane at a time is
   enough): they touch only `kit/` engine and setup files, user docs and this repo's config — nothing an M1 card
-  touches. Start T-M2-06 only after the owner marks D-008 decided
+  touches
 - Cards that change `kit/` (T-M2-06 … T-M2-10) refresh the engine copies with `npm run saf:refresh` and
   `node bin/cli.mjs upgrade --dir examples/todo-api`; the copies are in `workflow.alwaysAllowed` (D-007), so they are
   not listed in `touch` and not counted in the size check
@@ -26,13 +26,22 @@ interview that explains every option and shows every setting it does not ask.
   `72ad81c` and the `project-checks` gate needs the matrix green. It shares `touch` files with T-M2-06 … T-M2-09, so it
   runs before the chain or between its cards, never in parallel with one of them; its final proof is the CI run on the
   pushed commit (push on the owner's order)
-- T-M2-12 … T-M2-15 (setup choices, [spec](../../specs/setup-choices.md), decision D-009 proposed): `/saf-setup`
+- T-M2-12 … T-M2-15 (setup choices, [spec](../../specs/setup-choices.md), decision D-009 decided): `/saf-setup`
   shows "what it is · good for · cost · pick it when" for every option, in en or th, from one data table in the engine
   (`saf choices`), and before generating lists every setting it did not ask with where to change it (project file,
   per-machine file, env variable). A chain of regular cards (M2 is active, so not side cards) that **starts after
   T-M2-10**: T-M2-12 compares the interview keys with `questions.md`, which T-M2-10 extends with the test-mode rows,
   and it shares `kit/tools-saf/bin/saf.mjs` with T-M2-09; T-M2-15 edits the same skill and docs files as T-M2-10.
   "Setup suggestions" from the roadmap stays a separate later item
+- T-M2-16 and T-M2-17 close two safety gaps the spec review of T-M2-08 found in the `milestone`-mode exit gate
+  ([spec rules 19, 28–30](../../specs/test-mode.md#the-full-suite-gate-in-the-plan-files)). T-M2-16: the
+  `full-suite` gate holds every full-suite command that no declared gate runs (today a gate that runs only `npm test`
+  means e2e never runs in `milestone` mode), and the id `full-suite` is reserved. T-M2-17: STATE.md, `.saf/plan.md`
+  and `task:report` show evidence gates that the milestone file does not declare, so a failed `full-suite` gate can
+  never look green. Regular cards in a chain after T-M2-09 (T-M2-09 adds the culprit hint to the same exit-gate path;
+  T-M2-16 and T-M2-17 share `plan.mjs` and `testmode.mjs`). Both must pass `task:verify` and the spec review before
+  `npm run task:verify -- M2` (the `cards` gate); they change only `kit/tools-saf/lib/` and test-mode tests, so they
+  may run beside T-M2-10 and T-M2-12 … T-M2-15 (no shared `touch`)
 
 ## Done When
 - [ ] cards every card of M2 passed task:verify and the spec review (manual check)
@@ -55,6 +64,8 @@ interview that explains every option and shows every setting it does not ask.
 - [ ] T-M2-13 saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th
 - [ ] T-M2-14 Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one
 - [ ] T-M2-15 /saf-setup shows the four lines for every option and lists the settings it did not ask before generating
+- [ ] T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved
+- [ ] T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result
 
 ## Risks
 - M1 feedback may reorder or replace these cards — that is expected; this is a draft
@@ -75,3 +86,7 @@ interview that explains every option and shows every setting it does not ask.
 - **Default `milestone` trade-off:** a card can pass while it breaks another card's test; the break shows up at the
   exit gate, later cards may build on it, and fixing it waits until the milestone ends. `task:culprit` (T-M2-09) brings
   back "which card" in a few runs; the milestone cannot close while the gate fails
+- **Fixing merged behaviour:** T-M2-16 changes what T-M2-08 shipped (a declared gate that runs only part of the full
+  suite no longer suppresses the extra gate) and adjusts the one T-M2-08 test whose expectation encoded the gap;
+  reserving `full-suite` turns an existing gate with that id into a plan problem — the error names the id, so the fix
+  is a rename

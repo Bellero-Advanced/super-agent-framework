@@ -1,6 +1,6 @@
 # Spec — test mode (when the full test suite runs)
 
-Decision: [D-008](../DECISIONS.md) (proposed). Cards: T-M2-06 … T-M2-10.
+Decision: [D-008](../DECISIONS.md) (decided). Cards: T-M2-06 … T-M2-10, T-M2-16, T-M2-17.
 
 ## 1. Purpose
 
@@ -66,12 +66,26 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 
 18. In `milestone` mode `task:merge` skips the full-suite commands of `mergeChecks`, runs the rest, and prints which
     commands it skipped and why.
-19. In `milestone` mode `task:verify <M>` makes sure the full suite runs: if no gate's `run:` contains a full-suite
-    command, it runs an extra gate `full-suite` with every full-suite command. The gate decides pass or fail like any
+19. In `milestone` mode `task:verify <M>` makes sure every full-suite command runs: it adds a gate `full-suite`
+    holding the full-suite commands (rule 9, in `FULL_SUITE_KEYS` order) that no declared gate's `run:` contains. When
+    the declared gates already run every full-suite command, no gate is added. The gate decides pass or fail like any
     other gate.
 20. Milestone evidence carries `testMode` and `deferredCards` (the milestone's cards whose evidence has `deferred`).
 21. When a gate that runs a full-suite command fails and `deferredCards` is not empty, the output names the next step:
     `task:culprit <M>`.
+
+### The `full-suite` gate in the plan files
+
+28. The gate id `full-suite` is reserved in every mode: a milestone file that declares a gate with that id is a plan
+    problem that names the id and the file (`task:state --check` fails, `task:verify <M>` refuses). The id lives in
+    `FULL_SUITE_GATE` in `kit/tools-saf/lib/testmode.mjs`.
+29. STATE.md (exit-gate table), `.saf/plan.md` ("Done When") and the `task:report <M>` gate table show, after the
+    gates declared in the milestone file, every gate of the milestone evidence whose id is not declared, with its
+    result marked like a declared gate (passed · failed). `full-suite` is shown with its text from the text table
+    (`kit/tools-saf/lib/text.mjs`, en and th); any other undeclared id is shown with the "not in the milestone file"
+    text from the same table.
+30. Rule 29 reads only the tracked milestone evidence, never the current test mode, so these files stay the same on
+    every machine (rule 6). Before the first `task:verify <M>` run only the declared gates are shown.
 
 ### Finding the card that broke the suite (`task:culprit <M>`)
 
@@ -94,7 +108,9 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 - `TEST_MODES` · default mode · `LOCAL_KEYS` · `FULL_SUITE_KEYS` · the env variable name — `kit/tools-saf/lib/config.mjs`
 - schema: `workflow.testMode` · `stack.commands.testFiles` — `kit/tools-saf/schema/saf.config.schema.json`
 - targeted-file selection and the mode table of rule 15 — `kit/tools-saf/lib/testmode.mjs`
-- "full suite deferred to gate" text — `kit/tools-saf/lib/text.mjs`
+- "full suite deferred to gate" text · the `full-suite` gate text · the "not in the milestone file" text —
+  `kit/tools-saf/lib/text.mjs`
+- the reserved gate id (`FULL_SUITE_GATE`) — `kit/tools-saf/lib/testmode.mjs`
 - culprit search — `kit/tools-saf/lib/culprit.mjs` · script name `task:culprit` — `ENGINE_SCRIPTS` in `config.mjs`
 
 ## 4. Edge cases and errors
@@ -104,6 +120,10 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 - a lane card verified in `targeted` mode whose merge checks fail → the merge is rolled back (exit 5), as today
 - `task:culprit` in a lane worktree → refused, like other main-folder-only commands
 - `task:culprit` on a milestone with no started cards → error "no card of <M> has started"
+- the declared gates run some full-suite commands but not all (for example `npm test` but not the e2e command) →
+  the `full-suite` gate holds only the missing ones (rule 19)
+- a milestone gate was removed from the milestone file after `task:verify <M>` ran → it stays visible from the
+  evidence with the "not in the milestone file" text until the gates run again (rule 29)
 - people on one team use different modes → each card's evidence shows its own mode and source; the exit gate runs
   the full suite in `milestone` mode whoever runs it
 
@@ -124,6 +144,9 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 | TMODE-AC-11 | a repo with four card commits, the third breaks the suite | `task:culprit <M>` | names the third card and its commit; at most 2 + ⌈log2 4⌉ runs; temporary worktree gone; `docs/plan/` unchanged | unit |
 | TMODE-AC-12 | the suite fails before the first card; or passes at HEAD | `task:culprit <M>` | exit 2; exit 3 | unit |
 | TMODE-AC-13 | the full-suite gate fails and a card has `deferred` evidence | `task:verify <M>` | output names `task:culprit <M>` | unit |
+| TMODE-AC-14 | `milestone` mode, `test` and `e2e` commands set, the only declared gate runs `npm test`; then gates that run both | `task:verify <M>` | an extra `full-suite` gate runs only the e2e command (`npm test` runs once); then no extra gate | unit |
+| TMODE-AC-15 | a milestone file declares a gate with id `full-suite` | `task:state --check`; `task:verify <M>` | a plan problem naming `full-suite` and the file; verify refuses before running any gate | unit |
+| TMODE-AC-16 | milestone evidence with a failed `full-suite` gate and a passed gate that is not in the milestone file, doc language en and th | STATE.md, `.saf/plan.md` and `task:report <M>` are written | each shows a `full-suite` row marked failed with the text-table text in that language, and the other row with the "not in the milestone file" text; with no milestone evidence only the declared gates show | unit |
 
 ## 6. Out of scope
 
