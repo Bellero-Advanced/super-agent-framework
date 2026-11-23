@@ -149,7 +149,7 @@ export const ENGINE_SCRIPTS = {
 };
 
 export function resolveConfig(raw = {}) {
-  const c = deepMerge(DEFAULTS, raw);
+  const c = deepMerge(structuredClone(DEFAULTS), structuredClone(raw ?? {}));
   const rigor = RIGOR[c.project.rigor] ?? RIGOR.standard;
   const pm = c.stack.packageManager;
   c.workflow.sizes ??= { ...rigor.sizes };

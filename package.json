@@ -21,8 +21,8 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test --test-concurrency=4 \"test/**/*.test.mjs\"",
-    "test:unit": "node --test \"test/unit/*.test.mjs\"",
-    "test:e2e": "node --test \"test/e2e/*.test.mjs\""
+    "test": "node --test test/unit/*.test.mjs test/e2e/*.test.mjs",
+    "test:unit": "node --test test/unit/*.test.mjs",
+    "test:e2e": "node --test test/e2e/*.test.mjs"
   }
 }

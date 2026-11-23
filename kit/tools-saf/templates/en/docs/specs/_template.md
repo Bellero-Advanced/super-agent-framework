@@ -22,10 +22,12 @@ What happens on empty input, failure, retry, concurrency, permission denied.
 
 ## 5. Acceptance
 
-Each scenario has an id `<PREFIX>-AC-<nn>`. A card that lists the id in `scenarios:` needs a test with the id in its name.
+One table row per scenario; the first cell is the id `<PREFIX>-AC-<nn>`. A card that lists the id in `scenarios:` needs a test with the id in its name.
 
-- FEAT-AC-01 — Given … when … then …
-- FEAT-AC-02 — Given … when … then …
+| id | given | when | then | test layer |
+|---|---|---|---|---|
+| FEAT-AC-01 | … | … | … | unit |
+| FEAT-AC-02 | … | … | … | integration |
 
 ## 6. Out of scope
 

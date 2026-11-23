@@ -10,7 +10,9 @@ import { activeCards, alwaysAllowed, cardStatus, nextCards, unmetDepends } from 
 
 export const LANE_NAME = { code: "code lane", main: "main-folder lane" };
 
+/** Lane of a card: its role's lane · with worktree lanes turned off every card works in the main folder. */
 export function laneOf(plan, card) {
+  if (!plan.config.workflow.worktrees || plan.config.workflow.lanes.code < 1) return "main";
   const role = roleTable(plan.config).find((r) => r.name === card.role);
   return role?.lane ?? "code";
 }
