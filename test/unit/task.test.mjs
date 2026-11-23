@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
-import { cleanup, commitAll, fakeCtx, git, lib, planRepo, write } from "../helpers.mjs";
+import { cleanup, commitAll, fakeCtx, git, lib, planRepo, tmp, write } from "../helpers.mjs";
 
 const task = await lib("task.mjs");
+const { samePath, topLevel } = await lib("git.mjs");
 const { loadPlan, cardStatus } = await lib("plan.mjs");
 after(cleanup);
 
@@ -221,4 +223,50 @@ test("lane guard: a SAF project in a subfolder of a lane worktree is not a lane;
   assert.equal(task.laneFolder(lane, loadPlan(lane, config)).card, "T-M1-01");
   rmSync(join(lane, task.LANE_FILE));
   assert.throws(() => task.laneFolder(lane, loadPlan(lane, config)), /no lane label/);
+});
+
+test("lane guard: samePath treats two spellings of one folder as equal and two folders as different", () => {
+  const dir = tmp();
+  mkdirSync(join(dir, "a", "b"), { recursive: true });
+  mkdirSync(join(dir, "other"));
+  assert.equal(samePath(join(dir, "a", "b", ".."), join(dir, "a")), true);
+  assert.equal(samePath(join(dir, "a"), join(dir, "other")), false);
+  assert.equal(samePath(join(dir, "missing"), join(dir, "missing")), true); // not on disk: plain string compare
+  assert.equal(samePath(join(dir, "missing"), join(dir, "other")), false);
+  try {
+    symlinkSync(join(dir, "a"), join(dir, "link"), "junction");
+  } catch {
+    return; // no symlink right (some Windows setups): the cases above still ran
+  }
+  assert.equal(samePath(join(dir, "link"), join(dir, "a")), true);
+  assert.equal(samePath(join(dir, "link"), join(dir, "other")), false);
+  assert.notEqual(join(dir, "link"), join(dir, "a")); // a plain string compare would call them different
+});
+
+test("lane guard: samePath sees a Windows 8.3 short name as the long name", { skip: process.platform !== "win32" }, () => {
+  const dir = tmp();
+  let short = dir;
+  try {
+    short = execFileSync("cmd.exe", ["/d", "/c", "for", "%I", "in", `(${dir})`, "do", "@echo", "%~sI"], { encoding: "utf8" }).trim();
+  } catch {
+    // no short name available: the assertion below still holds for equal spellings
+  }
+  assert.equal(samePath(short, realpathSync.native(dir)), true);
+});
+
+test("lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not", async () => {
+  const { resolveConfig } = await lib("config.mjs");
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch: ["src/**"] }] });
+  commitAll(root, "seed");
+  // a linked worktree outside worktreeDir, on card/T-M1-09: no lane label, no open evidence for it
+  const wt = join(tmp(), "elsewhere");
+  git(root, "worktree", "add", "-q", "-b", "card/T-M1-09", wt);
+  assert.ok(samePath(topLevel(wt), wt));
+  assert.throws(() => task.laneFolder(wt, loadPlan(wt, config)), /no lane label.*T-M1-09/);
+  // a SAF project in a subfolder of that worktree: the top level is another folder → not a lane
+  const sub = join(wt, "examples", "demo");
+  write(sub, "saf.config.json", { version: 1, stack: { packageManager: "none" } });
+  const subConfig = resolveConfig({ version: 1, stack: { packageManager: "none" } });
+  assert.equal(samePath(topLevel(sub), sub), false);
+  assert.equal(task.laneFolder(sub, loadPlan(sub, subConfig)), null);
 });

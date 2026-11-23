@@ -1,14 +1,125 @@
 {
   "id": "T-M2-11",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T19:16:13.932Z",
     "base": "f7803f03a0523f388b55866801f354a91e857900",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-11",
-  "worktree": ".claude/worktrees/T-M2-11"
+  "worktree": ".claude/worktrees/T-M2-11",
+  "verified": {
+    "at": "2026-11-23T19:17:41.855Z",
+    "head": "3b0ed45f2d600f2ad2458c04fb058b229f7cd870",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run test:unit",
+        "exit": 0,
+        "ms": 6100,
+        "tail": [
+          "ok 55 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.055916",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 56 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 217.113625",
+          "  type: 'test'",
+          "  ...",
+          "1..56",
+          "# tests 56",
+          "# suites 0",
+          "# pass 55",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 5791.67725"
+        ]
+      },
+      {
+        "cmd": "npm test",
+        "exit": 0,
+        "ms": 13511,
+        "tail": [
+          "ok 62 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.06375",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 63 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 241.140125",
+          "  type: 'test'",
+          "  ...",
+          "1..63",
+          "# tests 63",
+          "# suites 0",
+          "# pass 62",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 13225.07275"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 274,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 203 markdown file(s) · 51 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 292,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 397 scanned file(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/git.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "test/unit/task.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/git.mjs": "049ede7c8eab498853c653f352dded6fcd46bbaa",
+        "kit/tools-saf/lib/task.mjs": "be143fcb3ecbda8634031af1635a86f0a34ea56b",
+        "test/unit/task.test.mjs": "a7d330cff08e4e0dd837fe77181c01dddc996bc9"
+      }
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 22,
+        "cap": 150
+      },
+      "test": {
+        "lines": 52,
+        "cap": 250
+      },
+      "over": []
+    }
+  }
 }
