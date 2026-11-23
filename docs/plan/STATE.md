@@ -2,26 +2,7 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M1 v0.1.0 public release — cards done 4/4
-
-- In progress: none
-- Next: none — all cards done, check the exit gates with npm run task:verify -- M1
-
-| Card | Work | Status | Evidence |
-|---|---|---|---|
-| [T-M1-01](tasks/M1/T-M1-01.md) | Publish super-agent-framework and create-saf 0.1.0 to npm | ✓ passed | [T-M1-01.json](evidence/T-M1-01.json) · passed 2026-11-23 18:52 (2 commands) |
-| [T-M1-02](tasks/M1/T-M1-02.md) | Tag v0.1.0 and publish the GitHub release | ✓ passed | [T-M1-02.json](evidence/T-M1-02.json) · passed 2026-11-23 19:09 (2 commands) |
-| [T-M1-03](tasks/M1/T-M1-03.md) | Upload the social preview image | ✓ passed | [T-M1-03.json](evidence/T-M1-03.json) · passed 2026-11-23 19:09 (1 commands) |
-| [T-M1-04](tasks/M1/T-M1-04.md) | Sort the first trial feedback into fixes and roadmap items | ✓ passed | [T-M1-04.json](evidence/T-M1-04.json) · passed 2026-11-23 19:09 (2 commands) |
-
-### Exit gates of M1 (checked with `npm run task:verify -- M1`)
-
-| Gate | Criterion | Result |
-|---|---|---|
-| cards | every card of M1 passed task:verify | manual check |
-| project-checks | the project's own checks pass on the released commit | not checked |
-| published | both packages on npm, tag and GitHub release v0.1.0 exist, social preview uploaded | not checked |
-| owner | the owner installed 0.1.0 from npm into a fresh folder (npx create-saf) and accepts the release | manual check |
+No active milestone (a file in `milestones/` with `status: active`).
 
 ## Side lane M2 Roadmap: next — cards done 1/6
 
@@ -48,4 +29,5 @@
 ## Other milestones
 
 - M0 SAF setup works in this repo — done
+- M1 v0.1.0 public release — done
 - M2 Roadmap: next — planned

@@ -1,0 +1,93 @@
+{
+  "id": "M1",
+  "kind": "milestone",
+  "verified": {
+    "at": "2026-11-23T19:10:22.800Z",
+    "head": "34e01cf6c5ef37d1e5c5715da9d2a4be47ccedd4",
+    "gates": [
+      {
+        "id": "cards",
+        "pass": null,
+        "commands": []
+      },
+      {
+        "id": "project-checks",
+        "pass": true,
+        "commands": [
+          {
+            "cmd": "npm test",
+            "exit": 0,
+            "ms": 18290,
+            "tail": [
+              "ok 59 - size: test lines are counted apart from code lines (added + removed, modified files too)",
+              "  ---",
+              "  duration_ms: 940.990916",
+              "  type: 'test'",
+              "  ...",
+              "# Subtest: lane guard: a SAF project in a subfolder of a lane worktree is not a lane; a lane root that lost its label is still refused",
+              "ok 60 - lane guard: a SAF project in a subfolder of a lane worktree is not a lane; a lane root that lost its label is still refused",
+              "  ---",
+              "  duration_ms: 659.696083",
+              "  type: 'test'",
+              "  ...",
+              "1..60",
+              "# tests 60",
+              "# suites 0",
+              "# pass 60",
+              "# fail 0",
+              "# cancelled 0",
+              "# skipped 0",
+              "# todo 0",
+              "# duration_ms 18012.473542"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "published",
+        "pass": true,
+        "commands": [
+          {
+            "cmd": "node scripts/release-check.mjs npm",
+            "exit": 0,
+            "ms": 1634,
+            "tail": [
+              "✓ super-agent-framework@0.1.0 on npm",
+              "✓ create-saf@0.1.0 on npm"
+            ]
+          },
+          {
+            "cmd": "node scripts/release-check.mjs tag",
+            "exit": 0,
+            "ms": 765,
+            "tail": [
+              "✓ tag v0.1.0 exists locally",
+              "✓ tag v0.1.0 is on origin"
+            ]
+          },
+          {
+            "cmd": "node scripts/release-check.mjs release",
+            "exit": 0,
+            "ms": 857,
+            "tail": [
+              "✓ GitHub release v0.1.0"
+            ]
+          },
+          {
+            "cmd": "node scripts/release-check.mjs social",
+            "exit": 0,
+            "ms": 897,
+            "tail": [
+              "✓ custom social preview uploaded (Settings → General → Social preview)"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "owner",
+        "pass": null,
+        "commands": []
+      }
+    ]
+  }
+}
