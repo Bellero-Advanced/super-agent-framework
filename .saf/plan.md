@@ -50,6 +50,13 @@ interview that explains every option and shows every setting it does not ask.
   T-M2-09; **T-M2-10 waits for it** because T-M2-10 puts `{{cmd.taskCulprit}}` in the generated CLAUDE.md. It shares
   `generate.mjs` and `docs/upgrade.md` with the draft cards T-M2-02 and T-M2-03, so those cannot run beside it
 
+- T-M2-15 also closes review note N2 of T-M2-14 before the explanations reach users: the skill asks the adopt
+  question and passes `--no-adopt` for "no" (without a flag `setup` archives by detection), and it lowercases the
+  `DOCS_URL` anchor (note 3 of T-M2-12). T-M2-19 (note N1 of T-M2-14) makes the generated release-operator agent say
+  pushing is allowed when `policies.push` is `allowed` and corrects the `push: allowed` explanation. It is its own
+  card, not part of T-M2-15: it changes a template and explanation text in `choices.mjs`, a different outcome than
+  the interview wiring. It **waits for T-M2-15** because both touch `choices.mjs`
+
 ## Done When
 - [ ] cards every card of M2 passed task:verify and the spec review (manual check)
 - [ ] project-checks the project's own checks pass on Linux, macOS and Windows (CI matrix green)
@@ -74,6 +81,7 @@ interview that explains every option and shows every setting it does not ask.
 - [x] T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved — passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate
 - [x] T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate
 - [x] T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate
+- [ ] T-M2-19 The release-operator agent says pushing is allowed when policies.push is allowed, and the push explanation says so
 
 ## Risks
 - M1 feedback may reorder or replace these cards — that is expected; this is a draft

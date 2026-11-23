@@ -2,7 +2,7 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 13/18
+## M2 Roadmap: next — cards done 13/19
 
 - In progress: none
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
@@ -27,6 +27,7 @@
 | [T-M2-16](tasks/M2/T-M2-16.md) | The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved | ✓ passed | [T-M2-16.json](evidence/T-M2-16.json) · passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate |
 | [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | ✓ passed | [T-M2-17.json](evidence/T-M2-17.json) · passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate |
 | [T-M2-18](tasks/M2/T-M2-18.md) | saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones | ✓ passed | [T-M2-18.json](evidence/T-M2-18.json) · passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate |
+| [T-M2-19](tasks/M2/T-M2-19.md) | The release-operator agent says pushing is allowed when policies.push is allowed, and the push explanation says so | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 

@@ -1,6 +1,6 @@
 # Spec — setup choices (what each option means, and every setting the interview does not ask)
 
-Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15. Builds on the test-mode questions that
+Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15, T-M2-19. Builds on the test-mode questions that
 T-M2-10 adds to the interview.
 
 ## 1. Purpose
@@ -62,8 +62,9 @@ the CLI and the tests all read the same words.
     followed by the values their rigor derives (card sizes, test caps, review, merge-check kinds — from `RIGOR` in
     `config.mjs`); options of `models.preset` by the planner and builder model ids (from `MODEL_PRESETS`).
 13. `choices --not-asked [--lang en|th]` prints every `NOT_ASKED` key with its one-line summary in that language and
-    where to change it: `saf.config.json` (checked with `saf config --check`, or set by re-running `/saf-setup`) and the
-    `DOCS_URL` link to the key's section of the config reference. Then a "per machine" block lists every key of
+    where to change it: `saf.config.json` (checked with `node tools/saf/bin/saf.mjs config --check`, or set by re-running
+    `/saf-setup`) and the `DOCS_URL` link to the key's section of the config reference — the anchor is the key's
+    top-level part in lowercase, because GitHub heading anchors are lowercase. Then a "per machine" block lists every key of
     `LOCAL_KEYS` (file `saf.config.local.json`, not tracked by git) and every entry of `MACHINE_SWITCHES` — today
     `SAF_TEST_MODE` (from `TEST_MODE_ENV`) and `SAF_STOP_HOOK=off` (from `STOP_HOOK_ENV`) — each with its line in that
     language.
@@ -88,9 +89,24 @@ the CLI and the tests all read the same words.
 ### Docs
 
 19. `docs/config-reference.md` names every schema leaf key (the key's last part in backticks, in the section of its
-    top-level key) and has one section per top-level key that `DOCS_URL` links to.
+    top-level key) and has one section per top-level key that `DOCS_URL` links to: a heading whose GitHub anchor (the
+    heading text in lowercase, spaces → `-`, punctuation dropped) equals the lowercase anchor of rule 13.
 20. `docs/setup-questions.md` says that each option comes with the four lines, that the confirm step lists the settings
     not asked, and how to print both with `saf choices` — it does not copy the explanations.
+
+### Setup flow and generated files
+
+21. When `detect` reports `adopt: true` and the setup is not a re-run, Step 1 asks the `adopt` flow question explicitly
+    and shows its explanations from `choices --group flow` (rule 16). Its recommended default lives in `questions.md`
+    (rule 9) and is "yes" — the same result as today's detection fallback. A new project (`adopt: false`) skips the
+    question and says so (rule 17).
+22. Step 3 always passes exactly one adopt flag to `setup`: `--adopt` for "yes", `--no-adopt` for "no" or a skipped
+    question. Without a flag `setup` falls back to detection and archives an existing project's files even after a
+    "no", which contradicts the `adopt: no` explanation.
+23. The generated release-operator agent file follows `policies.push` like `CLAUDE.md` and the decision log do:
+    `owner-order` → never push without the owner's order; `allowed` → pushing is allowed. Force-push and history
+    rewrite stay forbidden in both. The `push` explanations in `CHOICES` describe what the generated files say, so no
+    explanation says the release-operator file forbids a push that the chosen option allows.
 
 ## 3. Data
 
@@ -123,8 +139,10 @@ the CLI and the tests all read the same words.
 | SETUP-AC-04 | group 2 | `choices --group 2 --lang th`; `--group 9`; `--lang fr`; no flag | every option of `project.type` · `project.stage` · `project.rigor` is printed with four Thai-labelled fields; each rigor option is followed by its sizes from `RIGOR`; the bad calls exit 2 listing the valid groups / languages / flags | unit |
 | SETUP-AC-05 | the entries of `CHOICES` | the data test runs | every entry has `what` · `good` · `cost` · `when` in en and th, non-empty, ≤ `FIELD_MAX`, without two adjacent digits or `claude-`; every option value of a question with entries is covered exactly once | unit |
 | SETUP-AC-06 | the full `QUESTIONS` list | the completeness test runs | every `choice` question has entries covering all its values, every `value` question has exactly one, every `identity` question has none, and the `flow` group holds the adopt and commit questions | unit |
-| SETUP-AC-07 | `docs/config-reference.md` | the docs test runs | every schema leaf key is named in backticks in the section of its top-level key; every section `DOCS_URL` links to exists as a heading | unit |
+| SETUP-AC-07 | `docs/config-reference.md` and the output of `choices --not-asked` | the docs test runs | every schema leaf key is named in backticks in the section of its top-level key; every `DOCS_URL` anchor printed is lowercase and equals the GitHub anchor of a heading in the file | unit |
 | SETUP-AC-08 | `kit/claude/skills/saf-setup/SKILL.md` | the docs test runs | Step 1 runs `choices --group` before each group and Step 2 runs `choices --not-asked` and offers "Adjust a setting that was not asked" | unit |
+| SETUP-AC-09 | `SKILL.md` and `questions.md` | the docs test runs | Step 1 asks the adopt question when `detect` reports an existing project; Step 3 names both `--adopt` (for "yes") and `--no-adopt` (for "no" or a skipped question); `questions.md` gives the adopt question a recommended default outside the Key-column tables | unit |
+| SETUP-AC-10 | a config with `policies.push: "owner-order"`, then `"allowed"`, with the release-operator role enabled | `generate` renders the agent files | owner-order: `.claude/agents/release-operator.md` forbids pushing without the owner's order; allowed: it says pushing is allowed and contains no "Never push"; both forbid force-push; the en and th `push: allowed` explanations no longer say the file forbids pushing | unit |
 
 ## 6. Out of scope
 

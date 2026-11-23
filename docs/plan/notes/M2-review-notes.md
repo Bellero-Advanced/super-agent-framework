@@ -56,9 +56,9 @@ N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issu
 
 ## T-M2-12 (review FAIL → fixed → merged) — notes for the designer
 
-1. spec rule 13 uses the shorthand `saf config --check`, which is not an installed command (the npm bin has init/upgrade/version/help) — write `node tools/saf/bin/saf.mjs config --check`
+1. spec rule 13 uses the shorthand `saf config --check`, which is not an installed command (the npm bin has init/upgrade/version/help) — write `node tools/saf/bin/saf.mjs config --check` → done in the spec (rule 13)
 2. `choices.mjs` "exit 75" is a copy of `EXIT_BUSY` (measure.mjs) — interpolate the import so it cannot drift
-3. `DOCS_URL#<key>` keeps the key's case; GitHub anchors are lowercase (`tokenSaving`, `firstMilestone`) — T-M2-15 AC-07 must lowercase; `#models` is broken until T-M2-15 adds one heading per top-level key (do not publish in between)
+3. `DOCS_URL#<key>` keeps the key's case; GitHub anchors are lowercase (`tokenSaving`, `firstMilestone`) — T-M2-15 AC-07 must lowercase; `#models` is broken until T-M2-15 adds one heading per top-level key (do not publish in between) → T-M2-15 (rules 13, 19 · AC-07)
 4. several not-asked keys (`workflow.review`, `models.overrides`) only reach generated files: editing `saf.config.json` alone does not apply them until setup runs again, and the "where" line does not say so
 5. a valid-JSON but schema-invalid `saf.config.json` still gives its `chatLanguage`; the spec edge case "invalid → en" is ambiguous
 6. test gaps: snapshot compares names not contents · walking up from a subfolder untested · the `Set` in AC-02 hides a key listed twice · `SKILL_PACKS` compared with itself (compare with the schema enum)
@@ -82,8 +82,8 @@ N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issu
 
 ## T-M2-14 (review FAIL → fixed → merged) — notes for the designer
 
-N1. BUG `templates/agents/release-operator.md:27` `Never push{{#if pushOwner}} without the owner's order{{/if}}` renders "Never push" when `policies.push: allowed` — contradicts CLAUDE.md; needs an `{{else}}` branch (en + th)
-N2. BUG (T-M2-15 MUST handle before the explanations reach users) the setup skill adds `--adopt` only for "yes"; without a flag `generate` falls back to `detected.adopt` (true for any project with package.json, CLAUDE.md, .claude/, docs/INDEX.md or src/) — so "no" still archives. The skill must pass `--no-adopt` for "no"; Step 1 also never asks the adopt question explicitly
+N1. BUG `templates/agents/release-operator.md:27` `Never push{{#if pushOwner}} without the owner's order{{/if}}` renders "Never push" when `policies.push: allowed` — contradicts CLAUDE.md; needs an `{{else}}` branch (en + th) → T-M2-19 (agent templates are English only; the th `push: allowed` explanation is fixed there)
+N2. BUG (T-M2-15 MUST handle before the explanations reach users) the setup skill adds `--adopt` only for "yes"; without a flag `generate` falls back to `detected.adopt` (true for any project with package.json, CLAUDE.md, .claude/, docs/INDEX.md or src/) — so "no" still archives. The skill must pass `--no-adopt` for "no"; Step 1 also never asks the adopt question explicitly → T-M2-15 (rules 21–22 · AC-09)
 N3. fallback reason text in `planVerifyRun` (task.mjs) always says "no stack.commands.testFiles command", even when the cause is a missing `{files}` placeholder — misleading
 N4. engine enforces NOTHING of push / deploy / protectedBranches / noForcePush / externalServices (text in CLAUDE.md, DECISIONS, release-operator, security-review only; hooks are SessionStart and Stop) — the choices say so; decide whether the product should offer a real guard (hook) later
 N5. token saving: only `tokenSaving.enabled` gates the CLAUDE.md line; the habit flags are separate and `off` does not clear them — decide whether `off` should set them false
