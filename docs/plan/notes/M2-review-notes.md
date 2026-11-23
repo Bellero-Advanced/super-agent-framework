@@ -46,3 +46,10 @@ N2. `testmode.mjs:20-21` comment on `GATE_ADDS_FULL_SUITE` says "when no gate ru
 N3. no test for duplicate config values (`test` = `e2e`) or the reverse partial case (gate runs e2e only); code handles both
 N4. cosmetic: `const { config } = { config: {...} }` in the coverage test
 N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issues` (what `--check` reports) — no end-to-end exit-code check
+
+## T-M2-17 (review PASS) — notes for the designer
+
+1. `plan.mjs:441` an undeclared gate with `pass === null` shows `- [ ]` without `manualSuffix` while STATE.md and the report say "manual check" — the three views differ slightly for a manual undeclared gate
+2. `test-mode-gate-views.test.mjs:163` `!view.includes("old")` is a loose substring check; the no-evidence case checks "g1" is present, not that the gate rows equal exactly the declared rows
+3. th wording: `fullSuiteGate` says "การทดสอบทั้งชุด", `deferredToGate` says "test ทั้งชุด" — both correct, slightly inconsistent
+4. a declared gate with commands and a null result shows `gateNotRun`, an undeclared one shows `gateManual` — per the card, noted for consistency
