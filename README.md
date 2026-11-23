@@ -1,52 +1,85 @@
 # SAF — Super Agent Framework
 
-A card-and-milestone workflow for [Claude Code](https://claude.com/claude-code), installable into any new or existing
-project. SAF gives your AI team roles with fixed models, a plan made of small verifiable cards, exit gates per
-milestone, and evidence for every "done" — set up through a short interview.
+[![CI](https://github.com/Bellero-Advanced/super-agent-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/Bellero-Advanced/super-agent-framework/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/super-agent-framework.svg)](https://www.npmjs.com/package/super-agent-framework)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+**SAF makes Claude Code prove its work: no "done" without a real run, a reviewer who is not the builder, and a plan of
+small cards that big work cannot drift from.**
 
 [ภาษาไทย](README.th.md)
 
-## What you get
+![A real SAF run: setup, a card whose first verify fails, then passes with evidence](docs/assets/demo.svg)
 
-- **Cards and milestones** in `docs/plan/` — each card lists the files it may touch and the commands that prove it works
-- **`task:verify`** — the only way a card becomes done: it runs the card's commands, checks every changed file is inside the
-  card's `touch` list, and checks acceptance scenarios have tests. Results are written as evidence
-- **Generated status** — `STATE.md` and a SessionStart hook that tells every new Claude session the milestone, the card in
-  progress and its criteria
-- **Agent roles** with full model ids and effort: designer · spec-reviewer (read only) · implementer · qa-runner, plus a
-  library (art-producer · db-guardian · release-operator · security-auditor · data-engineer · content-writer) and custom roles
-- **Parallel lanes** — independent cards run in their own git worktrees; `task:merge` merges one at a time with checks and rollback
-- **Guards** — `docs:check` keeps agent docs true, `check-secrets` blocks secret values, `spec:matrix` maps scenarios to tests,
-  a measure lock queues heavy test runs
-- **`/saf` commands** — `/saf` · `/saf-plan` · `/saf-fix` · `/saf-test` · `/saf-protect` · `/saf-help` (+ short aliases)
+<sub>Every line above is real output, recorded from a fresh project by [`scripts/demo.mjs`](scripts/demo.mjs). The
+builder's first try had a failing test and touched a file outside its card, so the engine refused to call it done.</sub>
 
-The engine is plain Node (≥ 20) with **zero dependencies**, vendored into your repo at `tools/saf/`. It works with pnpm,
-npm, yarn, bun, or no package manager at all.
-
-## Install
+## Quickstart (30 seconds)
 
 ```bash
-cd your-project
-npx github:Bellero-Advanced/super-agent-framework init
-claude
-/saf-setup
+cd your-project            # new or existing, any language
+npx create-saf             # copies the engine (tools/saf/) and the setup skill
+claude                     # then type: /saf-setup
 ```
 
-`init` copies the engine and the setup skill. `/saf-setup` interviews you (grouped questions, each with a recommended
-default), generates everything, runs the self-checks and the first card, then has the designer draft your first milestone
-and waits for your Go.
+`/saf-setup` asks a few grouped questions (each with a recommended answer), generates everything, runs the first card,
+and has the designer draft your first milestone — then waits for your Go.
 
-Non-interactive: `npx github:Bellero-Advanced/super-agent-framework init --answers answers.json` — see
-[docs/install.md](docs/install.md).
+Without npm's `create` step: `npx github:Bellero-Advanced/super-agent-framework init`. Without questions:
+`npx create-saf --answers answers.json` ([docs/install.md](docs/install.md)).
 
-## The card loop
+## How it works
 
 ```
-owner says Go → designer writes cards → task:start → implementer → task:verify → spec-reviewer → qa-runner → commit / task:merge
-             → task:verify M<n> (exit gates) → report → owner closes the milestone
+             ┌──────────── milestone M1 (owner said Go) ────────────┐
+ designer ──▶│ card T-M1-01   card T-M1-02   card T-M1-03 …          │  each card: the files it may touch,
+ writes      └──────┬───────────────┬──────────────────────────────┘  the commands that prove it, scenarios
+ cards              ▼               ▼
+            task:start          task:start --worktree  ◀── parallel lanes: own git worktree, own port
+                │                   │                       (+ side lanes for cards of the next milestone)
+           implementer          implementer
+                │                   │
+           task:verify ──✗──▶ not done: failing command, file outside the card, scenario without a test
+                │ ✓  evidence JSON: commit, every command, exit code, output, changed files
+          spec-reviewer (read only, never the builder)  ·  qa-runner (real runs)
+                │
+          commit / task:merge (one at a time, re-checked, rolled back if it breaks)
+                ▼
+          task:verify M1 ── exit gates ──▶ report ──▶ owner closes the milestone
 ```
 
-Details: [docs/card-lifecycle.md](docs/card-lifecycle.md).
+- **Roles** with fixed models and effort: `designer` and `spec-reviewer` plan and judge; `implementer` and `qa-runner`
+  build and test — plus optional roles (release, security, database, art, data, content) and your own
+- **Gates** per milestone: commands that must pass plus manual checks, recorded as evidence
+- **Lanes**: independent cards run side by side in worktrees; `task:next --parallel` tells you which are safe together
+- **A SessionStart hook** tells every new session the milestone, the card in progress and its criteria — so it does not
+  start from zero or wander off the plan
+
+## Why not plain Claude Code?
+
+| Plain Claude Code | With SAF |
+|---|---|
+| "Done!" — you find out later whether it runs | `task:verify` runs the card's commands; only a pass is recorded as done, with the output kept as evidence |
+| The model that wrote the code also judges it | `spec-reviewer` is a separate, read-only role that checks the code against the spec |
+| A long task slowly drifts from what you asked | Work is cut into small cards; edits outside a card's files fail verify; milestones have exit gates |
+| Each new session forgets where you were | The hook injects the current milestone, card and criteria at every start |
+| Parallel agents step on each other | Worktree lanes with their own ports and test databases; merges go one at a time with checks |
+| Rules live in one long prompt | Generated `CLAUDE.md`, path rules, roles and skills — checked by `docs:check` so they stay true |
+
+The engine is plain Node (≥ 20) with **zero dependencies**, vendored into your repo at `tools/saf/`, and works with npm,
+pnpm, yarn, bun or no package manager. Linux, macOS and Windows are tested in CI.
+
+## What you get
+
+- `/saf <anything>` — one entry point that routes your request (build through a card, plan, bug, tests, security,
+  question); `/saf-plan` for planning and `/saf-setup` to change settings
+- **Skills** loaded when the work matches: debug protocol, TDD, code review, security review, test runner,
+  evidence-before-done, handoff, writing for agents — plus optional packs (UI, database migrations, performance, i18n,
+  mobile, game)
+- **Guards**: `docs:check` (agent docs stay true), `check-secrets`, `spec:matrix` (every scenario ↔ a test), a measure
+  lock that queues heavy test runs
+
+See a real project taken through two milestones: [examples/todo-api](examples/todo-api).
 
 ## Documentation
 
@@ -54,21 +87,14 @@ Details: [docs/card-lifecycle.md](docs/card-lifecycle.md).
 |---|---|
 | Install, non-interactive setup, adopting an existing project | [docs/install.md](docs/install.md) |
 | Every setup question and the config key it sets | [docs/setup-questions.md](docs/setup-questions.md) |
-| Cards, milestones, lanes, evidence | [docs/card-lifecycle.md](docs/card-lifecycle.md) |
+| Cards, milestones, lanes, side lanes, evidence | [docs/card-lifecycle.md](docs/card-lifecycle.md) |
 | Agent roles | [docs/roles.md](docs/roles.md) |
+| Skills and skill packs | [docs/skills.md](docs/skills.md) |
 | Model presets | [docs/model-presets.md](docs/model-presets.md) |
 | `saf.config.json` reference | [docs/config-reference.md](docs/config-reference.md) |
 | Upgrading | [docs/upgrade.md](docs/upgrade.md) |
 | FAQ | [docs/faq.md](docs/faq.md) |
-
-## Develop SAF itself
-
-```bash
-npm test          # unit + end-to-end (node:test, no dependencies)
-```
-
-Layout: `bin/` CLI · `src/` installer · `kit/tools-saf/` the engine and templates copied into projects ·
-`kit/claude/skills/saf-setup/` the interview skill · `test/`.
+| Contributing · security · roadmap · changes | [CONTRIBUTING.md](CONTRIBUTING.md) · [SECURITY.md](SECURITY.md) · [ROADMAP.md](ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md) |
 
 ## License
 

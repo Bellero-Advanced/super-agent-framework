@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+<!-- Source of social-preview.png (GitHub social preview, 1280×640). Render: open in a browser at 1280×640 and take a screenshot. -->
+<style>
+text{font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;fill:#e6edf3}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+</style>
+<rect width="1280" height="640" fill="#0d1117"/>
+<rect x="0" y="0" width="1280" height="8" fill="#56d364"/>
+<text x="80" y="150" font-size="34" fill="#8b949e" class="mono">super-agent-framework</text>
+<text x="80" y="240" font-size="76" font-weight="700">Super Agent Framework</text>
+<text x="80" y="310" font-size="34" fill="#c9d1d9">A card-and-milestone workflow for Claude Code</text>
+<g font-size="30">
+<text x="80" y="400"><tspan fill="#56d364">✓</tspan> "done" only with proof from a real run</text>
+<text x="80" y="450"><tspan fill="#56d364">✓</tspan> the reviewer is never the builder</text>
+<text x="80" y="500"><tspan fill="#56d364">✓</tspan> big work cannot drift from the plan</text>
+</g>
+<rect x="80" y="548" width="430" height="52" rx="8" fill="#161b22" stroke="#30363d"/>
+<text x="100" y="583" font-size="26" fill="#7ee787" class="mono">$ npx create-saf</text>
+<text x="1200" y="583" font-size="24" fill="#8b949e" text-anchor="end">MIT · zero dependencies · Node ≥ 20</text>
+</svg>
