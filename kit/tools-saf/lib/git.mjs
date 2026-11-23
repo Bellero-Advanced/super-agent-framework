@@ -169,11 +169,22 @@ export function topLevel(cwd) {
   const out = tryGit(cwd, ["rev-parse", "--show-toplevel"]);
   if (!out) return null;
   try {
-    return realpathSync(out.trim());
+    return realpathSync.native(out.trim());
   } catch {
     return out.trim();
   }
 }
+
+const realOf = (p) => {
+  try {
+    return realpathSync.native(p);
+  } catch {
+    return p;
+  }
+};
+
+/** Two spellings of one folder (symlink · `..` · Windows 8.3 short name) are the same path. */
+export const samePath = (a, b) => realOf(a) === realOf(b);
 
 /** Folder is the main working tree (has a `.git` directory, not a `.git` file). */
 export const isMainFolder = (root) => isDir(join(root, ".git"));

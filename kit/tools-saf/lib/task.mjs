@@ -1,6 +1,6 @@
 import { execFile } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { basename, dirname, join, normalize, sep } from "node:path";
 import { scriptCommand } from "./config.mjs";
 import {
   changedSince,
@@ -22,6 +22,7 @@ import {
   mergeInProgress,
   resolveCommit,
   revList,
+  samePath,
   showFile,
   submoduleReady,
   topLevel,
@@ -167,9 +168,9 @@ export function laneFolder(root, plan) {
     const branch = currentBranch(root);
     const owner = [...plan.evidence.values()].find((e) => open(e) && e.branch === branch);
     const here = basename(root);
-    const atPath = dirname(root).endsWith(wtDir) && open(plan.evidence.get(here)) ? here : undefined;
+    const atPath = normalize(dirname(root)).endsWith(normalize(wtDir)) && open(plan.evidence.get(here)) ? here : undefined;
     // a lane is guessed from the branch name only for the top level of a linked worktree — a SAF project in a subfolder is not a lane
-    const linked = !isMainFolder(root) && topLevel(root) === realpathSync(root);
+    const linked = !isMainFolder(root) && samePath(topLevel(root), root);
     const id = owner?.id ?? atPath ?? (linked && branch?.startsWith(prefix) ? branch.slice(prefix.length) : undefined);
     if (!id || (owner && !linked && !atPath)) return null;
     throw new TaskError(`no lane label ${LANE_FILE} but this is the worktree of lane card ${id} (branch ${branch ?? "detached"}) — every command is refused here · recover: in the main folder run ${cmd(plan.config, "task:start", `${id} --worktree --resume`)}`);
