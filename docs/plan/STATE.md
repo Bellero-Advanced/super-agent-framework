@@ -6,8 +6,8 @@ No active milestone (a file in `milestones/` with `status: active`).
 
 ## Side lane M2 Roadmap: next — cards done 1/7
 
-- In progress: none
-- Next: T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) · T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again)
+- In progress: **T-M2-11** The lane guard recognises a lane worktree on Windows too (CI matrix green again) — started 2026-11-23 19:16 · not verified yet · lane 1 · .claude/worktrees/T-M2-11
+- Next: T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode)
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -17,15 +17,15 @@ No active milestone (a file in `milestones/` with `status: active`).
 | [T-M2-08](tasks/M2/T-M2-08.md) | task:merge skips the deferred full suite and the milestone gate always runs it | · not started | – |
 | [T-M2-09](tasks/M2/T-M2-09.md) | task:culprit finds the card that broke the deferred full suite | · not started | – |
 | [T-M2-10](tasks/M2/T-M2-10.md) | /saf-setup asks for the test mode and the docs explain the three modes and task:culprit | · not started | – |
-| [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | · not started | – |
+| [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | ▶ in progress | [T-M2-11.json](evidence/T-M2-11.json) · started 2026-11-23 19:16 · not verified yet |
 
 ## Latest evidence
 
+- T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again) — started 2026-11-23 19:16 · not verified yet
 - T-M1-04 Sort the first trial feedback into fixes and roadmap items — passed 2026-11-23 19:09 (2 commands)
 - T-M1-02 Tag v0.1.0 and publish the GitHub release — passed 2026-11-23 19:09 (2 commands)
 - T-M1-03 Upload the social preview image — passed 2026-11-23 19:09 (1 commands)
 - T-M1-01 Publish super-agent-framework and create-saf 0.1.0 to npm — passed 2026-11-23 18:52 (2 commands)
-- T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
 
 ## Other milestones
 
