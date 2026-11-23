@@ -2,6 +2,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { LANGS, languageFor, notAskedText } from "../lib/choices.mjs";
 import { CONFIG_FILE, ConfigError, findRoot, loadConfig, scriptCommand, validateConfig } from "../lib/config.mjs";
 import { culpritLines, findCulprit } from "../lib/culprit.mjs";
 import { detectProject } from "../lib/detect.mjs";
@@ -48,6 +49,7 @@ import {
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
  *   setup --answers <file.json> [--adopt|--no-adopt] · detect · config --check · version
+ *   choices --not-asked [--lang en|th]     settings the setup interview does not ask, and where to change them (exit 2 usage)
  *
  * A lone `--` (npm passes arguments after it) is ignored everywhere except `measure`, where it separates the command.
  */
@@ -369,6 +371,17 @@ async function main() {
       for (const w of report.warnings) err(`  ⚠ ${w}`);
       return 0;
     }
+    case "choices": {
+      const rest = [sub, ...more];
+      const li = rest.indexOf("--lang");
+      const lang = li >= 0 ? rest[li + 1] : undefined;
+      if (!rest.includes("--not-asked") || rest.includes("--group") || (li >= 0 && !LANGS.includes(lang))) {
+        err(`usage: choices --not-asked [--lang ${LANGS.join("|")}]`);
+        return 2;
+      }
+      out(notAskedText(languageFor(process.cwd(), lang)));
+      return 0;
+    }
     case "detect":
       out(JSON.stringify(detectProject(process.cwd()), null, 2));
       return 0;
@@ -384,7 +397,7 @@ async function main() {
       out(readFileSync(new URL("../VERSION", import.meta.url), "utf8").trim());
       return 0;
     default:
-      err("usage: saf task <…> | hook <…> | docs-check | spec-matrix | check-secrets | measure | setup | detect | config --check | version");
+      err("usage: saf task <…> | hook <…> | docs-check | spec-matrix | check-secrets | measure | setup | choices | detect | config --check | version");
       return 2;
   }
 }
