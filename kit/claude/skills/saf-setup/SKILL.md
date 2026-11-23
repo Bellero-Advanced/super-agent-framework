@@ -32,7 +32,7 @@ detection (say what you detected instead):
 3. **Stack** — package manager · confirm the detected commands · database · monorepo / submodules
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model
 5. **Roles and skills** — optional roles (multi-select) · custom role? · report language · optional skill packs (multi-select)
-6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · **test mode** (how often the full suite runs — show the pros/cons table of [questions.md](questions.md#test-mode--explain-each-choice-before-asking), recommend `milestone`) and the command that runs only some test files · measure lock · performance budgets file
+6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · **test mode** (how often the full suite runs — explain the modes from the `choices --group 6` output, shown as printed (see below), recommend `milestone`) and the command that runs only some test files · measure lock · performance budgets file
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")
 
@@ -52,6 +52,8 @@ options also carry the values they derive). Then:
   (`- pnpm · npm · yarn · bun`): give each of them a row. A question with no options (a typed value) gets its one
   explanation as four short lines instead of a table. Identity questions (names, pitch, owner title, time zone, goal) print
   nothing: ask them without an explanation.
+- When an option prints derived values under its four lines (card sizes, test caps, review and merge checks for a rigor;
+  planner and builder models for a preset), add them as one line under that option's row, as printed.
 - Put the "pick it when" line of each option in its AskUserQuestion option description, as printed.
 - A question you skip because detection made the answer certain: say what was detected. Offer its explanation only when the
   person asks for it.
@@ -75,7 +77,8 @@ already know, instead of forcing them into options.
    - Change an answer: ask which one, update it, show the changed rows and ask again.
    - Adjust a setting that was not asked: ask for the keys and values in one plain message (dotted keys from the list above),
      add them to the answers you write to `.saf/setup-answers.json` in Step 3, and ask again. `setup` still checks them
-     against the schema.
+     against the schema. The per-machine block of the list is not a setup answer: for `SAF_TEST_MODE` or
+     `saf.config.local.json` follow the paragraph about test mode under Step 1 (the file holds only `workflow.testMode`).
 
 ## Step 3 — generate
 

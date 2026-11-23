@@ -37,8 +37,8 @@ See [model-presets.md](model-presets.md).
 | Key | Default | Notes |
 |---|---|---|
 | `preset` | `balanced` | max · balanced · economy · custom — picks the planner and builder models |
-| `planner` · `builder` | from the preset | full model ids; `custom` takes them from here |
-| `sessionDefault` | the builder model | the model for sessions opened without `--model` |
+| `planner` · `builder` | from the preset | full model ids; a non-empty value replaces the preset's model for every preset, and `custom` has no models of its own |
+| `sessionDefault` | the builder model | the model the generated CLAUDE.md tells a session opened without `--model` to start with; nothing enforces it |
 | `overrides` | {} | per role, `{ "<role>": { "model": …, "effort": … } }` — e.g. `{"qa-runner": {"effort": "low"}}`; not asked by the interview |
 
 ## roles

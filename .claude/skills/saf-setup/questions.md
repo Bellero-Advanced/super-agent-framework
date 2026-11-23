@@ -94,18 +94,7 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 
 ### Test mode — explain each choice before asking
 
-Show this table (translate it into the chat language) and ask the question once. A card always proves itself with a real
-test run; the mode only decides how often the **full** suite runs. In the two deferred modes a card's evidence carries
-its targeted-test run marked "full suite deferred to gate". In `milestone` mode the exit gate always runs the full suite; in `targeted` mode the full suite runs when a lane card merges.
-
-| Mode | What it is | Good for | Cost | Pick when |
-|---|---|---|---|---|
-| `every-card` | The full suite runs at every card's verify and again at merge | Catching a break on the very card that caused it; small suites | The slowest: the same suite runs two or three times per card | The suite takes seconds, or the project is high-risk (money, safety, data) |
-| `targeted` | Each lane card verifies with its own changed and scenario tests; the full suite runs once per card, when the card reaches the main branch | A middle path: one full run per card, no repeat | A break in untouched code shows at merge, not at verify; main-folder cards still run the full suite at verify | The suite takes a few minutes and you want every merge proven (SAF's own repository uses `targeted`) |
-| `milestone` (recommended) | Each card verifies with its own tests; merge skips the full suite; the full suite runs once at the milestone exit gate | The fastest loop; weak machines; large suites | A break elsewhere is found only at the gate — `task:culprit <M>` then finds the card by binary search (extra runs, but only when the gate fails) | Most projects: the suite takes more than a minute, or the machine is slow |
-
-Targeted runs need `stack.commands.testFiles`. Without it (or when a card changes no test file and names no scenario),
-the card runs the full suite instead — nothing is ever skipped without a real test run.
+The four lines for each mode (what it is · good for · cost · pick it when) come from `node tools/saf/bin/saf.mjs choices --group 6 --lang <chat language>`, shown as printed — this file keeps no copy. Recommended: `milestone`. How each mode behaves (deferred evidence, the exit gate, the per-machine override) is in the SAF repository's docs/card-lifecycle.md, section Test mode.
 
 Each person can override the repo's choice on their own machine, without changing a tracked file: the environment variable
 `SAF_TEST_MODE`, or an untracked `saf.config.local.json` that holds only `workflow.testMode` (any other key is refused,

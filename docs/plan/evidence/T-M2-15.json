@@ -7,19 +7,19 @@
     "base": "0ee8c4134540038918126351db35939bcfa16521",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-15",
   "worktree": ".claude/worktrees/T-M2-15",
   "verified": {
-    "at": "2026-11-23T21:26:09.661Z",
-    "head": "893869fe0001fa882132798526df0fe05f268abb",
+    "at": "2026-11-23T21:32:02.558Z",
+    "head": "6e09a7e5b97780c85afeb6fdb66328d95c8e75fb",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 324,
+        "ms": 318,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,13 +46,13 @@
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('kit/claude/skills/saf-setup/SKILL.md','utf8');if(!s.includes('choices --group')||!s.includes('choices --not-asked')||!s.includes('--no-adopt'))process.exit(1)\"",
         "exit": 0,
-        "ms": 41,
+        "ms": 42,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 307,
+        "ms": 282,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -66,13 +66,13 @@
         "tail": [
           "ok 12 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.729791",
+          "  duration_ms: 0.751083",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "ok 13 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.789917",
+          "  duration_ms: 0.82025",
           "  type: 'test'",
           "  ...",
           "1..13",
@@ -83,7 +83,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2344.522708"
+          "# duration_ms 2340.074375"
         ]
       }
     ],
@@ -99,10 +99,10 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/config-reference.md": "a2c82fb1330d071a660b2d15afba893ff6d34f17",
+        "docs/config-reference.md": "a348a267190e473b07cf115624d1612a8d0d23e0",
         "docs/setup-questions.md": "0532688bb70674780062c747edca60ce8b574916",
-        "kit/claude/skills/saf-setup/SKILL.md": "04d7ad171e471695224c51b154a42a0aca50845b",
-        "kit/claude/skills/saf-setup/questions.md": "77fa22a8a713d9871cc485c492b8654b2110fc22",
+        "kit/claude/skills/saf-setup/SKILL.md": "2c0863bec340ded3a6b5f7d9c8dda6a6c780f376",
+        "kit/claude/skills/saf-setup/questions.md": "c527d09e610e4adf73befd61325f0cd4e9ce14f1",
         "kit/tools-saf/lib/choices.mjs": "41c31097e6870cb1dbaa24de6bed5cfd26cf4972",
         "test/unit/setup-choices.test.mjs": "fb46be973185bbe330446c955af168b3d663e9d7"
       }
@@ -118,7 +118,7 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 108,
+        "lines": 126,
         "cap": 150
       },
       "test": {
