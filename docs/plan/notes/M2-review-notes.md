@@ -19,3 +19,12 @@ line with the card id or "dropped (reason)". Blocking findings never wait here �
 7. the oldest base is chosen by first-parent commit count — the rule says "oldest ancestor of HEAD"; confirm they agree
 8. no `onOutput` streaming — a long run shows nothing until it ends
 9. tie order when a commit matches several cards (subject id vs. file overlap) is not specified or tested
+
+## T-M2-18 (review PASS) — notes for the designer
+
+1. a minified one-line `package.json` has no indented line, so adding a script re-expands it to 2-space indent (rule 6 does not cover it; a `""` fallback would keep it minified)
+2. a valid JSON root that is not an object (e.g. `[]`) gets the message "package.json is not valid JSON" — behaviour right, wording slightly off
+3. a project that ran `init` without answers (stub config) passes validation, `packageManager` defaults to "npm", so upgrade adds the SAF scripts before setup ran — harmless, but the spec does not say so
+4. test gaps: BOM keeping · schema-invalid `saf.config.json` · non-object root or `scripts` · "unchanged" asserted only on `scripts`, not on other top-level keys
+5. pre-existing: `upgrade()` still calls `JSON.parse` on `saf.config.json` unguarded (install.mjs ~157) — an invalid config warns, then crashes
+6. `docs/specs/upgrade-scripts.md` header still says D-010 "(proposed)" — it is decided
