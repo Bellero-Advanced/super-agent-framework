@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -8,7 +9,7 @@ import { REPO, cleanup, gitRepo, lib, write } from "../helpers.mjs";
 
 const { generate, alignShellComments, templateData, MANIFEST } = await lib("generate.mjs");
 const { resolveConfig, CORE_SKILLS, recommendPacks } = await lib("config.mjs");
-const { init, upgrade } = await import(join(REPO, "src", "install.mjs"));
+const { init, upgrade } = await import(pathToFileURL(join(REPO, "src", "install.mjs")).href);
 const { detectProject } = await lib("detect.mjs");
 after(cleanup);
 

@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -6,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 export const REPO = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const LIB = join(REPO, "kit", "tools-saf", "lib");
-export const lib = (name) => import(join(LIB, name));
+export const lib = (name) => import(pathToFileURL(join(LIB, name)).href);
 
 // deterministic git for every test repo (no global config, no signing)
 Object.assign(process.env, {
