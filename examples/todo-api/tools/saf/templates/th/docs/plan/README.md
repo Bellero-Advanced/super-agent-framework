@@ -29,8 +29,8 @@
 ไฟล์ใน `dont_touch` · ฉากที่ไม่มี test)
 
 ความถี่ที่ test **ทั้งชุด** รันคือ `workflow.testMode` (`every-card` · `targeted` · `milestone` · ค่าเริ่มต้น `milestone`) ·
-ในโหมดที่เลื่อน การ์ดพิสูจน์ตัวเองด้วย test ของมันเอง หลักฐานจะมีคำว่า "full suite deferred to gate" (เลื่อนไปที่ประตู) และประตูออก
-milestone รัน test ทั้งชุดเสมอ (ถ้าล้ม `{{cmd.taskCulprit}}` หาการ์ดที่ทำให้ล้ม) · แต่ละคนเปลี่ยนโหมดในเครื่องตัวเองได้ด้วย `SAF_TEST_MODE` หรือไฟล์ `saf.config.local.json`
+ในโหมดที่เลื่อน การ์ดพิสูจน์ตัวเองด้วย test ของมันเอง หลักฐานจะมีคำว่า "full suite deferred to gate" (เลื่อนไปที่ประตู) · ในโหมด `milestone`
+ประตูออกรัน test ทั้งชุดเสมอ ส่วนในโหมด `targeted` test ทั้งชุดรันตอนรวมการ์ดสาย (ถ้าประตูล้ม `{{cmd.taskCulprit}}` หาการ์ดที่ทำให้ล้ม) · แต่ละคนเปลี่ยนโหมดในเครื่องตัวเองได้ด้วย `SAF_TEST_MODE` หรือไฟล์ `saf.config.local.json`
 ที่ git ไม่ track (ใส่ได้เฉพาะ `workflow.testMode` · key `$schema` ในไฟล์นี้ถูกปฏิเสธ)
 
 ## 2. รูปแบบการ์ด

@@ -30,7 +30,7 @@ files outside `touch` · files in `dont_touch` · scenarios without a test).
 
 How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default `milestone`).
 In the deferred modes a card proves itself with its own tests, its evidence says "full suite deferred to gate", and the
-milestone exit gate always runs the full suite (when it fails, `npm run task:culprit -- <M>` finds the card that broke it). Each person can override the mode with `SAF_TEST_MODE` or an untracked
+in `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card merges (when the gate fails, `npm run task:culprit -- <M>` finds the card that broke it). Each person can override the mode with `SAF_TEST_MODE` or an untracked
 `saf.config.local.json` (only `workflow.testMode`; a `$schema` key there is refused).
 
 ## 2. Card format

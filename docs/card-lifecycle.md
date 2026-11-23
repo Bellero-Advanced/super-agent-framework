@@ -125,9 +125,10 @@ passes without a real test run when its "Done when" names one; the mode only mov
   run with `stack.commands.testFiles`) run instead of the full suite. Its evidence records the mode and where it came from,
   the commands not run and the files tested, and every place the result appears says "full suite deferred to gate". With no
   `testFiles` command or no targeted files, nothing is deferred: the full suite runs and the evidence says why.
-- **The gate always runs the full suite.** In `milestone` mode `task:verify <M>` adds a `full-suite` gate for any full-suite
-  command the declared gates do not run (the id `full-suite` is reserved). Whoever runs the gate, in whatever mode, the
-  suite runs.
+- **In `milestone` mode the exit gate always runs the full suite.** `task:verify <M>` adds a `full-suite` gate for any
+  full-suite command the declared gates do not run (the id `full-suite` is reserved), so the suite runs whoever runs the
+  gate. In `targeted` mode the gate is as written and the full suite runs when a lane card merges (a main-folder card runs
+  it at its own verify); in `every-card` mode it runs at every verify and merge.
 - **When the gate fails**, `task:culprit <M>` finds the card: it tests the milestone's committed history in a temporary
   worktree (binary search, the main folder is never touched, nothing is written in `docs/plan/`) and names the card and commit.
   Exit **0** found · **2** already failing before the first card · **3** passes at HEAD (flaky, or already fixed) · **1** error
@@ -137,7 +138,7 @@ passes without a real test run when its "Done when" names one; the mode only mov
   Order: env, local file, `saf.config.json`, default. Generated files never depend on either.
 
 Which mode to pick (what it is, good for, cost, pick when) is in the setup question:
-[questions.md](../kit/claude/skills/saf-setup/questions.md#test-mode--explain-each-choice-before-asking). This repo itself
+[questions.md](../kit/claude/skills/saf-setup/questions.md#test-mode--explain-each-choice-before-asking). SAF's own repository
 uses `targeted`, because its cards change the engine that writes the evidence.
 
 ## Measure lock
