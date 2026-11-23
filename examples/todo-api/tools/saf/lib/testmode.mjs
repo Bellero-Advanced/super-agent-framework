@@ -16,6 +16,16 @@ export const VERIFY_DEFERS = {
   milestone: { main: true, lane: true },
 };
 
+/**
+ * Rule 15, merge column and exit-gate column: does `task:merge` skip the full-suite commands of `mergeChecks`,
+ * and does the milestone exit gate add the full suite when no gate runs it? Unknown mode = neither.
+ */
+export const MERGE_SKIPS_FULL_SUITE = { "every-card": false, targeted: false, milestone: true };
+export const GATE_ADDS_FULL_SUITE = { "every-card": false, targeted: false, milestone: true };
+
+/** The extra exit gate of rule 19 (the `run` list is every full-suite command, see `fullSuiteCommands`). */
+export const FULL_SUITE_GATE = { id: "full-suite", text: "the full test suite (deferred from the cards)" };
+
 /** Placeholder in `stack.commands.testFiles` that is replaced by the quoted file paths. */
 export const FILES_PLACEHOLDER = "{files}";
 
@@ -26,6 +36,30 @@ export function isFullSuite(config, cmd) {
     const v = (config.stack?.commands?.[k] ?? "").trim();
     return v !== "" && v === c;
   });
+}
+
+/** Every distinct full-suite command of the project, in FULL_SUITE_KEYS order. */
+export function fullSuiteCommands(config) {
+  const out = [];
+  for (const k of FULL_SUITE_KEYS) {
+    const v = (config.stack?.commands?.[k] ?? "").trim();
+    if (v !== "" && !out.includes(v)) out.push(v);
+  }
+  return out;
+}
+
+/** Rule 18: `mergeChecks` without the full-suite commands in a mode that skips them, unchanged otherwise. */
+export function mergeChecksFor(config) {
+  const checks = config.workflow?.mergeChecks ?? [];
+  return MERGE_SKIPS_FULL_SUITE[config.workflow?.testMode] ? checks.filter((c) => !isFullSuite(config, c)) : checks;
+}
+
+/** Rule 19: the gates to run — the milestone's gates, plus the `full-suite` gate when the mode requires it and no gate runs a full-suite command. */
+export function gatesWithFullSuite(config, gates) {
+  if (!GATE_ADDS_FULL_SUITE[config.workflow?.testMode]) return gates;
+  const run = fullSuiteCommands(config);
+  if (!run.length || gates.some((g) => g.run.some((c) => isFullSuite(config, c)))) return gates;
+  return [...gates, { ...FULL_SUITE_GATE, run }];
 }
 
 /** Rule 15, verify column. */
