@@ -1,30 +1,40 @@
 ---
-description: Plain-language request → find the matching card and role, run it through the card loop, prove it with real runs, report briefly
-argument-hint: <what you want, in plain words>
+description: Say what you want in plain words — SAF routes it (build through the card loop · plan · bug · test · security · question · how to use SAF), proves it with real runs and reports briefly
+argument-hint: <what you want, in plain words — or "help">
 ---
 
-# /saf — route work through the card loop
+# /saf — one entry point
 
 Request: $ARGUMENTS
 
-## 1. Locate
+## 1. Route
 
-1. Read the injected status (or `docs/plan/STATE.md`): active milestone, cards in progress, next cards.
-2. Match the request to a card in `docs/plan/tasks/`:
-   - a card exists → use it
-   - no card, but it belongs to the active milestone → `designer` writes the card first (`/saf-plan`), then continue
-   - not in any milestone → tell the {{owner}} in one line and ask whether to add it; do not invent work
-   - a bug → `/saf-fix` · tests only → `/saf-test` · security → `/saf-protect`
-3. Check `depends` of the card — an unmet dependency comes first.
+Read the injected status (or `docs/plan/STATE.md`) first, then pick **one** route:
 
-## 2. Run the card
+| The request is… | Route |
+|---|---|
+| empty, "help", "how do I use this", "what can you do" | **Help** (section 4) — answer it yourself, change nothing |
+| a question about this project ("where is…", "why does…", "what's the status") | answer from `docs/INDEX.md` → the topic's home and the code · change nothing |
+| plan a milestone, or new work that is in no milestone yet | `/saf-plan` — never invent work: ask the {{owner}} once whether to add it |
+| a bug, error, crash, flaky test | the `debug-protocol` skill — root cause with evidence before any edit |
+| "run the tests", "is it working", numbers | the `test-runner` skill (hand it to `qa-runner`) |
+| security, secrets, "is this safe" | the `security-review` skill{{#if hasRole.security_auditor}} (hand it to `security-auditor`){{/if}} |
+| build or change something | the card loop (section 2) |
+
+Unclear between two routes → ask one short question with a recommendation.
+
+## 2. Card loop (build or change)
+
+1. Match the request to a card in `docs/plan/tasks/` of the active milestone. No card yet but it belongs to the active
+   milestone → `designer` writes the card first, then continue. Unmet `depends` come first.
+2. Run it:
 
 | Step | Who | Command |
 |---|---|---|
 | start | main session | `{{cmd.taskStart}}`{{#if lanesOn}} (code-lane role → `{{cmd.taskStartLane}}`){{/if}} |
 | build | the card's `role` agent | touch only files in `touch` |
 | verify | same agent | `{{cmd.taskVerify}}` until it passes |
-| review | `spec-reviewer` (read only){{#unless reviewEvery}} — size M cards; S cards at the milestone gate{{/unless}} | give it the card id{{#if tokenSaving.reviewerDiff}} and a diff file{{/if}} |
+| review | `spec-reviewer` (read only){{#unless reviewEvery}} — size M cards; S cards at the milestone gate{{/unless}} | the card id{{#if tokenSaving.reviewerDiff}} and a diff file{{/if}} |
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
 | land | main session | commit{{#if lanesOn}} · lane card → `{{cmd.taskMerge}}`{{/if}} |
 
@@ -32,7 +42,29 @@ Independent cards may run in parallel{{#if lanesOn}} — `{{cmd.taskNext}}` list
 
 ## 3. Report
 
-Reply in {{chatLanguageName}}, results first: what changed for the user · which card · the verify result with the real
+Reply in {{chatLanguageName}}, results first: what changed for the user · which card · the verify result with real
 numbers · anything the {{owner}} must decide (once, with options and a recommendation). No stack traces.
+Never say "done" without real run output (the `evidence-before-done` skill).
 
-Never report "done" without a passing `task:verify` run.
+## 4. Help (answer this yourself)
+
+Show the {{owner}}, in {{chatLanguageName}}:
+
+- **Commands:** `/saf <anything>` (this) · `/saf-plan <M or goal>` (designer writes cards and specs, then waits for Go) ·
+  `/saf-setup` (change settings — re-runs the interview)
+- **Skills load by themselves** when the work matches: {{skillNamesText}}
+- **Roles:**
+
+| Role | Model | Effort | Does |
+|---|---|---|---|
+{{#each roles}}
+| `{{.name}}` | `{{.model}}` | {{.effort}} | {{.summary}} |
+{{/each}}
+
+- **Open a session per role:**
+{{#each sessionRows}}
+  - {{.work}} ({{.roles}}): `claude --model {{.model}}`
+{{/each}}
+- **Card commands:** `{{cmd.taskStart}}` → work → `{{cmd.taskVerify}}` → review → commit · status `docs/plan/STATE.md` ·
+  how it works `docs/plan/README.md`
+- **Try:** `/saf what is the next card?` · `/saf the login page crashes on submit` · `/saf run the tests`

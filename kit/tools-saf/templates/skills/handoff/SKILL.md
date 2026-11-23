@@ -1,6 +1,6 @@
 ---
 name: handoff
-description: Hand work to another agent or a later session without losing context — a short brief with the goal, the card, what was ruled out, the files that matter and the exact next step. Use before delegating, before a session ends mid-card, or when context is about to run out.
+description: Hand work to another agent or a later session without losing context — goal, card, what was ruled out, key files, exact next step. Use before delegating or when a session ends mid-card.
 ---
 
 # Handoff

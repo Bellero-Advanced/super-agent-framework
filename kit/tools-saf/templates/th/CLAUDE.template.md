@@ -16,7 +16,7 @@
 
 ## เปิด session ตามบทบาท
 
-agent อยู่ใน `.claude/agents/` (โมเดล + effort ตายตัวต่อบทบาท — `{{cmd.docsCheck}}` ตรวจ) · `/saf` ส่งงานตามรอบการ์ด
+agent อยู่ใน `.claude/agents/` (โมเดล + effort ตายตัวต่อบทบาท — `{{cmd.docsCheck}}` ตรวจ) · `/saf <อะไรก็ได้เป็นภาษาคน>` ส่งงานให้ถูกทาง (รอบการ์ด · วางแผน · บั๊ก · ทดสอบ · ความปลอดภัย · วิธีใช้) · skill ใน `.claude/skills/` โหลดเอง
 
 | งาน | บทบาท | เปิด session หลักด้วย |
 |---|---|---|
@@ -113,7 +113,7 @@ npm ส่งอาร์กิวเมนต์หลัง `--`: `npm run tas
 
 ```
 docs/        INDEX · DECISIONS · plan/ (milestone · การ์ด · หลักฐาน · STATE) · specs/ · archive/ (ประวัติ)
-.claude/     agents/ · commands/ (/saf…) · rules/ · skills/ · settings.json (hook ไม่มี env)
+.claude/     agents/ · commands/ (/saf · /saf-plan) · rules/ · skills/ · settings.json (hook ไม่มี env)
 .saf/        plan.md (กระจกแผน สร้างอัตโนมัติ) · manifest.json
 tools/saf/   เครื่องมือรอบการ์ด (vendored ไม่มี dependency) · saf.config.json = ค่าตั้งของมัน
 ```

@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Test-driven development — red, green, refactor. Write a failing test from the spec or acceptance scenario first, make it pass with the smallest change, then clean up. Use when building a feature or fixing a bug test-first.
+description: Test-driven development — red, green, refactor, one acceptance scenario at a time. Use when building a feature or fixing a bug test-first.
 ---
 
 # Test-driven development

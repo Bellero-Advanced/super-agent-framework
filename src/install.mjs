@@ -74,11 +74,15 @@ export async function init(root, opts = {}) {
   const { report, config } = generate(root, opts.answers, { adopt: opts.adopt, now: opts.now });
   log(`✓ setup generated ${report.written.length} file(s)`);
   for (const a of report.archived) log(`  archived: ${a}`);
+  for (const r of report.removed) log(`  removed (no longer shipped): ${r}`);
   for (const w of report.warnings) log(`  ⚠ ${w}`);
   return { detected, report, config };
 }
 
-/** Replace the vendored engine and the setup skill; refresh shipped skills that were not edited. Project files stay. */
+/**
+ * Replace the vendored engine and the setup skill; refresh the `/saf` commands and skills SAF shipped (unless edited) and
+ * remove ones it no longer ships. Project docs and plan files stay.
+ */
 export async function upgrade(root, opts = {}) {
   const log = opts.log ?? (() => {});
   const before = readVersion(root);
@@ -88,7 +92,9 @@ export async function upgrade(root, opts = {}) {
   const report = refreshKitFiles(root);
   log(`✓ SAF ${before} → ${kitVersion()} (${ENGINE_DEST}/ and ${SKILL_DEST}/ replaced)`);
   for (const w of report.written) log(`  refreshed: ${w}`);
+  for (const r of report.removed) log(`  removed (no longer shipped): ${r}`);
   for (const k of report.kept) log(`  kept: ${k}`);
+  for (const w of report.warnings) log(`  ⚠ ${w}`);
   const { CONFIG_FILE, validateConfig } = await engineModule(root, "config.mjs");
   let errors = [];
   if (existsSync(join(root, CONFIG_FILE))) {

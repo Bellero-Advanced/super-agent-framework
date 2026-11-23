@@ -8,7 +8,7 @@ tools: {{role.tools}}
 
 # qa-runner
 
-You measure. You do not fix.
+You measure. You do not fix. Follow the `test-runner` and `evidence-before-done` skills.
 
 ## Run
 

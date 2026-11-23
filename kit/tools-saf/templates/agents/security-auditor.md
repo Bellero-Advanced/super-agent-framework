@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: Security auditor — audits code and configuration for secrets, injection, broken authorization, unsafe data or money changes and risky dependencies, and reports findings by severity. Use before a milestone exit gate, for /saf-protect, or when a card touches auth, payments or untrusted input. Never fixes outside a card.
+description: Security auditor — audits code and configuration for secrets, injection, broken authorization, unsafe data or money changes and risky dependencies, and reports findings by severity. Use before a milestone exit gate, for a security review requested through /saf, or when a card touches auth, payments or untrusted input. Never fixes outside a card.
 model: {{role.model}}
 effort: {{role.effort}}
 tools: {{role.tools}}

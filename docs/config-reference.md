@@ -34,6 +34,12 @@ validates; every engine command validates on load. Missing keys get the defaults
 See [model-presets.md](model-presets.md) and [roles.md](roles.md): `models.preset/planner/builder/sessionDefault/overrides`,
 `roles.enabled/custom/reportLanguage`.
 
+## skills
+
+| Key | Default | Notes |
+|---|---|---|
+| `packs` | from the answers (`null` = derive) | any of ui-frontend · db-migrations · performance · i18n · mobile · game — see [skills.md](skills.md) |
+
 ## workflow
 
 | Key | Default | Notes |

@@ -16,7 +16,7 @@ This file = unbreakable rules + commands + where to start. Everything else lives
 
 ## Open a session per role
 
-Agents live in `.claude/agents/` (model + effort fixed per role — `{{cmd.docsCheck}}` verifies) · `/saf` routes work through the card loop.
+Agents live in `.claude/agents/` (model + effort fixed per role — `{{cmd.docsCheck}}` verifies) · `/saf <anything in plain words>` routes the work (card loop · plan · bug · test · security · help) · skills in `.claude/skills/` load by themselves.
 
 | Work | Roles | Open the main session with |
 |---|---|---|
@@ -113,7 +113,7 @@ npm passes arguments after `--`: `npm run task:verify -- T-M1-01`.
 
 ```
 docs/        INDEX · DECISIONS · plan/ (milestones · tasks · evidence · STATE) · specs/ · archive/ (history)
-.claude/     agents/ · commands/ (/saf…) · rules/ · skills/ · settings.json (hooks, no env)
+.claude/     agents/ · commands/ (/saf · /saf-plan) · rules/ · skills/ · settings.json (hooks, no env)
 .saf/        plan.md (generated mirror) · manifest.json
 tools/saf/   workflow engine (vendored, no dependencies) · saf.config.json = its settings
 ```

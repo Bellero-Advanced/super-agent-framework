@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review changes since a fixed point (commit, branch or merge-base) on two axes — standards (does the code follow this repo's documented rules?) and spec (does it do what the card and spec asked?). Use to review a card, a branch or work in progress.
+description: Review a card, branch or work in progress against its spec and this repo's rules (two axes: spec · standards). Ends with PASS or FAIL; never rewrites the code.
 ---
 
 # Code review

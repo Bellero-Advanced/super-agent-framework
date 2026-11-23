@@ -1,6 +1,6 @@
 ---
 name: debug-protocol
-description: Evidence-first debugging in five stages — reproduce, evidence, diagnose, fix, prove. Never touch code before the root cause is stated with evidence; fix the source, not the symptom. Use for any bug, error, crash, regression, flaky test or unexpected behaviour.
+description: Bug, error, crash, regression or flaky test — reproduce, gather evidence, state the root cause, then fix at the source with a test that proves it. Never edit code before the cause is proven.
 ---
 
 # Debug protocol
@@ -25,7 +25,9 @@ apart and run it. Never stack "maybe" fixes.
 
 - fix at the source (the wrong assumption), not where the symptom shows
 - write a test that fails before the fix and passes after
-- keep the change inside the card's `touch`; a larger fix needs its own card
+- where it lands: inside a card in progress → part of that card (stay inside its `touch`) · otherwise the designer writes a
+  small fix card and it runs `{{cmd.taskStart}}` → `{{cmd.taskVerify}}`
+- a flaky test is a bug — fix the flakiness, never retry until green
 
 ## 5. Prove
 
@@ -34,5 +36,9 @@ Flaky? Run it enough times to show the failure rate before and after.
 
 ## Dead end
 
-Stuck after two hypotheses failed: stop guessing, widen the evidence (add logging, bisect with `git bisect`, minimise the
-input), and write down what has been ruled out.
+Two hypotheses failed → stop guessing, widen the evidence (more logging, `git bisect`, a smaller input) and write down what
+has been ruled out.
+
+## Report
+
+Cause · fix · proof (command + exit code + counts). No stack-trace dumps.

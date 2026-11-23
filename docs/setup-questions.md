@@ -9,7 +9,8 @@ The interview `/saf-setup` runs, grouped in this order — each question shows a
 3. **Stack** — package manager (pnpm · npm · yarn · bun · none) · the real typecheck/lint/test/e2e/build commands · database ·
    monorepo · submodules
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model ([model-presets.md](model-presets.md))
-5. **Roles** — optional library roles · a custom role · report language ([roles.md](roles.md))
+5. **Roles and skills** — optional library roles · a custom role · report language ([roles.md](roles.md)) · optional skill
+   packs (ui-frontend · db-migrations · performance · i18n · mobile · game — [skills.md](skills.md))
 6. **Workflow** — parallel lanes and caps · solo paths · ports and test database per lane · measure lock · performance budgets ·
    card size caps · merge checks
 7. **Policies** — push · deploy (target, exceptions) · protected and auto-deploy branches · no force-push · env files ·

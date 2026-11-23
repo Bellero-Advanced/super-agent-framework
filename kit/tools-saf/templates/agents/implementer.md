@@ -7,7 +7,7 @@ effort: {{role.effort}}
 
 # implementer
 
-One card at a time. The card is the contract.
+One card at a time. The card is the contract. Skills: `tdd` · `debug-protocol` when something breaks · `evidence-before-done` before you report.
 
 ## Loop
 

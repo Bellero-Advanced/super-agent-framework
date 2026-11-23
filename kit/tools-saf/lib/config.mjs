@@ -52,6 +52,23 @@ export const RIGOR = {
   strict: { sizes: { S: 100, M: 300 }, testCaps: { S: 200, M: 500 }, review: "every-card+security", merge: ["typecheck", "lint", "test", "build"] },
 };
 
+/** Skills every project gets. Optional packs add one skill each (same name as the pack). */
+export const CORE_SKILLS = ["debug-protocol", "tdd", "code-review", "security-review", "writing-for-agents", "handoff", "evidence-before-done", "test-runner"];
+export const SKILL_PACKS = ["ui-frontend", "db-migrations", "performance", "i18n", "mobile", "game"];
+
+/** Packs recommended from the project's answers (used when skills.packs is not set). */
+export function recommendPacks(c) {
+  const t = c.project.type;
+  const out = new Set();
+  if (["web-app", "mobile", "game", "erp"].includes(t)) out.add("ui-frontend");
+  if (c.stack.database && c.stack.database !== "none") out.add("db-migrations");
+  if (t === "game") out.add("performance");
+  if (c.people.i18nRequired || c.people.uiLanguages.length > 1) out.add("i18n");
+  if (t === "mobile") out.add("mobile");
+  if (t === "game") out.add("game");
+  return SKILL_PACKS.filter((p) => out.has(p));
+}
+
 export const PROJECT_TYPES = ["web-app", "mobile", "game", "api", "erp", "data-ai", "library-cli", "other"];
 
 const DEFAULTS = {
@@ -68,6 +85,7 @@ const DEFAULTS = {
   },
   models: { preset: "balanced", planner: "", builder: "", sessionDefault: "", overrides: {} },
   roles: { enabled: [...CORE_ROLES], custom: [], reportLanguage: "en" },
+  skills: { packs: null },
   workflow: {
     sizes: null,
     testCaps: null,
@@ -175,6 +193,7 @@ export function resolveConfig(raw = {}) {
     const lock = { pnpm: ["pnpm-lock.yaml", "package.json", "pnpm-workspace.yaml"], npm: ["package-lock.json", "package.json"], yarn: ["yarn.lock", "package.json"], bun: ["bun.lockb", "bun.lock", "package.json"] }[pm];
     c.workflow.mergeInstall = lock && c.workflow.laneInstall ? { cmd: c.workflow.laneInstall, files: lock } : { cmd: "", files: [] };
   }
+  c.skills.packs ??= recommendPacks(c);
   if (!c.roles.enabled.length) c.roles.enabled = [...CORE_ROLES];
   for (const r of [...CORE_ROLES].reverse()) if (!c.roles.enabled.includes(r)) c.roles.enabled.unshift(r);
   for (const r of c.roles.custom) if (!c.roles.enabled.includes(r.name)) c.roles.enabled.push(r.name);

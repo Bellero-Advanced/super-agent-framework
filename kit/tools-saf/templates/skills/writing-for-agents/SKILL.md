@@ -1,6 +1,6 @@
 ---
 name: writing-for-agents
-description: How to write documents agents read — CLAUDE.md, agent roles, rules, commands, skills, cards and specs. Use when creating or editing any of them.
+description: How to write files agents read — CLAUDE.md, agents, rules, commands, skills, cards, specs. Use when creating or editing any of them.
 ---
 
 # Writing for agents

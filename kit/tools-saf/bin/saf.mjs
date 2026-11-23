@@ -356,6 +356,7 @@ async function main() {
       const { report } = generate(root, answers, { adopt });
       out(`✓ SAF setup generated ${report.written.length} file(s)`);
       for (const a of report.archived) out(`  archived: ${a}`);
+      for (const r of report.removed) out(`  removed (no longer shipped): ${r}`);
       for (const w of report.warnings) err(`  ⚠ ${w}`);
       return 0;
     }

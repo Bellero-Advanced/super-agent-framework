@@ -24,9 +24,9 @@
 | เรื่อง | บ้าน |
 |---|---|
 | บทบาท · โมเดล · effort | `.claude/agents/` |
-| คำสั่ง (/saf …) | `.claude/commands/` |
+| คำสั่ง: `/saf` (ทางเข้าเดียว — ตอบ "help" ด้วย) · `/saf-plan` · `/saf-setup` | `.claude/commands/` |
 | กฎตาม path | `.claude/rules/` |
-| skill (ตรวจโค้ด · ดีบัก · tdd · ความปลอดภัย …) | `.claude/skills/` |
+| skill — โหลดเองเมื่องานตรง: {{skillNamesText}} | `.claude/skills/` |
 | ค่าตั้ง SAF (ตรวจด้วย schema) | [saf.config.json](../saf.config.json) · schema `tools/saf/schema/saf.config.schema.json` |
 | แม่แบบการ์ด | [plan/tasks/_template.md](plan/tasks/_template.md) |
 

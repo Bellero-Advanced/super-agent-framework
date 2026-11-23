@@ -1,6 +1,6 @@
 ---
 name: saf-setup
-description: Set up SAF (Super Agent Framework) in this project — interview the user in grouped questions with recommended defaults, generate CLAUDE.md, docs, the card plan, agents, rules, commands and hooks from the answers, run the self-checks and the first card, then have the designer draft the first milestone. Use when the user types /saf-setup or asks to set up or re-configure SAF.
+description: Set up SAF (Super Agent Framework) in this project — interview the user in grouped questions with recommended defaults, generate CLAUDE.md, docs, the card plan, agents, rules, skills, commands and hooks from the answers, run the self-checks and the first card, then have the designer draft the first milestone. Use when the user types /saf-setup or asks to set up or re-configure SAF.
 ---
 
 # /saf-setup — SAF setup interview
@@ -31,7 +31,7 @@ detection (say what you detected instead):
 2. **Project** — name + one-line pitch + users/market (one free-text message) · type · stage · rigor
 3. **Stack** — package manager · confirm the detected commands · database · monorepo / submodules
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model
-5. **Roles** — optional roles (multi-select) · custom role? · report language
+5. **Roles and skills** — optional roles (multi-select) · custom role? · report language · optional skill packs (multi-select)
 6. **Workflow** — parallel lanes on/off and caps · measure lock · performance budgets file
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { CONFIG_FILE, ENGINE_SCRIPTS, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
+import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { scriptOf } from "./docs.mjs";
 import { loadPlan } from "./plan.mjs";
@@ -11,7 +11,7 @@ import { render } from "./template.mjs";
 /**
  * Generator — turns setup answers into the full project system:
  * CLAUDE.md · docs/INDEX.md · docs/DECISIONS.md · docs/plan/ (README, M0 gate, first card, optional M1 draft) ·
- * .claude/agents · .claude/commands (/saf…) · .claude/rules · generic skills · settings.json hooks · package scripts.
+ * .claude/agents · .claude/commands (/saf · /saf-plan) · .claude/rules · skills (core + chosen packs) · settings.json hooks · package scripts.
  *
  * Safety: a file that exists and was not written by SAF (or was edited since) is moved to docs/archive/ before
  * it is replaced. `.saf/manifest.json` records what SAF wrote. settings.json · .gitignore · package.json are merged, not replaced.
@@ -23,8 +23,15 @@ export const ARCHIVE = "docs/archive/pre-saf";
 export const SAF_VERSION = () => readFileSync(join(SAF_DIR, "VERSION"), "utf8").trim();
 
 const sha = (s) => createHash("sha1").update(s).digest("hex");
-const ALIASES = { "saf-p": "saf-plan", "saf-f": "saf-fix", "saf-t": "saf-test", "saf-pt": "saf-protect", "saf-audit": "saf-protect", "saf-h": "saf-help" };
-const SKILLS = ["code-review", "debug-protocol", "tdd", "security-review", "writing-for-agents", "handoff"];
+/** Text as SAF wrote it: a checkout that converted line endings to CRLF is still "unchanged". */
+const readText = (abs) => readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
+/** Templates are stored with LF; a checkout with CRLF line endings must render the same bytes. */
+const readTemplate = (p) => readFileSync(p, "utf8").replace(/\r\n/g, "\n");
+export const COMMANDS = ["saf", "saf-plan"];
+/** Agent-facing folders SAF owns files in — a file SAF wrote there that is no longer planned is removed when unedited. */
+const OWNED_DIRS = [".claude/commands/", ".claude/skills/", ".claude/agents/", ".claude/rules/"];
+/** Skills shipped in this project: core + chosen packs (one skill per pack). */
+export const skillsFor = (config) => [...CORE_SKILLS, ...config.skills.packs];
 const LANG_NAME = { th: { th: "ภาษาไทย", en: "Thai" }, en: { th: "ภาษาอังกฤษ", en: "English" } };
 const TYPE_LABEL = { "web-app": "web app / SaaS", mobile: "mobile app", game: "game", api: "API / backend", erp: "ERP / business system", "data-ai": "data / AI", "library-cli": "library / CLI", other: "other" };
 
@@ -131,6 +138,7 @@ export function templateData(config, detected, opts = {}) {
     coreRoles: roles.filter((r) => ["designer", "spec-reviewer", "implementer", "qa-runner"].includes(r.name)),
     extraRoles: roles.filter((r) => !["designer", "spec-reviewer", "implementer", "qa-runner"].includes(r.name)),
     roleNames: roles.map((r) => r.name).join(", "),
+    skillNamesText: skillsFor(config).map((n) => `\`${n}\``).join(" · "),
     hasRole: Object.fromEntries(roles.map((r) => [r.name.replace(/-/g, "_"), true])),
     sessionRows: sessionRows(roles, dl),
     projectCommands,
@@ -186,7 +194,7 @@ function plannedFiles(config, data, detected) {
   const lang = config.people.docLanguage;
   const L = (p) => join(TEMPLATES, lang, p);
   const files = [
-    [L("CLAUDE.md"), "CLAUDE.md"],
+    [L("CLAUDE.template.md"), "CLAUDE.md"],
     [L("docs/INDEX.md"), "docs/INDEX.md"],
     [L("docs/DECISIONS.md"), "docs/DECISIONS.md"],
     [L("docs/plan/README.md"), "docs/plan/README.md"],
@@ -196,21 +204,55 @@ function plannedFiles(config, data, detected) {
     [L("docs/specs/_template.md"), "docs/specs/_template.md"],
   ];
   if (data.m1) files.push([L("docs/plan/milestones/M1.md"), "docs/plan/milestones/M1.md"]);
-  for (const name of ["saf", "saf-plan", "saf-fix", "saf-test", "saf-protect", "saf-help"]) files.push([L(`commands/${name}.md`), `.claude/commands/${name}.md`]);
-  const out = files.map(([src, dest]) => ({ dest, content: alignShellComments(render(readFileSync(src, "utf8"), data)) }));
-  const aliasT = readFileSync(L("commands/_alias.md"), "utf8");
-  for (const [alias, target] of Object.entries(ALIASES)) out.push({ dest: `.claude/commands/${alias}.md`, content: render(aliasT, { ...data, alias, target }) });
+  for (const name of COMMANDS) files.push([L(`commands/${name}.md`), `.claude/commands/${name}.md`]);
+  const out = files.map(([src, dest]) => ({ dest, content: alignShellComments(render(readTemplate(src), data)) }));
   for (const role of data.roles) {
     const src = role.custom ? join(TEMPLATES, "agents", "_custom.md") : join(TEMPLATES, "agents", `${role.name}.md`);
-    out.push({ dest: `.claude/agents/${role.name}.md`, content: render(readFileSync(src, "utf8"), { ...data, role: { ...role, summaryYaml: JSON.stringify(role.summary || role.name) } }) });
+    out.push({ dest: `.claude/agents/${role.name}.md`, content: render(readTemplate(src), { ...data, role: { ...role, summaryYaml: JSON.stringify(role.summary || role.name) } }) });
   }
   for (const rule of ruleSet(config, detected)) {
-    out.push({ dest: `.claude/rules/${rule.name}.md`, content: render(readFileSync(join(TEMPLATES, "rules", `${rule.name}.md`), "utf8"), { ...data, rulePathsYaml: rule.paths.map((p) => `  - ${JSON.stringify(p)}`).join("\n") }) });
+    out.push({ dest: `.claude/rules/${rule.name}.md`, content: render(readTemplate(join(TEMPLATES, "rules", `${rule.name}.md`)), { ...data, rulePathsYaml: rule.paths.map((p) => `  - ${JSON.stringify(p)}`).join("\n") }) });
   }
-  for (const skill of SKILLS) {
-    for (const f of walk(join(TEMPLATES, "skills", skill))) out.push({ dest: `.claude/skills/${skill}/${relative(join(TEMPLATES, "skills", skill), f).split("\\").join("/")}`, content: readFileSync(f, "utf8"), kit: true });
+  out.push(...skillFiles(config, data));
+  return out;
+}
+
+/** Skill files rendered with the project's data (commands, languages) — core skills + chosen packs. */
+function skillFiles(config, data) {
+  const out = [];
+  for (const skill of skillsFor(config)) {
+    const dir = join(TEMPLATES, "skills", skill);
+    for (const f of walk(dir)) {
+      const rel = relative(dir, f).split("\\").join("/");
+      const raw = readTemplate(f);
+      out.push({ dest: `.claude/skills/${skill}/${rel}`, content: rel.endsWith(".md") ? render(raw, data) : raw, kit: true });
+    }
   }
   return out;
+}
+
+/**
+ * Remove files SAF wrote earlier under OWNED_DIRS that are no longer planned (a dropped command, role, rule or skill pack)
+ * — only when nobody edited them since. Edited ones are kept and reported. Files SAF never wrote are never touched.
+ */
+function retireUnplanned(root, manifest, plannedDests, report) {
+  for (const rel of Object.keys(manifest.files)) {
+    if (plannedDests.has(rel) || !OWNED_DIRS.some((d) => rel.startsWith(d))) continue;
+    const abs = join(root, rel);
+    if (!existsSync(abs)) {
+      delete manifest.files[rel];
+      continue;
+    }
+    if (sha(readText(abs)) !== manifest.files[rel]) {
+      report.kept.push(`${rel} (no longer shipped, but edited in this project — kept)`);
+      continue;
+    }
+    rmSync(abs);
+    delete manifest.files[rel];
+    report.removed.push(rel);
+    const dir = dirname(abs);
+    if (existsSync(dir) && readdirSync(dir).length === 0) rmSync(dir, { recursive: true });
+  }
 }
 
 const SETTINGS_HOOKS = {
@@ -301,11 +343,11 @@ export function generate(root, answers, opts = {}) {
   const errors = validateConfig(answers);
   if (errors.length) throw new Error(["setup answers are invalid:", ...errors.map((e) => `  ✗ ${e}`)].join("\n"));
   const detected = detectProject(root);
-  const report = { written: [], archived: [], kept: [], warnings: [] };
+  const report = { written: [], archived: [], kept: [], removed: [], warnings: [] };
   const manifest = readJson(join(root, MANIFEST), { files: {} });
   const ownedUnchanged = (rel) => {
     const abs = join(root, rel);
-    return manifest.files[rel] && existsSync(abs) && sha(readFileSync(abs, "utf8")) === manifest.files[rel];
+    return manifest.files[rel] && existsSync(abs) && sha(readText(abs)) === manifest.files[rel];
   };
   // a project SAF already set up (manifest present) is a re-run: never archive in bulk, only replace files one by one
   const rerun = existsSync(join(root, MANIFEST));
@@ -345,7 +387,7 @@ export function generate(root, answers, opts = {}) {
   for (const f of files) {
     const abs = join(root, f.dest);
     if (existsSync(abs) && statSync(abs).isFile()) {
-      const cur = readFileSync(abs, "utf8");
+      const cur = readText(abs);
       if (cur !== f.content && !ownedUnchanged(f.dest)) archive(root, f.dest, report);
     }
     mkdirSync(dirname(abs), { recursive: true });
@@ -353,6 +395,7 @@ export function generate(root, answers, opts = {}) {
     next.files[f.dest] = sha(f.content);
     report.written.push(f.dest);
   }
+  retireUnplanned(root, manifest, new Set(files.map((f) => f.dest)), report);
   mkdirSync(join(root, "docs/plan/evidence"), { recursive: true });
   if (!existsSync(join(root, "docs/plan/evidence/.gitkeep"))) writeFileSync(join(root, "docs/plan/evidence/.gitkeep"), "");
   next.files["docs/plan/evidence/.gitkeep"] = sha(readFileSync(join(root, "docs/plan/evidence/.gitkeep"), "utf8"));
@@ -368,32 +411,52 @@ export function generate(root, answers, opts = {}) {
   return { config, report, detected };
 }
 
-/** Refresh kit-owned files only (engine is copied by the installer): skills SAF ships, when unchanged since SAF wrote them. */
+/**
+ * Upgrade step (the engine itself is copied by the installer): bring the kit-owned agent files up to date with the new
+ * templates — `/saf` commands and skills (core + the packs in saf.config.json) — rendered with the project's settings.
+ * A file is written when it is missing or unchanged since SAF wrote it; edited files are kept and listed.
+ * Commands and skills an older SAF shipped that are no longer planned are removed when unedited (never files SAF did not write).
+ * Project docs (CLAUDE.md, docs/, plan) are not touched — re-run setup for those.
+ */
 export function refreshKitFiles(root) {
-  const report = { written: [], archived: [], kept: [], warnings: [] };
+  const report = { written: [], archived: [], kept: [], removed: [], warnings: [] };
   const manifest = readJson(join(root, MANIFEST), { files: {} });
-  for (const skill of SKILLS) {
-    for (const f of walk(join(TEMPLATES, "skills", skill))) {
-      const rel = `.claude/skills/${skill}/${relative(join(TEMPLATES, "skills", skill), f).split("\\").join("/")}`;
-      const abs = join(root, rel);
-      const content = readFileSync(f, "utf8");
-      if (existsSync(abs)) {
-        const cur = readFileSync(abs, "utf8");
-        if (cur === content) continue;
-        if (manifest.files[rel] && sha(cur) !== manifest.files[rel]) {
-          report.kept.push(`${rel} (edited in this project — kept)`);
-          continue;
-        }
-      }
-      mkdirSync(dirname(abs), { recursive: true });
-      writeFileSync(abs, content);
-      manifest.files[rel] = sha(content);
-      report.written.push(rel);
-    }
+  const raw = readJson(join(root, CONFIG_FILE), {});
+  const errors = validateConfig(raw);
+  if (errors.length) {
+    report.warnings.push(`${CONFIG_FILE} is invalid — commands and skills were not refreshed`);
+    return report;
   }
+  const config = resolveConfig(raw);
+  const detected = detectProject(root);
+  const pkg = config.stack.packageManager === "none" ? null : readJson(join(root, "package.json"), null);
+  const data = templateData(config, detected, { scripts: pkg?.scripts ?? null, version: SAF_VERSION() });
+  const kitDirs = [".claude/commands/", ".claude/skills/"];
+  const planned = plannedFiles(config, data, detected);
+  for (const f of planned.filter((x) => kitDirs.some((d) => x.dest.startsWith(d)))) {
+    const abs = join(root, f.dest);
+    if (existsSync(abs)) {
+      const cur = readText(abs);
+      if (cur === f.content) {
+        manifest.files[f.dest] = sha(f.content);
+        continue;
+      }
+      if (!manifest.files[f.dest] || sha(cur) !== manifest.files[f.dest]) {
+        report.kept.push(`${f.dest} (edited in this project — kept)`);
+        continue;
+      }
+    }
+    mkdirSync(dirname(abs), { recursive: true });
+    writeFileSync(abs, f.content);
+    manifest.files[f.dest] = sha(f.content);
+    report.written.push(f.dest);
+  }
+  const scoped = { files: Object.fromEntries(Object.entries(manifest.files).filter(([rel]) => kitDirs.some((d) => rel.startsWith(d)))) };
+  const before = Object.keys(scoped.files);
+  retireUnplanned(root, scoped, new Set(planned.map((x) => x.dest)), report);
+  for (const rel of before) if (!(rel in scoped.files)) delete manifest.files[rel];
   manifest.version = SAF_VERSION();
   mkdirSync(join(root, ".saf"), { recursive: true });
   writeFileSync(join(root, MANIFEST), `${JSON.stringify(manifest, null, 2)}\n`);
   return report;
 }
-

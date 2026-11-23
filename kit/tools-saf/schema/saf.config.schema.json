@@ -98,6 +98,18 @@
         "reportLanguage": { "enum": ["en", "th"] }
       }
     },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "packs": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "items": { "enum": ["ui-frontend", "db-migrations", "performance", "i18n", "mobile", "game"] }, "uniqueItems": true }
+          ]
+        }
+      }
+    },
     "workflow": {
       "type": "object",
       "additionalProperties": false,

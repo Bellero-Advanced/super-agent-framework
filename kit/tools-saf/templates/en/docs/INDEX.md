@@ -24,9 +24,9 @@ Each topic has exactly one home. Other files link to it instead of copying it. W
 | Topic | Home |
 |---|---|
 | Roles, models and effort | `.claude/agents/` |
-| Slash commands (/saf …) | `.claude/commands/` |
+| Slash commands: `/saf` (one entry point — also answers "help") · `/saf-plan` · `/saf-setup` | `.claude/commands/` |
 | Path-scoped rules | `.claude/rules/` |
-| Skills (review · debugging · tdd · security …) | `.claude/skills/` |
+| Skills — load by themselves when the work matches: {{skillNamesText}} | `.claude/skills/` |
 | SAF settings (schema-validated) | [saf.config.json](../saf.config.json) · schema `tools/saf/schema/saf.config.schema.json` |
 | Card template | [plan/tasks/_template.md](plan/tasks/_template.md) |
 

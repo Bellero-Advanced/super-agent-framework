@@ -59,7 +59,7 @@ npm needs `--` before arguments (`npm run task:verify -- T-M1-01`); the generate
 Effort is fixed per role and is the same in every preset (designer high · spec-reviewer high · implementer high ·
 qa-runner medium · …). Per-role changes go in `models.overrides` (`{"qa-runner": {"effort": "low"}}`).
 
-## 5. Roles
+## 5. Roles and skills
 
 Core roles are always on: `designer` · `spec-reviewer` (read only) · `implementer` · `qa-runner`.
 
@@ -68,6 +68,11 @@ Core roles are always on: `designer` · `spec-reviewer` (read only) · `implemen
 | Extra roles? (multi-select) | `roles.enabled` | art-producer · db-guardian · release-operator · security-auditor · data-engineer · content-writer | by type: game → art-producer · database → db-guardian · deploys → release-operator · strict rigor → security-auditor · data-ai → data-engineer · several UI languages → content-writer |
 | A custom role? (name · what it does · planner or builder · focus) | `roles.custom[]` | — | none |
 | Language of agent reports? | `roles.reportLanguage` | en · th | en (fewer tokens) |
+| Optional skill packs? (multi-select) | `skills.packs` | ui-frontend · db-migrations · performance · i18n · mobile · game | by answers: web-app/mobile/game/erp → ui-frontend · a database → db-migrations · game → performance + game · several UI languages → i18n · mobile → mobile |
+
+Core skills are always installed and load by themselves when the work matches: `debug-protocol` · `tdd` · `code-review` ·
+`security-review` · `writing-for-agents` · `handoff` · `evidence-before-done` · `test-runner`. Each pack adds one skill of
+the same name. Leaving `skills.packs` out uses the recommendation above.
 
 ## 6. Workflow
 
@@ -115,6 +120,7 @@ work starts when the user says Go.
   "stack": { "packageManager": "pnpm", "commands": { "typecheck": "pnpm typecheck", "lint": "pnpm lint", "test": "pnpm test" }, "database": "PostgreSQL" },
   "models": { "preset": "balanced" },
   "roles": { "enabled": ["db-guardian", "release-operator"] },
+  "skills": { "packs": ["ui-frontend", "db-migrations", "i18n"] },
   "policies": { "deploy": { "mode": "owner-order", "target": "staging" } },
   "firstMilestone": { "goal": "A visitor can sign up and buy one product." }
 }
