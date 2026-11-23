@@ -7,19 +7,19 @@
     "base": "7a51d62599ef9fa64942a8e95bcd1a6a04fb5706",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-13",
   "worktree": ".claude/worktrees/T-M2-13",
   "verified": {
-    "at": "2026-11-23T20:55:40.563Z",
-    "head": "11f0b41c73fbaff534490625ef5904e3d54e40fc",
+    "at": "2026-11-23T21:00:50.826Z",
+    "head": "f85b4706a3ebc178d574192f71a5c50b560dee51",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 297,
+        "ms": 294,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,34 +46,34 @@
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group 2 --lang th",
         "exit": 0,
-        "ms": 67,
+        "ms": 76,
         "tail": [
           "    เลือกเมื่อ: ตรงกับระยะจริงของโปรเจกต์ และแก้เมื่อโปรเจกต์ขยับไปต่อ",
           "## project.rigor",
           "- light",
-          "    คืออะไร: ค่าเริ่มต้นแบบหลวมที่สุด: การ์ดใหญ่ขึ้น ตรวจเทียบ spec เฉพาะการ์ดขนาด M และตอน merge รันคำสั่ง test เป็นเช็กเดียวของโปรเจกต์",
+          "    คืออะไร: ค่าเริ่มต้นแบบหลวมที่สุด: การ์ดใหญ่ขึ้น ตรวจเทียบ spec การ์ดขนาด M (การ์ด S ตรวจรวมที่ gate) และตอน merge รันคำสั่ง test เป็นเช็กเดียวของโปรเจกต์",
           "    เหมาะกับ: โปรโตไทป์และงานทดลองคนเดียวที่ความเร็วสำคัญกว่าขั้นตอน",
-          "    ราคาที่ต้องจ่าย: ตรวจและเช็กน้อยลง จึงเจอข้อผิดพลาดช้าและแก้แพงกว่า",
+          "    ข้อเสีย: ตรวจและเช็กน้อยลง จึงเจอข้อผิดพลาดช้าและแก้แพงกว่า",
           "    เลือกเมื่อ: เป็นโปรโตไทป์เร็ว ๆ หรืองานทดลองที่ทิ้งได้",
-          "    ขนาดการ์ด S / M: 200 / 500 · เพดานการทดสอบ S / M: 300 / 800 · การตรวจ: m-cards · เช็กตอน merge: test",
+          "    ขนาดการ์ด S / M: 200 / 500 · เพดานบรรทัดเทสต์ S / M: 300 / 800 · การตรวจ: m-cards · เช็กตอน merge: test",
           "- standard",
           "    คืออะไร: ค่าเริ่มต้นระดับกลาง: ทุกการ์ดถูกตรวจเทียบ spec และตอน merge รัน typecheck, lint และ test เท่าที่โปรเจกต์มี",
           "    เหมาะกับ: โปรเจกต์ส่วนใหญ่ที่ตั้งใจเก็บโค้ดไว้ใช้ต่อ",
-          "    ราคาที่ต้องจ่าย: ทุกการ์ดต้องรอการตรวจ ซึ่งใช้เวลาและ token ของ agent",
+          "    ข้อเสีย: ทุกการ์ดต้องรอการตรวจ ซึ่งใช้เวลาและ token ของ agent",
           "    เลือกเมื่อ: ไม่มีเหตุผลชัดเจนให้ไปทางอื่น",
-          "    ขนาดการ์ด S / M: 150 / 400 · เพดานการทดสอบ S / M: 250 / 600 · การตรวจ: every-card · เช็กตอน merge: typecheck · lint · test",
+          "    ขนาดการ์ด S / M: 150 / 400 · เพดานบรรทัดเทสต์ S / M: 250 / 600 · การตรวจ: every-card · เช็กตอน merge: typecheck · lint · test",
           "- strict",
           "    คืออะไร: ค่าเริ่มต้นเข้มที่สุด: การ์ดเล็กลง ตรวจเทียบ spec ทุกการ์ด ตรวจความปลอดภัยทุก milestone และเพิ่ม build ในเช็กตอน merge",
           "    เหมาะกับ: ระบบจริงที่มีผู้ใช้ และผลิตภัณฑ์ที่จัดการเงินหรือข้อมูลส่วนบุคคล",
-          "    ราคาที่ต้องจ่าย: การ์ดมากและเล็กลงพร้อมการตรวจเพิ่ม ใช้เวลาและ token มากที่สุด",
+          "    ข้อเสีย: การ์ดมากและเล็กลงพร้อมการตรวจเพิ่ม ใช้เวลาและ token มากที่สุด",
           "    เลือกเมื่อ: ความผิดพลาดจะกระทบผู้ใช้หรือเงิน",
-          "    ขนาดการ์ด S / M: 100 / 300 · เพดานการทดสอบ S / M: 200 / 500 · การตรวจ: every-card+security · เช็กตอน merge: typecheck · lint · test · build"
+          "    ขนาดการ์ด S / M: 100 / 300 · เพดานบรรทัดเทสต์ S / M: 200 / 500 · การตรวจ: every-card+security · เช็กตอน merge: typecheck · lint · test · build"
         ]
       },
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group 4 --lang en",
         "exit": 0,
-        "ms": 68,
+        "ms": 67,
         "tail": [
           "    What it is: You name the planner and builder models yourself; the roles use them instead of a preset pair.",
           "    Good for: Models no preset lists, such as a newer release or one your account provides.",
@@ -100,7 +100,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 275,
+        "ms": 281,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -110,17 +110,17 @@
       {
         "cmd": "node --test 'test/unit/setup-choices.test.mjs'",
         "exit": 0,
-        "ms": 1461,
+        "ms": 1283,
         "tail": [
           "ok 7 - SETUP-AC-04 a bad group, language or flag combination exits 2 and lists the valid values",
           "  ---",
-          "  duration_ms: 381.370792",
+          "  duration_ms: 377.883291",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-05 every explanation has four short fields in en and th, no numbers or model ids, and covers each option exactly once",
           "ok 8 - SETUP-AC-05 every explanation has four short fields in en and th, no numbers or model ids, and covers each option exactly once",
           "  ---",
-          "  duration_ms: 1.048916",
+          "  duration_ms: 1.061667",
           "  type: 'test'",
           "  ...",
           "1..8",
@@ -131,7 +131,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1407.161958"
+          "# duration_ms 1226.146459"
         ]
       }
     ],
@@ -145,7 +145,7 @@
       "forbidden": [],
       "hashes": {
         "kit/tools-saf/bin/saf.mjs": "1787df18f0f0fd4c337e162568d1a1d6bbbb9bfa",
-        "kit/tools-saf/lib/choices.mjs": "b6c781128b9cba891630685bb0c07a255a04ac26",
+        "kit/tools-saf/lib/choices.mjs": "96d870e65e661b7fd6c2f559db2dcb88d94b7557",
         "test/unit/setup-choices.test.mjs": "d06575b872e1bc433e1b76dad740d3a8d0844851"
       }
     },
