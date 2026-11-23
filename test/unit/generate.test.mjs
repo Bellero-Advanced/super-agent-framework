@@ -184,3 +184,28 @@ test("generated CLAUDE.md lists task:culprit in en and th, and the plan README n
     assert.match(read(root, "docs/plan/README.md"), /npm run task:culprit -- <M>/, `${lang}: the plan README names task:culprit`);
   }
 });
+
+test("SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing", async () => {
+  const { CHOICES } = await lib("choices.mjs");
+  const pushLine = (push) => {
+    const root = gitRepo();
+    generate(root, { stack: { packageManager: "none" }, roles: { enabled: ["release-operator"] }, policies: { push } });
+    const lines = read(root, ".claude/agents/release-operator.md").split(/\r?\n/).filter((l) => /push/i.test(l) && l.startsWith("- "));
+    assert.equal(lines.length, 1, `${push}: one push rule line`);
+    return lines[0];
+  };
+  const ownerOrder = pushLine("owner-order");
+  assert.match(ownerOrder, /Never push without the .+'s order/);
+  assert.match(ownerOrder, /never force-push/);
+  const allowed = pushLine("allowed");
+  assert.match(allowed, /Pushing is allowed/);
+  assert.doesNotMatch(allowed, /never push/i);
+  assert.match(allowed, /never force-push/);
+  const entry = CHOICES.find((e) => e.question === "push" && e.values.includes("allowed"));
+  assert.ok(entry, "the push: allowed explanation exists");
+  for (const lang of ["en", "th"]) {
+    const what = entry[lang].what;
+    assert.doesNotMatch(what, /never push|ห้าม push|still says/i, `${lang}: what no longer says the file forbids pushing`);
+    assert.match(what, /release-operator/, `${lang}: what still names the release-operator file`);
+  }
+});

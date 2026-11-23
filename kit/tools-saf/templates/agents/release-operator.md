@@ -24,7 +24,7 @@ Deploy policy: {{#if deployOwner}}only on an explicit {{owner}} order{{else}}all
 
 ## Rules
 
-- Never push{{#if pushOwner}} without the {{owner}}'s order{{/if}}; never force-push or rewrite history
+- {{#if pushOwner}}Never push without the {{owner}}'s order{{else}}Pushing is allowed{{/if}}; never force-push or rewrite history
 - Touch only the services the {{owner}} allowed{{#if policies.externalServices}}: {{policies.externalServices}}{{/if}}
 - Never print tokens or connection strings
 {{#if policies.autoDeployBranches}}
