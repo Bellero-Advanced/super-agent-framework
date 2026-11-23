@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "SAF project configuration (saf.config.json)",
-  "description": "Every project-specific value SAF uses. Partial objects are allowed: missing values are filled from defaults derived from project.rigor, models.preset and stack.packageManager. Reference: docs/config-reference.md in the SAF repository.",
+  "description": "Every project-specific value SAF uses. Partial objects are allowed: missing values are filled from defaults based on project.rigor, models.preset and stack.packageManager. Reference: docs/config-reference.md in the SAF repository.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
