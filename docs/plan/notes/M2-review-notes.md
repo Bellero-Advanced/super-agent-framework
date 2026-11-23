@@ -97,3 +97,9 @@ N2. AC-09 regexes are weak: `/--adopt[^\n]*yes/` on whitespace-collapsed text sp
 N3. SKILL: the chat-language question is asked before the language is known, so its options never show the four lines first (gap in spec rule 16); not said whether to skip that table when group 1's output is shown afterwards
 N6. the skill and the engine detect a re-run differently (skill: `saf.config.json` holds a full config; engine: `.saf/manifest.json` exists) — if the engine sees a re-run and the skill does not, the adopt question is asked and "yes" archives nothing
 G (decided here). the test-mode table in `questions.md` was removed (pointer to `saf choices --group 6` kept under the same heading so card-lifecycle's anchor works); the safety facts live in docs/card-lifecycle.md "Test mode"
+
+## T-M2-19 (review PASS) — notes for the designer
+
+N-a. `release-operator.md:27`/`:31`: with `push: allowed`, `deploy: owner-order` and `autoDeployBranches` set the agent says "Pushing is allowed" but later "Pushing <branches> deploys automatically — treat that push as a release"; consistent if read closely, could add "except branches that deploy automatically" (CLAUDE.md line 80 has the same layout)
+N-b. `release-operator.md:3` says live changes only "on an explicit owner order" even with `deploy: allowed` (same as T-M2-14 N6)
+N-c. with `push: allowed` the agent line does not mention protected branches (CLAUDE.md carries them) — a short pointer would help
