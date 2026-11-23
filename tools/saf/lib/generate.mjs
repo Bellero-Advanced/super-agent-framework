@@ -181,6 +181,7 @@ export function templateData(config, detected, opts = {}) {
       taskProbe: c("task:probe"),
       taskEnv: c("task:env"),
       taskReport: c("task:report", "<M>"),
+      taskCulprit: c("task:culprit", "<M>"),
       docsCheck: c("docs:check"),
       specMatrix: c("spec:matrix"),
       specMatrixCheck: c("spec:matrix", "--check"),
