@@ -1,0 +1,41 @@
+name: Bug report
+description: Something in SAF does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The command you ran and its real output (trim to the relevant lines; remove secrets).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The smallest steps or answers file that shows it.
+  - type: input
+    id: version
+    attributes:
+      label: SAF version
+      description: Output of `npx saf version` or `node tools/saf/bin/saf.mjs version`
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Linux, macOS, Windows, other]
+    validations:
+      required: true
+  - type: input
+    id: node
+    attributes:
+      label: Node version and package manager
+      placeholder: Node 22.x · pnpm 10
