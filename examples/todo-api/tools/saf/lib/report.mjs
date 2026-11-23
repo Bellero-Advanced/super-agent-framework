@@ -1,7 +1,7 @@
 import { posix } from "node:path";
 import { scriptCommand } from "./config.mjs";
 import { buildMatrix, isSpecFile } from "./matrix.mjs";
-import { EVIDENCE_DIR, PLAN_DIR, cardStatus, formatTime, titleOf } from "./plan.mjs";
+import { EVIDENCE_DIR, PLAN_DIR, cardStatus, formatTime, titleOf, undeclaredGates } from "./plan.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -37,6 +37,7 @@ export function renderReport(input, mid) {
     const mark = !res ? t.gateNotRun : res.pass === null ? t.gateManual : res.pass ? "✓" : t.gateFail;
     out.push(`| ${g.id} | ${cell(g.text)} | ${mark} |`);
   }
+  for (const g of undeclaredGates(plan, m)) out.push(`| ${g.id} | ${cell(g.text)} | ${g.pass === null ? t.gateManual : g.pass ? "✓" : t.gateFail} |`);
   out.push("", r.matrix, "");
   const specs = [...new Set(m.cards.flatMap((id) => plan.cards.get(id)?.spec ?? []))].filter(isSpecFile).sort();
   if (!specs.length) out.push(r.noSpecs(m.id));

@@ -4,6 +4,7 @@ import { FULL_SUITE_KEYS } from "./config.mjs";
 import { listRepoFiles } from "./git.mjs";
 import { IS_WINDOWS, quoteWindowsArg } from "./run.mjs";
 import { findScenarioTests, isTestFile } from "./scenarios.mjs";
+import { TEXT } from "./text.mjs";
 
 /**
  * Test mode at card verify (docs/specs/test-mode.md rules 9-15). The verify column of the mode table in rule 15:
@@ -23,8 +24,8 @@ export const VERIFY_DEFERS = {
 export const MERGE_SKIPS_FULL_SUITE = { "every-card": false, targeted: false, milestone: true };
 export const GATE_ADDS_FULL_SUITE = { "every-card": false, targeted: false, milestone: true };
 
-/** The extra exit gate of rule 19 (the `run` list is every full-suite command, see `fullSuiteCommands`). */
-export const FULL_SUITE_GATE = { id: "full-suite", text: "the full test suite (deferred from the cards)" };
+/** The extra exit gate of rule 19 (text: the en entry of the text table, rule 29; the `run` list is every full-suite command, see `fullSuiteCommands`). */
+export const FULL_SUITE_GATE = { id: "full-suite", text: TEXT.en.fullSuiteGate };
 
 /** Placeholder in `stack.commands.testFiles` that is replaced by the quoted file paths. */
 export const FILES_PLACEHOLDER = "{files}";

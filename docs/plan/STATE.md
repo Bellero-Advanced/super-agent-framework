@@ -2,9 +2,9 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 9/18
+## M2 Roadmap: next — cards done 10/18
 
-- In progress: **T-M2-17** STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — started 2026-11-23 20:34 · not verified yet · lane 1 · .claude/worktrees/T-M2-17
+- In progress: none
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
 
 | Card | Work | Status | Evidence |
@@ -25,7 +25,7 @@
 | [T-M2-14](tasks/M2/T-M2-14.md) | Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one | · not started | – |
 | [T-M2-15](tasks/M2/T-M2-15.md) | /saf-setup shows the four lines for every option and lists the settings it did not ask before generating | · not started | – |
 | [T-M2-16](tasks/M2/T-M2-16.md) | The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved | ✓ passed | [T-M2-16.json](evidence/T-M2-16.json) · passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate |
-| [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | ▶ in progress | [T-M2-17.json](evidence/T-M2-17.json) · started 2026-11-23 20:34 · not verified yet |
+| [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | ✓ passed | [T-M2-17.json](evidence/T-M2-17.json) · passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate |
 | [T-M2-18](tasks/M2/T-M2-18.md) | saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones | ✓ passed | [T-M2-18.json](evidence/T-M2-18.json) · passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
@@ -38,7 +38,7 @@
 
 ## Latest evidence
 
-- T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — started 2026-11-23 20:34 · not verified yet
+- T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate
 - T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved — passed 2026-11-23 20:30 (4 commands) · full suite deferred to gate
 - T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit — passed 2026-11-23 20:28 (4 commands) · full suite deferred to gate
 - T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate
