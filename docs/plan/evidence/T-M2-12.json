@@ -7,19 +7,19 @@
     "base": "069827737538efc3d58613a4e5f26160953e01d3",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-12",
   "worktree": ".claude/worktrees/T-M2-12",
   "verified": {
-    "at": "2026-11-23T20:42:52.796Z",
-    "head": "73af93c1083e2d2b9f2144779b63a65895abeefb",
+    "at": "2026-11-23T20:48:33.714Z",
+    "head": "db1e4a406f728473ef96600e81cd96db3231102f",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 278,
+        "ms": 360,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,12 +46,12 @@
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --not-asked --lang th",
         "exit": 0,
-        "ms": 71,
+        "ms": 65,
         "tail": [
           "การตั้งค่าที่ตอนสัมภาษณ์ไม่ได้ถาม",
-          "แก้ได้ใน saf.config.json (ตรวจด้วย saf config --check หรือรัน /saf-setup ใหม่)",
+          "แก้ได้ใน saf.config.json (ตรวจด้วย node tools/saf/bin/saf.mjs config --check หรือรัน /saf-setup ใหม่)",
           "  models.overrides — เปลี่ยนโมเดลหรือ effort ของ role ใด role หนึ่ง เช่น {\"qa-runner\": {\"effort\": \"low\"}} · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#models",
-          "  workflow.review — ใครตรวจการ์ดเทียบกับ spec: m-cards, every-card หรือ every-card+security (ค่าเริ่มต้นตาม rigor) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.review — การ์ดไหนได้รับการตรวจเทียบ spec: m-cards (เฉพาะขนาด M), every-card หรือ every-card+security (เพิ่มการตรวจความปลอดภัยทุก milestone) ใช้กับเอกสารที่สร้างเท่านั้น ค่าเริ่มต้นตาม rigor · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
           "  workflow.worktreeDir — โฟลเดอร์ที่สร้าง worktree ของแต่ละ lane · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
           "  workflow.branchPrefix — คำนำหน้าชื่อ branch ของแต่ละ lane (ลงท้ายด้วย /) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
           "  workflow.laneInstall — คำสั่งติดตั้ง dependency ใน lane ใหม่ (ว่าง = ไม่ติดตั้ง; ค่าเริ่มต้นตาม package manager) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
@@ -60,7 +60,7 @@
           "  workflow.measure.maxLoadPerCore — ค่าโหลดเครื่องต่อ core ที่ต่ำกว่านี้ คำสั่งชนิดรอเครื่องว่างจึงเริ่มได้ · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
           "  workflow.measure.names — ชื่อคำสั่งที่ measure lock รู้จัก และแต่ละชื่อรอให้เครื่องว่างหรือไม่ (idle) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
           "  workflow.alwaysAllowed — glob เพิ่มเติมที่ไม่นับเป็นไฟล์ที่การ์ดแก้ · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
-          "  workflow.commandTimeoutMs — เวลาสูงสุด (ms) ของแต่ละคำสั่งที่ engine รันให้การ์ด · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.commandTimeoutMs — เวลาสูงสุด (ms) ของแต่ละคำสั่งตอน verify การ์ด, merge checks และการหา culprit · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
           "  policies.secrets.extraPatterns — regular expression เพิ่มเติมที่ check-secrets ถือว่าเป็นความลับ · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#policies",
           "  policies.noTimeEstimates — บันทึกกฎ 'ไม่ประเมินเวลา ใช้ gate แทน' ควรเป็น true (engine ยังไม่อ่านค่านี้) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#policies",
           "  policies.evidenceRequired — บันทึกกฎ 'ต้องมีผลรันจริงจึงถือว่าเสร็จ' ควรเป็น true (engine ยังไม่อ่านค่านี้) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#policies",
@@ -73,7 +73,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 276,
+        "ms": 281,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -83,17 +83,17 @@
       {
         "cmd": "node --test 'test/unit/setup-choices.test.mjs'",
         "exit": 0,
-        "ms": 653,
+        "ms": 664,
         "tail": [
           "ok 3 - SETUP-AC-03 choices --not-asked lists every key with its summary, where to change it and the per-machine switches",
           "  ---",
-          "  duration_ms: 258.459125",
+          "  duration_ms: 255.29725",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-03 usage errors exit 2 and list the valid values",
           "ok 4 - SETUP-AC-03 usage errors exit 2 and list the valid values",
           "  ---",
-          "  duration_ms: 254.740834",
+          "  duration_ms: 257.079959",
           "  type: 'test'",
           "  ...",
           "1..4",
@@ -104,7 +104,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 598.833292"
+          "# duration_ms 606.107041"
         ]
       }
     ],
@@ -120,7 +120,7 @@
       "hashes": {
         "kit/claude/skills/saf-setup/questions.md": "f792efa0574924bf4da54063d25ed6d739ddd796",
         "kit/tools-saf/bin/saf.mjs": "303fe8b91bf7e06df16658ee2de4b03111f940ec",
-        "kit/tools-saf/lib/choices.mjs": "3a168d249b4c6c6383e1bd094548412d6892a94e",
+        "kit/tools-saf/lib/choices.mjs": "fa0993fff8ec3eeebbd3696cfdbc1a9af7139b7e",
         "test/unit/setup-choices.test.mjs": "0b6bc34e50a199bc6808c190647480fb052c46d9"
       }
     },

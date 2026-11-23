@@ -64,7 +64,7 @@ const ns = (en, th) => ({ en, th });
 /** Settings no question sets: key → one-line summary. */
 export const NOT_ASKED = {
   "models.overrides": ns('Change the model or effort of single roles, e.g. {"qa-runner": {"effort": "low"}}', 'เปลี่ยนโมเดลหรือ effort ของ role ใด role หนึ่ง เช่น {"qa-runner": {"effort": "low"}}'),
-  "workflow.review": ns("Who reviews a card against its spec: m-cards, every-card or every-card+security (default follows rigor)", "ใครตรวจการ์ดเทียบกับ spec: m-cards, every-card หรือ every-card+security (ค่าเริ่มต้นตาม rigor)"),
+  "workflow.review": ns("Which cards get a spec review: m-cards (size M only), every-card, or every-card+security (plus a security audit per milestone); only the generated docs use it; default follows rigor", "การ์ดไหนได้รับการตรวจเทียบ spec: m-cards (เฉพาะขนาด M), every-card หรือ every-card+security (เพิ่มการตรวจความปลอดภัยทุก milestone) ใช้กับเอกสารที่สร้างเท่านั้น ค่าเริ่มต้นตาม rigor"),
   "workflow.worktreeDir": ns("Folder where lane worktrees are created", "โฟลเดอร์ที่สร้าง worktree ของแต่ละ lane"),
   "workflow.branchPrefix": ns("Prefix of lane branch names (ends with a slash)", "คำนำหน้าชื่อ branch ของแต่ละ lane (ลงท้ายด้วย /)"),
   "workflow.laneInstall": ns("Command that installs dependencies in a new lane (empty = none; default follows the package manager)", "คำสั่งติดตั้ง dependency ใน lane ใหม่ (ว่าง = ไม่ติดตั้ง; ค่าเริ่มต้นตาม package manager)"),
@@ -73,7 +73,7 @@ export const NOT_ASKED = {
   "workflow.measure.maxLoadPerCore": ns("Machine load per core under which an idle-type command may start", "ค่าโหลดเครื่องต่อ core ที่ต่ำกว่านี้ คำสั่งชนิดรอเครื่องว่างจึงเริ่มได้"),
   "workflow.measure.names": ns("The command names the measure lock knows and whether each waits for a quiet machine (idle)", "ชื่อคำสั่งที่ measure lock รู้จัก และแต่ละชื่อรอให้เครื่องว่างหรือไม่ (idle)"),
   "workflow.alwaysAllowed": ns("Extra globs that never count as a card's changes", "glob เพิ่มเติมที่ไม่นับเป็นไฟล์ที่การ์ดแก้"),
-  "workflow.commandTimeoutMs": ns("Time limit (ms) for each command the engine runs for a card", "เวลาสูงสุด (ms) ของแต่ละคำสั่งที่ engine รันให้การ์ด"),
+  "workflow.commandTimeoutMs": ns("Time limit (ms) for each command of card verify, merge checks and culprit runs", "เวลาสูงสุด (ms) ของแต่ละคำสั่งตอน verify การ์ด, merge checks และการหา culprit"),
   "policies.secrets.extraPatterns": ns("Extra regular expressions that check-secrets treats as secrets", "regular expression เพิ่มเติมที่ check-secrets ถือว่าเป็นความลับ"),
   "policies.noTimeEstimates": ns("Records the rule 'no time estimates, use gates'; keep it true (the engine does not read it today)", "บันทึกกฎ 'ไม่ประเมินเวลา ใช้ gate แทน' ควรเป็น true (engine ยังไม่อ่านค่านี้)"),
   "policies.evidenceRequired": ns("Records the rule 'done needs a real run'; keep it true (the engine does not read it today)", "บันทึกกฎ 'ต้องมีผลรันจริงจึงถือว่าเสร็จ' ควรเป็น true (engine ยังไม่อ่านค่านี้)"),
@@ -85,8 +85,8 @@ export const MACHINE_SWITCHES = {
   [`${STOP_HOOK_ENV}=off`]: ns("Environment variable: turns off the Stop-hook reminder about a card that has not passed", "ตัวแปรสภาพแวดล้อม: ปิดการเตือนของ Stop hook เรื่องการ์ดที่ยังไม่ผ่าน"),
 };
 export const LABELS = {
-  en: { head: "Settings the interview does not ask", where: `Change them in ${CONFIG_FILE} (check: saf config --check, or re-run /saf-setup).`, machine: `Per machine (${LOCAL_CONFIG_FILE}, not tracked by git, or an environment variable)` },
-  th: { head: "การตั้งค่าที่ตอนสัมภาษณ์ไม่ได้ถาม", where: `แก้ได้ใน ${CONFIG_FILE} (ตรวจด้วย saf config --check หรือรัน /saf-setup ใหม่)`, machine: `ตั้งเฉพาะเครื่อง (${LOCAL_CONFIG_FILE} ไม่ถูกเก็บใน git หรือใช้ตัวแปรสภาพแวดล้อม)` },
+  en: { head: "Settings the interview does not ask", where: `Change them in ${CONFIG_FILE} (check: node tools/saf/bin/saf.mjs config --check, or re-run /saf-setup).`, machine: `Per machine (${LOCAL_CONFIG_FILE}, not tracked by git, or an environment variable)` },
+  th: { head: "การตั้งค่าที่ตอนสัมภาษณ์ไม่ได้ถาม", where: `แก้ได้ใน ${CONFIG_FILE} (ตรวจด้วย node tools/saf/bin/saf.mjs config --check หรือรัน /saf-setup ใหม่)`, machine: `ตั้งเฉพาะเครื่อง (${LOCAL_CONFIG_FILE} ไม่ถูกเก็บใน git หรือใช้ตัวแปรสภาพแวดล้อม)` },
 };
 
 /** Dotted path of every schema leaf: a property that is not an object with its own `properties`. */
