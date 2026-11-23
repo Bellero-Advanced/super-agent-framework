@@ -1,0 +1,243 @@
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { validate } from "./schema.mjs";
+
+/**
+ * saf.config.json — every project-specific value the engine and the generator use.
+ * The same object shape is used for setup answers (partial) and for the stored config (complete).
+ * `resolveConfig` fills defaults (rigor-, preset- and stack-derived) so a partial answers file and a
+ * complete config file produce the same result.
+ */
+
+export const CONFIG_FILE = "saf.config.json";
+export const SAF_DIR = dirname(dirname(fileURLToPath(import.meta.url)));
+export const SCHEMA_FILE = join(SAF_DIR, "schema", "saf.config.schema.json");
+
+export const MODELS = {
+  fable: "claude-fable-5-2",
+  opus: "claude-opus-5-5",
+  sonnet: "claude-sonnet-5-5",
+  haiku: "claude-haiku-5-5",
+};
+
+/** Planner/reviewer roles get `planner`; builder roles get `builder`. Effort is set per role, not per preset. */
+export const MODEL_PRESETS = {
+  max: { planner: MODELS.fable, builder: MODELS.opus },
+  balanced: { planner: MODELS.opus, builder: MODELS.sonnet },
+  economy: { planner: MODELS.sonnet, builder: MODELS.haiku },
+};
+
+/**
+ * Role library. tier → model tier · lane → where cards of this role run in parallel mode
+ * (code = own worktree lane · main = main folder, one at a time) · readOnly roles get a fixed tool list.
+ */
+export const ROLE_LIBRARY = {
+  designer: { core: true, tier: "planner", lane: "main", effort: "high", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "Writes milestone plans, cards and specs. Never edits product code." },
+  "spec-reviewer": { core: true, tier: "planner", lane: "main", effort: "high", tools: "Read, Grep, Glob", readOnly: true, summary: "Read-only. Compares a finished card with its spec and reports every mismatch." },
+  implementer: { core: true, tier: "builder", lane: "code", effort: "high", tools: "", summary: "Takes one card, writes code and tests, runs task:verify until it passes." },
+  "qa-runner": { core: true, tier: "builder", lane: "code", effort: "medium", tools: "Read, Grep, Glob, Bash", summary: "Runs real tests (e2e, load, perf, screenshots) and reports real numbers. Never fixes code to pass." },
+  "art-producer": { core: false, tier: "builder", lane: "main", effort: "medium", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "Produces images and media from approved briefs; logs every asset." },
+  "db-guardian": { core: false, tier: "builder", lane: "code", effort: "high", tools: "", summary: "Writes and rehearses schema migrations, access rules and data fixes. Never applies to production." },
+  "release-operator": { core: false, tier: "builder", lane: "main", effort: "medium", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "The only role that touches live systems — only on an explicit owner order, dry run first, logged." },
+  "security-auditor": { core: false, tier: "planner", lane: "main", effort: "high", tools: "Read, Grep, Glob, Bash", summary: "Audits code and config for security issues and reports by severity. Never fixes outside a card." },
+  "data-engineer": { core: false, tier: "builder", lane: "code", effort: "high", tools: "", summary: "Builds data pipelines, evaluations and model integrations with measured results." },
+  "content-writer": { core: false, tier: "builder", lane: "main", effort: "medium", tools: "Read, Grep, Glob, Write, Edit", summary: "Writes user-facing copy and translations through the project's i18n system." },
+};
+export const CORE_ROLES = Object.keys(ROLE_LIBRARY).filter((r) => ROLE_LIBRARY[r].core);
+
+export const RIGOR = {
+  light: { sizes: { S: 200, M: 500 }, testCaps: { S: 300, M: 800 }, review: "m-cards", merge: ["test"] },
+  standard: { sizes: { S: 150, M: 400 }, testCaps: { S: 250, M: 600 }, review: "every-card", merge: ["typecheck", "lint", "test"] },
+  strict: { sizes: { S: 100, M: 300 }, testCaps: { S: 200, M: 500 }, review: "every-card+security", merge: ["typecheck", "lint", "test", "build"] },
+};
+
+export const PROJECT_TYPES = ["web-app", "mobile", "game", "api", "erp", "data-ai", "library-cli", "other"];
+
+const DEFAULTS = {
+  version: 1,
+  project: { name: "my-project", pitch: "", type: "web-app", domain: "", users: "", stage: "prototype", rigor: "standard" },
+  people: { ownerTitle: "owner", docLanguage: "en", chatLanguage: "en", uiLanguages: ["en"], i18nRequired: false, timeZone: "UTC" },
+  stack: {
+    summary: "",
+    packageManager: "npm",
+    monorepo: false,
+    commands: { typecheck: "", lint: "", test: "", e2e: "", build: "" },
+    database: "none",
+    submodules: false,
+  },
+  models: { preset: "balanced", planner: "", builder: "", sessionDefault: "", overrides: {} },
+  roles: { enabled: [...CORE_ROLES], custom: [], reportLanguage: "en" },
+  workflow: {
+    sizes: null,
+    testCaps: null,
+    review: null,
+    lanes: { code: 3, main: 1 },
+    worktrees: true,
+    worktreeDir: ".claude/worktrees",
+    branchPrefix: "card/",
+    solo: [],
+    laneInstall: null,
+    lanePorts: { base: 3000, step: 10, env: ["PORT"] },
+    laneDb: "",
+    mergeChecks: null,
+    mergeInstall: null,
+    measure: { enabled: true, waitMs: 20 * 60 * 1000, maxLoadPerCore: 0.5, names: { test: { idle: false }, e2e: { idle: false }, perf: { idle: true }, adhoc: { idle: true } } },
+    perfBudgets: "",
+    alwaysAllowed: [],
+    commandTimeoutMs: 30 * 60 * 1000,
+  },
+  policies: {
+    push: "owner-order",
+    deploy: { mode: "owner-order", target: "", exceptions: "" },
+    protectedBranches: ["main"],
+    autoDeployBranches: [],
+    noForcePush: true,
+    secrets: { envFiles: [".env", ".env.local", ".env.*.local"], extraPatterns: [] },
+    forbiddenPaths: [],
+    ownerOnlyPaths: [],
+    externalServices: [],
+    noTimeEstimates: true,
+    evidenceRequired: true,
+  },
+  tokenSaving: { enabled: true, silentInterim: true, batchReviewerNotes: true, reviewerDiff: true, fixFlakyFirst: true },
+  firstMilestone: { goal: "" },
+};
+
+const isObj = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+
+/** Deep merge: objects merge, arrays and scalars replace. */
+export function deepMerge(base, over) {
+  if (!isObj(base) || !isObj(over)) return over === undefined ? base : over;
+  const out = { ...base };
+  for (const [k, v] of Object.entries(over)) out[k] = v === undefined ? base[k] : isObj(v) && isObj(base[k]) ? deepMerge(base[k], v) : v;
+  return out;
+}
+
+/** Shell command for a project script with the chosen package manager (npm needs `--` before arguments). */
+export function scriptCommand(pm, script, args = "") {
+  const a = args ? ` ${args}` : "";
+  switch (pm) {
+    case "pnpm":
+      return `pnpm ${script}${a}`;
+    case "yarn":
+      return `yarn ${script}${a}`;
+    case "bun":
+      return `bun run ${script}${a}`;
+    case "none":
+      return `node tools/saf/bin/saf.mjs ${ENGINE_SCRIPTS[script] ?? script}${a}`;
+    default:
+      return `npm run ${script}${args ? ` -- ${args}` : ""}`;
+  }
+}
+
+/** package.json script name → engine sub-command (also used for packageManager "none"). */
+export const ENGINE_SCRIPTS = {
+  "task:start": "task start",
+  "task:verify": "task verify",
+  "task:abandon": "task abandon",
+  "task:merge": "task merge",
+  "task:state": "task state",
+  "task:next": "task next",
+  "task:probe": "task probe",
+  "task:env": "task env",
+  "task:report": "task report",
+  "docs:check": "docs-check",
+  "spec:matrix": "spec-matrix",
+  "check-secrets": "check-secrets",
+  measure: "measure adhoc --",
+};
+
+export function resolveConfig(raw = {}) {
+  const c = deepMerge(DEFAULTS, raw);
+  const rigor = RIGOR[c.project.rigor] ?? RIGOR.standard;
+  const pm = c.stack.packageManager;
+  c.workflow.sizes ??= { ...rigor.sizes };
+  c.workflow.testCaps ??= { ...rigor.testCaps };
+  c.workflow.review ??= rigor.review;
+  const preset = MODEL_PRESETS[c.models.preset];
+  if (preset) {
+    c.models.planner ||= preset.planner;
+    c.models.builder ||= preset.builder;
+  } else {
+    c.models.planner ||= MODELS.opus;
+    c.models.builder ||= MODELS.sonnet;
+  }
+  c.models.sessionDefault ||= c.models.builder;
+  if (c.workflow.mergeChecks === null) {
+    const project = rigor.merge.map((k) => c.stack.commands[k]).filter(Boolean);
+    c.workflow.mergeChecks = [...project, scriptCommand(pm, "check-secrets"), scriptCommand(pm, "docs:check")];
+  }
+  if (c.workflow.laneInstall === null) {
+    c.workflow.laneInstall = { pnpm: "pnpm install --frozen-lockfile", npm: "npm ci", yarn: "yarn install --frozen-lockfile", bun: "bun install --frozen-lockfile", none: "" }[pm] ?? "";
+  }
+  if (c.workflow.mergeInstall === null) {
+    const lock = { pnpm: ["pnpm-lock.yaml", "package.json", "pnpm-workspace.yaml"], npm: ["package-lock.json", "package.json"], yarn: ["yarn.lock", "package.json"], bun: ["bun.lockb", "bun.lock", "package.json"] }[pm];
+    c.workflow.mergeInstall = lock && c.workflow.laneInstall ? { cmd: c.workflow.laneInstall, files: lock } : { cmd: "", files: [] };
+  }
+  if (!c.roles.enabled.length) c.roles.enabled = [...CORE_ROLES];
+  for (const r of [...CORE_ROLES].reverse()) if (!c.roles.enabled.includes(r)) c.roles.enabled.unshift(r);
+  for (const r of c.roles.custom) if (!c.roles.enabled.includes(r.name)) c.roles.enabled.push(r.name);
+  return c;
+}
+
+/** Every enabled role with its model, effort, lane and tools. */
+export function roleTable(c) {
+  const out = [];
+  for (const name of c.roles.enabled) {
+    const lib = ROLE_LIBRARY[name];
+    const custom = c.roles.custom.find((r) => r.name === name);
+    const base = lib ?? custom;
+    if (!base) continue;
+    const tier = base.tier ?? "builder";
+    const o = c.models.overrides?.[name] ?? {};
+    out.push({
+      name,
+      custom: !lib,
+      tier,
+      lane: base.lane ?? (tier === "planner" ? "main" : "code"),
+      effort: o.effort ?? base.effort ?? "medium",
+      model: o.model ?? (tier === "planner" ? c.models.planner : c.models.builder),
+      tools: base.tools ?? "",
+      readOnly: !!base.readOnly,
+      summary: base.summary ?? base.description ?? "",
+      focus: custom?.focus ?? "",
+    });
+  }
+  return out;
+}
+
+export function loadSchema() {
+  return JSON.parse(readFileSync(SCHEMA_FILE, "utf8"));
+}
+
+/** Validate a raw (possibly partial) config/answers object. @returns {string[]} */
+export function validateConfig(raw) {
+  return validate(loadSchema(), raw);
+}
+
+export class ConfigError extends Error {}
+
+/** Folder that holds saf.config.json, walking up from `start`. */
+export function findRoot(start = process.cwd()) {
+  let dir = start;
+  for (;;) {
+    if (existsSync(join(dir, CONFIG_FILE))) return dir;
+    const up = dirname(dir);
+    if (up === dir) throw new ConfigError(`no ${CONFIG_FILE} found from ${start} upwards — run the SAF installer first`);
+    dir = up;
+  }
+}
+
+export function loadConfig(root) {
+  const file = join(root, CONFIG_FILE);
+  let raw;
+  try {
+    raw = JSON.parse(readFileSync(file, "utf8"));
+  } catch (e) {
+    throw new ConfigError(`${CONFIG_FILE}: cannot read JSON (${e instanceof Error ? e.message : e})`);
+  }
+  const errors = validateConfig(raw);
+  if (errors.length) throw new ConfigError([`${CONFIG_FILE} is invalid:`, ...errors.map((e) => `  ✗ ${e}`)].join("\n"));
+  return resolveConfig(raw);
+}

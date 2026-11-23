@@ -1,0 +1,218 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SAF project configuration (saf.config.json)",
+  "description": "Every project-specific value SAF uses. Partial objects are allowed: missing values are filled from defaults derived from project.rigor, models.preset and stack.packageManager. Reference: docs/config-reference.md in the SAF repository.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "pitch": { "type": "string" },
+        "type": { "enum": ["web-app", "mobile", "game", "api", "erp", "data-ai", "library-cli", "other"] },
+        "domain": { "type": "string" },
+        "users": { "type": "string" },
+        "stage": { "enum": ["idea", "prototype", "mvp", "production"] },
+        "rigor": { "enum": ["light", "standard", "strict"] }
+      }
+    },
+    "people": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ownerTitle": { "type": "string", "minLength": 1 },
+        "docLanguage": { "enum": ["th", "en"] },
+        "chatLanguage": { "enum": ["th", "en"] },
+        "uiLanguages": { "type": "array", "items": { "type": "string", "minLength": 2 }, "uniqueItems": true },
+        "i18nRequired": { "type": "boolean" },
+        "timeZone": { "type": "string", "minLength": 1 }
+      }
+    },
+    "stack": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "summary": { "type": "string" },
+        "packageManager": { "enum": ["pnpm", "npm", "yarn", "bun", "none"] },
+        "monorepo": { "type": "boolean" },
+        "commands": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "typecheck": { "type": "string" },
+            "lint": { "type": "string" },
+            "test": { "type": "string" },
+            "e2e": { "type": "string" },
+            "build": { "type": "string" }
+          }
+        },
+        "database": { "type": "string" },
+        "submodules": { "type": "boolean" }
+      }
+    },
+    "models": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preset": { "enum": ["max", "balanced", "economy", "custom"] },
+        "planner": { "$ref": "#/$defs/modelIdOrEmpty" },
+        "builder": { "$ref": "#/$defs/modelIdOrEmpty" },
+        "sessionDefault": { "$ref": "#/$defs/modelIdOrEmpty" },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { "model": { "$ref": "#/$defs/modelId" }, "effort": { "$ref": "#/$defs/effort" } }
+          }
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "array", "items": { "$ref": "#/$defs/roleName" }, "uniqueItems": true },
+        "custom": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "description"],
+            "properties": {
+              "name": { "$ref": "#/$defs/roleName" },
+              "description": { "type": "string", "minLength": 1 },
+              "tier": { "enum": ["planner", "builder"] },
+              "lane": { "enum": ["code", "main"] },
+              "effort": { "$ref": "#/$defs/effort" },
+              "tools": { "type": "string" },
+              "readOnly": { "type": "boolean" },
+              "focus": { "type": "string" }
+            }
+          }
+        },
+        "reportLanguage": { "enum": ["en", "th"] }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sizes": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sizeCaps" }] },
+        "testCaps": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sizeCaps" }] },
+        "review": { "oneOf": [{ "type": "null" }, { "enum": ["m-cards", "every-card", "every-card+security"] }] },
+        "lanes": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "code": { "type": "integer", "minimum": 0, "maximum": 9 }, "main": { "type": "integer", "minimum": 1, "maximum": 1 } }
+        },
+        "worktrees": { "type": "boolean" },
+        "worktreeDir": { "type": "string", "minLength": 1 },
+        "branchPrefix": { "type": "string", "pattern": "^[\\w.-]+/$" },
+        "solo": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "laneInstall": { "type": ["string", "null"] },
+        "lanePorts": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "base": { "type": "integer", "minimum": 1, "maximum": 65000 },
+            "step": { "type": "integer", "minimum": 1, "maximum": 1000 },
+            "env": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z_][A-Z0-9_]*$" } }
+          }
+        },
+        "laneDb": { "type": "string" },
+        "mergeChecks": { "oneOf": [{ "type": "null" }, { "type": "array", "items": { "type": "string", "minLength": 1 } }] },
+        "mergeInstall": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": { "cmd": { "type": "string" }, "files": { "type": "array", "items": { "type": "string" } } }
+            }
+          ]
+        },
+        "measure": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "waitMs": { "type": "integer", "minimum": 0 },
+            "maxLoadPerCore": { "type": "number", "minimum": 0 },
+            "names": {
+              "type": "object",
+              "additionalProperties": { "type": "object", "additionalProperties": false, "properties": { "idle": { "type": "boolean" } } }
+            }
+          }
+        },
+        "perfBudgets": { "type": "string" },
+        "alwaysAllowed": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "commandTimeoutMs": { "type": "integer", "minimum": 1000 }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "push": { "enum": ["owner-order", "allowed"] },
+        "deploy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "enum": ["owner-order", "allowed", "none"] },
+            "target": { "type": "string" },
+            "exceptions": { "type": "string" }
+          }
+        },
+        "protectedBranches": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "autoDeployBranches": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "noForcePush": { "type": "boolean" },
+        "secrets": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "envFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "extraPatterns": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+          }
+        },
+        "forbiddenPaths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "ownerOnlyPaths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "externalServices": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "noTimeEstimates": { "type": "boolean" },
+        "evidenceRequired": { "type": "boolean" }
+      }
+    },
+    "tokenSaving": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "silentInterim": { "type": "boolean" },
+        "batchReviewerNotes": { "type": "boolean" },
+        "reviewerDiff": { "type": "boolean" },
+        "fixFlakyFirst": { "type": "boolean" }
+      }
+    },
+    "firstMilestone": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": { "goal": { "type": "string" } }
+    }
+  },
+  "$defs": {
+    "modelId": { "type": "string", "pattern": "^claude-[a-z]+(-\\d+)+$" },
+    "modelIdOrEmpty": { "type": "string", "pattern": "^(claude-[a-z]+(-\\d+)+)?$" },
+    "effort": { "enum": ["low", "medium", "high", "xhigh", "max"] },
+    "roleName": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "sizeCaps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["S", "M"],
+      "properties": { "S": { "type": "integer", "minimum": 1 }, "M": { "type": "integer", "minimum": 1 } }
+    }
+  }
+}
