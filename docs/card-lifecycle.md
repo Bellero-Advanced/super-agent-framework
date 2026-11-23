@@ -19,6 +19,10 @@ Status is never typed by hand — it is computed from three kinds of files:
 4. `task:verify <id>` — runs every "Done when" command, then compares changed files with `touch`/`dont_touch`, then checks
    every id in `scenarios` has a test with the id in its name. Pass → `done`; otherwise `failed` with the reasons.
    Flaky passes (failed before, passed now) are reported.
+   It also counts changed lines (added + removed, from the start commit) — test files apart from code (test-file names and
+   `test/`, `tests/`, `__tests__/` folders) — and compares them with the caps of the card's size (`workflow.sizes`,
+   `workflow.testCaps`). Over a cap = a warning in the output and in the evidence (`verified.size`), never a failure:
+   the reviewer decides, or the designer splits the card.
 5. `spec-reviewer` (read only) compares the code with the card and the spec — every card at standard/strict rigor, size-M
    cards at light rigor.
 6. `qa-runner` runs real tests when the card touches UI, multiplayer or performance.

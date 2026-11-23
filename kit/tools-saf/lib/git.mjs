@@ -69,6 +69,32 @@ export function changedSince(cwd, rev) {
   return [...new Set([...tracked, ...untracked])].sort();
 }
 
+/**
+ * Added + removed lines per file, from `rev` to the working tree (committed · staged · unstaged · untracked).
+ * Binary files count 0. A file git does not report (untracked) counts its lines as added; a missing file counts 0.
+ */
+export function lineStats(cwd, rev, files) {
+  const tracked = new Map();
+  const parts = splitZ(git(cwd, ["diff", "--numstat", "--no-renames", "--ignore-submodules=all", "-z", rev, "--"]));
+  for (const p of parts) {
+    const m = p.match(/^(\d+|-)\t(\d+|-)\t(.*)$/s);
+    if (m) tracked.set(m[3], (Number(m[1]) || 0) + (Number(m[2]) || 0));
+  }
+  const out = {};
+  for (const f of files) {
+    if (tracked.has(f)) out[f] = tracked.get(f);
+    else if (existsSync(join(cwd, f))) {
+      try {
+        const text = readFileSync(join(cwd, f), "utf8");
+        out[f] = text.includes("\0") ? 0 : text.split("\n").length - (text.endsWith("\n") || !text ? 1 : 0);
+      } catch {
+        out[f] = 0;
+      }
+    } else out[f] = 0;
+  }
+  return out;
+}
+
 export function fileHash(cwd, rel) {
   const abs = join(cwd, rel);
   if (!existsSync(abs)) return "deleted";

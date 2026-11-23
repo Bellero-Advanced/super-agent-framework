@@ -15,6 +15,7 @@ import {
   isDir,
   isMainFolder,
   lastCommitOf,
+  lineStats,
   listRepoFiles,
   mainWorktreeHead,
   mergeBase,
@@ -452,6 +453,27 @@ export function cardFiles(ctx, card, ev, filesBase = ev.started.base) {
   };
 }
 
+/** Paths that count as test files for the size cap, besides the test-file names scenarios.mjs knows (data, not logic). */
+const TEST_DIR = /(?:^|\/)(?:tests?|__tests__)\//;
+const isTestPath = (f) => isTestFile(f) || TEST_DIR.test(f);
+
+/** Changed lines (added + removed) of the card's files, code and test apart, against the caps of its size in the config. */
+export function cardSize(ctx, card, files, filesBase) {
+  const stats = lineStats(ctx.root, filesBase, files.changed);
+  let code = 0;
+  let test = 0;
+  for (const f of files.changed) {
+    if (isTestPath(f)) test += stats[f] ?? 0;
+    else code += stats[f] ?? 0;
+  }
+  const size = card.size ?? null;
+  const cap = { code: ctx.config.workflow.sizes?.[size] ?? null, test: ctx.config.workflow.testCaps?.[size] ?? null };
+  const over = ["code", "test"].filter((k) => cap[k] !== null && { code, test }[k] > cap[k]);
+  return { size, code: { lines: code, cap: cap.code }, test: { lines: test, cap: cap.test }, over };
+}
+
+const sizeWarning = (id, s) => `  ⚠ ${id} is over the size cap (${s.size}): ${s.over.map((k) => `${k} ${s[k].lines} > ${s[k].cap}`).join(" · ")} changed lines — not a failure, the reviewer decides (or the designer splits the card)`;
+
 export function cardScenarios(root, ids) {
   if (!ids.length) return { required: [], missing: [] };
   const files = listRepoFiles(root).filter(isTestFile);
@@ -497,15 +519,17 @@ export async function verifyCard(ctx, id) {
   // compare files after running the commands — junk files left outside .gitignore are caught too
   const files = cardFiles(ctx, card, ev, filesBase);
   const scenarios = cardScenarios(ctx.root, card.scenarios);
+  const size = cardSize(ctx, card, files, filesBase);
   const pass = commands.every((c) => c.exit === 0) && !files.outside.length && !files.forbidden.length && !scenarios.missing.length;
   const at = nowIso(ctx);
   const attempts = ev.attempts + 1;
   const failed = commands.filter((c) => c.exit !== 0);
   const failures = failed.length ? [...(ev.failures ?? []), { at, head, attempts, commands: failed }].slice(-RUN_LIMITS.failuresKept) : ev.failures;
-  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios }, ...(failures ? { failures } : {}) };
+  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios, size }, ...(failures ? { failures } : {}) };
   if (pass && failures?.length) {
     ctx.log?.(`  ! passed after failing ${failures.length} time(s) (attempt ${failures.map((f) => f.attempts).join(", ")}) — flaky? ${[...new Set(failures.flatMap((f) => f.commands.map((c) => c.cmd)))].join(" · ")}`);
   }
+  if (size.over.length) ctx.log?.(sizeWarning(id, size));
   writeJson(ctx.root, evidencePath(id), next);
   if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
   return next;
