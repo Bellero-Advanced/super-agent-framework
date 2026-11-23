@@ -2,23 +2,7 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M0 SAF setup works in this repo — cards done 1/1
-
-- In progress: none
-- Next: none — all cards done, check the exit gates with npm run task:verify -- M0
-
-| Card | Work | Status | Evidence |
-|---|---|---|---|
-| [T-M0-01](tasks/M0/T-M0-01.md) | SAF self-checks pass through the real card loop | ✓ passed | [T-M0-01.json](evidence/T-M0-01.json) · passed 2026-11-23 17:34 (3 commands) |
-
-### Exit gates of M0 (checked with `npm run task:verify -- M0`)
-
-| Gate | Criterion | Result |
-|---|---|---|
-| plan-docs | plan, docs and secret checks pass | not checked |
-| probe | a fresh Claude session knows the current card from the SessionStart hook (uses two short model calls) | not checked |
-| project-checks | the project's own checks pass | not checked |
-| owner | the owner has read CLAUDE.md and docs/plan/README.md and agrees with the setup | manual check |
+No active milestone (a file in `milestones/` with `status: active`).
 
 ## Side lane M2 Roadmap: next — cards done 0/1
 
@@ -35,5 +19,6 @@
 
 ## Other milestones
 
+- M0 SAF setup works in this repo — done
 - M1 v0.1.0 public release — planned
 - M2 Roadmap: next — planned

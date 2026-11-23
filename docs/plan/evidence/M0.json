@@ -1,0 +1,94 @@
+{
+  "id": "M0",
+  "kind": "milestone",
+  "verified": {
+    "at": "2026-11-23T17:35:14.374Z",
+    "head": "a9b4d42b63af1b92364c032bf5e6969e5e175d66",
+    "gates": [
+      {
+        "id": "plan-docs",
+        "pass": true,
+        "commands": [
+          {
+            "cmd": "npm run task:state -- --check",
+            "exit": 0,
+            "ms": 315,
+            "tail": [
+              "✓ plan is valid · STATE.md and .saf/plan.md match plan + evidence"
+            ]
+          },
+          {
+            "cmd": "npm run docs:check",
+            "exit": 0,
+            "ms": 280,
+            "tail": [
+              "✓ docs:check passed — 194 markdown file(s) · 36 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+            ]
+          },
+          {
+            "cmd": "npm run check-secrets",
+            "exit": 0,
+            "ms": 329,
+            "tail": [
+              "✓ check-secrets: <redacted> findings in 380 scanned file(s)"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "probe",
+        "pass": true,
+        "commands": [
+          {
+            "cmd": "npm run task:probe",
+            "exit": 0,
+            "ms": 17001,
+            "tail": [
+              "✓ probe: fresh session without tools — expected M0 done 1/1 · no card in progress · 16.7s",
+              "  ✓ with hooks: correct — M0 done 1/1 · none",
+              "  ✓ all hooks off: cannot answer (as expected) → the answer above came from the SessionStart hook — unknown"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "project-checks",
+        "pass": true,
+        "commands": [
+          {
+            "cmd": "npm test",
+            "exit": 0,
+            "ms": 16833,
+            "tail": [
+              "ok 55 - lane start step 5 failure exits 6 and --resume finishes it",
+              "  ---",
+              "  duration_ms: 614.406833",
+              "  type: 'test'",
+              "  ...",
+              "# Subtest: hooks: session-start text, stop guidance, probe judging",
+              "ok 56 - hooks: session-start text, stop guidance, probe judging",
+              "  ---",
+              "  duration_ms: 233.19725",
+              "  type: 'test'",
+              "  ...",
+              "1..56",
+              "# tests 56",
+              "# suites 0",
+              "# pass 56",
+              "# fail 0",
+              "# cancelled 0",
+              "# skipped 0",
+              "# todo 0",
+              "# duration_ms 16077.889708"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "owner",
+        "pass": null,
+        "commands": []
+      }
+    ]
+  }
+}
