@@ -72,4 +72,4 @@ Layout: `bin/` CLI · `src/` installer · `kit/tools-saf/` the engine and templa
 
 ## License
 
-License to be decided before the project is open-sourced. Until then all rights are reserved.
+[MIT](LICENSE)

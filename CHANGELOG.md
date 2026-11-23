@@ -2,7 +2,7 @@
 
 ## 0.1.0 — unreleased
 
-First version.
+First version. Released under the MIT license.
 
 - Engine (`tools/saf/`, zero dependencies, Node ≥ 20): `task start|verify|abandon|merge|state|next|probe|env|report`,
   SessionStart and Stop hooks, `docs-check`, `spec-matrix`, `check-secrets`, measure lock, `setup`, `detect`, `config --check`
