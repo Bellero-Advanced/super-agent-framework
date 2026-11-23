@@ -48,14 +48,36 @@ export function tailOf(text, lines) {
     .slice(-lines);
 }
 
+export const IS_WINDOWS = process.platform === "win32";
+
 let bashPath;
+/** POSIX: bash when present (card commands are usually written for it), else the default shell. Windows: cmd.exe. */
 function shell() {
+  if (IS_WINDOWS) return null;
   if (bashPath === undefined) {
     const r = spawnSync("bash", ["-c", "exit 0"], { stdio: "ignore" });
     bashPath = r.status === 0 ? "bash" : null;
   }
   return bashPath;
 }
+
+/** Stop a command and everything it started: the process group on POSIX, the process tree on Windows. */
+export function killTree(child, signal) {
+  if (!child.pid) return;
+  try {
+    if (IS_WINDOWS) spawnSync("taskkill", ["/pid", String(child.pid), "/T", "/F"], { stdio: "ignore", windowsHide: true });
+    else process.kill(-child.pid, signal);
+  } catch {
+    try {
+      child.kill(signal);
+    } catch {
+      // already gone
+    }
+  }
+}
+
+/** Quote one argument for cmd.exe (used when a .cmd shim such as npm or claude must run through the shell on Windows). */
+export const quoteWindowsArg = (a) => (/^[\w@%+=:,./\\-]+$/.test(a) ? a : `"${a.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\+)$/, "$1$1")}"`);
 
 /**
  * @param {string} root working directory
@@ -69,8 +91,8 @@ export function taskRunner(root, opts = {}) {
       const env = { ...process.env, ...(opts.env ?? {}) };
       const sh = shell();
       const child = sh
-        ? spawn(sh, ["-c", cmd], { cwd: root, env, detached: process.platform !== "win32", stdio: ["ignore", "pipe", "pipe"] })
-        : spawn(cmd, { cwd: root, env, shell: true, stdio: ["ignore", "pipe", "pipe"] });
+        ? spawn(sh, ["-c", cmd], { cwd: root, env, detached: true, stdio: ["ignore", "pipe", "pipe"] })
+        : spawn(cmd, { cwd: root, env, shell: true, detached: !IS_WINDOWS, windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
       let buf = "";
       const onData = (d) => {
         const s = d.toString();
@@ -84,16 +106,8 @@ export function taskRunner(root, opts = {}) {
       const kill = (why) => {
         if (killedFor) return;
         killedFor = why;
-        const sig = (s) => {
-          try {
-            if (process.platform !== "win32" && child.pid) process.kill(-child.pid, s);
-            else child.kill(s);
-          } catch {
-            // already gone
-          }
-        };
-        sig("SIGTERM");
-        setTimeout(() => sig("SIGKILL"), RUN_LIMITS.killGraceMs).unref();
+        killTree(child, "SIGTERM");
+        if (!IS_WINDOWS) setTimeout(() => killTree(child, "SIGKILL"), RUN_LIMITS.killGraceMs).unref();
       };
       const timer = setTimeout(() => kill("timeout"), opts.timeoutMs ?? 30 * 60 * 1000);
       timer.unref();

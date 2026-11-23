@@ -48,7 +48,7 @@ import {
   stopGuidance,
   verifySummary,
 } from "./plan.mjs";
-import { RUN_LIMITS } from "./run.mjs";
+import { IS_WINDOWS, RUN_LIMITS, quoteWindowsArg } from "./run.mjs";
 import { findScenarioTests, isTestFile } from "./scenarios.mjs";
 import { textFor } from "./text.mjs";
 
@@ -89,6 +89,8 @@ export function writeJson(root, rel, data) {
 }
 
 const readOrNull = (root, rel) => (existsSync(join(root, rel)) ? readFileSync(join(root, rel), "utf8") : null);
+/** Generated files compare equal across line-ending conversions (a CRLF checkout on Windows is not "stale"). */
+const sameText = (a, b) => a !== null && b !== null && a.replace(/\r\n/g, "\n") === b.replace(/\r\n/g, "\n");
 
 // ── generated files ─────────────────────────────────────────────────────────
 
@@ -99,13 +101,13 @@ export const generatedFiles = (plan) => [
 
 export const staleGenerated = (root, plan) =>
   generatedFiles(plan)
-    .filter(([rel, content]) => readOrNull(root, rel) !== content)
+    .filter(([rel, content]) => !sameText(readOrNull(root, rel), content))
     .map(([rel]) => rel);
 
 export function writeGenerated(root, plan) {
   const changed = [];
   for (const [rel, content] of generatedFiles(plan)) {
-    if (readOrNull(root, rel) === content) continue;
+    if (sameText(readOrNull(root, rel), content)) continue;
     mkdirSync(dirname(join(root, rel)), { recursive: true });
     writeFileSync(join(root, rel), content);
     changed.push(rel);
@@ -698,12 +700,14 @@ export function checkStop(ctx, input, env = process.env) {
 // ── task:env ────────────────────────────────────────────────────────────────
 
 /** `eval "$(… task:env)"` lines for servers a person starts by hand inside a lane. Main folder → comment only. */
-export function laneEnvLines(config, lane) {
+/** POSIX shells (and Git Bash on Windows) get `export` lines; plain Windows shells get PowerShell `$env:` lines. */
+export function laneEnvLines(config, lane, env = process.env, platform = process.platform) {
   const p = config.workflow.lanePorts;
   if (lane === null) return [`# main folder — default ports (base ${p.base}); nothing to export`];
   const port = p.base + p.step * lane;
-  const out = [`export SAF_LANE=${lane}`, ...p.env.map((name) => `export ${name}=${port}`)];
-  if (config.workflow.laneDb) out.push(`export SAF_LANE_DB=${config.workflow.laneDb.replace(/\{n\}/g, String(lane)).replace(/\{name\}/g, config.project.name.replace(/[^\w]/g, "_").toLowerCase())}`);
+  const set = platform === "win32" && !env.SHELL ? (k, v) => `$env:${k} = "${v}"` : (k, v) => `export ${k}=${v}`;
+  const out = [set("SAF_LANE", lane), ...p.env.map((name) => set(name, port))];
+  if (config.workflow.laneDb) out.push(set("SAF_LANE_DB", config.workflow.laneDb.replace(/\{n\}/g, String(lane)).replace(/\{name\}/g, config.project.name.replace(/[^\w]/g, "_").toLowerCase())));
   out.push(`# lane ${lane}: port ${port}`);
   return out;
 }
@@ -736,10 +740,14 @@ function askClaude(root, bin, extra, timeoutMs) {
   delete env.CLAUDE_CODE_ENTRYPOINT;
   const args = ["-p", PROBE_QUESTION, "--tools", "", "--no-session-persistence", "--output-format", "text", ...extra];
   return new Promise((resolve) => {
-    execFile(bin, args, { cwd: root, env, timeout: timeoutMs, maxBuffer: 4 * 1024 * 1024 }, (err, stdout, stderr) => {
+    const done = (err, stdout, stderr) => {
       const exit = err ? (typeof err.code === "number" ? err.code : 1) : 0;
       resolve({ exit, out: `${stdout}${exit ? `\n${stderr}` : ""}`.trim() });
-    });
+    };
+    const opts = { cwd: root, env, timeout: timeoutMs, maxBuffer: 4 * 1024 * 1024 };
+    // Windows: `claude` is a .cmd shim, which only runs through the shell
+    if (IS_WINDOWS) execFile([bin, ...args].map(quoteWindowsArg).join(" "), { ...opts, shell: true, windowsHide: true }, done);
+    else execFile(bin, args, opts, done);
   });
 }
 

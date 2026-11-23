@@ -29,7 +29,7 @@ export function tmp(prefix = "saf-test-") {
   return d;
 }
 export function cleanup() {
-  for (const d of made.splice(0)) rmSync(d, { recursive: true, force: true });
+  for (const d of made.splice(0)) rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 }
 
 export function write(root, rel, content) {

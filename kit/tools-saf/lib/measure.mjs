@@ -4,6 +4,7 @@ import { existsSync, linkSync, mkdirSync, readFileSync, unlinkSync, writeFileSyn
 import { cpus, loadavg } from "node:os";
 import { dirname, join } from "node:path";
 import { commonGitDir } from "./git.mjs";
+import { IS_WINDOWS, quoteWindowsArg } from "./run.mjs";
 
 /**
  * Measure lock — heavy commands (e2e · perf · full test suites · load bots) run one at a time on this machine,
@@ -110,7 +111,11 @@ export async function runMeasured(o) {
     o.spawnChild ??
     ((argv, childEnv) =>
       new Promise((resolve) => {
-        const child = spawn(argv[0], argv.slice(1), { stdio: "inherit", env: childEnv, cwd: process.cwd(), shell: argv.length === 1 });
+        // one word = a shell line · several = argv; on Windows always through cmd.exe so npm/pnpm .cmd shims resolve
+        const child =
+          IS_WINDOWS && argv.length > 1
+            ? spawn(argv.map(quoteWindowsArg).join(" "), { stdio: "inherit", env: childEnv, cwd: process.cwd(), shell: true, windowsHide: true })
+            : spawn(argv[0], argv.slice(1), { stdio: "inherit", env: childEnv, cwd: process.cwd(), shell: argv.length === 1 });
         const forward = (sig) => child.kill(sig);
         process.on("SIGINT", forward);
         process.on("SIGTERM", forward);

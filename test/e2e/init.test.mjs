@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { delimiter, dirname, join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, commitAll, gitRepo, tmp, write } from "../helpers.mjs";
 
@@ -12,12 +12,13 @@ import { REPO, cleanup, commitAll, gitRepo, tmp, write } from "../helpers.mjs";
 after(cleanup);
 
 const CLI = join(REPO, "bin", "cli.mjs");
-const has = (bin) => spawnSync(bin, ["--version"], { stdio: "ignore" }).status === 0;
-const NODE_DIR = process.execPath.replace(/\/node$/, "");
-const ENV = { ...process.env, PATH: `${NODE_DIR}:${process.env.PATH}`, npm_config_update_notifier: "false", npm_config_fund: "false", npm_config_audit: "false" };
+const has = (bin) => spawnSync(`${bin} --version`, { stdio: "ignore", shell: true }).status === 0;
+const PATH_KEY = Object.keys(process.env).find((k) => k.toUpperCase() === "PATH") ?? "PATH";
+const ENV = { ...process.env, [PATH_KEY]: `${dirname(process.execPath)}${delimiter}${process.env[PATH_KEY]}`, npm_config_update_notifier: "false", npm_config_fund: "false", npm_config_audit: "false" };
 
+/** The platform's own shell (sh on POSIX, cmd.exe on Windows) — the commands below are written to work in both. */
 function sh(cwd, cmd) {
-  const r = spawnSync("bash", ["-c", cmd], { cwd, env: ENV, encoding: "utf8", timeout: 120_000 });
+  const r = spawnSync(cmd, { cwd, env: ENV, encoding: "utf8", timeout: 120_000, shell: true, windowsHide: true });
   return { code: r.status, out: `${r.stdout}${r.stderr}` };
 }
 function ok(cwd, cmd) {

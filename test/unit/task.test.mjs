@@ -93,7 +93,9 @@ test("lanes: start --worktree → verify in lane → merge; conflicts and failed
   const lane = join(root, ev.worktree);
   assert.ok(existsSync(join(lane, task.LANE_FILE)));
   assert.match(git(root, "log", "-1", "--format=%s"), /start T-M1-01 lane 1/);
-  assert.deepEqual(task.laneEnvLines(config, 1).slice(0, 2), ["export SAF_LANE=1", "export PORT=3010"]);
+  assert.deepEqual(task.laneEnvLines(config, 1, { SHELL: "/bin/bash" }, "linux").slice(0, 2), ["export SAF_LANE=1", "export PORT=3010"]);
+  assert.deepEqual(task.laneEnvLines(config, 1, { SHELL: "/usr/bin/bash" }, "win32").slice(0, 2), ["export SAF_LANE=1", "export PORT=3010"], "Git Bash");
+  assert.deepEqual(task.laneEnvLines(config, 1, {}, "win32").slice(0, 2), ['$env:SAF_LANE = "1"', '$env:PORT = "3010"'], "PowerShell");
 
   // merging before the lane passed is refused (exit 3)
   await assert.rejects(task.mergeCard(ctx, "T-M1-01", { checks: [] }), (e) => e.exitCode === 3);

@@ -39,7 +39,7 @@ test("runner redacts env secret values from output", async () => {
   const secret = ["s3cr3t", "VALUE", "x".repeat(12)].join("_");
   assert.ok(!redactSecrets(`token=${secret}`, { API_TOKEN: secret }).includes(secret));
   const run = taskRunner(tmp(), { env: { API_TOKEN: secret }, timeoutMs: 10_000 });
-  const r = await run('echo "$API_TOKEN"; exit 3');
+  const r = await run('node -e "console.log(process.env.API_TOKEN); process.exit(3)"');
   assert.equal(r.exit, 3);
   assert.ok(!r.tail.join("\n").includes(secret));
 });

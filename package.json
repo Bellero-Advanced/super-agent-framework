@@ -1,7 +1,7 @@
 {
   "name": "super-agent-framework",
   "version": "0.1.0",
-  "description": "SAF — a card-and-milestone workflow for Claude Code: roles, gates, evidence and a setup interview for any project",
+  "description": "SAF \u2014 a card-and-milestone workflow for Claude Code: roles, gates, evidence and a setup interview for any project",
   "type": "module",
   "private": true,
   "bin": {
@@ -21,9 +21,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node --test test/unit/*.test.mjs test/e2e/*.test.mjs",
-    "test:unit": "node --test test/unit/*.test.mjs",
-    "test:e2e": "node --test test/e2e/*.test.mjs"
+    "test": "node scripts/test.mjs",
+    "test:unit": "node scripts/test.mjs unit",
+    "test:e2e": "node scripts/test.mjs e2e"
   },
   "license": "MIT"
 }
