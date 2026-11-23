@@ -2,22 +2,32 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-No active milestone (a file in `milestones/` with `status: active`).
-
-## Side lane M2 Roadmap: next — cards done 2/7
+## M2 Roadmap: next — cards done 2/11
 
 - In progress: none
-- Next: T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode)
+- Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
+| [T-M2-01](tasks/M2/T-M2-01.md) | Add a document language by adding a template folder and a text table | · not started | – |
+| [T-M2-02](tasks/M2/T-M2-02.md) | Show what /saf-setup would change before regenerating project docs | · not started | – |
+| [T-M2-03](tasks/M2/T-M2-03.md) | Skill packs from other repositories | · not started | – |
 | [T-M2-04](tasks/M2/T-M2-04.md) | task:verify reports changed code and test lines against the card's size cap | ✓ passed | [T-M2-04.json](evidence/T-M2-04.json) · passed 2026-11-23 18:42 (2 commands) |
+| [T-M2-05](tasks/M2/T-M2-05.md) | Evidence viewer: a static HTML page from docs/plan/evidence/ | · not started | – |
 | [T-M2-06](tasks/M2/T-M2-06.md) | Choose how often the full test suite runs, per project and per machine (workflow.testMode) | · not started | – |
 | [T-M2-07](tasks/M2/T-M2-07.md) | task:verify runs the card's own tests instead of the full suite when the test mode defers it | · not started | – |
 | [T-M2-08](tasks/M2/T-M2-08.md) | task:merge skips the deferred full suite and the milestone gate always runs it | · not started | – |
 | [T-M2-09](tasks/M2/T-M2-09.md) | task:culprit finds the card that broke the deferred full suite | · not started | – |
 | [T-M2-10](tasks/M2/T-M2-10.md) | /saf-setup asks for the test mode and the docs explain the three modes and task:culprit | · not started | – |
 | [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | ✓ passed | [T-M2-11.json](evidence/T-M2-11.json) · passed 2026-11-23 19:17 (4 commands) |
+
+### Exit gates of M2 (checked with `npm run task:verify -- M2`)
+
+| Gate | Criterion | Result |
+|---|---|---|
+| cards | every card of M2 passed task:verify and the spec review | manual check |
+| project-checks | the project's own checks pass on Linux, macOS and Windows (CI matrix green) | not checked |
+| owner | the owner tried each item in a fresh project and accepts it | manual check |
 
 ## Latest evidence
 
@@ -31,4 +41,3 @@ No active milestone (a file in `milestones/` with `status: active`).
 
 - M0 SAF setup works in this repo — done
 - M1 v0.1.0 public release — done
-- M2 Roadmap: next — planned
