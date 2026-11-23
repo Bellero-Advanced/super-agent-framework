@@ -30,7 +30,8 @@
       "lint": "",
       "test": "npm test",
       "e2e": "npm run test:e2e",
-      "build": ""
+      "build": "",
+      "testFiles": "node --test {files}"
     },
     "database": "none",
     "submodules": false
@@ -117,7 +118,8 @@
     },
     "perfBudgets": "",
     "alwaysAllowed": ["tools/saf/**", ".claude/skills/saf-setup/**", "examples/todo-api/tools/saf/**"],
-    "commandTimeoutMs": 1800000
+    "commandTimeoutMs": 1800000,
+    "testMode": "targeted"
   },
   "policies": {
     "push": "owner-order",

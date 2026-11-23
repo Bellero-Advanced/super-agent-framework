@@ -37,7 +37,7 @@ packs from other repositories, a card size check and an evidence viewer.
 - [ ] T-M2-03 Skill packs from other repositories
 - [x] T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
 - [ ] T-M2-05 Evidence viewer: a static HTML page from docs/plan/evidence/
-- [ ] T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) — started 2026-11-23 19:27 · not verified yet · lane 1 · .claude/worktrees/T-M2-06
+- [x] T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) — passed 2026-11-23 19:28 (4 commands)
 - [ ] T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it
 - [ ] T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it
 - [ ] T-M2-09 task:culprit finds the card that broke the deferred full suite

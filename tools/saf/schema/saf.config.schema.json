@@ -47,7 +47,8 @@
             "lint": { "type": "string" },
             "test": { "type": "string" },
             "e2e": { "type": "string" },
-            "build": { "type": "string" }
+            "build": { "type": "string" },
+            "testFiles": { "type": "string" }
           }
         },
         "database": { "type": "string" },
@@ -168,7 +169,8 @@
         },
         "perfBudgets": { "type": "string" },
         "alwaysAllowed": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-        "commandTimeoutMs": { "type": "integer", "minimum": 1000 }
+        "commandTimeoutMs": { "type": "integer", "minimum": 1000 },
+        "testMode": { "enum": ["every-card", "targeted", "milestone"] }
       }
     },
     "policies": {
