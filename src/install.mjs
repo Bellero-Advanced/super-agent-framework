@@ -10,7 +10,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
  *   saf.config.json stub (only when missing) · .gitignore lines
  *
  * `init --answers` then runs the generator in-process from the copied engine, so the project is set up exactly as
- * `/saf-setup` would leave it. `upgrade` replaces only kit-owned files and never touches project content.
+ * `/saf-setup` would leave it. `upgrade` replaces only kit-owned files; project content stays, except that missing engine scripts are added to package.json.
  */
 
 export const KIT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "kit");
@@ -80,17 +80,73 @@ export async function init(root, opts = {}) {
 }
 
 /**
+ * Add the engine's package.json scripts the project lacks (never change an existing one, never create the file).
+ * Keeps the file's indentation, line endings and trailing newline; writes only when a script was added.
+ */
+async function mergeUpgradeScripts(root, log) {
+  const result = { added: [], kept: [] };
+  const { CONFIG_FILE, validateConfig, resolveConfig } = await engineModule(root, "config.mjs");
+  const { engineScripts } = await engineModule(root, "generate.mjs");
+  let raw = null;
+  try {
+    raw = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
+  } catch {}
+  if (!raw || validateConfig(raw).length) {
+    log(`  ⚠ ${CONFIG_FILE} is missing or invalid — package.json scripts were not checked`);
+    return result;
+  }
+  const config = resolveConfig(raw);
+  if (config.stack.packageManager === "none") return result;
+  const file = join(root, "package.json");
+  const hint = "run the engine as `node tools/saf/bin/saf.mjs <command>`";
+  if (!existsSync(file)) {
+    log(`  • no package.json — scripts were not added; ${hint}`);
+    return result;
+  }
+  const text = readFileSync(file, "utf8");
+  const bom = text.startsWith("\uFEFF") ? "\uFEFF" : "";
+  const body = text.slice(bom.length);
+  let pkg = null;
+  try {
+    pkg = JSON.parse(body);
+  } catch {}
+  if (!pkg || typeof pkg !== "object" || Array.isArray(pkg)) {
+    log(`  ⚠ package.json is not valid JSON — scripts were not added; ${hint}`);
+    return result;
+  }
+  if (!pkg.scripts || typeof pkg.scripts !== "object" || Array.isArray(pkg.scripts)) pkg.scripts = {};
+  for (const [name, value] of Object.entries(engineScripts(config))) {
+    if (pkg.scripts[name] === undefined) {
+      pkg.scripts[name] = value;
+      result.added.push(name);
+    } else if (pkg.scripts[name] !== value) {
+      result.kept.push(name);
+      log(`  kept script: ${name} (SAF expects "${value}")`);
+    }
+  }
+  if (result.added.length) {
+    const indent = body.match(/^([ \t]+)\S/m)?.[1] ?? 2;
+    const eol = body.includes("\r\n") ? "\r\n" : "\n";
+    const tail = /\r?\n$/.test(body) ? eol : "";
+    writeFileSync(file, `${bom}${JSON.stringify(pkg, null, indent).replace(/\n/g, eol)}${tail}`);
+  }
+  for (const name of result.added) log(`  added script: ${name}`);
+  return result;
+}
+
+/**
  * Replace the vendored engine and the setup skill; refresh the `/saf` commands and skills SAF shipped (unless edited) and
- * remove ones it no longer ships. Project docs and plan files stay.
+ * remove ones it no longer ships; add the engine's missing package.json scripts. Project docs and plan files stay.
  */
 export async function upgrade(root, opts = {}) {
   const log = opts.log ?? (() => {});
   const before = readVersion(root);
   if (!before) throw new Error(`no ${ENGINE_DEST}/ here — run init first`);
   copyKit(root);
+  log(`✓ SAF ${before} → ${kitVersion()} (${ENGINE_DEST}/ and ${SKILL_DEST}/ replaced)`);
+  const scripts = await mergeUpgradeScripts(root, log);
   const { refreshKitFiles } = await engineModule(root, "generate.mjs");
   const report = refreshKitFiles(root);
-  log(`✓ SAF ${before} → ${kitVersion()} (${ENGINE_DEST}/ and ${SKILL_DEST}/ replaced)`);
   for (const w of report.written) log(`  refreshed: ${w}`);
   for (const r of report.removed) log(`  removed (no longer shipped): ${r}`);
   for (const k of report.kept) log(`  kept: ${k}`);
@@ -102,5 +158,5 @@ export async function upgrade(root, opts = {}) {
     for (const e of errors) log(`  ✗ ${CONFIG_FILE}: ${e}`);
   }
   log("Project docs were not changed. To regenerate them with the new templates, run /saf-setup again (edited files are archived first).");
-  return { before, after: kitVersion(), report, errors };
+  return { before, after: kitVersion(), report, errors, scripts };
 }

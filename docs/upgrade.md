@@ -12,6 +12,8 @@ npx github:Bellero-Advanced/super-agent-framework upgrade      # in the project 
 - removes commands and skills an older SAF shipped that are no longer part of the kit (for example the 0.0.x `/saf-fix`,
   `/saf-test`, `/saf-protect`, `/saf-help` and their short aliases) — only files `.saf/manifest.json` records as written by
   SAF and still unedited; your own commands and skills are never touched
+- adds the engine's missing scripts (for example `task:culprit`) to `package.json` — scripts you already have are never changed,
+  the file is never created, and nothing is added when `stack.packageManager` is `none`
 - validates `saf.config.json` against the new schema and lists any errors
 - never touches CLAUDE.md, docs, the plan, cards, evidence, agents or rules
 

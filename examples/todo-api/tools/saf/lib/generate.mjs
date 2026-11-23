@@ -305,6 +305,16 @@ export function mergeGitignore(root, config, report) {
   report?.written.push(".gitignore (merged)");
 }
 
+/** The package.json scripts SAF wants for a resolved config — the one list setup and upgrade share. */
+export function engineScripts(config) {
+  const want = { saf: "node tools/saf/bin/saf.mjs" };
+  for (const [script, sub] of Object.entries(ENGINE_SCRIPTS)) {
+    if (script === "measure" && !config.workflow.measure.enabled) continue;
+    want[script] = `node tools/saf/bin/saf.mjs ${sub}`;
+  }
+  return want;
+}
+
 function mergePackageJson(root, config, report) {
   if (config.stack.packageManager === "none") return null;
   const file = join(root, "package.json");
@@ -314,12 +324,7 @@ function mergePackageJson(root, config, report) {
     return null;
   }
   pkg.scripts ??= {};
-  const want = { saf: "node tools/saf/bin/saf.mjs" };
-  for (const [script, sub] of Object.entries(ENGINE_SCRIPTS)) {
-    if (script === "measure" && !config.workflow.measure.enabled) continue;
-    want[script] = `node tools/saf/bin/saf.mjs ${sub}`;
-  }
-  for (const [k, v] of Object.entries(want)) {
+  for (const [k, v] of Object.entries(engineScripts(config))) {
     if (pkg.scripts[k] === undefined) pkg.scripts[k] = v;
     else if (pkg.scripts[k] !== v) report.warnings.push(`package.json already has a different "${k}" script — kept yours; SAF docs assume "${v}"`);
   }

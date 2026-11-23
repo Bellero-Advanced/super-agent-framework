@@ -73,7 +73,7 @@ interview that explains every option and shows every setting it does not ask.
 - [ ] T-M2-15 /saf-setup shows the four lines for every option and lists the settings it did not ask before generating
 - [ ] T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved
 - [ ] T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result
-- [ ] T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — started 2026-11-23 20:17 · not verified yet · lane 1 · .claude/worktrees/T-M2-18
+- [x] T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate
 
 ## Risks
 - M1 feedback may reorder or replace these cards — that is expected; this is a draft

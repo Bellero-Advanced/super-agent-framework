@@ -19,7 +19,8 @@
     "task:report": "node tools/saf/bin/saf.mjs task report",
     "docs:check": "node tools/saf/bin/saf.mjs docs-check",
     "spec:matrix": "node tools/saf/bin/saf.mjs spec-matrix",
-    "check-secrets": "node tools/saf/bin/saf.mjs check-secrets"
+    "check-secrets": "node tools/saf/bin/saf.mjs check-secrets",
+    "task:culprit": "node tools/saf/bin/saf.mjs task culprit"
   },
   "engines": {
     "node": ">=20"
