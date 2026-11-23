@@ -5,7 +5,8 @@ Source: `docs/plan/milestones/M2.md` · full status: `docs/plan/STATE.md` · a c
 
 ## Goal
 The "Next" items of [ROADMAP.md](../../../ROADMAP.md): more document languages, a guided upgrade of project docs, skill
-packs from other repositories, a card size check and an evidence viewer.
+packs from other repositories, a card size check and an evidence viewer. Plus (owner order 2026-11-24) a setup
+interview that explains every option and shows every setting it does not ask.
 
 ## Scope
 - Drafted from the roadmap; the designer rewrites the cards with `/saf-plan M2` after M1 feedback, and the owner says Go
@@ -25,6 +26,13 @@ packs from other repositories, a card size check and an evidence viewer.
   `72ad81c` and the `project-checks` gate needs the matrix green. It shares `touch` files with T-M2-06 … T-M2-09, so it
   runs before the chain or between its cards, never in parallel with one of them; its final proof is the CI run on the
   pushed commit (push on the owner's order)
+- T-M2-12 … T-M2-15 (setup choices, [spec](../../specs/setup-choices.md), decision D-009 proposed): `/saf-setup`
+  shows "what it is · good for · cost · pick it when" for every option, in en or th, from one data table in the engine
+  (`saf choices`), and before generating lists every setting it did not ask with where to change it (project file,
+  per-machine file, env variable). A chain of regular cards (M2 is active, so not side cards) that **starts after
+  T-M2-10**: T-M2-12 compares the interview keys with `questions.md`, which T-M2-10 extends with the test-mode rows,
+  and it shares `kit/tools-saf/bin/saf.mjs` with T-M2-09; T-M2-15 edits the same skill and docs files as T-M2-10.
+  "Setup suggestions" from the roadmap stays a separate later item
 
 ## Done When
 - [ ] cards every card of M2 passed task:verify and the spec review (manual check)
@@ -43,6 +51,10 @@ packs from other repositories, a card size check and an evidence viewer.
 - [ ] T-M2-09 task:culprit finds the card that broke the deferred full suite
 - [ ] T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit
 - [x] T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again) — passed 2026-11-23 19:17 (4 commands)
+- [ ] T-M2-12 saf choices --not-asked lists every setting the interview does not ask, and where to change it
+- [ ] T-M2-13 saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th
+- [ ] T-M2-14 Option explanations for groups 5-8 and the setup-flow questions, with a test that no asked choice lacks one
+- [ ] T-M2-15 /saf-setup shows the four lines for every option and lists the settings it did not ask before generating
 
 ## Risks
 - M1 feedback may reorder or replace these cards — that is expected; this is a draft
@@ -57,6 +69,9 @@ packs from other repositories, a card size check and an evidence viewer.
 - **Bootstrapping:** T-M2-07 … T-M2-09 change verify, merge and the gate while being verified by them. Until T-M2-07
   lands every mode behaves like `every-card`; each card's own `npm test` (run in full in `targeted` mode at verify or
   merge) is the guard
+- **Setup choices text drifts from the engine:** an explanation that names a number or a model goes stale when a code
+  table changes — the data test forbids digits and model ids in the text and the CLI appends the real values; the
+  coverage test fails when a schema key or an enum value has no explanation or not-asked line
 - **Default `milestone` trade-off:** a card can pass while it breaks another card's test; the break shows up at the
   exit gate, later cards may build on it, and fixing it waits until the milestone ends. `task:culprit` (T-M2-09) brings
   back "which card" in a few runs; the milestone cannot close while the gate fails
