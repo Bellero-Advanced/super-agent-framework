@@ -45,6 +45,20 @@
     "test": "node scripts/test.mjs",
     "test:unit": "node scripts/test.mjs unit",
     "test:e2e": "node scripts/test.mjs e2e",
-    "test:package": "node scripts/test.mjs package"
+    "test:package": "node scripts/test.mjs package",
+    "saf": "node tools/saf/bin/saf.mjs",
+    "task:start": "node tools/saf/bin/saf.mjs task start",
+    "task:verify": "node tools/saf/bin/saf.mjs task verify",
+    "task:abandon": "node tools/saf/bin/saf.mjs task abandon",
+    "task:merge": "node tools/saf/bin/saf.mjs task merge",
+    "task:state": "node tools/saf/bin/saf.mjs task state",
+    "task:next": "node tools/saf/bin/saf.mjs task next",
+    "task:probe": "node tools/saf/bin/saf.mjs task probe",
+    "task:env": "node tools/saf/bin/saf.mjs task env",
+    "task:report": "node tools/saf/bin/saf.mjs task report",
+    "docs:check": "node tools/saf/bin/saf.mjs docs-check",
+    "spec:matrix": "node tools/saf/bin/saf.mjs spec-matrix",
+    "check-secrets": "node tools/saf/bin/saf.mjs check-secrets",
+    "saf:refresh": "node bin/cli.mjs upgrade --dir ."
   }
 }
