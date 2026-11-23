@@ -31,6 +31,7 @@ test("generate writes the whole system and a valid config", () => {
   assert.equal(pkg.scripts["task:verify"], "node tools/saf/bin/saf.mjs task verify");
   assert.deepEqual(config.workflow.mergeChecks, ["npm test", "npm run check-secrets", "npm run docs:check"], "lint has no script → not a merge check");
   assert.match(read(root, "CLAUDE.md"), /Not set up yet .*lint → npm run lint/);
+  assert.match(read(root, "CLAUDE.md"), /npm run task:culprit -- <M>/, "the command list names task:culprit");
   assert.ok(report.written.length > 25);
 });
 
@@ -171,4 +172,15 @@ test("side lanes: on by default (1 at a time) and documented in the plan README;
   generate(th, { people: { docLanguage: "th" }, stack: { packageManager: "none" }, workflow: { sideLanes: { enabled: false } } });
   assert.doesNotMatch(read(th, "docs/plan/README.md"), /สายข้าง/);
   assert.doesNotMatch(read(th, ".claude/agents/designer.md"), /side_cards/);
+});
+
+test("generated CLAUDE.md lists task:culprit in en and th, and the plan README names the test mode", () => {
+  for (const lang of ["en", "th"]) {
+    const root = gitRepo();
+    write(root, "package.json", { name: "demo", scripts: { test: "node -e 0" } });
+    generate(root, { people: { docLanguage: lang }, stack: { packageManager: "npm", commands: { test: "npm test" } } }, { now: new Date("2026-01-02T00:00:00Z") });
+    assert.match(read(root, "CLAUDE.md"), /npm run task:culprit -- <M>/, `${lang}: CLAUDE.md lists task:culprit`);
+    assert.match(read(root, "docs/plan/README.md"), /workflow\.testMode/, `${lang}: the plan README names the test mode`);
+    assert.match(read(root, "docs/plan/README.md"), /npm run task:culprit -- <M>/, `${lang}: the plan README names task:culprit`);
+  }
 });

@@ -65,7 +65,7 @@ interview that explains every option and shows every setting it does not ask.
 - [x] T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it — passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate
 - [x] T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it — passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate
 - [x] T-M2-09 task:culprit finds the card that broke the deferred full suite — passed 2026-11-23 20:03 (3 commands) · full suite deferred to gate
-- [ ] T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit — started 2026-11-23 20:22 · not verified yet · lane 1 · .claude/worktrees/T-M2-10
+- [x] T-M2-10 /saf-setup asks for the test mode and the docs explain the three modes and task:culprit — passed 2026-11-23 20:28 (4 commands) · full suite deferred to gate
 - [x] T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again) — passed 2026-11-23 19:17 (4 commands)
 - [ ] T-M2-12 saf choices --not-asked lists every setting the interview does not ask, and where to change it
 - [ ] T-M2-13 saf choices --group explains each option (what · good for · cost · pick it when) for groups 1-4, en and th

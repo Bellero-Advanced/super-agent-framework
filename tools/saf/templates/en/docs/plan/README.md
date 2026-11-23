@@ -28,6 +28,11 @@ Status is never typed by hand. It is computed from three kinds of files:
 A card is **done** only when `task:verify` passes. A failed verify keeps the card open and records why (failed commands ·
 files outside `touch` · files in `dont_touch` · scenarios without a test).
 
+How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default `milestone`).
+In the deferred modes a card proves itself with its own tests, its evidence says "full suite deferred to gate", and the
+in `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card merges (when the gate fails, `{{cmd.taskCulprit}}` finds the card that broke it). Each person can override the mode with `SAF_TEST_MODE` or an untracked
+`saf.config.local.json` (only `workflow.testMode`; a `$schema` key there is refused).
+
 ## 2. Card format
 
 Copy [tasks/_template.md](tasks/_template.md). Frontmatter fields:
@@ -95,6 +100,8 @@ Other cards run in the main folder, one at a time.
 - inside the lane: work, then `{{cmd.taskVerify}}` (writes evidence on the lane branch only) · `{{cmd.taskEnv}}` prints the lane's ports
 - back in the main folder: `{{cmd.taskMerge}}` merges one card, runs the merge checks ({{mergeChecksText}}) and refreshes status.
   Exit 3 = refused (not passed / dirty main) · 4 = conflict (merge rolled back) · 5 = merge checks failed (merge rolled back)
+- with `workflow.testMode` = `milestone` the merge checks skip the full test suite (the gate runs it); when the gate fails,
+  `{{cmd.taskCulprit}}` finds the card that broke it
 {{/if}}
 {{#if measureOn}}
 
