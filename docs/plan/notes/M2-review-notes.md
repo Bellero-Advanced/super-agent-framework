@@ -79,3 +79,13 @@ N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issu
 13. FIELD_MAX 160, longest field 159 — the next wording edit may need a limit bump or trim
 14. FACT for the interview itself: `project.stage` (CLAUDE.md header only), `stack.submodules` (read nowhere) and `stack.monorepo` (one CLAUDE.md line) have almost no effect although the interview asks them — decide: drop the question, mark it "informational", or give it an effect
 15. Thai wording written by the implementer and reviewed by an AI only — a native-reader pass before publishing
+
+## T-M2-14 (review FAIL → fixed → merged) — notes for the designer
+
+N1. BUG `templates/agents/release-operator.md:27` `Never push{{#if pushOwner}} without the owner's order{{/if}}` renders "Never push" when `policies.push: allowed` — contradicts CLAUDE.md; needs an `{{else}}` branch (en + th)
+N2. BUG (T-M2-15 MUST handle before the explanations reach users) the setup skill adds `--adopt` only for "yes"; without a flag `generate` falls back to `detected.adopt` (true for any project with package.json, CLAUDE.md, .claude/, docs/INDEX.md or src/) — so "no" still archives. The skill must pass `--no-adopt` for "no"; Step 1 also never asks the adopt question explicitly
+N3. fallback reason text in `planVerifyRun` (task.mjs) always says "no stack.commands.testFiles command", even when the cause is a missing `{files}` placeholder — misleading
+N4. engine enforces NOTHING of push / deploy / protectedBranches / noForcePush / externalServices (text in CLAUDE.md, DECISIONS, release-operator, security-review only; hooks are SessionStart and Stop) — the choices say so; decide whether the product should offer a real guard (hook) later
+N5. token saving: only `tokenSaving.enabled` gates the CLAUDE.md line; the habit flags are separate and `off` does not clear them — decide whether `off` should set them false
+N6. `deploy allowed`: the release-operator file still describes an order step
+N7. `measure` is used only by the `measure` script (task:verify and merge checks never take the lock); `lane ports` / `lane db` only print exports; `perf budgets` only named in qa-runner.md
