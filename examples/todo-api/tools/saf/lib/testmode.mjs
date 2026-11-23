@@ -54,12 +54,12 @@ export function mergeChecksFor(config) {
   return MERGE_SKIPS_FULL_SUITE[config.workflow?.testMode] ? checks.filter((c) => !isFullSuite(config, c)) : checks;
 }
 
-/** Rule 19: the gates to run — the milestone's gates, plus the `full-suite` gate when the mode requires it and no gate runs a full-suite command. */
+/** Rule 19: the gates to run — the milestone's gates, plus the `full-suite` gate holding the full-suite commands no declared gate runs (none left = no extra gate). */
 export function gatesWithFullSuite(config, gates) {
   if (!GATE_ADDS_FULL_SUITE[config.workflow?.testMode]) return gates;
-  const run = fullSuiteCommands(config);
-  if (!run.length || gates.some((g) => g.run.some((c) => isFullSuite(config, c)))) return gates;
-  return [...gates, { ...FULL_SUITE_GATE, run }];
+  const covered = new Set(gates.flatMap((g) => g.run.filter((c) => isFullSuite(config, c)).map((c) => String(c).trim())));
+  const run = fullSuiteCommands(config).filter((c) => !covered.has(c));
+  return run.length ? [...gates, { ...FULL_SUITE_GATE, run }] : gates;
 }
 
 /** Rule 15, verify column. */

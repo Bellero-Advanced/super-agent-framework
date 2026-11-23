@@ -110,13 +110,13 @@ test("TMODE-AC-10 deferredCards lists the milestone's cards whose evidence has d
   assert.deepEqual(gctx.ran, ["npm test", "npm run test:e2e"]);
 });
 
-test("TMODE-AC-10 no extra gate when a gate already runs a full-suite command, or in another mode", async () => {
-  const gates = [{ id: "G1", text: "suite", run: ["npm test"] }];
+test("TMODE-AC-10 no extra gate when the gates already run every full-suite command, or in another mode", async () => {
+  const gates = [{ id: "G1", text: "suite", run: ["npm test", "npm run test:e2e"] }];
   const a = await setup("milestone", { gates });
   const actx = fakeCtx(a.root, a.config);
   const ar = await task.verifyMilestone(actx, "M1");
   assert.deepEqual(ar.evidence.verified.gates.map((g) => g.id), ["G1"]);
-  assert.deepEqual(actx.ran, ["npm test"]);
+  assert.deepEqual(actx.ran, ["npm test", "npm run test:e2e"]);
   for (const mode of ["targeted", "every-card"]) {
     const b = await setup(mode, { gates: [{ id: "G1", text: "lint", run: ["echo lint"] }] });
     const bctx = fakeCtx(b.root, b.config);

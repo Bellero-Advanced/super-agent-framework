@@ -5,6 +5,7 @@ import { submodulePaths } from "./git.mjs";
 import { codeSpans, findSection, frontmatter, scanLines, sections } from "./markdown.mjs";
 import { stripComment } from "./yaml.mjs";
 import { parseYaml } from "./yaml.mjs";
+import { FULL_SUITE_GATE } from "./testmode.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -135,6 +136,7 @@ export function parseMilestone(src, file) {
   for (const g of Array.isArray(data.gates) ? data.gates : []) {
     const rec = asRecord(g);
     if (!str(rec.id) || !str(rec.text)) issues.push(`${file}: every gate needs id and text`);
+    else if (str(rec.id) === FULL_SUITE_GATE.id) issues.push(`${file}: gate id "${FULL_SUITE_GATE.id}" is reserved for the extra exit gate (test mode) — rename it`);
     else gates.push({ id: str(rec.id), text: str(rec.text), run: strList(rec.run) });
   }
   const body = new Map();

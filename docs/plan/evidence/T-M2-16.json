@@ -1,14 +1,160 @@
 {
   "id": "T-M2-16",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T20:29:22.531Z",
     "base": "e21fcd0a0531be4121179ea4cc7ebe3473adcf60",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-16",
-  "worktree": ".claude/worktrees/T-M2-16"
+  "worktree": ".claude/worktrees/T-M2-16",
+  "verified": {
+    "at": "2026-11-23T20:30:15.815Z",
+    "head": "03fbafae277d0e9c02bf47ea39fd4fd87e68e7e3",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 274,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (in progress) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (in progress) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "30 scenario(s) in 3 spec(s) · with test 21 · gaps 9 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/test-mode-gate.test.mjs test/unit/test-mode-gate-coverage.test.mjs",
+        "exit": 0,
+        "ms": 3792,
+        "tail": [
+          "ok 13 - TMODE-AC-10 no extra gate when the gates already run every full-suite command, or in another mode",
+          "  ---",
+          "  duration_ms: 275.852417",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-10 the full-suite gate decides pass or fail like any gate",
+          "ok 14 - TMODE-AC-10 the full-suite gate decides pass or fail like any gate",
+          "  ---",
+          "  duration_ms: 94.208833",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 14",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3740.426875"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 327,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 213 markdown file(s) · 91 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/test-mode-gate-coverage.test.mjs' 'test/unit/test-mode-gate.test.mjs'",
+        "exit": 0,
+        "ms": 3639,
+        "tail": [
+          "ok 13 - TMODE-AC-10 no extra gate when the gates already run every full-suite command, or in another mode",
+          "  ---",
+          "  duration_ms: 280.700917",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-10 the full-suite gate decides pass or fail like any gate",
+          "ok 14 - TMODE-AC-10 the full-suite gate decides pass or fail like any gate",
+          "  ---",
+          "  duration_ms: 90.126625",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 14",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3584.83875"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/testmode.mjs",
+        "test/unit/test-mode-gate-coverage.test.mjs",
+        "test/unit/test-mode-gate.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/plan.mjs": "8916c7d0eb78a94350452e1302dea6ef0bb6f2a7",
+        "kit/tools-saf/lib/testmode.mjs": "a04cf237ffbacb009d614fd41612e66e7c8af67d",
+        "test/unit/test-mode-gate-coverage.test.mjs": "9782836afbdd6d27695788831fed257730571596",
+        "test/unit/test-mode-gate.test.mjs": "353657cbbc8e73c71a05f9704b60560e2c120b7a"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "TMODE-AC-14",
+        "TMODE-AC-15"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 10,
+        "cap": 150
+      },
+      "test": {
+        "lines": 71,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/test-mode-gate-coverage.test.mjs",
+        "test/unit/test-mode-gate.test.mjs"
+      ]
+    }
+  }
 }
