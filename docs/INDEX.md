@@ -32,6 +32,7 @@ Each topic has exactly one home. Other files link to it instead of copying it. W
 | Skills — load by themselves when the work matches: `debug-protocol` · `tdd` · `code-review` · `security-review` · `writing-for-agents` · `handoff` · `evidence-before-done` · `test-runner` | `.claude/skills/` |
 | SAF settings (schema-validated) | [saf.config.json](../saf.config.json) · schema `tools/saf/schema/saf.config.schema.json` |
 | Card template | [plan/tasks/_template.md](plan/tasks/_template.md) |
+| Non-blocking review notes waiting for milestone end | `docs/plan/notes/` (one file per milestone, e.g. [plan/notes/M2-review-notes.md](plan/notes/M2-review-notes.md)) |
 
 ## 4. Code is the truth
 

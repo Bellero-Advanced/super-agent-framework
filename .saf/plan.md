@@ -42,6 +42,13 @@ interview that explains every option and shows every setting it does not ask.
   T-M2-16 and T-M2-17 share `plan.mjs` and `testmode.mjs`). Both must pass `task:verify` and the spec review before
   `npm run task:verify -- M2` (the `cards` gate); they change only `kit/tools-saf/lib/` and test-mode tests, so they
   may run beside T-M2-10 and T-M2-12 … T-M2-15 (no shared `touch`)
+- T-M2-18 closes a gap the spec review of T-M2-09 found ([spec](../../specs/upgrade-scripts.md), decision D-010
+  proposed): `saf upgrade` never added new engine scripts to `package.json`, so existing projects had no
+  `task:culprit` while the exit-gate hint prints `npm run task:culprit -- <M>`. Upgrade now adds missing
+  `ENGINE_SCRIPTS` keys and never changes an existing script (chosen over printing the raw `node tools/saf/bin/saf.mjs`
+  form: one fix covers every future engine command, and the docs keep one command style). A regular card after
+  T-M2-09; **T-M2-10 waits for it** because T-M2-10 puts `{{cmd.taskCulprit}}` in the generated CLAUDE.md. It shares
+  `generate.mjs` and `docs/upgrade.md` with the draft cards T-M2-02 and T-M2-03, so those cannot run beside it
 
 ## Done When
 - [ ] cards every card of M2 passed task:verify and the spec review (manual check)
@@ -66,6 +73,7 @@ interview that explains every option and shows every setting it does not ask.
 - [ ] T-M2-15 /saf-setup shows the four lines for every option and lists the settings it did not ask before generating
 - [ ] T-M2-16 The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved
 - [ ] T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result
+- [ ] T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones
 
 ## Risks
 - M1 feedback may reorder or replace these cards — that is expected; this is a draft
@@ -90,3 +98,9 @@ interview that explains every option and shows every setting it does not ask.
   suite no longer suppresses the extra gate) and adjusts the one T-M2-08 test whose expectation encoded the gap;
   reserving `full-suite` turns an existing gate with that id into a plan problem — the error names the id, so the fix
   is a rename
+- **Upgrade now edits `package.json`:** until T-M2-18, `upgrade` promised to touch only kit-owned files. Adding a
+  missing script is the one exception (D-010, proposed); it never overwrites, never creates the file and never
+  rewrites it when nothing is missing, so a project that customised a SAF script keeps it
+- **Batched review notes:** the non-blocking notes of the spec reviews (T-M2-09: 9 notes, note 2 became T-M2-18)
+  are listed one line each in [M2-review-notes.md](../notes/M2-review-notes.md) and go to the designer at milestone
+  end, who turns the ones worth doing into cards of the next milestone — they do not block M2
