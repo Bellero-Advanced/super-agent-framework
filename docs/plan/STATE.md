@@ -4,7 +4,7 @@
 
 ## M2 Roadmap: next — cards done 6/18
 
-- In progress: none
+- In progress: **T-M2-18** saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — started 2026-11-23 20:17 · not verified yet · lane 1 · .claude/worktrees/T-M2-18
 - Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
 
 | Card | Work | Status | Evidence |
@@ -26,7 +26,7 @@
 | [T-M2-15](tasks/M2/T-M2-15.md) | /saf-setup shows the four lines for every option and lists the settings it did not ask before generating | · not started | – |
 | [T-M2-16](tasks/M2/T-M2-16.md) | The milestone gate runs every full-suite command no declared gate runs, and the gate id full-suite is reserved | · not started | – |
 | [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | · not started | – |
-| [T-M2-18](tasks/M2/T-M2-18.md) | saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones | · not started | – |
+| [T-M2-18](tasks/M2/T-M2-18.md) | saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones | ▶ in progress | [T-M2-18.json](evidence/T-M2-18.json) · started 2026-11-23 20:17 · not verified yet |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 
@@ -38,11 +38,11 @@
 
 ## Latest evidence
 
+- T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — started 2026-11-23 20:17 · not verified yet
 - T-M2-09 task:culprit finds the card that broke the deferred full suite — passed 2026-11-23 20:03 (3 commands) · full suite deferred to gate
 - T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it — passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate
 - T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it — passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate
 - T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) — passed 2026-11-23 19:28 (4 commands)
-- T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again) — passed 2026-11-23 19:17 (4 commands)
 
 ## Other milestones
 
