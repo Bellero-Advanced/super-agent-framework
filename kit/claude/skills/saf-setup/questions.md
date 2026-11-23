@@ -35,7 +35,7 @@ Rigor sets defaults the user can still override:
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Package manager? | `stack.packageManager` | pnpm · npm · yarn · bun · none (no Node tooling — SAF commands run as `node tools/saf/bin/saf.mjs …`) | detected from the lock file |
-| Are these the real commands? (typecheck · lint · test · e2e · build) | `stack.commands.*` | confirm · edit | detected scripts; empty when none |
+| Are these the real commands? (typecheck · lint · test · e2e · build) | `stack.commands.typecheck` · `stack.commands.lint` · `stack.commands.test` · `stack.commands.e2e` · `stack.commands.build` | confirm · edit | detected scripts; empty when none |
 | Database? | `stack.database` | none · PostgreSQL · MySQL · SQLite · MongoDB · Supabase · other | detected |
 | Monorepo? Git submodules? | `stack.monorepo` · `stack.submodules` | yes · no | detected |
 | Stack in one line (free text, optional) | `stack.summary` | — | frameworks detected |
@@ -66,7 +66,7 @@ Core roles are always on: `designer` · `spec-reviewer` (read only) · `implemen
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Extra roles? (multi-select) | `roles.enabled` | art-producer · db-guardian · release-operator · security-auditor · data-engineer · content-writer | by type: game → art-producer · database → db-guardian · deploys → release-operator · strict rigor → security-auditor · data-ai → data-engineer · several UI languages → content-writer |
-| A custom role? (name · what it does · planner or builder · focus) | `roles.custom[]` | — | none |
+| A custom role? (name · what it does · planner or builder · focus) | `roles.custom` | — | none |
 | Language of agent reports? | `roles.reportLanguage` | en · th | en (fewer tokens) |
 | Optional skill packs? (multi-select) | `skills.packs` | ui-frontend · db-migrations · performance · i18n · mobile · game | by answers: web-app/mobile/game/erp → ui-frontend · a database → db-migrations · game → performance + game · several UI languages → i18n · mobile → mobile |
 
@@ -81,7 +81,7 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 | Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom caps) · off | on for standard/strict, off for light |
 | Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time) · off | on, 1 at a time |
 | Paths that only one card may touch at a time? | `workflow.solo` | globs | none (lock files are handled automatically) |
-| Ports per lane for dev servers? | `workflow.lanePorts` | base · step · env names | base 3000 · step 10 · `PORT` |
+| Ports per lane for dev servers? | `workflow.lanePorts.base` · `workflow.lanePorts.step` · `workflow.lanePorts.env` | base · step · env names | base 3000 · step 10 · `PORT` |
 | Test database name per lane? | `workflow.laneDb` | pattern with `{n}` | empty; with a database: `<name>_lane{n}_test` |
 | Measure lock (heavy commands one at a time on this machine)? | `workflow.measure.enabled` | on · off | on |
 | Performance budget file? | `workflow.perfBudgets` | path · none | none |
@@ -114,7 +114,7 @@ including `$schema`). Order: env, then local file, then `saf.config.json`, then 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Push | `policies.push` | only on your order · allowed | only on your order |
-| Deploy | `policies.deploy.mode` · `.target` · `.exceptions` | only on your order · allowed · this project does not deploy | only on your order |
+| Deploy | `policies.deploy.mode` · `policies.deploy.target` · `policies.deploy.exceptions` | only on your order · allowed · this project does not deploy | only on your order |
 | Protected branches · branches that deploy on push | `policies.protectedBranches` · `policies.autoDeployBranches` | names | `main` · none |
 | Never force-push or rewrite history | `policies.noForcePush` | yes · no | yes |
 | Env files that hold secrets (never committed, never printed, keys counted only) | `policies.secrets.envFiles` | names | `.env` · `.env.local` · `.env.*.local` |
@@ -127,7 +127,7 @@ Always on (not asked): no time estimates — gates, not dates · "done" needs re
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
-| Token-saving mode | `tokenSaving.*` | on (all) · choose · off | on: silent on interim agent notifications · reviewer notes batched to the designer at milestone end · reviewer reads a diff file · fix flaky tests first |
+| Token-saving mode | `tokenSaving.enabled` · `tokenSaving.silentInterim` · `tokenSaving.batchReviewerNotes` · `tokenSaving.reviewerDiff` · `tokenSaving.fixFlakyFirst` | on (all) · choose · off | on: silent on interim agent notifications · reviewer notes batched to the designer at milestone end · reviewer reads a diff file · fix flaky tests first |
 | What should work at the end of the first milestone? (free text) | `firstMilestone.goal` | — | — (empty = no M1 draft yet) |
 
 M0 (the setup gate) is always created and active. M1 is created as `planned` from the goal; the designer fills its cards;

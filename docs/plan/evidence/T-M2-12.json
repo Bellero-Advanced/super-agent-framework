@@ -1,14 +1,160 @@
 {
   "id": "T-M2-12",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T20:39:54.357Z",
     "base": "069827737538efc3d58613a4e5f26160953e01d3",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-12",
-  "worktree": ".claude/worktrees/T-M2-12"
+  "worktree": ".claude/worktrees/T-M2-12",
+  "verified": {
+    "at": "2026-11-23T20:48:33.714Z",
+    "head": "db1e4a406f728473ef96600e81cd96db3231102f",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 360,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "30 scenario(s) in 3 spec(s) · with test 25 · gaps 5 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node tools/saf/bin/saf.mjs choices --not-asked --lang th",
+        "exit": 0,
+        "ms": 65,
+        "tail": [
+          "การตั้งค่าที่ตอนสัมภาษณ์ไม่ได้ถาม",
+          "แก้ได้ใน saf.config.json (ตรวจด้วย node tools/saf/bin/saf.mjs config --check หรือรัน /saf-setup ใหม่)",
+          "  models.overrides — เปลี่ยนโมเดลหรือ effort ของ role ใด role หนึ่ง เช่น {\"qa-runner\": {\"effort\": \"low\"}} · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#models",
+          "  workflow.review — การ์ดไหนได้รับการตรวจเทียบ spec: m-cards (เฉพาะขนาด M), every-card หรือ every-card+security (เพิ่มการตรวจความปลอดภัยทุก milestone) ใช้กับเอกสารที่สร้างเท่านั้น ค่าเริ่มต้นตาม rigor · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.worktreeDir — โฟลเดอร์ที่สร้าง worktree ของแต่ละ lane · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.branchPrefix — คำนำหน้าชื่อ branch ของแต่ละ lane (ลงท้ายด้วย /) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.laneInstall — คำสั่งติดตั้ง dependency ใน lane ใหม่ (ว่าง = ไม่ติดตั้ง; ค่าเริ่มต้นตาม package manager) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.mergeInstall — {cmd, files}: ติดตั้งใหม่หลัง merge ที่แก้ไฟล์เหล่านี้ (ค่าเริ่มต้นตาม package manager) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.measure.waitMs — ระยะเวลา (ms) ที่คำสั่งรอ measure lock หรือเครื่องที่ว่างก่อนยอมแพ้ (exit 75) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.measure.maxLoadPerCore — ค่าโหลดเครื่องต่อ core ที่ต่ำกว่านี้ คำสั่งชนิดรอเครื่องว่างจึงเริ่มได้ · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.measure.names — ชื่อคำสั่งที่ measure lock รู้จัก และแต่ละชื่อรอให้เครื่องว่างหรือไม่ (idle) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.alwaysAllowed — glob เพิ่มเติมที่ไม่นับเป็นไฟล์ที่การ์ดแก้ · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  workflow.commandTimeoutMs — เวลาสูงสุด (ms) ของแต่ละคำสั่งตอน verify การ์ด, merge checks และการหา culprit · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#workflow",
+          "  policies.secrets.extraPatterns — regular expression เพิ่มเติมที่ check-secrets ถือว่าเป็นความลับ · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#policies",
+          "  policies.noTimeEstimates — บันทึกกฎ 'ไม่ประเมินเวลา ใช้ gate แทน' ควรเป็น true (engine ยังไม่อ่านค่านี้) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#policies",
+          "  policies.evidenceRequired — บันทึกกฎ 'ต้องมีผลรันจริงจึงถือว่าเสร็จ' ควรเป็น true (engine ยังไม่อ่านค่านี้) · https://github.com/Bellero-Advanced/super-agent-framework/blob/main/docs/config-reference.md#policies",
+          "ตั้งเฉพาะเครื่อง (saf.config.local.json ไม่ถูกเก็บใน git หรือใช้ตัวแปรสภาพแวดล้อม):",
+          "  workflow.testMode — ความถี่ที่รันชุดทดสอบทั้งหมด เฉพาะเครื่องนี้",
+          "  SAF_TEST_MODE — ตัวแปรสภาพแวดล้อม: โหมดทดสอบของ shell หรือการรันนี้ ชนะทั้งไฟล์ local และ saf.config.json",
+          "  SAF_STOP_HOOK=off — ตัวแปรสภาพแวดล้อม: ปิดการเตือนของ Stop hook เรื่องการ์ดที่ยังไม่ผ่าน"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 281,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 213 markdown file(s) · 93 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-choices.test.mjs'",
+        "exit": 0,
+        "ms": 664,
+        "tail": [
+          "ok 3 - SETUP-AC-03 choices --not-asked lists every key with its summary, where to change it and the per-machine switches",
+          "  ---",
+          "  duration_ms: 255.29725",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-03 usage errors exit 2 and list the valid values",
+          "ok 4 - SETUP-AC-03 usage errors exit 2 and list the valid values",
+          "  ---",
+          "  duration_ms: 257.079959",
+          "  type: 'test'",
+          "  ...",
+          "1..4",
+          "# tests 4",
+          "# suites 0",
+          "# pass 4",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 606.107041"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/claude/skills/saf-setup/questions.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/choices.mjs",
+        "test/unit/setup-choices.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/claude/skills/saf-setup/questions.md": "f792efa0574924bf4da54063d25ed6d739ddd796",
+        "kit/tools-saf/bin/saf.mjs": "303fe8b91bf7e06df16658ee2de4b03111f940ec",
+        "kit/tools-saf/lib/choices.mjs": "fa0993fff8ec3eeebbd3696cfdbc1a9af7139b7e",
+        "test/unit/setup-choices.test.mjs": "0b6bc34e50a199bc6808c190647480fb052c46d9"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-01",
+        "SETUP-AC-02",
+        "SETUP-AC-03"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 140,
+        "cap": 150
+      },
+      "test": {
+        "lines": 96,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-choices.test.mjs"
+      ]
+    }
+  }
 }
