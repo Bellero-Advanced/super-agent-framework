@@ -325,7 +325,7 @@ export function verifySummary(plan, ev) {
   if (!ev) return t.notStarted;
   const v = ev.verified;
   if (!v) return t.startedNotVerified(timeOf(plan, ev.started.at));
-  if (v.pass) return t.passed(timeOf(plan, v.at), v.commands.length);
+  if (v.pass) return t.passed(timeOf(plan, v.at), v.commands.length) + (v.deferred?.length ? t.deferredToGate : "");
   const why = [];
   const failed = v.commands.filter((c) => c.exit !== 0).map((c) => `\`${c.cmd}\``);
   if (failed.length) why.push(t.whyCommands(failed.join(" · ")));

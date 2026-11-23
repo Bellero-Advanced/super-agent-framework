@@ -56,6 +56,7 @@ import {
 } from "./plan.mjs";
 import { IS_WINDOWS, RUN_LIMITS, quoteWindowsArg } from "./run.mjs";
 import { findScenarioTests, isTestFile } from "./scenarios.mjs";
+import { defersAtVerify, isFullSuite, targetedCommand, targetedFiles } from "./testmode.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -506,6 +507,20 @@ function laneFilesBase(root, ev) {
   return ev.started.base;
 }
 
+/**
+ * Which commands verify runs (spec test-mode rules 9-14): full-suite criteria are replaced by one targeted run when the
+ * mode defers them and a targeted run is possible; otherwise every criterion runs and `targeted.fallback` says why.
+ */
+function planVerifyRun(ctx, card, ev, filesBase, inLane) {
+  const full = card.criteria.filter((c) => isFullSuite(ctx.config, c));
+  if (!full.length || !defersAtVerify(ctx.config, inLane)) return { run: card.criteria, deferred: [], targeted: null };
+  // files are listed before the run, so the selection uses the card's real changes
+  const files = targetedFiles(ctx.root, card, cardFiles(ctx, card, ev, filesBase).changed);
+  const command = targetedCommand(ctx.config, files);
+  if (!command) return { run: card.criteria, deferred: [], targeted: { fallback: files.length ? "no stack.commands.testFiles command" : "no targeted test files" } };
+  return { run: [...card.criteria.filter((c) => !full.includes(c)), command], deferred: full, targeted: { files } };
+}
+
 export async function verifyCard(ctx, id) {
   const plan = loadPlan(ctx.root, ctx.config);
   const lane = laneFolder(ctx.root, plan);
@@ -518,7 +533,11 @@ export async function verifyCard(ctx, id) {
   if (ev.status === "done" && !lane) throw new TaskError(`${id} already passed (${verifySummary(plan, ev)}) — to check again start counting anew: ${cmd(ctx.config, "task:start", `${id} --restart`)}`);
   const filesBase = lane ? laneFilesBase(ctx.root, ev) : ev.started.base;
   const head = resolveCommit(ctx.root, "HEAD") ?? "";
-  const commands = await runAll(ctx, card.criteria);
+  const { run, deferred, targeted } = planVerifyRun(ctx, card, ev, filesBase, !!lane);
+  const mode = { mode: ctx.config.workflow.testMode ?? null, source: ctx.config.workflow.testModeSource ?? null };
+  if (deferred.length) ctx.log?.(`  ! full suite deferred to gate (test mode ${mode.mode} from ${mode.source}): ${deferred.join(" · ")}`);
+  else if (targeted?.fallback) ctx.log?.(`  ! full suite runs at verify (test mode ${mode.mode} from ${mode.source}): ${targeted.fallback}`);
+  const commands = await runAll(ctx, run);
   // compare files after running the commands — junk files left outside .gitignore are caught too
   const files = cardFiles(ctx, card, ev, filesBase);
   const scenarios = cardScenarios(ctx.root, card.scenarios);
@@ -528,7 +547,7 @@ export async function verifyCard(ctx, id) {
   const attempts = ev.attempts + 1;
   const failed = commands.filter((c) => c.exit !== 0);
   const failures = failed.length ? [...(ev.failures ?? []), { at, head, attempts, commands: failed }].slice(-RUN_LIMITS.failuresKept) : ev.failures;
-  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios, size }, ...(failures ? { failures } : {}) };
+  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios, size, testMode: mode, ...(deferred.length ? { deferred } : {}), ...(targeted ? { targeted } : {}) }, ...(failures ? { failures } : {}) };
   if (pass && failures?.length) {
     ctx.log?.(`  ! passed after failing ${failures.length} time(s) (attempt ${failures.map((f) => f.attempts).join(", ")}) — flaky? ${[...new Set(failures.flatMap((f) => f.commands.map((c) => c.cmd)))].join(" · ")}`);
   }
