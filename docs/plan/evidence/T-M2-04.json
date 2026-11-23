@@ -1,14 +1,176 @@
 {
   "id": "T-M2-04",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-23T18:35:57.367Z",
     "base": "19abd5e6ae9c19dcf291fe35bcca53dbc182a58e",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-04",
-  "worktree": ".claude/worktrees/T-M2-04"
+  "worktree": ".claude/worktrees/T-M2-04",
+  "verified": {
+    "at": "2026-11-23T18:42:39.599Z",
+    "head": "bc5fa42aff92238855f22351fab011877b9ff77e",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm test",
+        "exit": 0,
+        "ms": 15116,
+        "tail": [
+          "ok 59 - size: test lines are counted apart from code lines (added + removed, modified files too)",
+          "  ---",
+          "  duration_ms: 264.346709",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a SAF project in a subfolder of a lane worktree is not a lane; a lane root that lost its label is still refused",
+          "ok 60 - lane guard: a SAF project in a subfolder of a lane worktree is not a lane; a lane root that lost its label is still refused",
+          "  ---",
+          "  duration_ms: 431.241416",
+          "  type: 'test'",
+          "  ...",
+          "1..60",
+          "# tests 60",
+          "# suites 0",
+          "# pass 60",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 14793.181959"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 279,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 195 markdown file(s) · 39 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/card-lifecycle.md",
+        "examples/todo-api/tools/saf/lib/git.mjs",
+        "examples/todo-api/tools/saf/lib/task.mjs",
+        "kit/tools-saf/lib/git.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "test/unit/task.test.mjs",
+        "tools/saf/lib/git.mjs",
+        "tools/saf/lib/task.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/card-lifecycle.md": "6ff95232626c2e756eaf54c9707223ea82fa9adb",
+        "examples/todo-api/tools/saf/lib/git.mjs": "a69375aa3d53111ca7cbc79d29dddfa0609f2158",
+        "examples/todo-api/tools/saf/lib/task.mjs": "898ba05c73cdd75399b7cac79083bcf415feb12b",
+        "kit/tools-saf/lib/git.mjs": "a69375aa3d53111ca7cbc79d29dddfa0609f2158",
+        "kit/tools-saf/lib/task.mjs": "898ba05c73cdd75399b7cac79083bcf415feb12b",
+        "test/unit/task.test.mjs": "93700565c3ecf9e7aecd5e632c6ab4d9d0dce9fe",
+        "tools/saf/lib/git.mjs": "a69375aa3d53111ca7cbc79d29dddfa0609f2158",
+        "tools/saf/lib/task.mjs": "898ba05c73cdd75399b7cac79083bcf415feb12b"
+      }
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 217,
+        "cap": 150
+      },
+      "test": {
+        "lines": 70,
+        "cap": 250
+      },
+      "over": [
+        "code"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-23T18:37:24.599Z",
+      "head": "d05e2c89cae254c1cf44b83ccd2bcf28b0c2aac9",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "npm test",
+          "exit": 1,
+          "ms": 16662,
+          "tail": [
+            "  duration_ms: 1280.852166",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: start refuses: inactive milestone, unmet depends, a second main-folder card",
+            "ok 52 - start refuses: inactive milestone, unmet depends, a second main-folder card",
+            "  ---",
+            "  duration_ms: 389.266916",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: milestone gates: commands run, manual gates stay open, open cards block",
+            "ok 53 - milestone gates: commands run, manual gates stay open, open cards block",
+            "  ---",
+            "  duration_ms: 460.000334",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: lanes: start --worktree → verify in lane → merge; conflicts and failed checks roll back",
+            "ok 54 - lanes: start --worktree → verify in lane → merge; conflicts and failed checks roll back",
+            "  ---",
+            "  duration_ms: 3683.663875",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: lane start step 5 failure exits 6 and --resume finishes it",
+            "ok 55 - lane start step 5 failure exits 6 and --resume finishes it",
+            "  ---",
+            "  duration_ms: 404.080666",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: hooks: session-start text, stop guidance, probe judging",
+            "ok 56 - hooks: session-start text, stop guidance, probe judging",
+            "  ---",
+            "  duration_ms: 312.749916",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: size: a card under the cap reports counts and no warning",
+            "ok 57 - size: a card under the cap reports counts and no warning",
+            "  ---",
+            "  duration_ms: 314.891333",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: size: over the cap warns in the output and the evidence but still passes",
+            "ok 58 - size: over the cap warns in the output and the evidence but still passes",
+            "  ---",
+            "  duration_ms: 259.083417",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: size: test lines are counted apart from code lines (added + removed, modified files too)",
+            "ok 59 - size: test lines are counted apart from code lines (added + removed, modified files too)",
+            "  ---",
+            "  duration_ms: 294.162125",
+            "  type: 'test'",
+            "  ...",
+            "1..59",
+            "# tests 59",
+            "# suites 0",
+            "# pass 58",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 16369.058416"
+          ]
+        }
+      ]
+    }
+  ]
 }

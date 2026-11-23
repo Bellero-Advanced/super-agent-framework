@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { scriptCommand } from "./config.mjs";
 import {
@@ -15,6 +15,7 @@ import {
   isDir,
   isMainFolder,
   lastCommitOf,
+  lineStats,
   listRepoFiles,
   mainWorktreeHead,
   mergeBase,
@@ -23,6 +24,7 @@ import {
   revList,
   showFile,
   submoduleReady,
+  topLevel,
 } from "./git.mjs";
 import { globToRegExp, toGlob } from "./glob.mjs";
 import { laneOf, pickParallel } from "./parallel.mjs";
@@ -166,7 +168,8 @@ export function laneFolder(root, plan) {
     const owner = [...plan.evidence.values()].find((e) => open(e) && e.branch === branch);
     const here = basename(root);
     const atPath = dirname(root).endsWith(wtDir) && open(plan.evidence.get(here)) ? here : undefined;
-    const linked = !isMainFolder(root);
+    // a lane is guessed from the branch name only for the top level of a linked worktree — a SAF project in a subfolder is not a lane
+    const linked = !isMainFolder(root) && topLevel(root) === realpathSync(root);
     const id = owner?.id ?? atPath ?? (linked && branch?.startsWith(prefix) ? branch.slice(prefix.length) : undefined);
     if (!id || (owner && !linked && !atPath)) return null;
     throw new TaskError(`no lane label ${LANE_FILE} but this is the worktree of lane card ${id} (branch ${branch ?? "detached"}) — every command is refused here · recover: in the main folder run ${cmd(plan.config, "task:start", `${id} --worktree --resume`)}`);
@@ -452,6 +455,27 @@ export function cardFiles(ctx, card, ev, filesBase = ev.started.base) {
   };
 }
 
+/** Paths that count as test files for the size cap, besides the test-file names scenarios.mjs knows (data, not logic). */
+const TEST_DIR = /(?:^|\/)(?:tests?|__tests__)\//;
+const isTestPath = (f) => isTestFile(f) || TEST_DIR.test(f);
+
+/** Changed lines (added + removed) of the card's files, code and test apart, against the caps of its size in the config. */
+export function cardSize(ctx, card, files, filesBase) {
+  const stats = lineStats(ctx.root, filesBase, files.changed);
+  let code = 0;
+  let test = 0;
+  for (const f of files.changed) {
+    if (isTestPath(f)) test += stats[f] ?? 0;
+    else code += stats[f] ?? 0;
+  }
+  const size = card.size ?? null;
+  const cap = { code: ctx.config.workflow.sizes?.[size] ?? null, test: ctx.config.workflow.testCaps?.[size] ?? null };
+  const over = ["code", "test"].filter((k) => cap[k] !== null && { code, test }[k] > cap[k]);
+  return { size, code: { lines: code, cap: cap.code }, test: { lines: test, cap: cap.test }, over };
+}
+
+const sizeWarning = (id, s) => `  ⚠ ${id} is over the size cap (${s.size}): ${s.over.map((k) => `${k} ${s[k].lines} > ${s[k].cap}`).join(" · ")} changed lines — not a failure, the reviewer decides (or the designer splits the card)`;
+
 export function cardScenarios(root, ids) {
   if (!ids.length) return { required: [], missing: [] };
   const files = listRepoFiles(root).filter(isTestFile);
@@ -497,15 +521,17 @@ export async function verifyCard(ctx, id) {
   // compare files after running the commands — junk files left outside .gitignore are caught too
   const files = cardFiles(ctx, card, ev, filesBase);
   const scenarios = cardScenarios(ctx.root, card.scenarios);
+  const size = cardSize(ctx, card, files, filesBase);
   const pass = commands.every((c) => c.exit === 0) && !files.outside.length && !files.forbidden.length && !scenarios.missing.length;
   const at = nowIso(ctx);
   const attempts = ev.attempts + 1;
   const failed = commands.filter((c) => c.exit !== 0);
   const failures = failed.length ? [...(ev.failures ?? []), { at, head, attempts, commands: failed }].slice(-RUN_LIMITS.failuresKept) : ev.failures;
-  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios }, ...(failures ? { failures } : {}) };
+  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios, size }, ...(failures ? { failures } : {}) };
   if (pass && failures?.length) {
     ctx.log?.(`  ! passed after failing ${failures.length} time(s) (attempt ${failures.map((f) => f.attempts).join(", ")}) — flaky? ${[...new Set(failures.flatMap((f) => f.commands.map((c) => c.cmd)))].join(" · ")}`);
   }
+  if (size.over.length) ctx.log?.(sizeWarning(id, size));
   writeJson(ctx.root, evidencePath(id), next);
   if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
   return next;

@@ -23,18 +23,18 @@
 | published | both packages on npm, tag and GitHub release v0.1.0 exist, social preview uploaded | not checked |
 | owner | the owner installed 0.1.0 from npm into a fresh folder (npx create-saf) and accepts the release | manual check |
 
-## Side lane M2 Roadmap: next — cards done 0/1
+## Side lane M2 Roadmap: next — cards done 1/1
 
-- In progress: **T-M2-04** task:verify reports changed code and test lines against the card's size cap — started 2026-11-23 18:35 · not verified yet · lane 1 · .claude/worktrees/T-M2-04
-- Next: none — only cards in progress remain
+- In progress: none
+- Next: none — every side card is done
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
-| [T-M2-04](tasks/M2/T-M2-04.md) | task:verify reports changed code and test lines against the card's size cap | ▶ in progress | [T-M2-04.json](evidence/T-M2-04.json) · started 2026-11-23 18:35 · not verified yet |
+| [T-M2-04](tasks/M2/T-M2-04.md) | task:verify reports changed code and test lines against the card's size cap | ✓ passed | [T-M2-04.json](evidence/T-M2-04.json) · passed 2026-11-23 18:42 (2 commands) |
 
 ## Latest evidence
 
-- T-M2-04 task:verify reports changed code and test lines against the card's size cap — started 2026-11-23 18:35 · not verified yet
+- T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
 - T-M0-01 SAF self-checks pass through the real card loop — passed 2026-11-23 17:34 (3 commands)
 
 ## Other milestones

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { cleanup, commitAll, fakeCtx, git, lib, planRepo, write } from "../helpers.mjs";
@@ -153,4 +153,72 @@ test("hooks: session-start text, stop guidance, probe judging", async () => {
   assert.ok(!task.judgeProbe(t, "unknown"));
   assert.ok(!task.judgeProbe(t, "M1 done 1/1 · T-M1-01"));
   assert.ok(task.judgeProbe({ ...t, cards: [] }, "M1 done 0/1 · none"));
+});
+
+const lines = (n) => `${Array.from({ length: n }, (_, i) => `line ${i}`).join("\n")}\n`;
+
+test("size: a card under the cap reports counts and no warning", async () => {
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "S", touch: ["src/**", "test/**"] }] });
+  const ctx = fakeCtx(root, config, { logged: [] });
+  ctx.log = (s) => ctx.logged.push(s);
+  task.startCard(ctx, "T-M1-01");
+  write(root, "src/a.js", lines(10));
+  write(root, "test/a.test.js", lines(4));
+  const r = await task.verifyCard(ctx, "T-M1-01");
+  assert.equal(r.status, "done");
+  assert.deepEqual(r.verified.size, { size: "S", code: { lines: 10, cap: config.workflow.sizes.S }, test: { lines: 4, cap: config.workflow.testCaps.S }, over: [] });
+  assert.ok(!ctx.logged.some((l) => /over the size cap/.test(l)));
+});
+
+test("size: over the cap warns in the output and the evidence but still passes", async () => {
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "S", touch: ["src/**", "test/**"] }] });
+  config.workflow.sizes.S = 5; // caps come from the config
+  const ctx = fakeCtx(root, config, { logged: [] });
+  ctx.log = (s) => ctx.logged.push(s);
+  task.startCard(ctx, "T-M1-01");
+  write(root, "src/a.js", lines(6));
+  const r = await task.verifyCard(ctx, "T-M1-01");
+  assert.equal(r.status, "done");
+  assert.deepEqual(r.verified.size.over, ["code"]);
+  assert.equal(r.verified.size.code.lines, 6);
+  assert.ok(ctx.logged.some((l) => /over the size cap/.test(l) && /code 6 > 5/.test(l)));
+  assert.equal(JSON.parse(readFileSync(join(root, task.evidencePath("T-M1-01")), "utf8")).verified.size.code.lines, 6);
+});
+
+test("size: test lines are counted apart from code lines (added + removed, modified files too)", async () => {
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "S", touch: ["src/**", "test/**"] }] });
+  config.workflow.testCaps.S = 3;
+  write(root, "src/old.js", lines(5));
+  write(root, "test/old.test.js", lines(2));
+  commitAll(root, "seed");
+  const ctx = fakeCtx(root, config, { logged: [] });
+  ctx.log = (s) => ctx.logged.push(s);
+  task.startCard(ctx, "T-M1-01");
+  write(root, "src/old.js", lines(2)); // 3 removed
+  write(root, "test/old.test.js", `${lines(2)}extra 1\nextra 2\n`); // 2 added
+  write(root, "test/new.spec.ts", lines(2)); // untracked, 2 added
+  const r = await task.verifyCard(ctx, "T-M1-01");
+  assert.equal(r.verified.size.code.lines, 3);
+  assert.equal(r.verified.size.test.lines, 4);
+  assert.deepEqual(r.verified.size.over, ["test"]);
+  assert.ok(ctx.logged.some((l) => /test 4 > 3/.test(l)));
+  assert.equal(r.status, "done");
+});
+
+test("lane guard: a SAF project in a subfolder of a lane worktree is not a lane; a lane root that lost its label is still refused", async () => {
+  const { resolveConfig } = await lib("config.mjs");
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch: ["src/**"] }] });
+  const ev = task.startCard(fakeCtx(root, config), "T-M1-01", { worktree: true });
+  const lane = join(root, ev.worktree);
+  // a second, independent SAF project that lives in a subfolder of the lane worktree (on the card/* branch)
+  const sub = join(lane, "examples", "demo");
+  write(sub, "saf.config.json", { version: 1, stack: { packageManager: "none" } });
+  write(sub, "docs/plan/milestones/M1.md", "---\nid: M1\ntitle: m\nstatus: active\ncards: []\n---\n\n# M1\n");
+  const subConfig = resolveConfig({ version: 1, stack: { packageManager: "none" } });
+  assert.equal(task.laneFolder(sub, loadPlan(sub, subConfig)), null);
+  assert.deepEqual(task.stateCheck(fakeCtx(sub, subConfig)).issues, []);
+  // the lane root itself: label present → lane; label lost → refused
+  assert.equal(task.laneFolder(lane, loadPlan(lane, config)).card, "T-M1-01");
+  rmSync(join(lane, task.LANE_FILE));
+  assert.throws(() => task.laneFolder(lane, loadPlan(lane, config)), /no lane label/);
 });
