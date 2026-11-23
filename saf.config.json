@@ -116,7 +116,7 @@
       }
     },
     "perfBudgets": "",
-    "alwaysAllowed": [],
+    "alwaysAllowed": ["tools/saf/**", ".claude/skills/saf-setup/**", "examples/todo-api/tools/saf/**"],
     "commandTimeoutMs": 1800000
   },
   "policies": {
