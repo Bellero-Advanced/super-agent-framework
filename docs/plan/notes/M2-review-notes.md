@@ -38,3 +38,11 @@ D. plan README §1 says the evidence says "full suite deferred to gate"; the evi
 E. several new doc lines run past the ~120-column wrap (README.md:54, README.th.md:53, docs/plan/README.md §1, plan README templates line 33, docs/setup-questions.md §6)
 F. the `testFiles` row lists `jest {files}` beyond the card's examples (harmless)
 G. the test-mode explanation table in questions.md may overlap T-M2-13/14 (`saf choices --group`) — decide which is the source of truth
+
+## T-M2-16 (review PASS) — notes for the designer
+
+N1. `testmode.mjs:26` comment on `FULL_SUITE_GATE` says its `run` is every full-suite command — now only those no declared gate runs
+N2. `testmode.mjs:20-21` comment on `GATE_ADDS_FULL_SUITE` says "when no gate runs it" — out of date after partial coverage
+N3. no test for duplicate config values (`test` = `e2e`) or the reverse partial case (gate runs e2e only); code handles both
+N4. cosmetic: `const { config } = { config: {...} }` in the coverage test
+N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issues` (what `--check` reports) — no end-to-end exit-code check
