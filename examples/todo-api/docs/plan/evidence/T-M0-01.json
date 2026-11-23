@@ -1,0 +1,54 @@
+{
+  "id": "T-M0-01",
+  "milestone": "M0",
+  "status": "done",
+  "started": {
+    "at": "2026-11-23T17:21:17.669Z",
+    "base": "21a89bf3c6787d1eaf74ab71adf29605a2656b10",
+    "dirty": {}
+  },
+  "attempts": 1,
+  "verified": {
+    "at": "2026-11-23T17:21:18.340Z",
+    "head": "21a89bf3c6787d1eaf74ab71adf29605a2656b10",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run task:state -- --check",
+        "exit": 0,
+        "ms": 171,
+        "tail": [
+          "✓ plan is valid · STATE.md and .saf/plan.md match plan + evidence"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 154,
+        "tail": [
+          "! .claude/rules/server-authority.md — paths match no file yet (server/**, api/**, src/server/**, src/api/**, src/routes/**, functions/**, workers/**, backend/**)",
+          "! .claude/rules/tests.md — paths match no file yet (**/*.test.*, **/*.spec.*, **/test_*.py, **/*_test.py, **/*_test.go, tests/**, test/**, e2e/**)",
+          "✓ docs:check passed — 21 markdown file(s) · 16 local link(s) · 36 command(s) in agent docs · 4 agent(s) · 2 warning(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 168,
+        "tail": [
+          "✓ check-secrets: <redacted> findings in 114 scanned file(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {}
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    }
+  }
+}

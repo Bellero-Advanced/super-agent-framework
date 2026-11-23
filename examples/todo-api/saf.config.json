@@ -1,0 +1,159 @@
+{
+  "$schema": "tools/saf/schema/saf.config.schema.json",
+  "version": 1,
+  "project": {
+    "name": "todo-api",
+    "pitch": "A tiny todo HTTP API — the SAF example project.",
+    "type": "api",
+    "domain": "",
+    "users": "developers reading the SAF example",
+    "stage": "prototype",
+    "rigor": "standard"
+  },
+  "people": {
+    "ownerTitle": "owner",
+    "docLanguage": "en",
+    "chatLanguage": "en",
+    "uiLanguages": [
+      "en"
+    ],
+    "i18nRequired": false,
+    "timeZone": "UTC"
+  },
+  "stack": {
+    "summary": "Node ≥ 20, no dependencies — node:http and node:test",
+    "packageManager": "npm",
+    "monorepo": false,
+    "commands": {
+      "typecheck": "",
+      "lint": "",
+      "test": "npm test",
+      "e2e": "",
+      "build": ""
+    },
+    "database": "none",
+    "submodules": false
+  },
+  "models": {
+    "preset": "balanced",
+    "planner": "claude-opus-5-5",
+    "builder": "claude-sonnet-5-5",
+    "sessionDefault": "claude-sonnet-5-5",
+    "overrides": {}
+  },
+  "roles": {
+    "enabled": [
+      "designer",
+      "spec-reviewer",
+      "implementer",
+      "qa-runner"
+    ],
+    "custom": [],
+    "reportLanguage": "en"
+  },
+  "skills": {
+    "packs": []
+  },
+  "workflow": {
+    "sizes": {
+      "S": 150,
+      "M": 400
+    },
+    "testCaps": {
+      "S": 250,
+      "M": 600
+    },
+    "review": "every-card",
+    "lanes": {
+      "code": 3,
+      "main": 1
+    },
+    "sideLanes": {
+      "enabled": true,
+      "max": 1
+    },
+    "worktrees": false,
+    "worktreeDir": ".claude/worktrees",
+    "branchPrefix": "card/",
+    "solo": [],
+    "laneInstall": "npm ci",
+    "lanePorts": {
+      "base": 3000,
+      "step": 10,
+      "env": [
+        "PORT"
+      ]
+    },
+    "laneDb": "",
+    "mergeChecks": [
+      "npm test",
+      "npm run check-secrets",
+      "npm run docs:check"
+    ],
+    "mergeInstall": {
+      "cmd": "npm ci",
+      "files": [
+        "package-lock.json",
+        "package.json"
+      ]
+    },
+    "measure": {
+      "enabled": false,
+      "waitMs": 1200000,
+      "maxLoadPerCore": 0.5,
+      "names": {
+        "test": {
+          "idle": false
+        },
+        "e2e": {
+          "idle": false
+        },
+        "perf": {
+          "idle": true
+        },
+        "adhoc": {
+          "idle": true
+        }
+      }
+    },
+    "perfBudgets": "",
+    "alwaysAllowed": [],
+    "commandTimeoutMs": 1800000
+  },
+  "policies": {
+    "push": "owner-order",
+    "deploy": {
+      "mode": "none",
+      "target": "",
+      "exceptions": ""
+    },
+    "protectedBranches": [
+      "main"
+    ],
+    "autoDeployBranches": [],
+    "noForcePush": true,
+    "secrets": {
+      "envFiles": [
+        ".env",
+        ".env.local",
+        ".env.*.local"
+      ],
+      "extraPatterns": []
+    },
+    "forbiddenPaths": [],
+    "ownerOnlyPaths": [],
+    "externalServices": [],
+    "noTimeEstimates": true,
+    "evidenceRequired": true
+  },
+  "tokenSaving": {
+    "enabled": true,
+    "silentInterim": true,
+    "batchReviewerNotes": true,
+    "reviewerDiff": true,
+    "fixFlakyFirst": true
+  },
+  "firstMilestone": {
+    "goal": "A client can add todos, list them and mark one done over HTTP, and bad input gets a clear 400."
+  }
+}

@@ -775,7 +775,9 @@ export async function runProbe(ctx, opts = {}) {
   const bin = opts.bin ?? "claude";
   const timeout = opts.timeoutMs ?? 180_000;
   const started = Date.now();
-  const [main, control] = await Promise.all([askClaude(ctx.root, bin, [], timeout), askClaude(ctx.root, bin, NO_HOOKS, timeout)]);
+  // one after the other: accounts and gateways with a concurrency limit reject two parallel calls
+  const main = await askClaude(ctx.root, bin, [], timeout);
+  const control = await askClaude(ctx.root, bin, NO_HOOKS, timeout);
   const knows = main.exit === 0 && judgeProbe(target, main.out);
   const blind = control.exit === 0 && !judgeProbe(target, control.out);
   return { expected: describeProbeTarget(target), main: { ...main, knows }, control: { ...control, blind }, pass: knows && blind, ms: Date.now() - started };

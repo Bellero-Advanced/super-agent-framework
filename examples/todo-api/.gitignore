@@ -1,0 +1,10 @@
+node_modules/
+
+# SAF
+.claude/settings.local.json
+.saf-lane.json
+.saf/memory/
+.env
+.env.local
+.env.*.local
+.claude/worktrees/
