@@ -152,6 +152,7 @@ export function templateData(config, detected, opts = {}) {
     reviewEvery: config.workflow.review !== "m-cards",
     reviewSecurity: config.workflow.review === "every-card+security",
     lanesOn: config.workflow.worktrees && config.workflow.lanes.code > 0,
+    sideOn: config.workflow.sideLanes.enabled,
     measureOn: config.workflow.measure.enabled,
     deployOwner: config.policies.deploy.mode === "owner-order",
     deployNone: config.policies.deploy.mode === "none",

@@ -13,7 +13,7 @@ Status is never typed by hand — it is computed from three kinds of files:
 ## The loop
 
 1. The owner says **Go** on a milestone (`status: active`; one at a time). The designer has written its cards (`/saf-plan`).
-2. `task:start <id>` — refuses when the milestone is not active, a dependency has not passed, or another main-folder card is
+2. `task:start <id>` — refuses when the milestone is not active (and the card is not a [side card](#side-lanes)), a dependency has not passed, or another main-folder card is
    open. Records the start commit and a hash of every already-dirty file (so pre-existing changes are not blamed on the card).
 3. The card's role does the work, touching only files matched by `touch` and never `dont_touch`.
 4. `task:verify <id>` — runs every "Done when" command, then compares changed files with `touch`/`dont_touch`, then checks
@@ -78,6 +78,33 @@ data-engineer, builder custom roles) can run side by side:
 
 Roles in the main-folder lane (designer, spec-reviewer, art-producer, release-operator, …) and submodule cards run in the main
 folder, one at a time. With lanes off, every card runs in the main folder, one at a time.
+
+## Side lanes
+
+Work that does not wait on the active milestone — a landing page, community setup, a docs site — can run beside it
+without breaking milestone order. The designer lists those cards in `side_cards:` of their **planned** milestone:
+
+```yaml
+id: M3
+status: planned
+cards: [T-M3-01, T-M3-02, T-M3-03]
+side_cards: [T-M3-01]          # must also be in cards
+```
+
+- **Same standards.** Side cards start, verify, merge and get reviewed exactly like other cards: spec, `touch`, `depends`,
+  size caps, scenario tests, evidence. Lane rules (touch overlap, caps, solo paths, `--worktree`) apply unchanged.
+- **The active milestone comes first.** `task:next` (all forms) walks the active milestone's cards first, then side cards
+  in `cards` order, tagged `[side lane M3]`; `--json` adds `side: [...]`. `task:start` of a side card succeeds only in
+  capacity the active milestone leaves free — with lanes off (one folder), a side card starts only when no active card can.
+- **A cap.** At most `workflow.sideLanes.max` side cards in progress (default 1). `workflow.sideLanes.enabled: false` turns
+  the feature off (`side_cards` is then ignored).
+- **Plan checks.** `task:state --check` fails when `side_cards` lists a card that is not in `cards`, or when a side card
+  depends on a card that can never start (not done, not in the active milestone, not a side card).
+- **Status.** `STATE.md` shows a "Side lane M3" block after the active milestone (only side cards, counted separately);
+  `.saf/plan.md` adds a side-lane task list; the SessionStart hook prints one line per side lane plus its card in
+  progress. Side cards never count toward the active milestone's done count or exit gates — they count again when their own
+  milestone becomes active.
+- **Heavy runs** of a side lane (e2e, perf) go through the same measure lock as everything else.
 
 ## Measure lock
 

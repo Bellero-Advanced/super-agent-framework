@@ -53,6 +53,28 @@ Each gate has `id`, `text` and optional `run:` commands — a gate without comma
 `{{cmd.taskVerifyM}}` runs every gate and writes `docs/plan/evidence/<M>.json`; `{{cmd.taskReport}}` writes the report.
 
 Only the {{owner}} moves a milestone to `active` ("Go") or `done`.
+{{#if sideOn}}
+
+### Side lanes
+
+Work that does not depend on the active milestone (a landing page, community setup, docs site) can run beside it.
+The designer lists those cards in `side_cards:` of their **planned** milestone (each must also be in `cards:`):
+
+```yaml
+status: planned
+cards: [T-M3-01, T-M3-02, T-M3-03]
+side_cards: [T-M3-01]
+```
+
+- side cards start, verify, merge and get reviewed exactly like other cards — same spec, `touch`, `depends`, size caps and evidence
+- the active milestone always comes first: `{{cmd.taskNext}}` lists its cards before side cards (tagged `[side lane M<n>]`),
+  and a side card starts only in capacity the active milestone leaves free
+- at most {{workflow.sideLanes.max}} side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json`)
+- a side card may depend only on cards that are done or can start themselves
+- `docs/plan/STATE.md` and the session summary show each side lane in its own block; side cards never count toward the
+  active milestone's done count or its exit gates — they count when their own milestone becomes active
+- heavy test runs of a side lane go through the same measure lock as everything else
+{{/if}}
 
 ## 4. Specs and acceptance scenarios
 

@@ -24,6 +24,10 @@ You turn the {{owner}}'s goals into milestones, cards and specs that another age
   - `role` is one of: {{roleNames}}
   - "Done when" items are commands that exit 0 when the card is right — never prose
   - `scenarios` names the acceptance ids the card proves
+{{#if sideOn}}
+- side lanes: cards of a planned milestone that do not wait on the active one (landing page, community setup) go in its
+  `side_cards:` — same standards as any card; they only use capacity the active milestone leaves free
+{{/if}}
 - specs in `docs/specs/` from `docs/specs/_template.md` — numbered testable rules, an Acceptance section with `<PREFIX>-AC-<nn>` ids
 - new decisions as rows in `docs/DECISIONS.md` with status **proposed** — only the {{owner}} marks a row decided
 

@@ -1,11 +1,13 @@
 import { roleTable } from "./config.mjs";
 import { globToRegExp, preparePattern, touchOverlaps } from "./glob.mjs";
-import { activeCards, alwaysAllowed, cardStatus, nextCards, unmetDepends } from "./plan.mjs";
+import { activeCards, activeSideCards, alwaysAllowed, cardStatus, isSideCard, nextCards, sideLaneMax, sideTracks, unmetDepends } from "./plan.mjs";
 
 /**
  * Which cards may run at the same time. Pure functions — no disk access.
  * Rules: no touch overlap with a card already picked or in progress · per-lane caps · "solo" paths
  * (e.g. migrations) run alone in the code lane. When unsure → overlap (the safe mistake).
+ * Side lanes: cards of the active milestone are walked first, then side cards — so side cards only get capacity the
+ * active milestone leaves free, and at most workflow.sideLanes.max of them run at once.
  */
 
 export const LANE_NAME = { code: "code lane", main: "main-folder lane" };
@@ -33,7 +35,13 @@ const isSolo = (plan, card) => {
   return solo.length > 0 && touchOverlaps(comparableTouch(plan, card), solo).length > 0;
 };
 
-export const startableCards = (plan, m) => nextCards(plan, m, Infinity);
+/** Walk order: the active milestone's cards first, then side cards of planned milestones (each in `cards` order). */
+export const walkOrder = (plan, m) => [...new Set([...(m?.cards ?? []), ...sideTracks(plan).flatMap((t) => t.cards)])];
+
+/** Ids in a result that are side cards (in order, no repeats). */
+export const sideIds = (plan, ids) => [...new Set(ids.filter((id) => isSideCard(plan, id)))];
+
+export const startableCards = (plan, m) => nextCards(plan, { ...m, cards: walkOrder(plan, m) }, Infinity);
 
 const pairText = (pairs) => pairs.map(([x, y]) => `${x} ↔ ${y}`).join(", ");
 
@@ -42,7 +50,7 @@ export function pickParallel(plan, m) {
   const active = activeCards(plan);
   const parallel = { code: [], main: [] };
   if (plan.issues.length) {
-    return { parallel, active: active.map((c) => c.id), skipped: [], blocked: `the plan has ${plan.issues.length} problem(s) — no parallel set until fixed (task:state --check)` };
+    return { parallel, active: active.map((c) => c.id), skipped: [], side: [], blocked: `the plan has ${plan.issues.length} problem(s) — no parallel set until fixed (task:state --check)` };
   }
   const skipped = [];
   const used = { code: 0, main: 0 };
@@ -50,8 +58,10 @@ export function pickParallel(plan, m) {
   const holders = [...active];
   let soloHolder = active.find((c) => isSolo(plan, c))?.id;
   const solo = (plan.config.workflow.solo ?? []).join(", ");
+  let sideUsed = activeSideCards(plan).length;
+  const sideMax = sideLaneMax(plan);
 
-  for (const id of m.cards) {
+  for (const id of walkOrder(plan, m)) {
     const card = plan.cards.get(id);
     if (!card || cardStatus(plan, id) !== "todo") continue;
     const wait = unmetDepends(plan, id);
@@ -86,10 +96,17 @@ export function pickParallel(plan, m) {
       skipped.push({ id, reason: `${LANE_NAME[lane]} is full (${caps[lane]} card(s), counting cards in progress)` });
       continue;
     }
+    const side = isSideCard(plan, id);
+    if (side && sideUsed >= sideMax) {
+      skipped.push({ id, reason: `side lanes are full (${sideMax} side card(s) at a time, counting cards in progress)` });
+      continue;
+    }
+    if (side) sideUsed++;
     parallel[lane].push(id);
     used[lane]++;
     holders.push(card);
     if (isSoloCard) soloHolder = id;
   }
-  return { parallel, active: active.map((c) => c.id), skipped };
+  const ids = [...parallel.code, ...parallel.main, ...active.map((c) => c.id), ...skipped.map((x) => x.id)];
+  return { parallel, active: active.map((c) => c.id), skipped, side: sideIds(plan, ids) };
 }

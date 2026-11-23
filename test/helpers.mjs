@@ -58,21 +58,24 @@ export function card({ id, title = `card ${id}`, size = "S", role = "implementer
   return `---\nid: ${id}\nmilestone: ${m}\ntitle: ${title}\nsize: ${size}\nrole: ${role}\n${list("touch", touch)}${list("dont_touch", dontTouch)}${list("depends", depends)}${list("scenarios", scenarios)}---\n\n# ${id}\n\n## Done when\n\n${criteria.map((c) => `- \`${c}\``).join("\n")}\n`;
 }
 
-export function milestone({ id = "M1", status = "active", cards = [], gates = [] }) {
+export function milestone({ id = "M1", status = "active", cards = [], gates = [], sideCards = null }) {
   const g = gates.length
     ? `gates:\n${gates.map((x) => `  - id: ${JSON.stringify(x.id)}\n    text: ${x.text}\n${x.run ? `    run:\n${x.run.map((r) => `      - ${JSON.stringify(r)}`).join("\n")}\n` : ""}`).join("")}`
     : "";
-  return `---\nid: ${id}\ntitle: milestone ${id}\nstatus: ${status}\ncards:\n${cards.map((c) => `  - ${c}`).join("\n")}\n${g}---\n\n# ${id}\n\n## Goal\n\ntest\n`;
+  const side = sideCards ? `side_cards:\n${sideCards.map((c) => `  - ${c}`).join("\n")}\n` : "";
+  return `---\nid: ${id}\ntitle: milestone ${id}\nstatus: ${status}\ncards:\n${cards.map((c) => `  - ${c}`).join("\n")}\n${side}${g}---\n\n# ${id}\n\n## Goal\n\ntest\n`;
 }
 
 /** A git repo with saf.config.json, one milestone and the given cards — committed. */
-export async function planRepo({ config = {}, cards = [], gates = [], files = {} } = {}) {
+export async function planRepo({ config = {}, cards = [], gates = [], files = {}, extra = [] } = {}) {
   const { resolveConfig } = await lib("config.mjs");
   const root = gitRepo();
   write(root, "saf.config.json", { version: 1, stack: { packageManager: "none" }, ...config });
   write(root, ".gitignore", ".saf-lane.json\n.claude/worktrees/\n");
-  write(root, "docs/plan/milestones/M1.md", milestone({ cards: cards.map((c) => c.id), gates }));
-  for (const c of cards) write(root, `docs/plan/tasks/M1/${c.id}.md`, card(c));
+  const inExtra = new Set(extra.flatMap((m) => m.cards));
+  write(root, "docs/plan/milestones/M1.md", milestone({ cards: cards.map((c) => c.id).filter((id) => !inExtra.has(id)), gates }));
+  for (const m of extra) write(root, `docs/plan/milestones/${m.id}.md`, milestone(m));
+  for (const c of cards) write(root, `docs/plan/tasks/${c.id.split("-")[1]}/${c.id}.md`, card(c));
   for (const [f, v] of Object.entries(files)) write(root, f, v);
   const cfg = resolveConfig(JSON.parse(JSON.stringify({ version: 1, stack: { packageManager: "none" }, ...config })));
   const { loadPlan } = await lib("plan.mjs");

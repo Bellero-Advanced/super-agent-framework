@@ -91,6 +91,7 @@ const DEFAULTS = {
     testCaps: null,
     review: null,
     lanes: { code: 3, main: 1 },
+    sideLanes: { enabled: true, max: 1 },
     worktrees: true,
     worktreeDir: ".claude/worktrees",
     branchPrefix: "card/",

@@ -36,6 +36,9 @@ import {
   TASK_DIR,
   activeCards,
   activeMilestone,
+  activeSideCards,
+  isSideCard,
+  sideLaneMax,
   alwaysAllowed,
   cardStatus,
   doneCount,
@@ -215,7 +218,9 @@ function parallelBlock(plan, id) {
   if (!card || !m) return null;
   const evidence = new Map(plan.evidence);
   evidence.delete(id);
-  const r = pickParallel({ ...plan, evidence }, { ...m, cards: [id] });
+  // a side card starts only in capacity the active milestone leaves free: walk the active milestone's startable cards first
+  const walk = isSideCard(plan, id) ? { id: "side", cards: [...(activeMilestone(plan)?.cards ?? []), id] } : { ...m, cards: [id] };
+  const r = pickParallel({ ...plan, evidence }, walk);
   const all = [...r.parallel.code, ...r.parallel.main];
   return all.includes(id) ? null : (r.skipped[0]?.reason ?? r.blocked ?? "not allowed by the parallel rules");
 }
@@ -336,7 +341,15 @@ export function startCard(ctx, id, opts = {}) {
   requireValid(plan);
   const card = requireCard(plan, id);
   const m = plan.milestones.find((x) => x.id === card.milestone);
-  if (m?.status !== "active") throw new TaskError(`${id} belongs to ${card.milestone}, which is not status: active — only cards of the active milestone can start`);
+  const side = m?.status !== "active" && isSideCard(plan, id);
+  if (m?.status !== "active" && !side) {
+    const hint = m?.status === "planned" ? ` and ${id} is not in its side_cards` : "";
+    throw new TaskError(`${id} belongs to ${card.milestone}, which is not status: active${hint} — only cards of the active milestone or side cards can start`);
+  }
+  if (side && !opts.restart) {
+    const running = activeSideCards(plan).filter((c) => c.id !== id);
+    if (running.length >= sideLaneMax(plan)) throw new TaskError(`side lanes are full (${sideLaneMax(plan)} at a time): ${running.map((c) => c.id).join(", ")} in progress — pass or abandon it first`);
+  }
   const status = cardStatus(plan, id);
   if (status !== "todo" && !opts.restart) {
     throw new TaskError(
@@ -720,7 +733,7 @@ export const PROBE_QUESTION =
 export function probeTarget(plan) {
   const m = activeMilestone(plan);
   if (!m) return null;
-  return { milestone: m.id, done: doneCount(plan, m), total: m.cards.length, cards: activeCards(plan).filter((x) => x.milestone === m.id).map((c) => ({ id: c.id, title: c.title })) };
+  return { milestone: m.id, done: doneCount(plan, m), total: m.cards.length, cards: activeCards(plan).filter((x) => x.milestone === m.id || isSideCard(plan, x.id)).map((c) => ({ id: c.id, title: c.title })) };
 }
 
 export const describeProbeTarget = (t) => `${t.milestone} done ${t.done}/${t.total} · ${t.cards.length ? t.cards.map((c) => `${c.id} ${c.title}`).join(" · ") : "no card in progress"}`;

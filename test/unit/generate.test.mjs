@@ -150,3 +150,15 @@ test("CRLF checkouts count as unchanged", () => {
   const r = generate(root, { stack: { packageManager: "none" } });
   assert.deepEqual(r.report.archived, []);
 });
+
+test("side lanes: on by default (1 at a time) and documented in the plan README; off removes the section", () => {
+  const root = gitRepo();
+  const { config } = generate(root, { stack: { packageManager: "none" } });
+  assert.deepEqual(config.workflow.sideLanes, { enabled: true, max: 1 });
+  assert.match(read(root, "docs/plan/README.md"), /### Side lanes[\s\S]*side_cards: \[T-M3-01\][\s\S]*At most 1 side card|at most 1 side card/);
+  assert.match(read(root, ".claude/agents/designer.md"), /side_cards:/);
+  const th = gitRepo();
+  generate(th, { people: { docLanguage: "th" }, stack: { packageManager: "none" }, workflow: { sideLanes: { enabled: false } } });
+  assert.doesNotMatch(read(th, "docs/plan/README.md"), /สายข้าง/);
+  assert.doesNotMatch(read(th, ".claude/agents/designer.md"), /side_cards/);
+});

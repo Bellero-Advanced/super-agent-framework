@@ -79,6 +79,7 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom caps) · off | on for standard/strict, off for light |
+| Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time) · off | on, 1 at a time |
 | Paths that only one card may touch at a time? | `workflow.solo` | globs | none (lock files are handled automatically) |
 | Ports per lane for dev servers? | `workflow.lanePorts` | base · step · env names | base 3000 · step 10 · `PORT` |
 | Test database name per lane? | `workflow.laneDb` | pattern with `{n}` | empty; with a database: `<name>_lane{n}_test` |

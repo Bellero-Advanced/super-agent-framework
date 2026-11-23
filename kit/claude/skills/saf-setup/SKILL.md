@@ -32,7 +32,7 @@ detection (say what you detected instead):
 3. **Stack** — package manager · confirm the detected commands · database · monorepo / submodules
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model
 5. **Roles and skills** — optional roles (multi-select) · custom role? · report language · optional skill packs (multi-select)
-6. **Workflow** — parallel lanes on/off and caps · measure lock · performance budgets file
+6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · measure lock · performance budgets file
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")
 

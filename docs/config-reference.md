@@ -47,6 +47,7 @@ See [model-presets.md](model-presets.md) and [roles.md](roles.md): `models.prese
 | `sizes` · `testCaps` | from rigor | `{ "S": 150, "M": 400 }` changed code lines |
 | `review` | from rigor | m-cards · every-card · every-card+security |
 | `worktrees` · `lanes` | true · `{ code: 3, main: 1 }` | parallel lanes; with worktrees off all cards run in the main folder |
+| `sideLanes` | `{ enabled: true, max: 1 }` | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` in progress at once — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
 | `worktreeDir` · `branchPrefix` | `.claude/worktrees` · `card/` | |
 | `solo` | [] | globs whose cards run alone in the code lane (e.g. migrations) |
 | `laneInstall` | from the package manager | run in a new lane (`npm ci`, `pnpm install --frozen-lockfile`, …) |

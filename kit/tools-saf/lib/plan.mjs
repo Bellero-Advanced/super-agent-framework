@@ -10,7 +10,8 @@ import { textFor } from "./text.mjs";
 /**
  * Card-based plan — reads docs/plan/ and computes status from evidence only.
  *
- *   milestones/M1.md        goal · scope · exit gates · ordered card list · status (one active at a time)
+ *   milestones/M1.md        goal · scope · exit gates · ordered card list · status (one active at a time) ·
+ *                           side_cards: cards that may run as a side lane while the milestone is still planned
  *   tasks/M1/T-M1-01.md     one card per file (frontmatter + a criteria section whose items are commands)
  *   evidence/T-M1-01.json   evidence — written by task:start / task:verify only
  *   STATE.md · .saf/plan.md generated from the three above (never edited by hand)
@@ -139,7 +140,7 @@ export function parseMilestone(src, file) {
   const body = new Map();
   for (const [k, lines] of sections(src)) body.set(k, lines.map((l) => l.text).join("\n").trim());
   if (issues.length) return { issues };
-  return { milestone: { id, title: str(data.title), status, file, cards: strList(data.cards), legacy, gates, sections: body }, issues };
+  return { milestone: { id, title: str(data.title), status, file, cards: strList(data.cards), sideCards: strList(data.side_cards), legacy, gates, sections: body }, issues };
 }
 
 function listFiles(root, dir, ext, recursive) {
@@ -227,6 +228,15 @@ export function validatePlan(plan) {
     for (const d of c.depends) if (!known(d)) issues.push(`${c.file}: depends on a card that does not exist (${d})`);
     issues.push(...repoIssues(c, plan.submodules ?? []));
   }
+  // side lanes: side_cards ⊆ cards · a side card may only depend on cards that are done or can start themselves
+  for (const m of plan.milestones.filter((x) => x.status === "planned")) {
+    for (const cid of m.sideCards ?? []) if (!m.cards.includes(cid)) issues.push(`${m.file}: side_cards lists ${cid}, which is not in cards of ${m.id}`);
+    if (!sideLanesOn(plan)) continue;
+    for (const cid of (m.sideCards ?? []).filter((x) => m.cards.includes(x))) {
+      const never = (plan.cards.get(cid)?.depends ?? []).filter((d) => !isDone(cardStatus(plan, d)) && !startableMilestone(plan, d));
+      if (never.length) issues.push(`${m.file}: side card ${cid} depends on ${never.join(", ")}, which cannot start (its milestone is not active and it is not a side card)`);
+    }
+  }
   for (const id of plan.evidence.keys()) if (!plan.cards.has(id)) issues.push(`${EVIDENCE_DIR}/${id}.json: card ${id} does not exist`);
   for (const id of plan.gateEvidence.keys()) if (!ids.has(id)) issues.push(`${EVIDENCE_DIR}/${id}.json: milestone ${id} does not exist`);
   return issues;
@@ -242,6 +252,33 @@ export function cardStatus(plan, id) {
 }
 
 export const activeMilestone = (plan) => plan.milestones.find((m) => m.status === "active");
+
+// ── side lanes ───────────────────────────────────────────────────────────────
+// A planned milestone may list `side_cards`: those cards can start, verify and merge while the active milestone runs —
+// same card rules (depends · touch · caps · evidence · review), but they only take capacity the active milestone leaves free.
+
+export const sideLanesOn = (plan) => plan.config?.workflow?.sideLanes?.enabled !== false;
+export const sideLaneMax = (plan) => plan.config?.workflow?.sideLanes?.max ?? 1;
+
+/** Planned milestones with their side cards (in `cards` order) — only those that have any. */
+export function sideTracks(plan) {
+  if (!sideLanesOn(plan)) return [];
+  return plan.milestones
+    .filter((m) => m.status === "planned")
+    .map((m) => ({ m, cards: m.cards.filter((id) => (m.sideCards ?? []).includes(id)) }))
+    .filter((t) => t.cards.length);
+}
+
+export const isSideCard = (plan, id) => sideTracks(plan).some((t) => t.cards.includes(id));
+
+/** Side cards started but not passed. */
+export const activeSideCards = (plan) => activeCards(plan).filter((c) => isSideCard(plan, c.id));
+
+/** The card's milestone lets it start: the active milestone, or a side card. */
+export function startableMilestone(plan, id) {
+  const mid = plan.cards.get(id)?.milestone ?? id.match(CARD_ID)?.[1];
+  return plan.milestones.some((m) => m.id === mid && m.status === "active") || isSideCard(plan, id);
+}
 
 export function titleOf(plan, id) {
   return plan.cards.get(id)?.title ?? plan.milestones.find((m) => m.legacy[id])?.legacy[id]?.title ?? id;
@@ -266,14 +303,14 @@ export const doneCount = (plan, m) => m.cards.filter((id) => isDone(cardStatus(p
 const cmdOf = (plan) => (script, args) => scriptCommand(plan.config.stack.packageManager, script, args);
 const T = (plan) => textFor(plan.config.people.docLanguage);
 
-export function nextLine(plan, m) {
+export function nextLine(plan, m, side = false) {
   const t = T(plan);
   const next = nextCards(plan, m);
   if (next.length) return next.map((id) => `${id} ${titleOf(plan, id)}`).join(" · ");
   const waiting = m.cards.filter((id) => cardStatus(plan, id) === "todo").map((id) => t.nextWait(id, unmetDepends(plan, id).join(", ")));
   if (waiting.length) return t.nextWaiting(waiting.join(" · "));
   if (doneCount(plan, m) < m.cards.length) return t.nextOnlyActive;
-  return t.nextGate(cmdOf(plan)("task:verify", m.id));
+  return side ? t.sideAllDone : t.nextGate(cmdOf(plan)("task:verify", m.id));
 }
 
 export function formatTime(iso, timeZone = "UTC") {
@@ -314,6 +351,29 @@ function gateMark(plan, m, g) {
   return r.pass ? t.gatePass(timeOf(plan, ev.verified.at)) : t.gateFail;
 }
 
+/** Heading · in progress · next · card table for `m.cards` (the active milestone, or one milestone's side cards). */
+function stateBlock(plan, m, heading, side = false) {
+  const t = T(plan);
+  const out = [`## ${heading} — ${t.doneCount(doneCount(plan, m), m.cards.length)}`, ""];
+  const act = activeCards(plan).filter((x) => m.cards.includes(x.id));
+  out.push(`- ${t.doing}: ${act.length ? act.map((x) => `**${x.id}** ${x.title} — ${verifySummary(plan, plan.evidence.get(x.id))}${laneTag(plan, x.id)}`).join(" · ") : t.none}`);
+  out.push(`- ${t.next}: ${nextLine(plan, m, side)}`, "");
+  out.push(t.table, "|---|---|---|---|");
+  for (const id of m.cards) {
+    const s = cardStatus(plan, id);
+    const card = plan.cards.get(id);
+    const ref = card ? `[${id}](${card.file.slice(PLAN_DIR.length + 1)})` : id;
+    const ev =
+      s === "legacy"
+        ? (m.legacy[id]?.commits ?? []).map((x) => `\`${x}\``).join(" · ")
+        : plan.evidence.has(id)
+          ? `[${id}.json](evidence/${id}.json) · ${verifySummary(plan, plan.evidence.get(id))}`
+          : "–";
+    out.push(`| ${ref} | ${cell(titleOf(plan, id))} | ${t.status[s]} | ${cell(ev)} |`);
+  }
+  return out;
+}
+
 export function renderState(plan) {
   const t = T(plan);
   const c = cmdOf(plan);
@@ -322,29 +382,14 @@ export function renderState(plan) {
   if (!m) {
     out.push(t.noActive, "");
   } else {
-    out.push(`## ${m.id} ${m.title} — ${t.doneCount(doneCount(plan, m), m.cards.length)}`, "");
-    const act = activeCards(plan).filter((x) => x.milestone === m.id);
-    out.push(`- ${t.doing}: ${act.length ? act.map((x) => `**${x.id}** ${x.title} — ${verifySummary(plan, plan.evidence.get(x.id))}${laneTag(plan, x.id)}`).join(" · ") : t.none}`);
-    out.push(`- ${t.next}: ${nextLine(plan, m)}`, "");
-    out.push(t.table, "|---|---|---|---|");
-    for (const id of m.cards) {
-      const s = cardStatus(plan, id);
-      const card = plan.cards.get(id);
-      const ref = card ? `[${id}](${card.file.slice(PLAN_DIR.length + 1)})` : id;
-      const ev =
-        s === "legacy"
-          ? (m.legacy[id]?.commits ?? []).map((x) => `\`${x}\``).join(" · ")
-          : plan.evidence.has(id)
-            ? `[${id}.json](evidence/${id}.json) · ${verifySummary(plan, plan.evidence.get(id))}`
-            : "–";
-      out.push(`| ${ref} | ${cell(titleOf(plan, id))} | ${t.status[s]} | ${cell(ev)} |`);
-    }
+    out.push(...stateBlock(plan, m, `${m.id} ${m.title}`));
     if (m.gates.length) {
       out.push("", t.gatesTitle(m.id, c("task:verify", m.id)), "", t.gatesTable, "|---|---|---|");
       for (const g of m.gates) out.push(`| ${g.id} | ${cell(g.text)} | ${gateMark(plan, m, g)} |`);
     }
     out.push("");
   }
+  for (const tr of sideTracks(plan)) out.push(...stateBlock(plan, { ...tr.m, cards: tr.cards }, t.sideHeading(tr.m.id, tr.m.title), true), "");
   const recent = [...plan.evidence.values()]
     .map((e) => ({ e, at: e.verified?.at ?? e.started.at }))
     .sort((a, b) => b.at.localeCompare(a.at) || a.e.id.localeCompare(b.e.id))
@@ -379,20 +424,35 @@ export function renderMirror(plan) {
     const r = plan.gateEvidence.get(m.id)?.verified.gates.find((x) => x.id === g.id);
     out.push(`- [${r?.pass ? "x" : " "}] ${g.id} ${g.text}${g.run.length ? "" : t.manualSuffix}`);
   }
+  const tasks = (x, ids) => {
+    for (const id of ids) {
+      const s = cardStatus(plan, id);
+      const note =
+        s === "legacy"
+          ? t.doneBefore((x.legacy[id]?.commits ?? []).map((y) => `\`${y}\``).join(" · "))
+          : s === "todo"
+            ? ""
+            : ` — ${verifySummary(plan, plan.evidence.get(id))}${laneTag(plan, id)}`;
+      out.push(`- [${isDone(s) ? "x" : " "}] ${id} ${titleOf(plan, id)}${note}`);
+    }
+    out.push("");
+  };
   out.push("", "## Task List");
-  for (const id of m.cards) {
-    const s = cardStatus(plan, id);
-    const note =
-      s === "legacy"
-        ? t.doneBefore((m.legacy[id]?.commits ?? []).map((x) => `\`${x}\``).join(" · "))
-        : s === "todo"
-          ? ""
-          : ` — ${verifySummary(plan, plan.evidence.get(id))}${laneTag(plan, id)}`;
-    out.push(`- [${isDone(s) ? "x" : " "}] ${id} ${titleOf(plan, id)}${note}`);
+  tasks(m, m.cards);
+  for (const tr of sideTracks(plan)) {
+    out.push(t.mirrorSide(tr.m.id));
+    tasks(tr.m, tr.cards);
   }
-  out.push("");
   sec("Risks", "risks");
   return `${out.join("\n").replace(/\n+$/, "")}\n`;
+}
+
+/** Session lines for one card in progress: a lane card → where it lives · a main-folder card → criteria + touch. */
+function doingLines(plan, card, laneStatus) {
+  const t = T(plan);
+  const ev = plan.evidence.get(card.id);
+  if (ev?.lane) return [t.sessionLaneCard(card.id, card.title, ev.lane, ev.worktree ?? "-", ev.branch ?? "-", laneStatus(ev))];
+  return [t.sessionCard(card.id, card.title, card.file, verifySummary(plan, ev)), t.sessionCriteria(card.criteria.join(" · ")), t.sessionTouch(card.touch.join(" · "), card.dontTouch.join(" · "))];
 }
 
 /** Text the SessionStart hook injects into every new session (short — the full view is STATE.md). */
@@ -407,17 +467,14 @@ export function sessionContext(plan, laneStatus = () => "-") {
     out.push(t.sessionMilestone(m.id, m.title, doneCount(plan, m), m.cards.length));
     const act = activeCards(plan).filter((x) => x.milestone === m.id);
     if (!act.length) out.push(t.sessionNoCard);
-    for (const card of act) {
-      const ev = plan.evidence.get(card.id);
-      if (ev?.lane) {
-        out.push(t.sessionLaneCard(card.id, card.title, ev.lane, ev.worktree ?? "-", ev.branch ?? "-", laneStatus(ev)));
-        continue;
-      }
-      out.push(t.sessionCard(card.id, card.title, card.file, verifySummary(plan, ev)));
-      out.push(t.sessionCriteria(card.criteria.join(" · ")));
-      out.push(t.sessionTouch(card.touch.join(" · "), card.dontTouch.join(" · ")));
-    }
+    for (const card of act) out.push(...doingLines(plan, card, laneStatus));
     out.push(t.sessionNext(nextLine(plan, m)));
+  }
+  for (const tr of sideTracks(plan)) {
+    const sm = { ...tr.m, cards: tr.cards };
+    const act = activeCards(plan).filter((x) => tr.cards.includes(x.id));
+    out.push(t.sessionSide(tr.m.id, doneCount(plan, sm), tr.cards.length, act.length ? act.map((x) => x.id).join(", ") : t.none, nextLine(plan, sm, true)));
+    for (const card of act) out.push(...doingLines(plan, card, laneStatus));
   }
   const recent = [...plan.evidence.values()]
     .filter((e) => e.verified)

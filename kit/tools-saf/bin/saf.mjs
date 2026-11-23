@@ -8,8 +8,8 @@ import { docsInputFor, runDocsCheck } from "../lib/docs.mjs";
 import { listRepoFiles } from "../lib/git.mjs";
 import { blockingGaps, buildMatrix, completeGaps, renderMatrix, summarize } from "../lib/matrix.mjs";
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
-import { LANE_NAME, laneOf, pickParallel, startableCards } from "../lib/parallel.mjs";
-import { CARD_ID, activeCards, activeMilestone, cardStatus, loadPlan, titleOf } from "../lib/plan.mjs";
+import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
+import { CARD_ID, activeCards, activeMilestone, cardStatus, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
 import { taskRunner } from "../lib/run.mjs";
 import { scanSecrets } from "../lib/secrets.mjs";
@@ -41,6 +41,7 @@ import {
  *   task verify <id|M>  [--verbose]        card: the only way to "done" · milestone: exit gates
  *   task abandon <id> · task merge <id>    (merge exit 3 refused · 4 conflict · 5 merge checks failed)
  *   task state [--check] · task next [--parallel] [--json] · task probe [--bin <claude>] · task env · task report <M>
+ *     (task next lists the active milestone's cards first, then side cards of planned milestones — --json has a `side` list)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -179,11 +180,12 @@ async function task(sub, rest) {
         return 1;
       }
       if (plan.issues.length) throw new TaskError(["the plan has problems — no proposal until fixed:", ...plan.issues.map((i) => `  ✗ ${i}`)].join("\n"));
-      const label = (id) => `${id} ${titleOf(plan, id)}`;
+      // side cards carry a tag; a plan without side_cards prints exactly what it did before
+      const label = (id) => `${id} ${titleOf(plan, id)}${isSideCard(plan, id) ? ` [side lane ${plan.cards.get(id)?.milestone ?? ""}]` : ""}`;
       if (!flag("--parallel")) {
         const startable = startableCards(plan, m);
         const active = activeCards(plan).map((x) => x.id);
-        if (flag("--json")) out(JSON.stringify({ milestone: m.id, startable, active }, null, 2));
+        if (flag("--json")) out(JSON.stringify({ milestone: m.id, startable, active, side: sideIds(plan, [...startable, ...active]) }, null, 2));
         else {
           out(`${m.id} — ${startable.length} card(s) can start:`);
           for (const id of startable) out(`  ${label(id)}`);
