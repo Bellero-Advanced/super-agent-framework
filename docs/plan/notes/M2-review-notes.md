@@ -64,3 +64,18 @@ N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issu
 6. test gaps: snapshot compares names not contents · walking up from a subfolder untested · the `Set` in AC-02 hides a key listed twice · `SKILL_PACKS` compared with itself (compare with the schema enum)
 7. unknown extra arguments (`--foo`, `--lang=th`) are silently ignored (exit 0)
 8. older: `examples/todo-api/.claude/skills/saf-setup/**` is stale against kit (still `stack.commands.*`, lacks the test-mode rows) — `upgrade` refreshes only the engine copy there
+
+## T-M2-13 (review FAIL → fixed → merged) — notes for the designer
+
+4. api "Adds only the server rule": when i18n is required, `ruleSet` also adds the UI rule (generate.mjs:67)
+5. ui-languages "several": not mentioned — it adds the UI rule even for types without one (api, data-ai, library-cli, other), and the interview suggests the content-writer role
+6. strict: not mentioned — the interview suggests security-auditor (planner = most expensive model) and the CLAUDE.md "Definition of done" requires a security-auditor review even when the role is not enabled
+7. custom-models: "Builders are the rest" ignores custom roles marked planner and per-role `models.overrides`; `resolveConfig` uses `models.planner/builder` with any preset (`||=`), not only Custom
+8. ui-languages one/none `cost` "retrofitting later" undersells the UI rule (without i18n it already says text stays in one place, ui.md:12)
+9. rigor derived line prints raw ids ("m-cards", "every-card+security"); "Card size S / M" has no unit (code lines)
+10. groups 5-8 and flow print one blank line and exit 0 until T-M2-14 (`out("")` adds a newline)
+11. AC-05 checks coverage for groups 1-4 only — loop over every question that has entries so T-M2-14 is covered automatically
+12. stray positional arguments are accepted silently (`choices foo --group 2`)
+13. FIELD_MAX 160, longest field 159 — the next wording edit may need a limit bump or trim
+14. FACT for the interview itself: `project.stage` (CLAUDE.md header only), `stack.submodules` (read nowhere) and `stack.monorepo` (one CLAUDE.md line) have almost no effect although the interview asks them — decide: drop the question, mark it "informational", or give it an effect
+15. Thai wording written by the implementer and reviewed by an AI only — a native-reader pass before publishing
