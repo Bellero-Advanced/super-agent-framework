@@ -18,7 +18,7 @@ and a new session sees the current card.
 - [ ] owner the owner has read CLAUDE.md and docs/plan/README.md and agrees with the setup (manual check)
 
 ## Task List
-- [ ] T-M0-01 SAF self-checks pass through the real card loop
+- [x] T-M0-01 SAF self-checks pass through the real card loop — passed 2026-11-23 17:34 (3 commands)
 
 ## Side lane (M2)
 - [ ] T-M2-04 task:verify reports changed code and test lines against the card's size cap

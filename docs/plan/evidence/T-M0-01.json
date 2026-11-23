@@ -1,0 +1,52 @@
+{
+  "id": "T-M0-01",
+  "milestone": "M0",
+  "status": "done",
+  "started": {
+    "at": "2026-11-23T17:34:23.436Z",
+    "base": "3d9dd873ebfa28dd75c1dc17cdc4de0e8d173ce6",
+    "dirty": {}
+  },
+  "attempts": 1,
+  "verified": {
+    "at": "2026-11-23T17:34:24.595Z",
+    "head": "3d9dd873ebfa28dd75c1dc17cdc4de0e8d173ce6",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run task:state -- --check",
+        "exit": 0,
+        "ms": 274,
+        "tail": [
+          "✓ plan is valid · STATE.md and .saf/plan.md match plan + evidence"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 267,
+        "tail": [
+          "✓ docs:check passed — 194 markdown file(s) · 36 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 309,
+        "tail": [
+          "✓ check-secrets: <redacted> findings in 380 scanned file(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {}
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    }
+  }
+}

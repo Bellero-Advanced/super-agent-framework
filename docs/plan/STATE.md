@@ -2,14 +2,14 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M0 SAF setup works in this repo — cards done 0/1
+## M0 SAF setup works in this repo — cards done 1/1
 
 - In progress: none
-- Next: T-M0-01 SAF self-checks pass through the real card loop
+- Next: none — all cards done, check the exit gates with npm run task:verify -- M0
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
-| [T-M0-01](tasks/M0/T-M0-01.md) | SAF self-checks pass through the real card loop | · not started | – |
+| [T-M0-01](tasks/M0/T-M0-01.md) | SAF self-checks pass through the real card loop | ✓ passed | [T-M0-01.json](evidence/T-M0-01.json) · passed 2026-11-23 17:34 (3 commands) |
 
 ### Exit gates of M0 (checked with `npm run task:verify -- M0`)
 
@@ -31,8 +31,7 @@
 
 ## Latest evidence
 
-none yet
-
+- T-M0-01 SAF self-checks pass through the real card loop — passed 2026-11-23 17:34 (3 commands)
 
 ## Other milestones
 
