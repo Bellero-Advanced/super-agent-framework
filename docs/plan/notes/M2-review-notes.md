@@ -53,3 +53,14 @@ N5. AC-15 "When" names `task:state --check`; the test checks `loadPlan(...).issu
 2. `test-mode-gate-views.test.mjs:163` `!view.includes("old")` is a loose substring check; the no-evidence case checks "g1" is present, not that the gate rows equal exactly the declared rows
 3. th wording: `fullSuiteGate` says "การทดสอบทั้งชุด", `deferredToGate` says "test ทั้งชุด" — both correct, slightly inconsistent
 4. a declared gate with commands and a null result shows `gateNotRun`, an undeclared one shows `gateManual` — per the card, noted for consistency
+
+## T-M2-12 (review FAIL → fixed → merged) — notes for the designer
+
+1. spec rule 13 uses the shorthand `saf config --check`, which is not an installed command (the npm bin has init/upgrade/version/help) — write `node tools/saf/bin/saf.mjs config --check`
+2. `choices.mjs` "exit 75" is a copy of `EXIT_BUSY` (measure.mjs) — interpolate the import so it cannot drift
+3. `DOCS_URL#<key>` keeps the key's case; GitHub anchors are lowercase (`tokenSaving`, `firstMilestone`) — T-M2-15 AC-07 must lowercase; `#models` is broken until T-M2-15 adds one heading per top-level key (do not publish in between)
+4. several not-asked keys (`workflow.review`, `models.overrides`) only reach generated files: editing `saf.config.json` alone does not apply them until setup runs again, and the "where" line does not say so
+5. a valid-JSON but schema-invalid `saf.config.json` still gives its `chatLanguage`; the spec edge case "invalid → en" is ambiguous
+6. test gaps: snapshot compares names not contents · walking up from a subfolder untested · the `Set` in AC-02 hides a key listed twice · `SKILL_PACKS` compared with itself (compare with the schema enum)
+7. unknown extra arguments (`--foo`, `--lang=th`) are silently ignored (exit 0)
+8. older: `examples/todo-api/.claude/skills/saf-setup/**` is stale against kit (still `stack.commands.*`, lacks the test-mode rows) — `upgrade` refreshes only the engine copy there
