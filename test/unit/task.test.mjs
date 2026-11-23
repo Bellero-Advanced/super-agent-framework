@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { cleanup, commitAll, fakeCtx, git, lib, planRepo, write } from "../helpers.mjs";
@@ -203,4 +203,22 @@ test("size: test lines are counted apart from code lines (added + removed, modif
   assert.deepEqual(r.verified.size.over, ["test"]);
   assert.ok(ctx.logged.some((l) => /test 4 > 3/.test(l)));
   assert.equal(r.status, "done");
+});
+
+test("lane guard: a SAF project in a subfolder of a lane worktree is not a lane; a lane root that lost its label is still refused", async () => {
+  const { resolveConfig } = await lib("config.mjs");
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch: ["src/**"] }] });
+  const ev = task.startCard(fakeCtx(root, config), "T-M1-01", { worktree: true });
+  const lane = join(root, ev.worktree);
+  // a second, independent SAF project that lives in a subfolder of the lane worktree (on the card/* branch)
+  const sub = join(lane, "examples", "demo");
+  write(sub, "saf.config.json", { version: 1, stack: { packageManager: "none" } });
+  write(sub, "docs/plan/milestones/M1.md", "---\nid: M1\ntitle: m\nstatus: active\ncards: []\n---\n\n# M1\n");
+  const subConfig = resolveConfig({ version: 1, stack: { packageManager: "none" } });
+  assert.equal(task.laneFolder(sub, loadPlan(sub, subConfig)), null);
+  assert.deepEqual(task.stateCheck(fakeCtx(sub, subConfig)).issues, []);
+  // the lane root itself: label present → lane; label lost → refused
+  assert.equal(task.laneFolder(lane, loadPlan(lane, config)).card, "T-M1-01");
+  rmSync(join(lane, task.LANE_FILE));
+  assert.throws(() => task.laneFolder(lane, loadPlan(lane, config)), /no lane label/);
 });

@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -162,6 +162,17 @@ export function mainWorktreeHead(cwd) {
   const out = tryGit(cwd, ["worktree", "list", "--porcelain"]);
   const m = out?.match(/^HEAD ([0-9a-f]+)/m);
   return m ? m[1] : null;
+}
+
+/** Top-level folder of the git work tree that contains `cwd` (real path), or null. */
+export function topLevel(cwd) {
+  const out = tryGit(cwd, ["rev-parse", "--show-toplevel"]);
+  if (!out) return null;
+  try {
+    return realpathSync(out.trim());
+  } catch {
+    return out.trim();
+  }
 }
 
 /** Folder is the main working tree (has a `.git` directory, not a `.git` file). */
