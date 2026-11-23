@@ -5,8 +5,8 @@ import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, lib, tmp, write } from "../helpers.mjs";
 
-const { QUESTIONS, NOT_ASKED, INTERNAL_KEYS, MACHINE_SWITCHES, DOCS_URL, schemaLeaves } = await lib("choices.mjs");
-const { LOCAL_KEYS, ROLE_LIBRARY, SKILL_PACKS, loadSchema } = await lib("config.mjs");
+const { QUESTIONS, CHOICES, FIELD_MAX, GROUPS, LABELS, NOT_ASKED, INTERNAL_KEYS, MACHINE_SWITCHES, DOCS_URL, schemaLeaves } = await lib("choices.mjs");
+const { LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SKILL_PACKS, loadSchema } = await lib("config.mjs");
 
 after(cleanup);
 
@@ -86,11 +86,81 @@ test("SETUP-AC-03 choices --not-asked lists every key with its summary, where to
   assert.deepEqual(withConfig.filter((f) => !before.includes(f)), ["saf.config.json"]);
 });
 
+const USAGE = /usage: choices --group <1\|2\|3\|4\|5\|6\|7\|8\|flow> \[--lang en\|th\] \| choices --not-asked \[--lang en\|th\]/;
+
 test("SETUP-AC-03 usage errors exit 2 and list the valid values", () => {
   const root = tmp();
-  for (const args of [[], ["--lang", "fr", "--not-asked"], ["--group", "2"], ["--not-asked", "--lang"]]) {
+  for (const args of [[], ["--lang", "fr", "--not-asked"], ["--not-asked", "--lang"]]) {
     const r = run(root, ...args);
     assert.equal(r.status, 2, args.join(" "));
-    assert.match(r.stderr, /usage: choices --not-asked \[--lang en\|th\]/);
+    assert.match(r.stderr, USAGE);
   }
+});
+
+const TEXT_FIELDS = ["what", "good", "cost", "when"];
+const entriesOf = (id) => CHOICES.filter((e) => e.question === id);
+
+test("SETUP-AC-04 choices --group 2 --lang th prints every option with four Thai-labelled fields and the derived rigor values", () => {
+  const root = tmp();
+  const before = snapshot(root);
+  const r = run(root, "--group", "2", "--lang", "th");
+  assert.equal(r.status, 0, r.stderr);
+  for (const id of ["project-type", "project-stage", "project-rigor"]) {
+    const q = QUESTIONS.find((x) => x.id === id);
+    assert.ok(r.stdout.includes(q.keys[0]), q.keys[0]);
+    for (const v of q.options) assert.ok(entriesOf(id).some((e) => e.values.includes(v) && r.stdout.includes(`- ${e.values.join(" · ")}`)), `${id} ${v}`);
+    for (const e of entriesOf(id)) for (const f of TEXT_FIELDS) assert.ok(r.stdout.includes(e.th[f]), `${id} ${e.values} ${f}`);
+  }
+  const count = (text) => r.stdout.split(text).length - 1;
+  for (const label of LABELS.th.fields) assert.equal(count(`    ${label}: `), CHOICES.filter((e) => QUESTIONS.find((q) => q.id === e.question).group === 2).length, label);
+  for (const [name, v] of Object.entries(RIGOR)) {
+    const line = r.stdout.split("\n").find((l) => l.includes(`${LABELS.th.sizes}: ${v.sizes.S} / ${v.sizes.M}`) && l.includes(`${v.testCaps.S} / ${v.testCaps.M}`) && l.includes(`${LABELS.th.review}: ${v.review}`));
+    assert.ok(line && line.includes(v.merge.join(" · ")), name);
+  }
+  assert.ok(!r.stdout.includes(LABELS.en.fields[0]), "no English labels");
+  assert.deepEqual(snapshot(root), before, "writes no file");
+});
+
+test("SETUP-AC-04 choices --group 4 appends the planner and builder models of each preset; the language follows the config unless --lang is given", () => {
+  const root = tmp();
+  const en = run(root, "--group", "4", "--lang", "en");
+  assert.equal(en.status, 0, en.stderr);
+  for (const v of Object.values(MODEL_PRESETS)) assert.ok(en.stdout.includes(`${LABELS.en.planner}: ${v.planner} · ${LABELS.en.builder}: ${v.builder}`));
+  write(root, "saf.config.json", { version: 1, people: { chatLanguage: "th" } });
+  assert.ok(run(root, "--group", "4").stdout.includes(LABELS.th.fields[0]));
+  assert.ok(run(root, "--group", "4", "--lang", "en").stdout.includes(LABELS.en.fields[0]));
+  assert.equal(run(root, "--group", "flow").status, 0);
+});
+
+test("SETUP-AC-04 a bad group, language or flag combination exits 2 and lists the valid values", () => {
+  const root = tmp();
+  for (const args of [["--group", "9"], ["--group", "2", "--lang", "fr"], ["--group"], ["--group", "--lang", "th"], ["--group", "2", "--not-asked"], ["--lang", "th"]]) {
+    const r = run(root, ...args);
+    assert.equal(r.status, 2, args.join(" "));
+    assert.match(r.stderr, USAGE);
+    assert.equal(r.stdout, "");
+  }
+  assert.deepEqual(GROUPS.map(String), ["1", "2", "3", "4", "5", "6", "7", "8", "flow"]);
+});
+
+test("SETUP-AC-05 every explanation has four short fields in en and th, no numbers or model ids, and covers each option exactly once", () => {
+  assert.ok(CHOICES.length > 0 && Number.isInteger(FIELD_MAX));
+  for (const e of CHOICES) {
+    for (const lang of ["en", "th"]) {
+      assert.deepEqual(Object.keys(e[lang]), TEXT_FIELDS, `${e.question} ${lang}`);
+      for (const f of TEXT_FIELDS) {
+        const text = e[lang][f];
+        const at = `${e.question} ${e.values} ${lang}.${f}`;
+        assert.ok(typeof text === "string" && text.trim() && text.length <= FIELD_MAX, `${at}: empty or over ${FIELD_MAX} (${text.length})`);
+        assert.ok(!/\d\d/.test(text) && !text.includes("claude-"), `${at}: number or model id`);
+      }
+    }
+  }
+  for (const q of QUESTIONS.filter((x) => [1, 2, 3, 4].includes(x.group))) {
+    const entries = entriesOf(q.id);
+    if (q.kind === "identity") assert.equal(entries.length, 0, q.id);
+    else if (q.kind === "value") assert.deepEqual(entries.map((e) => e.values), [[]], `${q.id}: exactly one entry`);
+    else assert.deepEqual(entries.flatMap((e) => e.values).sort(), [...q.options].sort(), `${q.id}: every option covered exactly once`);
+  }
+  assert.deepEqual(CHOICES.filter((e) => !QUESTIONS.some((q) => q.id === e.question)), []);
 });
