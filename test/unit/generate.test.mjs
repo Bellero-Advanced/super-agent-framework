@@ -62,6 +62,15 @@ test("bash command comments are aligned", () => {
   assert.equal(alignShellComments("```bash\nab  # x\nabcd  # y\nplain\n```"), "```bash\nab    # x\nabcd  # y\nplain\n```");
 });
 
+test("first milestone title: the first sentence — a version number is not a sentence end; long goals cut at a word", () => {
+  const root = gitRepo();
+  const title = (goal) => JSON.parse(templateData(resolveConfig({ firstMilestone: { goal } }), detectProject(root), { now: new Date(0) }).m1.titleYaml);
+  assert.equal(title("v0.1.0 public release: both packages published. Then feedback."), "v0.1.0 public release: both packages published");
+  assert.equal(title("Ship it.\nMore"), "Ship it");
+  const long = title("word ".repeat(30));
+  assert.ok(long.endsWith("…") && !/wor…$/.test(long) && long.length <= 81, long);
+});
+
 test("template data: session rows group roles by model; th labels", () => {
   const root = gitRepo();
   const c = resolveConfig({ people: { docLanguage: "th" }, models: { preset: "max" } });
