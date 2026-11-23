@@ -4,10 +4,10 @@
 
 No active milestone (a file in `milestones/` with `status: active`).
 
-## Side lane M2 Roadmap: next — cards done 1/6
+## Side lane M2 Roadmap: next — cards done 1/7
 
 - In progress: none
-- Next: T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode)
+- Next: T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) · T-M2-11 The lane guard recognises a lane worktree on Windows too (CI matrix green again)
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -17,6 +17,7 @@ No active milestone (a file in `milestones/` with `status: active`).
 | [T-M2-08](tasks/M2/T-M2-08.md) | task:merge skips the deferred full suite and the milestone gate always runs it | · not started | – |
 | [T-M2-09](tasks/M2/T-M2-09.md) | task:culprit finds the card that broke the deferred full suite | · not started | – |
 | [T-M2-10](tasks/M2/T-M2-10.md) | /saf-setup asks for the test mode and the docs explain the three modes and task:culprit | · not started | – |
+| [T-M2-11](tasks/M2/T-M2-11.md) | The lane guard recognises a lane worktree on Windows too (CI matrix green again) | · not started | – |
 
 ## Latest evidence
 
