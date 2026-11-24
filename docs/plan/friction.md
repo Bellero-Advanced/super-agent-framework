@@ -16,3 +16,5 @@ Earlier record, from before this log existed: [notes/M2-review-notes.md](notes/M
 - F-008 · 2026-11-24 · command-failed · T-M3-28 · spec:matrix · spec:matrix --check in a lane fails while another lane's started card has not merged, so two parallel lane cards with spec scenarios cannot both verify · evidence: T-M3-28 verify failed 3 times in its lane: spec:matrix --check reports 8 gaps COPIES-AC-01..08 of the started card T-M3-27 whose tests live on another lane branch
 - F-001 → fixed · 2026-11-24 · T-M3-27
 - F-009 · 2026-11-24 · workaround · T-M3-31 · .claude/commands · the repo's own /saf command drifts from its template and needs a hand edit on every template change · evidence: T-M3-31 report: saf:refresh keeps the edited .claude/commands/saf.md so the repo's own /saf command must be hand-edited when the template changes
+- F-008 → carded · 2026-11-24 · T-M3-32
+- F-009 → carded · 2026-11-24 · T-M3-33
