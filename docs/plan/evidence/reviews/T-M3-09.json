@@ -1,0 +1,18 @@
+{
+  "id": "T-M3-09",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T19:45:46.989Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "REL-AC-04 write detection has holes; tag-step output wrong; npm option injection via leading dash name; unescaped changed-file names",
+      "head": "b6cd9f6c80bb04bc90fe3a213e7c4f0b4beef4b9",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T19:39:47.984Z"
+    }
+  ]
+}
