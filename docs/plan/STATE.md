@@ -4,8 +4,8 @@
 
 ## M3 SAF builds itself — cards done 21/34
 
-- In progress: none
-- Next: T-M3-04 task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort · T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code
+- In progress: **T-M3-04** task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort — started 2026-11-24 17:26 · not verified yet · lane 1 · .claude/worktrees/T-M3-04
+- Next: T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -30,7 +30,7 @@
 | [T-M3-24](tasks/M3/T-M3-24.md) | Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt) | ✓ passed | [T-M3-24.json](evidence/T-M3-24.json) · passed 2026-11-24 17:06 (5 commands) · full suite deferred to gate |
 | [T-M3-25](tasks/M3/T-M3-25.md) | Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested | ✓ passed | [T-M3-25.json](evidence/T-M3-25.json) · passed 2026-11-24 17:02 (5 commands) · full suite deferred to gate |
 | [T-M3-03](tasks/M3/T-M3-03.md) | models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check | ✓ passed | [T-M3-03.json](evidence/T-M3-03.json) · passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate |
-| [T-M3-04](tasks/M3/T-M3-04.md) | task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort | · not started | – |
+| [T-M3-04](tasks/M3/T-M3-04.md) | task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort | ▶ in progress | [T-M3-04.json](evidence/T-M3-04.json) · started 2026-11-24 17:26 · not verified yet |
 | [T-M3-05](tasks/M3/T-M3-05.md) | /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code | · not started | – |
 | [T-M3-06](tasks/M3/T-M3-06.md) | SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer | · not started | – |
 | [T-M3-07](tasks/M3/T-M3-07.md) | At milestone end task:report lists open friction with a brief for the designer, and task:friction draft prints card drafts for recurring friction | · not started | – |
@@ -57,11 +57,11 @@
 
 ## Latest evidence
 
+- T-M3-04 task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort — started 2026-11-24 17:26 · not verified yet
 - T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate
 - T-M3-24 Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt) — passed 2026-11-24 17:06 (5 commands) · full suite deferred to gate
 - T-M3-25 Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested — passed 2026-11-24 17:02 (5 commands) · full suite deferred to gate
 - T-M3-19 STATE.md, the plan mirror, the report and the HTML page give every exit gate the same result word, and broken evidence never crashes them — passed 2026-11-24 16:55 (5 commands) · full suite deferred to gate
-- T-M3-21 Setup messages say what happened: "not a JSON object" for a valid non-object file, the archive path in every settings warning and dry-run line, and a minified package.json stays minified — passed 2026-11-24 16:55 (5 commands) · full suite deferred to gate
 
 ## Other milestones
 
