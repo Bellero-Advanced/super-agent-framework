@@ -150,3 +150,10 @@ N6. evidence defers `npm test` (targeted mode); the milestone gate must cover th
 8. cosmetic: JSDoc of `generate()` (~generate.mjs:654) omits `keep`; the saf.mjs header says `[--dry-run [--diff]]`, the error message `[--dry-run] [--diff]`
 9. `--diff` prints whatever the person wrote in CLAUDE.md etc. to the terminal and through the T-M2-22 skill into the chat (rule 14, by design) — spec: one-line caution not to keep secrets in those files
 10. evidence defers `npm test` (targeted); the milestone gate runs the full suite
+
+## T-M2-22 (review FAIL → fixed → merged) — notes for the designer
+
+EFFORT DATA POINT (D-016): first S card run at implementer effort `medium`; 1 review bounce (docs/upgrade.md corrupted: new paragraph inserted before the old text and a bullet block pasted twice; the test only searched for words and `!includes("T-M2-20")` checked nothing). The SKILL.md logic itself was fully correct. Record review rounds per card (T-M3-02) to judge whether medium pays off.
+N5. the skill gives no guidance for quoting paths with spaces (POSIX '…', Windows "…"); the dry-run line separates path and reason with two spaces; a comma inside a path would split the comma form
+N6. "yours is archived to docs/archive/pre-saf/" — with an older archive the name gets a `.1`, `.2` suffix; the dry run does not print the target (only the real run's `archived:` lines do)
+N7. "without the `same` lines" is slightly unclear (the merges block also prints `<path>: same`)
