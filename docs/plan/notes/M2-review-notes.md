@@ -239,3 +239,15 @@ N6. port error says "from saf.config.json" when the code cap is the default (acc
 N7. EDGE: `saf.config.local.json` is git-ignored, so absent inside a lane worktree: if the repo's own `lanes.code` breaks the port check and only the local file lowers it, every engine command in a lane fails (loadConfig throws) incl. task:verify — a sentence in T-M2-26's docs (same already true for test mode)
 N8. with `lanes.code: 0` set locally while lane cards are in progress, `laneOf` returns "main" for them so they count against the main-folder lane on that machine (lanes off already behaved this way)
 N9. evidence defers `npm test` (targeted); the gate runs the full suite
+
+## T-M2-26 (review FAIL ×1 + main-session check → fixed → merged) — notes for the designer
+
+SPEC FIXES (docs/specs/lane-caps.md, same errors as the docs fixed in the card):
+S1. Edge-cases bullet about two machines is FALSE ("each counts only its own worktrees (`freeLane` reads this machine's worktree folder)"): `pickParallel` counts every card in `activeCards(plan)` (evidence is TRACKED in git, lane-start evidence is committed on the branch) and `freeLane` skips both the evidence lane numbers and this machine's worktree labels — on a shared branch a machine with a lower cap can see "code lane is full" because of cards started elsewhere; only ports are per machine
+S2. rule 7 / LCAP-AC-02: the "(this machine: saf.config.local.json)" text ends the `pickParallel` reasons only; `task:start`'s side-cap refusal has it inside the text, "no free lane number" never names the file — reword to "names"
+S3. rule 12 asks six files to name four things; add a test per file (done in the card) — keep the rule as the source
+EFFORT DATA (D-016): S cards at implementer effort `medium`: T-M2-22 (bounce, docs corrupted), T-M2-27 (pass; +1 secret-leak gap closed), T-M2-25 (pass), T-M2-26 (2 bounces: false sentences about machines/side cards). Both bounces are TEXT-for-users cards, the two code-first cards passed. Candidate rule: text-for-users S cards at `high`, or make the per-sentence "code checked" list a verify condition.
+a. card-lifecycle: "Per machine" line mentions lane caps then "Order: env, local file …" (fixed to "Mode order")
+b. config-reference "now 32" (line ~67) and "65535" (lines ~72, ~104) are not pinned to `LANE_CEILING` / `MAX_PORT` by the test (only line ~95 is)
+c. the per-machine test mode from saf.config.local.json does not reach lane verifies (the file is git-ignored → absent in a lane worktree): lanes use the repo mode unless `SAF_TEST_MODE` is set — say so in card-lifecycle "Per machine" and SKILL.md (predates the card)
+d. T-M2-26 Thai check for lanes `on` accepts the text without the file name; Thai template line ~97 reads long
