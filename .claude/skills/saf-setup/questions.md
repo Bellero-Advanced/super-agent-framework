@@ -51,6 +51,7 @@ npm needs `--` before arguments (`npm run task:verify -- T-M1-01`); the generate
 | Model preset? | `models.preset` | Max · Balanced · Economy · Custom | Balanced |
 | Custom only: planner model · builder model | `models.planner` · `models.builder` | full model ids | — |
 | Model for sessions opened without `--model`? | `models.sessionDefault` | builder model · planner model | builder model |
+| Effort for every card, or lower for small ones? | `models.effort` | fixed · by-size | fixed |
 
 | Preset | Planner roles (designer · spec-reviewer · security-auditor) | Builder roles (implementer · qa-runner · others) |
 |---|---|---|
@@ -58,8 +59,14 @@ npm needs `--` before arguments (`npm run task:verify -- T-M1-01`); the generate
 | Balanced | `claude-opus-5-5` | `claude-sonnet-5-5` |
 | Economy | `claude-sonnet-5-5` | `claude-haiku-5-5` |
 
-Effort is fixed per role and is the same in every preset (designer high · spec-reviewer high · implementer high ·
-qa-runner medium · …). Per-role changes go in `models.overrides` (`{"qa-runner": {"effort": "low"}}`).
+A preset changes the models only; a role's own effort is the same in every preset (designer high · spec-reviewer high ·
+implementer high · qa-runner medium · …). `models.effort` decides how that effort is used: `fixed` keeps one effort per
+role for every card and the agent files as they are; `by-size` lowers it only for the roles and card sizes in the effort
+table (`EFFORT_BY_SIZE` in `config.mjs`, decision D-016) and setup then writes one extra agent file
+`.claude/agents/<role>-<effort>.md` per role and lowered effort, which `task:start` names for the card. Cards of size S at
+a lower effort may bounce more in review; `task:report` shows review rounds by size and effort. Per-role changes go in
+`models.overrides` (`{"qa-runner": {"effort": "low"}}`) and win over both modes; a role with an effort override gets no
+extra file.
 
 ## 5. Roles and skills
 
@@ -101,7 +108,7 @@ Each person can override the repo's choice on their own machine, without changin
 variable `SAF_TEST_MODE`, or an untracked `saf.config.local.json`; order: env, then local file, then `saf.config.json`, then the
 default (`milestone`). The two caps (`workflow.lanes.code`, `workflow.sideLanes.max`): the local file, then `saf.config.json`, then
 the default — there is no environment variable for lane caps, so every session on a machine counts the same caps. The local file
-may hold only the test mode, the two caps and `models.effort` (any other key is refused, including `$schema` and `workflow.lanes.main`). When the person says
+may hold only the test mode, the two caps and `models.effort` (any other key is refused, including `$schema` and `workflow.lanes.main`); `by-size` there lowers effort only when the project's `saf.config.json` also says `by-size` (setup then wrote the extra agent files), otherwise the role's own agent is used, and `fixed` there always turns it off. When the person says
 the machine is weak or strong, offer to write the caps there. The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart; the code cap is at most
 `LANE_CEILING` (`config.mjs`).
 

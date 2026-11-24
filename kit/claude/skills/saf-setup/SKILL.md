@@ -39,7 +39,7 @@ detection (say what you detected instead):
 
 Test mode and the two lane caps are per-machine choices, and so is the effort mode. The untracked `saf.config.local.json` may hold `workflow.testMode`,
 `workflow.lanes.code`, `workflow.sideLanes.max` and `models.effort` and nothing else (the engine refuses anything outside `LOCAL_KEYS`,
-`$schema` and `workflow.lanes.main` included). When the person says their machine is slow (or fast), offer to write the
+`$schema` and `workflow.lanes.main` included). `by-size` there lowers effort only when the project's `saf.config.json` also says `by-size` (setup then wrote the extra agent files), otherwise the role's own agent is used, and `fixed` there always turns it off. When the person says their machine is slow (or fast), offer to write the
 test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
 code-lane cap (`workflow.lanes.code`, at most `LANE_CEILING` in `config.mjs`) or a side-card cap (`workflow.sideLanes.max`)
 there. The installer git-ignores that file, so it is absent inside a lane worktree: engine commands run there, such as a

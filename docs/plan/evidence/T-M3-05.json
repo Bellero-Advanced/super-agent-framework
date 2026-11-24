@@ -1,14 +1,191 @@
 {
   "id": "T-M3-05",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T17:26:09.715Z",
     "base": "c79bb23dc7fc0f522cc4e4e9482b6082e72ff30a",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 3,
   "lane": 2,
   "branch": "card/T-M3-05",
-  "worktree": ".claude/worktrees/T-M3-05"
+  "worktree": ".claude/worktrees/T-M3-05",
+  "verified": {
+    "at": "2026-11-24T17:32:44.423Z",
+    "head": "64cef71ca91f96be7cc3d993363987cf4aad9919",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 370,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 151 · gaps 23 · gaps of started cards 0 · started in another folder 2"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/effort-setup.test.mjs test/unit/setup-choices.test.mjs",
+        "exit": 0,
+        "ms": 2518,
+        "tail": [
+          "ok 21 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 0.855292",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 22 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 1.092167",
+          "  type: 'test'",
+          "  ...",
+          "1..22",
+          "# tests 22",
+          "# suites 0",
+          "# pass 22",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2466.897917"
+        ]
+      },
+      {
+        "cmd": "node tools/saf/bin/saf.mjs choices --group 4 --lang th",
+        "exit": 0,
+        "ms": 76,
+        "tail": [
+          "    คืออะไร: ให้ CLAUDE.md แนะนำให้เปิด session ที่ไม่ใส่ --model ด้วยโมเดลฝั่งลงมือ SAF เขียนแค่คำแนะนำ คุณต้องตั้งเองใน .claude/settings.local.json",
+          "    เหมาะกับ: งานทำการ์ดประจำวันด้วยค่าใช้จ่ายที่ต่ำกว่า",
+          "    ข้อเสีย: session วางแผนและตรวจต้องใส่ --model เองจึงจะใช้โมเดลฝั่งวางแผน",
+          "    เลือกเมื่อ: session ส่วนใหญ่ของคุณทำการ์ด",
+          "- planner",
+          "    คืออะไร: ให้ CLAUDE.md แนะนำให้เปิด session ที่ไม่ใส่ --model ด้วยโมเดลฝั่งวางแผน SAF เขียนแค่คำแนะนำ คุณต้องตั้งเองใน .claude/settings.local.json",
+          "    เหมาะกับ: session ที่ส่วนใหญ่วางแผน ออกแบบ และตรวจ",
+          "    ข้อเสีย: งานการ์ดเล็ก ๆ ใน session แบบนี้ก็ใช้โมเดลที่แรงกว่าและแพงกว่าไปด้วย",
+          "    เลือกเมื่อ: session ส่วนใหญ่ของคุณวางแผนและตรวจ",
+          "## models.effort",
+          "- fixed",
+          "    คืออะไร: แต่ละ role ใช้ effort ระดับเดียวกับทุกการ์ด และไฟล์ agent คงเดิม",
+          "    เหมาะกับ: โปรเจกต์ที่ต้องการ effort เท่ากันทุกการ์ดและมีไฟล์ agent น้อยที่สุด",
+          "    ข้อเสีย: การ์ดเล็กใช้ effort เท่ากับการ์ดใหญ่ จึงอาจใช้มากกว่าที่จำเป็น",
+          "    เลือกเมื่อ: ต้องการ effort ระดับเดียวต่อ role และไม่อยากมีไฟล์เพิ่มให้ดูแล",
+          "- by-size",
+          "    คืออะไร: ลด effort เฉพาะ role และขนาดการ์ดที่ตาราง effort ของ SAF ระบุ โดยเพิ่มไฟล์ agent หนึ่งไฟล์ต่อ role และต่อ effort ที่ลดลง",
+          "    เหมาะกับ: โปรเจกต์ที่มีการ์ดเล็กจำนวนมากและไม่ต้องใช้ effort เต็มของ role",
+          "    ข้อเสีย: การ์ดเล็กที่ใช้ effort ต่ำลงอาจถูกตีกลับในการตรวจมากขึ้น task:report แสดงรอบตรวจแยกตามขนาดและ effort",
+          "    เลือกเมื่อ: ต้องการลดค่าใช้จ่ายของการ์ดเล็ก saf.config.local.json ตั้งต่อเครื่องได้ และ models.overrides ยังชนะสำหรับ role เดียว"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 304,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 280 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/effort-setup.test.mjs'",
+        "exit": 0,
+        "ms": 280,
+        "tail": [
+          "ok 6 - EFFORT-AC-08 docs: setup-questions lists the effort question, config-reference defines the table and the variant files, roles names the variant agents",
+          "  ---",
+          "  duration_ms: 0.531166",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: EFFORT-AC-08 SKILL.md per-machine paragraph says by-size on this machine needs a project whose saf.config.json says by-size",
+          "ok 7 - EFFORT-AC-08 SKILL.md per-machine paragraph says by-size on this machine needs a project whose saf.config.json says by-size",
+          "  ---",
+          "  duration_ms: 0.590791",
+          "  type: 'test'",
+          "  ...",
+          "1..7",
+          "# tests 7",
+          "# suites 0",
+          "# pass 7",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 229.483959"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/config-reference.md",
+        "docs/roles.md",
+        "docs/setup-questions.md",
+        "kit/claude/skills/saf-setup/SKILL.md",
+        "kit/claude/skills/saf-setup/questions.md",
+        "kit/tools-saf/lib/choices.mjs",
+        "test/unit/effort-setup.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/config-reference.md": "3db59833145d6282d0c850b18125ec1de456ab4a",
+        "docs/roles.md": "9cd10d6e3ab17242daae4d63f6000dd1e2677fb5",
+        "docs/setup-questions.md": "0970384ea69423b79a9f576096856c10c9881e0e",
+        "kit/claude/skills/saf-setup/SKILL.md": "95a4ee43a25bcc2b11ef249728ffe2a7dae6a10e",
+        "kit/claude/skills/saf-setup/questions.md": "eb0fbd04178858cbd0f8fa943b3f0c0b778e0c2d",
+        "kit/tools-saf/lib/choices.mjs": "453ea4f241f2fd96b469b1b972152dde4eba82f8",
+        "test/unit/effort-setup.test.mjs": "e063b458cf30f2c3c5eb9748716a481766d3a9ca"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "EFFORT-AC-08"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 63,
+        "cap": 150
+      },
+      "test": {
+        "lines": 132,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/effort-setup.test.mjs"
+      ]
+    }
+  }
 }

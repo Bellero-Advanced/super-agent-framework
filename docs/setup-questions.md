@@ -8,7 +8,8 @@ The interview `/saf-setup` runs, grouped in this order — each question shows a
    stage (idea · prototype · MVP · production) · rigor (light · standard · strict)
 3. **Stack** — package manager (pnpm · npm · yarn · bun · none) · the real typecheck/lint/test/e2e/build commands · database ·
    monorepo · submodules
-4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model ([model-presets.md](model-presets.md))
+4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model ([model-presets.md](model-presets.md)) · effort
+   (`fixed` · `by-size`, recommended `fixed`: `by-size` gives small cards a lower effort and adds agent files — [roles.md](roles.md#variant-agent-files))
 5. **Roles and skills** — optional library roles · a custom role · report language ([roles.md](roles.md)) · optional skill
    packs (ui-frontend · db-migrations · performance · i18n · mobile · game — [skills.md](skills.md))
 6. **Workflow** — parallel lanes and caps · side lanes (on/off, how many at a time) · moving a role to the other lane
