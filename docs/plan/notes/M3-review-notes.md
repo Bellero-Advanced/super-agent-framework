@@ -143,3 +143,6 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-24 (pin setup/upgrade behaviour) — non-blocking from round 1
 - doc-languages LANG-AC-02 test cannot tell "fallback rendered English" from "file left alone" (project generated in en); comment "shipped engine has no xx" misleading. upgrade-scripts:49-50 messages say UPG-AC-04 inside UPG-AC-01 test; :122-136 non-object cases are UPG-AC-07's rules but named UPG-AC-05. No idempotence (second run) check for settings-root archive cases and `.1`.
+
+## T-M3-03 (effort by size) — non-blocking from round 1
+- docs.mjs:177 and generate.mjs:280 hard-code the effort list; build from EFFORTS. AC-01 loop covers core roles only (release-operator never exercised). config-reference.md:43 row: "effort table" undefined, "yet" leaks plan state, no mention of extra agent files — T-M3-05 covers (rule 14). config-reference.md:96-99 "first source that sets it" covers only test mode and lane caps. SKILL.md:40 opens "Test mode and the two lane caps…" then lists four keys; questions.md:104 "only those three keys and models.effort" awkward. No test that a second upgrade/setup leaves variants unchanged. Variant model not checked against config in docs:check (rule 9 does not ask). MISSING_VARIANTS_WARNING says files "do not exist" though an edited variant may remain.
