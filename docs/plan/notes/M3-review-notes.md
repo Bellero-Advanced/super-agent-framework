@@ -50,3 +50,11 @@ D2. schema.mjs `props[k]` has the same inherited-property weakness (`constructor
 D3. card-lifecycle "By default the roles … run in the main folder" — submodule cards can never move (fixed in the card)
 D4. wording polish applied in the card; SKILL.md:36 (outside touch) does not name role-lanes in the group 6 list (it also omits solo and ports) — `choices --group 6` prints the question anyway
 D5. FRICTION F-008 hit again: `spec:matrix --check` in a lane fails while ANOTHER lane's started card has its tests only on its own branch — T-M3-28 and T-M3-29 blocked each other (deadlock); broken by `task:abandon` of T-M3-29 (non-destructive for lanes: worktree and branch stay) then restart. Fix: the check must count a lane card's gaps only in its own lane (and cards in progress in the main folder only in the main folder) — carded below
+
+## T-M3-29 (review PASS at round 1; 4 shipped-text notes fixed before merge) — notes for the designer
+
+A1. docs/specs/agent-instructions.md rule 4 `text` names "English and Thai" and "setup-choices.md rule 8 (no run of two digits)"; the shipped template correctly says "every language" and "never copies a number or model id from a data table" (a shipped file cannot name SAF's own spec) — update the spec wording; this repo's reviews lose the literal "no two-digit run" check unless the main session states it in the prompt
+A2. spec-reviewer.md "the dry run says what apply does" is weaker than the spec's "what the dry run says equals what apply does"
+A3. no test renders the reviewer with `tokenSaving.reviewerDiff: false` (spec §4) — the `{{else}}` branch is unpinned
+A4. `examples/todo-api/.claude/agents/implementer.md` is stale against its own templates (only the example's engine copy is refreshed; outside touch, same as T-M3-28)
+A5. F-008 did not recur after the restart — the cross-lane `spec:matrix` deadlock is real only while two started cards both have scenarios and neither has merged
