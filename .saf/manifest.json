@@ -30,7 +30,7 @@
     ".claude/skills/test-runner/SKILL.md": "445b3fc69ba944b6d8fc45d0c27c392aa3a66e81",
     "docs/plan/evidence/.gitkeep": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
     "docs/plan/STATE.md": "c342caf41cb3a425825ca369291a727ea4ddb4e5",
-    ".claude/agents/designer-medium.md": "ebe1b53d4139427f2a6963bacddcfb44f9a44fd1",
-    ".claude/agents/implementer-medium.md": "add5c99cca6fb94a96cc7a177b8c5bb6b9706452"
+    ".claude/agents/designer-medium.md": "c3738cd8d0927c17a0836492afee7b5c20cf312f",
+    ".claude/agents/implementer-medium.md": "459a4dfe797d63d85174db0bf28dc2b485816485"
   }
 }

@@ -1,7 +1,7 @@
 {
   "id": "T-M3-37",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T19:09:54.341Z",
     "base": "0160e68e19de939d0b1e431e3c81b9484ee20640",
@@ -13,8 +13,251 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-37",
-  "worktree": ".claude/worktrees/T-M3-37"
+  "worktree": ".claude/worktrees/T-M3-37",
+  "verified": {
+    "at": "2026-11-24T19:19:05.606Z",
+    "head": "24739ba33caa9ed661d55cd41bd28b9c2edf907d",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 474,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "188 scenario(s) in 20 spec(s) · with test 171 · gaps 17 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/card-steps.test.mjs",
+        "exit": 0,
+        "ms": 9015,
+        "tail": [
+          "ok 10 - SIZE-AC-14 the designer, implementer and spec-reviewer agents each state their step rule; the reviewer's differs with and without a diff file",
+          "  ---",
+          "  duration_ms: 60.156708",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SIZE-AC-14 docs/card-lifecycle.md has the part 'L cards in steps' with the plan check, the commit subject, resuming and the diff sections, naming L_MIN_STEPS",
+          "ok 11 - SIZE-AC-14 docs/card-lifecycle.md has the part 'L cards in steps' with the plan check, the commit subject, resuming and the diff sections, naming L_MIN_STEPS",
+          "  ---",
+          "  duration_ms: 0.689458",
+          "  type: 'test'",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 8944.127209"
+        ]
+      },
+      {
+        "cmd": "node -e \"const fs=require('fs');const t=fs.readFileSync('kit/tools-saf/templates/en/docs/plan/tasks/_template.md','utf8')+fs.readFileSync('kit/tools-saf/templates/agents/implementer.md','utf8');if(!/## Steps/.test(t)||!/step <k>\\/<n>/.test(t))process.exit(1)\"",
+        "exit": 0,
+        "ms": 86,
+        "tail": []
+      },
+      {
+        "cmd": "node --test test/unit/review-diff.test.mjs test/unit/agent-instructions.test.mjs test/unit/plan.test.mjs test/unit/doc-languages.test.mjs test/unit/generate.test.mjs",
+        "exit": 0,
+        "ms": 6337,
+        "tail": [
+          "ok 37 - RDIFF-AC-06 /saf (en and th): reviewerDiff on names task:diff and the review types · off has no task:diff and still names the types",
+          "  ---",
+          "  duration_ms: 142.95625",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RDIFF-AC-06 the commands block of the CLAUDE templates and the script wiring carry task:diff",
+          "ok 38 - RDIFF-AC-06 the commands block of the CLAUDE templates and the script wiring carry task:diff",
+          "  ---",
+          "  duration_ms: 60.728583",
+          "  type: 'test'",
+          "  ...",
+          "1..38",
+          "# tests 38",
+          "# suites 0",
+          "# pass 38",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 6284.846375"
+        ]
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 372,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run task:state -- --check",
+        "exit": 0,
+        "ms": 337,
+        "tail": [
+          "> super-agent-framework@0.1.0 task:state",
+          "> node tools/saf/bin/saf.mjs task state --check",
+          "✓ plan is valid (lane worktree — state files are not compared here)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 314,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 281 markdown file(s) · 308 local link(s) · 104 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 377,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 626 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/card-sizes.test.mjs' 'test/unit/card-steps.test.mjs'",
+        "exit": 0,
+        "ms": 4544,
+        "tail": [
+          "ok 21 - SIZE-AC-14 the designer, implementer and spec-reviewer agents each state their step rule; the reviewer's differs with and without a diff file",
+          "  ---",
+          "  duration_ms: 74.459917",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SIZE-AC-14 docs/card-lifecycle.md has the part 'L cards in steps' with the plan check, the commit subject, resuming and the diff sections, naming L_MIN_STEPS",
+          "ok 22 - SIZE-AC-14 docs/card-lifecycle.md has the part 'L cards in steps' with the plan check, the commit subject, resuming and the diff sections, naming L_MIN_STEPS",
+          "  ---",
+          "  duration_ms: 0.496917",
+          "  type: 'test'",
+          "  ...",
+          "1..22",
+          "# tests 22",
+          "# suites 0",
+          "# pass 22",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 4490.856209"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/agents/designer-medium.md",
+        ".claude/agents/designer.md",
+        ".claude/agents/implementer-medium.md",
+        ".claude/agents/implementer.md",
+        ".claude/agents/spec-reviewer.md",
+        "docs/card-lifecycle.md",
+        "docs/plan/README.md",
+        "docs/plan/tasks/_template.md",
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/reviewdiff.mjs",
+        "kit/tools-saf/templates/agents/designer.md",
+        "kit/tools-saf/templates/agents/implementer.md",
+        "kit/tools-saf/templates/agents/spec-reviewer.md",
+        "kit/tools-saf/templates/en/docs/plan/README.md",
+        "kit/tools-saf/templates/en/docs/plan/tasks/_template.md",
+        "kit/tools-saf/templates/th/docs/plan/README.md",
+        "kit/tools-saf/templates/th/docs/plan/tasks/_template.md",
+        "test/unit/card-sizes.test.mjs",
+        "test/unit/card-steps.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/agents/designer-medium.md": "c3738cd8d0927c17a0836492afee7b5c20cf312f",
+        ".claude/agents/designer.md": "b74b27f24e08d16113ab8a52d13eaadc6f561ae3",
+        ".claude/agents/implementer-medium.md": "459a4dfe797d63d85174db0bf28dc2b485816485",
+        ".claude/agents/implementer.md": "fb3ac7992ff522d9f64539349ab267d38b61da7e",
+        ".claude/agents/spec-reviewer.md": "52ae08c78049a53e752cd5865576788f1d01c154",
+        "docs/card-lifecycle.md": "0b0c5a41fafcb46bb46f71d3607e2b2cda9c5837",
+        "docs/plan/README.md": "9cb6f8bd969431da2997a8c903c93295b1cb120b",
+        "docs/plan/tasks/_template.md": "1066311ff89d57c3d6dd757bc1aac0976892113d",
+        "kit/tools-saf/lib/plan.mjs": "81df09bcbace06ec0a319eaa3b12870fa0fe6722",
+        "kit/tools-saf/lib/reviewdiff.mjs": "e110fec9da9288e25ff8faf37fa0a630dcdcc9b5",
+        "kit/tools-saf/templates/agents/designer.md": "fef78a7e3da5fe9fec9243eb8b12ccbd30cd57c6",
+        "kit/tools-saf/templates/agents/implementer.md": "d3bcf000e1344e308ed6351392304ca0036ddd1d",
+        "kit/tools-saf/templates/agents/spec-reviewer.md": "749612c314020ad0cb8fa9e73cd8f5ab911215cb",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "1e3b84f960f188dab6e439277785031849eb96e1",
+        "kit/tools-saf/templates/en/docs/plan/tasks/_template.md": "d56e53458310823b47301951b49467c14af0add9",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "9cd6632fdbc15d97e0651896541c15f2cc3333a7",
+        "kit/tools-saf/templates/th/docs/plan/tasks/_template.md": "54b7e53e02dacae99e6624e0a7a5c96c62a41f7d",
+        "test/unit/card-sizes.test.mjs": "bb7e24bf95e8ef9a40ed919e0b31024d849d1339",
+        "test/unit/card-steps.test.mjs": "3cf7bf2ddf6a2e047073f93ecad099d6247f057f"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SIZE-AC-12",
+        "SIZE-AC-13",
+        "SIZE-AC-14"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 176,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 196,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/card-sizes.test.mjs",
+        "test/unit/card-steps.test.mjs"
+      ]
+    }
+  }
 }

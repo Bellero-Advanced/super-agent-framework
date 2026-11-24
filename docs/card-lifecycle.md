@@ -80,6 +80,22 @@ scenarios: [AUTH-AC-04]
 Headings accepted for the criteria section: "Done when", "Pass criteria", "Criteria", "เกณฑ์ผ่าน".
 Each list item is one command — a leading backticked command or the whole line.
 
+### L cards in steps
+
+An L card divides its work into steps, listed in a `## Steps` section (Thai: `## ขั้นตอน`) as numbered items:
+
+```markdown
+## Steps
+
+1. Data model and migration
+2. Server routes
+3. Screens
+```
+
+- **The plan check.** `parseCard` returns the steps as `card.steps` (any card; an M card may have the section and nothing checks it). An L card with fewer than `L_MIN_STEPS` (`lib/plan.mjs`) steps is a plan issue: `task:state --check` prints `<file>: an L card needs a "## Steps" section with at least <L_MIN_STEPS> numbered steps`.
+- **One commit per step (a convention the agents carry; the engine does not check it).** Each step ends with one commit whose subject contains `<card id> step <k>/<n>` (`<n>` = the number of steps), for example `feat(M4): T-M4-03 step 2/4 server routes`. Fixes after the last step are ordinary commits. A card that stopped midway resumes at the first step with no such commit (`git log --oneline <start commit>..HEAD`). `task:verify` runs once, after the last step, and the size caps count the whole card.
+- **The reviewer's diff.** `task:diff <id>` of a card with steps reads the first-parent history from the files base to `HEAD`: a commit is the end of step `k` when its subject contains `<id> step <k>/` with `k` between 1 and the number of steps (the newest such commit wins). The file then holds one section per step — `# step <k>/<n> <text> · commit <short sha>` with the diff of the card's files since the previous step, or `# step <k>/<n> <text> · no commit` — and a last section `# after the last step commit` (uncommitted work and later commits; left out when empty). The header gains a `# steps …` line. When no step has a commit, or the step commits are not in step order, the file is the whole-card diff and the header line says `# steps: no step commits — whole diff` or `# steps: step commits out of order — whole diff`. A card without steps gets the same file as before. For a card of a submodule (`repo`) the submodule's files are not in these commits: their diff goes into the last section. A lane card is read in its worktree, where its step commits live; `task:merge` keeps them.
+
 ## Specs and scenarios
 
 Specs live in `docs/specs/<system>.md`. The "Acceptance" (or "ฉากยอมรับ") section is a table whose first cell is a

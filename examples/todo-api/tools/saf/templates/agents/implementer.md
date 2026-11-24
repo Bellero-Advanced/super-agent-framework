@@ -18,6 +18,10 @@ One card at a time. The card is the contract. Skills: `tdd` · `debug-protocol` 
 5. Run `{{cmd.taskVerify}}` and fix until it passes. Never weaken a check, skip a test or widen `touch` to get green.
 6. Keep the size: M ≤ {{sizeM}} / L ≤ {{sizeL}} changed code lines (tests ≤ {{testM}} / {{testL}}).
 
+## L cards in steps
+
+An L card has a `## Steps` section. Build it one step at a time: finish a step, then make one commit whose subject contains `<card id> step <k>/<n>` (`<n>` = the number of steps), for example `feat(M4): T-M4-03 step 2/4 server routes`. Fixes after the last step are ordinary commits. A card that stopped midway resumes at the first step with no such commit — list them with `git log --oneline <start commit>..HEAD` (`started.base` in the card's evidence is the start commit). Run `{{cmd.taskVerify}}` once, after the last step.
+
 ## Rules
 
 - Numbers and tunables go in data tables, not in logic

@@ -60,6 +60,65 @@ const countLines = (buf) => {
   return buf.length && buf.at(-1) !== 10 ? n + 1 : n;
 };
 
+const shortSha = (sha) => sha.slice(0, 7);
+const escapeRe = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Rule 21 of docs/specs/card-sizes.md: the step commits of a card — on the first-parent history from `base` to HEAD, a commit
+ * whose subject contains `<id> step <k>/` (1 ≤ k ≤ steps) ends step k; a step's end is its newest such commit.
+ * @returns {{ends:(string|null)[], ordered:boolean}} `ends[k-1]` = the end commit of step k, or null
+ */
+function stepEnds(dir, id, base, count) {
+  const re = new RegExp(`(?<![\\w-])${escapeRe(id)} step (\\d+)/`);
+  const ends = new Array(count).fill(null);
+  const at = new Array(count).fill(-1);
+  runGit(dir, ["log", "--first-parent", "--reverse", "--format=%H%x09%s", `${base}..HEAD`])
+    .toString("utf8")
+    .split("\n")
+    .filter(Boolean)
+    .forEach((line, i) => {
+      const tab = line.indexOf("\t");
+      const k = Number(line.slice(tab + 1).match(re)?.[1]);
+      if (k >= 1 && k <= count) {
+        ends[k - 1] = line.slice(0, tab);
+        at[k - 1] = i;
+      }
+    });
+  const seen = at.filter((i) => i >= 0);
+  return { ends, ordered: seen.every((v, j) => j === 0 || v > seen[j - 1]) };
+}
+
+/** Diff of one file between two commits (`to` null = the work tree, which also holds new files git does not know yet). */
+function rangeDiff(dir, from, to, file, untracked) {
+  if (!to) return fileDiff(dir, from, file, untracked);
+  return runGit(dir, [...DIFF_OPTS, "--src-prefix=a/", "--dst-prefix=b/", from, to, "--", file]);
+}
+
+/**
+ * The per-step sections of rule 21, built from the step ends. Files of a submodule are not in the step commits of this
+ * folder: their diff (against the submodule base) goes into the last section.
+ * @returns {{steps:string, parts:Buffer[]}} the header line and the sections
+ */
+function stepSections(root, card, files, base, ends, subDiffs) {
+  const n = card.steps.length;
+  const rootFiles = files.changed.filter((f) => !subDiffs.has(f));
+  const untracked = untrackedIn(root);
+  const parts = [];
+  const marks = [];
+  let prev = base;
+  card.steps.forEach((text, i) => {
+    const end = ends[i];
+    marks.push(`${i + 1}/${n} ${end ? shortSha(end) : "no commit"}`);
+    parts.push(Buffer.from(`${i ? "\n" : ""}# step ${i + 1}/${n} ${oneLine(text)} · ${end ? `commit ${shortSha(end)}` : "no commit"}\n`));
+    if (!end) return;
+    for (const f of rootFiles) parts.push(rangeDiff(root, prev, end, f, untracked));
+    prev = end;
+  });
+  const tail = [...rootFiles.map((f) => rangeDiff(root, prev, null, f, untracked)), ...[...subDiffs.values()]].filter((b) => b.length);
+  if (tail.length) parts.push(Buffer.from("\n# after the last step commit\n"), ...tail);
+  return { steps: `# steps ${marks.join(" · ")}`, parts };
+}
+
 /**
  * Where this card is read: its folder, its plan and the base files are counted from — the rules of spec section 2, rule 3.
  * @throws {TaskError} not started · another lane's card · the lane's worktree is missing
@@ -94,24 +153,42 @@ export function writeReviewDiff(ctx, id) {
   const files = cardFiles(sub, card, where.ev, filesBase);
   const size = cardSize(sub, card, files, filesBase);
   const inSub = (f) => card.repo !== ROOT_REPO && where.ev.started.repoBase && f.startsWith(`${card.repo}/`);
-  const parts = [];
-  if (files.changed.length) {
+  const subDir = card.repo !== ROOT_REPO ? join(where.root, card.repo) : null;
+  /** Today's whole-card diff: one part per file, in sorted order (also the fallback of rule 21). */
+  const wholeParts = (only = null) => {
+    const parts = [];
+    if (!files.changed.length) return parts;
     const rootUntracked = untrackedIn(where.root);
-    const subDir = card.repo !== ROOT_REPO ? join(where.root, card.repo) : null;
     const subUntracked = subDir && existsSync(join(subDir, ".git")) && files.changed.some(inSub) ? untrackedIn(subDir) : new Set();
-    for (const f of files.changed) {
+    for (const f of only ?? files.changed) {
       const buf = inSub(f)
         ? fileDiff(subDir, where.ev.started.repoBase, f.slice(card.repo.length + 1), subUntracked, `${card.repo}/`)
         : fileDiff(where.root, filesBase, f, rootUntracked);
       parts.push(buf.length ? buf : Buffer.from(`# ${oneLine(f)}: no change against the base\n`));
     }
-  }
+    return parts;
+  };
+  let parts;
+  let stepsLine = null;
+  const stepCount = card.steps?.length ?? 0;
+  const found = stepCount ? stepEnds(where.root, id, filesBase, stepCount) : null;
+  if (found && found.ends.every((e) => !e)) stepsLine = "# steps: no step commits — whole diff";
+  else if (found && !found.ordered) stepsLine = "# steps: step commits out of order — whole diff";
+  if (found && !stepsLine) {
+    const subFiles = files.changed.filter(inSub);
+    const subParts = wholeParts(subFiles);
+    const subDiffs = new Map(subFiles.map((f, i) => [f, subParts[i]]));
+    const built = stepSections(where.root, card, files, filesBase, found.ends, subDiffs);
+    parts = built.parts;
+    stepsLine = built.steps;
+  } else parts = wholeParts();
   const capText = (k) => `${size[k].lines}${size[k].cap === null ? "" : `/${size[k].cap}`}`;
   const header = [
     `# ${id} ${oneLine(card.title ?? "")}`,
     `# base ${filesBase} · HEAD ${resolveCommit(where.root, "HEAD") ?? "-"}`,
     `# files ${files.changed.length}`,
     `# size ${size.size ?? "-"}: code ${capText("code")} · test ${capText("test")} changed lines${size.over.length ? ` — over the cap: ${size.over.join(", ")}` : ""}`,
+    ...(stepsLine ? [stepsLine] : []),
     ...files.changed.map((f) => `#   ${oneLine(f)}`),
     ...(files.changed.length ? [] : ["no changed files"]),
     "",

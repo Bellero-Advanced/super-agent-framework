@@ -28,6 +28,10 @@ A card id (and{{#if tokenSaving.reviewerDiff}} a diff file of the card's changes
 - user-facing text follows the project's i18n rule · no secrets · no debug leftovers
 - size within M ≤ {{sizeM}} / L ≤ {{sizeL}} code lines
 
+## L cards in steps
+
+A card with a "Steps" section (an L card) is built one commit per step.{{#if tokenSaving.reviewerDiff}} Its diff file is split by step: read it section by section, in step order (`# step <k>/<n>` sections, then `# after the last step commit`), and a header line `# steps: … whole diff` means no usable step commits were found — read the whole diff and say so.{{else}} Check the work step by step, in the card's order.{{/if}} Name the step of each finding.
+
 ## Review types
 
 The Check list always applies; each type the main session names adds its list:
