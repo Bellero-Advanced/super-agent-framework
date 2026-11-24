@@ -125,7 +125,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code — passed 2026-11-24 17:38 (5 commands) · full suite deferred to gate
 - [x] T-M3-06 SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer — passed 2026-11-24 17:45 (4 commands) · full suite deferred to gate
 - [x] T-M3-07 At milestone end task:report lists open friction with a brief for the designer, and task:friction draft prints card drafts for recurring friction — passed 2026-11-24 17:46 (6 commands) · full suite deferred to gate
-- [ ] T-M3-08 With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces
+- [ ] T-M3-08 With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces — started 2026-11-24 17:49 · not verified yet · lane 1 · .claude/worktrees/T-M3-08
 - [ ] T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off
 - [ ] T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit
 - [ ] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again

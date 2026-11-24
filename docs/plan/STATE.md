@@ -4,8 +4,8 @@
 
 ## M3 SAF builds itself — cards done 25/34
 
-- In progress: none
-- Next: T-M3-08 With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces
+- In progress: **T-M3-08** With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces — started 2026-11-24 17:49 · not verified yet · lane 1 · .claude/worktrees/T-M3-08
+- Next: no card can start yet — T-M3-09 waits for T-M3-08 · T-M3-10 waits for T-M3-09 · T-M3-11 waits for T-M3-09 · T-M3-12 waits for T-M3-10, T-M3-11 · T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -34,7 +34,7 @@
 | [T-M3-05](tasks/M3/T-M3-05.md) | /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code | ✓ passed | [T-M3-05.json](evidence/T-M3-05.json) · passed 2026-11-24 17:38 (5 commands) · full suite deferred to gate |
 | [T-M3-06](tasks/M3/T-M3-06.md) | SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer | ✓ passed | [T-M3-06.json](evidence/T-M3-06.json) · passed 2026-11-24 17:45 (4 commands) · full suite deferred to gate |
 | [T-M3-07](tasks/M3/T-M3-07.md) | At milestone end task:report lists open friction with a brief for the designer, and task:friction draft prints card drafts for recurring friction | ✓ passed | [T-M3-07.json](evidence/T-M3-07.json) · passed 2026-11-24 17:46 (6 commands) · full suite deferred to gate |
-| [T-M3-08](tasks/M3/T-M3-08.md) | With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces | · not started | – |
+| [T-M3-08](tasks/M3/T-M3-08.md) | With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces | ▶ in progress | [T-M3-08.json](evidence/T-M3-08.json) · started 2026-11-24 17:49 · not verified yet |
 | [T-M3-09](tasks/M3/T-M3-09.md) | task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off | · not started | – |
 | [T-M3-10](tasks/M3/T-M3-10.md) | task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit | · not started | – |
 | [T-M3-11](tasks/M3/T-M3-11.md) | A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again | · not started | – |
@@ -57,11 +57,11 @@
 
 ## Latest evidence
 
+- T-M3-08 With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces — started 2026-11-24 17:49 · not verified yet
 - T-M3-07 At milestone end task:report lists open friction with a brief for the designer, and task:friction draft prints card drafts for recurring friction — passed 2026-11-24 17:46 (6 commands) · full suite deferred to gate
 - T-M3-06 SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer — passed 2026-11-24 17:45 (4 commands) · full suite deferred to gate
 - T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code — passed 2026-11-24 17:38 (5 commands) · full suite deferred to gate
 - T-M3-04 task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort — passed 2026-11-24 17:32 (5 commands) · full suite deferred to gate
-- T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate
 
 ## Other milestones
 
