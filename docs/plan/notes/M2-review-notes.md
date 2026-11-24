@@ -229,3 +229,13 @@ decided) · 05/N6 (card done). Evidence notes 20/N6 · 02/N6 · 21/10 are closed
 N2. SAME DATA-LOSS CLASS, outside rules 19-22: in planSettings if `local.env` and `settings.env` share a key, settings.env wins and the old local value is overwritten with no archive or warning; if either `env` is a string or an array the spread turns it into index keys ("abc" → {0:"a",1:"b",2:"c"}) — card candidate
 N3. for `[]`, `null` or a string root the warning and the dry-run line say "not valid JSON" though the file is valid JSON with a non-object root (spec rule 22 uses the same wording); the settings.json warning does not name its archive path (report.archived does)
 N4. test gaps: settings.json with a `null`/string/number root; both files unreadable; the `.1` collision only at plan level, not after a real run
+
+## T-M2-25 (review PASS, first S card at medium with no bounce) — notes for the designer
+
+N1. SPEC DEFECT docs/specs/lane-caps.md LCAP-AC-04 row (~line 92): base 65000, step 100, `lanes.code` 3 cannot fail (65300 ≤ 65535); the code follows rule 3 and the test uses step 200 — change the row to step 200, or `lanes.code` ≥ 6 with step 100
+N2. rule 7 says the lane-full message ENDS with "(this machine: saf.config.local.json)"; `task:start`'s side-lanes error (task.mjs:356) prints it inside the parentheses ("side lanes are full (N at a time, this machine: …): …") — reword rule 7 to "contains", or ask for one wording
+N3. no test for the machine suffix on `task:start`'s own side-lanes refusal; N4 AC-03 does not test `true` / 2.5 (validator rejects them); N5 AC-05 checks docs/plan/README.md only indirectly + a redundant expression
+N6. port error says "from saf.config.json" when the code cap is the default (acceptable)
+N7. EDGE: `saf.config.local.json` is git-ignored, so absent inside a lane worktree: if the repo's own `lanes.code` breaks the port check and only the local file lowers it, every engine command in a lane fails (loadConfig throws) incl. task:verify — a sentence in T-M2-26's docs (same already true for test mode)
+N8. with `lanes.code: 0` set locally while lane cards are in progress, `laneOf` returns "main" for them so they count against the main-folder lane on that machine (lanes off already behaved this way)
+N9. evidence defers `npm test` (targeted); the gate runs the full suite
