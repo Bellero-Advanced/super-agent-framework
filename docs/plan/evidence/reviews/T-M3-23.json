@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-23",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T16:38:38.754Z",
+      "result": "fail",
+      "kinds": [
+        "docs"
+      ],
+      "note": "SKILL.md:106-107 dry-run line format false: action is padded to width 15, not one space",
+      "head": "956a51126f49d10568ac655228f27141a97df310",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T16:34:54.060Z"
+    }
+  ]
+}
