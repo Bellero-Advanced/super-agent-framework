@@ -55,7 +55,7 @@
 
 ไฟล์ milestone มี `status: planned | active | paused | done` · `cards:` (ลำดับ = ลำดับทำ) และ `gates:`
 แต่ละประตูมี `id` · `text` · `run:` (ไม่บังคับ) — ประตูที่ไม่มีคำสั่ง = {{owner}}ตรวจเอง
-`{{cmd.taskVerifyM}}` รันทุกประตูแล้วเขียน `docs/plan/evidence/<M>.json` · `{{cmd.taskReport}}` เขียนรายงาน
+`{{cmd.taskVerifyM}}` รันทุกประตูแล้วเขียน `docs/plan/evidence/<M>.json` · `{{cmd.taskReport}}` เขียนรายงาน (`--html` เขียนหน้าเว็บเพิ่มสำหรับคนที่ไม่อ่าน JSON)
 
 มีแต่{{owner}}ที่เปลี่ยน milestone เป็น `active` (กด Go) หรือ `done`
 {{#if sideOn}}

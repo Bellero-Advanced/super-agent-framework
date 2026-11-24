@@ -1,14 +1,173 @@
 {
   "id": "T-M2-05",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T04:44:10.830Z",
     "base": "6b18751f8d85b6d57ee40f2736d0dea67e177c98",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-05",
-  "worktree": ".claude/worktrees/T-M2-05"
+  "worktree": ".claude/worktrees/T-M2-05",
+  "verified": {
+    "at": "2026-11-24T04:52:53.119Z",
+    "head": "895b4f399ba7049e0dc3e3c16ce3258184267b7b",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 202,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "90 scenario(s) in 11 spec(s) · with test 38 · gaps 52 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/evidence-viewer.test.mjs",
+        "exit": 0,
+        "ms": 503,
+        "tail": [
+          "ok 5 - VIEW-AC-01 a milestone without any evidence lists every card as not started and every gate as not checked",
+          "  ---",
+          "  duration_ms: 0.507375",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "ok 6 - VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "  ---",
+          "  duration_ms: 1.565708",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
+          "# suites 0",
+          "# pass 6",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 470.173125"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/viewer.mjs','utf8');if(/<script|https?:\\/\\//i.test(s))process.exit(1)\"",
+        "exit": 0,
+        "ms": 30,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 191,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 240 markdown file(s) · 163 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/evidence-viewer.test.mjs'",
+        "exit": 0,
+        "ms": 473,
+        "tail": [
+          "ok 5 - VIEW-AC-01 a milestone without any evidence lists every card as not started and every gate as not checked",
+          "  ---",
+          "  duration_ms: 0.510958",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "ok 6 - VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "  ---",
+          "  duration_ms: 1.567834",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
+          "# suites 0",
+          "# pass 6",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 441.198125"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/card-lifecycle.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/text.mjs",
+        "kit/tools-saf/lib/viewer.mjs",
+        "kit/tools-saf/templates/en/docs/plan/README.md",
+        "kit/tools-saf/templates/th/docs/plan/README.md",
+        "test/unit/evidence-viewer.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/card-lifecycle.md": "3405ef07c18155397ee1c88300c3aec666afebad",
+        "kit/tools-saf/bin/saf.mjs": "84174192d6145a8e2acf13b29331373a2740c666",
+        "kit/tools-saf/lib/text.mjs": "2a35960b8f353529d5eb4d5e8b2484a69fae952f",
+        "kit/tools-saf/lib/viewer.mjs": "722f33baf123477c241e999d632ca2c5aaf07d25",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "2af01928ac46611e9ca3c60585391b6345de2f8b",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "95b077d22eefaa4527b01492c90fffde1aba29d3",
+        "test/unit/evidence-viewer.test.mjs": "1954e89d7ae92e58b9e00362df907aa05372a3ff"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "VIEW-AC-01",
+        "VIEW-AC-02",
+        "VIEW-AC-03",
+        "VIEW-AC-04"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 234,
+        "cap": 400
+      },
+      "test": {
+        "lines": 204,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/evidence-viewer.test.mjs"
+      ]
+    }
+  }
 }

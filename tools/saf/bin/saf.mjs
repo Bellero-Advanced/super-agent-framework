@@ -13,6 +13,7 @@ import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/me
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, activeCards, activeMilestone, cardStatus, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
+import { htmlPath, renderEvidencePage } from "../lib/viewer.mjs";
 import { taskRunner } from "../lib/run.mjs";
 import { scanSecrets } from "../lib/secrets.mjs";
 import {
@@ -42,7 +43,7 @@ import {
  *   task start <id> [--base <commit>] [--restart] [--worktree [--resume]]
  *   task verify <id|M>  [--verbose]        card: the only way to "done" · milestone: exit gates
  *   task abandon <id> · task merge <id>    (merge exit 3 refused · 4 conflict · 5 merge checks failed)
- *   task state [--check] · task next [--parallel] [--json] · task probe [--bin <claude>] · task env · task report <M>
+ *   task state [--check] · task next [--parallel] [--json] · task probe [--bin <claude>] · task env · task report <M> [--html]
  *     (task next lists the active milestone's cards first, then side cards of planned milestones — --json has a `side` list)
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
  *   hook session-start · hook check-stop    (Claude Code hooks)
@@ -236,6 +237,10 @@ async function task(sub, rest) {
       mkdirSync(dirname(file), { recursive: true });
       writeFileSync(file, text);
       out(`wrote ${reportPath(id)}`);
+      if (flag("--html")) {
+        writeFileSync(join(root, htmlPath(id)), renderEvidencePage(plan, id));
+        out(`wrote ${htmlPath(id)}`);
+      }
       return 0;
     }
     case "culprit": {

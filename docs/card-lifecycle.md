@@ -28,7 +28,7 @@ Status is never typed by hand — it is computed from three kinds of files:
 6. `qa-runner` runs real tests when the card touches UI, multiplayer or performance.
 7. Commit (main-folder card) or `task:merge <id>` (lane card).
 8. When all cards pass: `task:verify M<n>` runs the exit gates (gates without commands are manual owner checks) and
-   `task:report M<n>` writes the report from evidence. The owner closes the milestone.
+   `task:report M<n>` writes the report from evidence (`--html` also writes one page for people who do not read JSON). The owner closes the milestone.
 
 `task:abandon <id>` gives up an unfinished card. `task:start <id> --restart` re-opens a passed card.
 

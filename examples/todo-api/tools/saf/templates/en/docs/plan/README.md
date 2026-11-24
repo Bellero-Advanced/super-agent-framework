@@ -55,7 +55,7 @@ The "Done when" section: every list item is one command (a leading backticked co
 
 A milestone file has `status: planned | active | paused | done`, a `cards:` list (order = work order) and `gates:`.
 Each gate has `id`, `text` and optional `run:` commands — a gate without commands is a manual check by the {{owner}}.
-`{{cmd.taskVerifyM}}` runs every gate and writes `docs/plan/evidence/<M>.json`; `{{cmd.taskReport}}` writes the report.
+`{{cmd.taskVerifyM}}` runs every gate and writes `docs/plan/evidence/<M>.json`; `{{cmd.taskReport}}` writes the report (`--html` also writes a page for people who do not read JSON).
 
 Only the {{owner}} moves a milestone to `active` ("Go") or `done`.
 {{#if sideOn}}

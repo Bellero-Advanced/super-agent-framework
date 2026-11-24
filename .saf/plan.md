@@ -97,7 +97,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate
 - [x] T-M2-19 The release-operator agent says pushing is allowed when policies.push is allowed, and the push explanation says so — passed 2026-11-23 21:34 (4 commands) · full suite deferred to gate
 - [x] T-M2-20 A setup re-run keeps your edited decision log, index and plan files, and leaves package.json alone unless a script is missing — passed 2026-11-24 04:40 (5 commands) · full suite deferred to gate
-- [ ] T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence — started 2026-11-24 04:44 · not verified yet · lane 1 · .claude/worktrees/T-M2-05
+- [x] T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence — passed 2026-11-24 04:52 (5 commands) · full suite deferred to gate
 - [ ] T-M2-02 saf setup --dry-run lists, per file, what a setup run would do — and writes nothing
 - [ ] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it
 - [ ] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff
