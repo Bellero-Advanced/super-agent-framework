@@ -145,7 +145,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-37 An L card lists its steps: the plan check demands them, task:diff splits the review diff by step commit, and the agents build and review step by step — passed 2026-11-24 19:25 (9 commands) · full suite deferred to gate
 - [x] T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off — passed 2026-11-24 19:54 (6 commands) · full suite deferred to gate
 - [ ] T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit — started 2026-11-24 19:57 · not verified yet · lane 1 · .claude/worktrees/T-M3-10
-- [ ] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again
+- [ ] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again — started 2026-11-24 19:57 · not verified yet · lane 2 · .claude/worktrees/T-M3-11
 - [ ] T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0
 - [ ] T-M3-13 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it
 - [ ] T-M3-14 Setup and upgrade install skill packs named in skills.external only when their content hash matches
