@@ -34,11 +34,14 @@ that role. The engine tells the main session which agent to use for each card.
 ### Agent files
 
 6. In `by-size` mode setup writes, besides `<role>.md`, one file `.claude/agents/<role>-<effort>.md` for every enabled
-   role and every effort its `EFFORT_BY_SIZE` row reaches that differs from its role effort (after overrides). In
-   `fixed` mode no variant file is planned.
+   role without an effort in `models.overrides` and every effort its `EFFORT_BY_SIZE` row reaches that differs from its
+   role effort. A role with an effort override never gets a variant: by rule 3 every card uses the override, which
+   `<role>.md` already carries. In `fixed` mode no variant file is planned.
 7. A variant file is rendered from the same role template with `name: <role>-<effort>`, `effort: <effort>`, the same
    model and tools, and a description that starts with `Same as <role> at <effort> effort — use it only when
-   task:start names it.`
+   task:start names it.` followed by the base description. No template file is added or changed: `generate.mjs`
+   renders the base template with the variant effort, then rewrites the frontmatter lines `name:` and `description:`;
+   the body stays the base agent's.
 8. `saf upgrade` (`refreshKitFiles`) writes missing or unedited variant files and removes unedited variant files that
    are no longer planned (as for skills); edited ones are kept and listed. Base agent files stay setup-only.
 9. `docs:check` accepts `<role>-<effort>.md` for an enabled role when `effort` in its frontmatter equals the suffix
@@ -48,9 +51,14 @@ that role. The engine tells the main session which agent to use for each card.
 ### Per machine
 
 10. `models.effort` joins `LOCAL_KEYS`: the untracked `saf.config.local.json` may set it. Source order: local file →
-    `saf.config.json` → default; the resolved config records `models.effortSource` (as `workflow.testModeSource`). A
-    local `by-size` on a project whose tracked mode is `fixed` has no variant files: the engine names the base agent
-    and `task:start` prints one warning saying setup must run with `by-size` for the variant agents.
+    `saf.config.json` → default; the resolved config records `models.effortSource` (as `workflow.testModeSource`) and
+    `models.effortTracked`, the mode from `saf.config.json` or the default without the local file (the mode setup
+    planned the agent files with). When the mode is `by-size` and `models.effortTracked` is `fixed`, there are no
+    variant files: `cardEffort` names the base agent and returns one warning saying setup must run with `by-size` for
+    the variant agents (`task:start` prints it, T-M3-04). Every doc that lists the keys the local file may hold
+    (`docs/config-reference.md`, `docs/card-lifecycle.md`, the plan README templates en + th and this repository's
+    rendered `docs/plan/README.md`, `kit/claude/skills/saf-setup/SKILL.md`, `questions.md`) names `models.effort`, and
+    `MACHINE_SWITCHES` (`choices.mjs`) has its en + th line — the LCAP-AC-06 docs test checks every `LOCAL_KEYS` key.
 
 ### Shown and measured
 
@@ -74,7 +82,8 @@ that role. The engine tells the main session which agent to use for each card.
 
 ## 3. Data
 
-- `EFFORT_BY_SIZE`, `LOCAL_KEYS`, defaults, `roleTable`: `kit/tools-saf/lib/config.mjs`
+- `EFFORT_BY_SIZE`, `LOCAL_KEYS`, defaults, `roleTable`, `models.effortSource` / `models.effortTracked`:
+  `kit/tools-saf/lib/config.mjs`
 - `cardEffort`, `variantAgents`: `kit/tools-saf/lib/effort.mjs`
 - Variant files: `plannedFiles` / `refreshKitFiles` in `kit/tools-saf/lib/generate.mjs` · agent check
   `kit/tools-saf/lib/docs.mjs`
@@ -84,8 +93,8 @@ that role. The engine tells the main session which agent to use for each card.
 ## 4. Edge cases and errors
 
 - A card without `size` (legacy) → treated as M for effort, and `task:start` says so.
-- A role in `models.overrides` with an effort → the override wins in both modes; no variant is planned for it unless
-  the override itself differs from the role effort (then `<role>.md` already carries it — no variant).
+- A role in `models.overrides` with an effort → the override wins in both modes and for every size, and no variant is
+  planned for it (rule 6): its `<role>.md` already carries the override.
 - A role disabled later → its unedited variant files are removed by upgrade and re-run (rule 8).
 - Invalid `models.effort` in the local file → the config error names the local file (as for `workflow.testMode`).
 
@@ -94,10 +103,10 @@ that role. The engine tells the main session which agent to use for each card.
 | id | given | when | then | test layer |
 |---|---|---|---|---|
 | EFFORT-AC-01 | configs in `fixed` and `by-size` mode, with and without an override | `cardEffort` for S and M cards of each table role and a role outside the table | effort and agent name follow rules 3–4 | unit |
-| EFFORT-AC-02 | a `by-size` config | setup plans files | one variant file per role and differing effort, with the name, effort, model, tools and description of rule 7; none in `fixed` mode | unit |
+| EFFORT-AC-02 | a `by-size` config | setup plans files | one variant file per role and differing effort, with the name, effort, model, tools, description and base body of rule 7; none for a role with an effort override; none in `fixed` mode | unit |
 | EFFORT-AC-03 | a project switched from `by-size` to `fixed`, one variant edited | `saf upgrade` | the unedited variant is removed, the edited one kept and listed; base agent files untouched | integration |
 | EFFORT-AC-04 | variant files present | `docs:check` | passes for valid variants; fails for an effort/suffix mismatch or a variant of a disabled role; a custom role named like a variant is a config error | unit |
-| EFFORT-AC-05 | tracked `fixed`, local file `by-size` | config resolves and `cardEffort` runs | mode `by-size` with source the local file; `cardEffort` names the base agent and returns the missing-variants warning | unit |
+| EFFORT-AC-05 | tracked `fixed`, local file `by-size` | config resolves and `cardEffort` runs | mode `by-size` with source the local file and `models.effortTracked` `fixed`; `cardEffort` names the base agent and returns the missing-variants warning; with tracked `by-size` too it names the variant and returns no warning | unit |
 | EFFORT-AC-06 | a `by-size` project and an S card | `task:start` | prints the agent line of rule 11, evidence has `started.effort`, the session summary shows the agent | unit |
 | EFFORT-AC-07 | cards of both sizes with review rounds, one started before this change | `task:report <M>` | the table has one row per (size, effort) pair and a `—` row with correct counts | unit |
 | EFFORT-AC-08 | the choices table | `saf choices --group 4` in en and th | the `effort` question and both options are explained in every field, within `FIELD_MAX`, with no digits or model ids; `models.effort` is asked, not in the not-asked list | unit |
