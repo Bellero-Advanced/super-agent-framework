@@ -1,25 +1,25 @@
 {
   "id": "T-M3-03",
   "milestone": "M3",
-  "status": "failed",
+  "status": "done",
   "started": {
     "at": "2026-11-24T17:08:21.267Z",
     "base": "2779c314424821af72d59dbc41d19c4946b4248e",
     "dirty": {}
   },
-  "attempts": 4,
+  "attempts": 5,
   "lane": 1,
   "branch": "card/T-M3-03",
   "worktree": ".claude/worktrees/T-M3-03",
   "verified": {
-    "at": "2026-11-24T17:16:06.830Z",
-    "head": "fd7868b816e0eb769a70d9390896b1c2367592a6",
-    "pass": false,
+    "at": "2026-11-24T17:16:16.526Z",
+    "head": "d258ae3e1be54cb8c780a6ac9170e7f6bec9c38c",
+    "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 369,
+        "ms": 389,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -46,17 +46,17 @@
       {
         "cmd": "node --test test/unit/effort-by-size.test.mjs test/unit/setup-choices.test.mjs test/unit/config.test.mjs test/unit/generate.test.mjs",
         "exit": 0,
-        "ms": 2594,
+        "ms": 2712,
         "tail": [
           "ok 36 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.846875",
+          "  duration_ms: 0.930958",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "ok 37 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 1.093667",
+          "  duration_ms: 1.110834",
           "  type: 'test'",
           "  ...",
           "1..37",
@@ -67,23 +67,23 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2538.275917"
+          "# duration_ms 2661.717333"
         ]
       },
       {
         "cmd": "node --test test/unit/test-mode-config.test.mjs test/unit/lane-caps-docs.test.mjs",
         "exit": 0,
-        "ms": 255,
+        "ms": 259,
         "tail": [
           "ok 10 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
           "  ---",
-          "  duration_ms: 77.548417",
+          "  duration_ms: 75.450375",
           "  type: 'test'",
           "  ...",
           "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
           "ok 11 - this repo pins targeted with a testFiles command and ignores the local file",
           "  ---",
-          "  duration_ms: 0.27225",
+          "  duration_ms: 0.25925",
           "  type: 'test'",
           "  ...",
           "1..11",
@@ -94,13 +94,13 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 199.892958"
+          "# duration_ms 202.501916"
         ]
       },
       {
         "cmd": "npm run saf:refresh -- --check",
         "exit": 0,
-        "ms": 273,
+        "ms": 316,
         "tail": [
           "> super-agent-framework@0.1.0 saf:refresh",
           "> node scripts/refresh-copies.mjs --check",
@@ -110,7 +110,7 @@
       {
         "cmd": "node -e \"const s=JSON.parse(require('fs').readFileSync('kit/tools-saf/schema/saf.config.schema.json','utf8'));if(!s.properties.models.properties.effort)process.exit(1)\"",
         "exit": 0,
-        "ms": 45,
+        "ms": 42,
         "tail": []
       },
       {
@@ -126,7 +126,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 351,
+        "ms": 346,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -136,17 +136,17 @@
       {
         "cmd": "node --test 'test/unit/effort-by-size.test.mjs' 'test/unit/lane-caps-docs.test.mjs' 'test/unit/test-mode-config.test.mjs'",
         "exit": 0,
-        "ms": 394,
+        "ms": 386,
         "tail": [
           "ok 15 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
           "  ---",
-          "  duration_ms: 71.106416",
+          "  duration_ms: 69.460416",
           "  type: 'test'",
           "  ...",
           "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
           "ok 16 - this repo pins targeted with a testFiles command and ignores the local file",
           "  ---",
-          "  duration_ms: 0.269791",
+          "  duration_ms: 0.337208",
           "  type: 'test'",
           "  ...",
           "1..16",
@@ -157,7 +157,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 340.098792"
+          "# duration_ms 331.660542"
         ]
       }
     ],
@@ -181,9 +181,7 @@
         "test/unit/lane-caps-docs.test.mjs",
         "test/unit/test-mode-config.test.mjs"
       ],
-      "outside": [
-        "docs/specs/effort-by-size.md"
-      ],
+      "outside": [],
       "forbidden": [],
       "hashes": {
         "docs/card-lifecycle.md": "1f5b7f0f03a2ffcecd82a7d28962630e98957d9b",
