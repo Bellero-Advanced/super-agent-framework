@@ -1,0 +1,83 @@
+{
+  "id": "M2",
+  "kind": "milestone",
+  "verified": {
+    "at": "2026-11-24T06:55:16.417Z",
+    "head": "b7fd08b107ba3bafb5c796bd802d462809ffbb04",
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferredCards": [
+      "T-M2-07",
+      "T-M2-08",
+      "T-M2-09",
+      "T-M2-10",
+      "T-M2-12",
+      "T-M2-13",
+      "T-M2-14",
+      "T-M2-15",
+      "T-M2-16",
+      "T-M2-17",
+      "T-M2-18",
+      "T-M2-19",
+      "T-M2-20",
+      "T-M2-05",
+      "T-M2-02",
+      "T-M2-21",
+      "T-M2-22",
+      "T-M2-01",
+      "T-M2-27",
+      "T-M2-25",
+      "T-M2-26",
+      "T-M2-28",
+      "T-M2-29",
+      "T-M2-30"
+    ],
+    "gates": [
+      {
+        "id": "cards",
+        "pass": null,
+        "commands": []
+      },
+      {
+        "id": "project-checks",
+        "pass": true,
+        "commands": [
+          {
+            "cmd": "npm test",
+            "exit": 0,
+            "ms": 13681,
+            "tail": [
+              "ok 207 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+              "  ---",
+              "  duration_ms: 677.0435",
+              "  type: 'test'",
+              "  ...",
+              "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+              "ok 208 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+              "  ---",
+              "  duration_ms: 0.979417",
+              "  type: 'test'",
+              "  ...",
+              "1..208",
+              "# tests 208",
+              "# suites 0",
+              "# pass 207",
+              "# fail 0",
+              "# cancelled 0",
+              "# skipped 1",
+              "# todo 0",
+              "# duration_ms 13479.249875"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "owner",
+        "pass": null,
+        "commands": []
+      }
+    ]
+  }
+}

@@ -42,7 +42,7 @@
 | Gate | Criterion | Result |
 |---|---|---|
 | cards | every card of M2 passed task:verify and the spec review | manual check |
-| project-checks | the project's own checks pass on Linux, macOS and Windows (CI matrix green) | not checked |
+| project-checks | the project's own checks pass on Linux, macOS and Windows (CI matrix green) | ✓ passed 2026-11-24 06:55 |
 | owner | the owner tried each item in a fresh project and accepts it | manual check |
 
 ## Latest evidence
