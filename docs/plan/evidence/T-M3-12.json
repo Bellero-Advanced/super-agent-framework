@@ -1,7 +1,7 @@
 {
   "id": "T-M3-12",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T20:56:20.184Z",
     "base": "b985a238d87f36abb4751e3b35cdaa3c972d2211",
@@ -13,8 +13,71 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-12",
-  "worktree": ".claude/worktrees/T-M3-12"
+  "worktree": ".claude/worktrees/T-M3-12",
+  "verified": {
+    "at": "2026-11-24T21:03:52.505Z",
+    "head": "41131959b7cbfb449681a42cf01c3ae850bf5389",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('CHANGELOG.md','utf8');const u=s.split(/^## /m).find(x=>x.startsWith('Unreleased'))||'';for(const w of ['task:culprit','task:friction','task:review','task:release','saf choices','package.json'])if(!u.includes(w))process.exit(1)\"",
+        "exit": 0,
+        "ms": 51,
+        "tail": []
+      },
+      {
+        "cmd": "node --input-type=module -e \"import { readFileSync } from 'node:fs'; import { readChangelog, nextVersion } from './tools/saf/lib/release.mjs'; const v = nextVersion('0.1.0', readChangelog(readFileSync('CHANGELOG.md','utf8'))); if (v !== '0.2.0') { console.error(v); process.exit(1) }\"",
+        "exit": 0,
+        "ms": 67,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 303,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 282 markdown file(s) · 314 local link(s) · 108 command(s) in agent docs · 5 agent(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "CHANGELOG.md"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "CHANGELOG.md": "f4f349d6a8ad04cdc6c5e9a92080507dd883ef84"
+      }
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "note": "legacy S counted as M",
+      "code": {
+        "lines": 88,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 0,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    }
+  }
 }
