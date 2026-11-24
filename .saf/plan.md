@@ -112,7 +112,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it — passed 2026-11-24 05:09 (5 commands) · full suite deferred to gate
 - [x] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — passed 2026-11-24 05:17 (5 commands) · full suite deferred to gate
 - [x] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning — passed 2026-11-24 05:27 (5 commands) · full suite deferred to gate
-- [ ] T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it — started 2026-11-24 05:47 · not verified yet · lane 1 · .claude/worktrees/T-M2-27
+- [x] T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it — passed 2026-11-24 05:51 (5 commands) · full suite deferred to gate
 - [ ] T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json
 - [ ] T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one
 - [ ] T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units

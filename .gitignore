@@ -6,6 +6,8 @@ coverage/
 
 # SAF
 .claude/settings.local.json
+docs/archive/pre-saf/.claude/settings.local.json*
+docs/archive/pre-saf/.claude/settings.json*
 .saf-lane.json
 saf.config.local.json
 .saf/memory/
