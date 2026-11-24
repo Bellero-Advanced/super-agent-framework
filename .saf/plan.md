@@ -68,7 +68,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 
 ## Task List
 - [x] T-M3-01 Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count — passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate
-- [ ] T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds
+- [ ] T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — started 2026-11-24 08:04 · not verified yet · lane 1 · .claude/worktrees/T-M3-02
 - [ ] T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read
 - [ ] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
 - [ ] T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names
