@@ -4,8 +4,8 @@
 
 ## M2 Roadmap: next — cards done 26/27
 
-- In progress: none
-- Next: T-M2-30 Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value
+- In progress: **T-M2-30** Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value — started 2026-11-24 06:50 · not verified yet · lane 1 · .claude/worktrees/T-M2-30
+- Next: none — only cards in progress remain
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -35,7 +35,7 @@
 | [T-M2-26](tasks/M2/T-M2-26.md) | Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one | ✓ passed | [T-M2-26.json](evidence/T-M2-26.json) · passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate |
 | [T-M2-28](tasks/M2/T-M2-28.md) | Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units | ✓ passed | [T-M2-28.json](evidence/T-M2-28.json) · passed 2026-11-24 06:19 (7 commands) · full suite deferred to gate |
 | [T-M2-29](tasks/M2/T-M2-29.md) | setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything | ✓ passed | [T-M2-29.json](evidence/T-M2-29.json) · passed 2026-11-24 06:46 (5 commands) · full suite deferred to gate |
-| [T-M2-30](tasks/M2/T-M2-30.md) | Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value | · not started | – |
+| [T-M2-30](tasks/M2/T-M2-30.md) | Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value | ▶ in progress | [T-M2-30.json](evidence/T-M2-30.json) · started 2026-11-24 06:50 · not verified yet |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 
@@ -47,11 +47,11 @@
 
 ## Latest evidence
 
+- T-M2-30 Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value — started 2026-11-24 06:50 · not verified yet
 - T-M2-29 setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything — passed 2026-11-24 06:46 (5 commands) · full suite deferred to gate
 - T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units — passed 2026-11-24 06:19 (7 commands) · full suite deferred to gate
 - T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate
 - T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json — passed 2026-11-24 05:53 (6 commands) · full suite deferred to gate
-- T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it — passed 2026-11-24 05:51 (5 commands) · full suite deferred to gate
 
 ## Other milestones
 
