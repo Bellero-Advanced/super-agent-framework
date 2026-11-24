@@ -719,7 +719,11 @@ export function planDiffs(plan) {
 export function refreshKitFiles(root) {
   const report = { written: [], archived: [], kept: [], removed: [], warnings: [] };
   const manifest = readJson(join(root, MANIFEST), { files: {} });
-  const raw = readJson(join(root, CONFIG_FILE), {});
+  const raw = readJson(join(root, CONFIG_FILE), existsSync(join(root, CONFIG_FILE)) ? null : {});
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    report.warnings.push(`${CONFIG_FILE} is not valid JSON — commands and skills were not refreshed`);
+    return report;
+  }
   const errors = validateConfig(raw);
   if (errors.length) {
     report.warnings.push(`${CONFIG_FILE} is invalid — commands and skills were not refreshed`);
