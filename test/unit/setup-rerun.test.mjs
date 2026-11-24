@@ -69,6 +69,22 @@ test("RERUN-AC-01 a CRLF checkout of an unedited living file is not an edit; an 
   assert.ok(read(bare, "docs/INDEX.md").endsWith("mine\n"));
 });
 
+test("RERUN-AC-01 an unedited living file is really updated when the answers change what it says", async () => {
+  const root = await project();
+  const old = read(root, "docs/DECISIONS.md");
+  const oldHash = manifest(root)["docs/DECISIONS.md"];
+  const changed = { ...ANSWERS, project: { rigor: "strict" } };
+  const { report } = generate(root, changed);
+  const now = read(root, "docs/DECISIONS.md");
+  assert.notEqual(now, old, "the bytes changed");
+  assert.match(now, /Rigor level \*\*strict\*\*/);
+  assert.ok(report.written.includes("docs/DECISIONS.md"), "in report.written");
+  assert.ok(!report.kept.includes("docs/DECISIONS.md"), "not kept");
+  assert.ok(!report.warnings.some((w) => w.includes("docs/DECISIONS.md")), "no edit warning");
+  assert.equal(report.archived.length, 0, "nothing archived");
+  assert.notEqual(manifest(root)["docs/DECISIONS.md"], oldHash, "manifest entry follows the new text");
+});
+
 test("RERUN-AC-01 LIVING_FILES covers the decision log, the index, milestones and cards", () => {
   const living = (rel) => LIVING_FILES.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
   for (const rel of ["docs/DECISIONS.md", "docs/INDEX.md", "docs/plan/milestones/M1.md", "docs/plan/tasks/M0/T-M0-01.md", "docs/plan/tasks/_template.md"]) assert.ok(living(rel), rel);

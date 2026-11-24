@@ -99,6 +99,32 @@ test("LANG-AC-02 a language with one template reads it for that file, falls back
   assert.ok(read(root, "docs/plan/STATE.md").includes(TEXT.en.stateTitle), "status files use English labels");
 });
 
+test("LANG-AC-02 upgrade's refreshKitFiles warns once per command or skill whose template the language lacks, and writes the English one", async () => {
+  const { gen } = await fixture();
+  const root = tmp("saf-xx-up-");
+  gen.generate(root, ANSWERS("en"));
+  const cfgFile = join(root, "saf.config.json");
+  const cfg = JSON.parse(readFileSync(cfgFile, "utf8"));
+  cfg.people.docLanguage = "xx";
+  writeFileSync(cfgFile, `${JSON.stringify(cfg, null, 2)}\n`);
+  const report = gen.refreshKitFiles(root);
+  const warned = report.warnings.filter((w) => w.includes("is missing"));
+  assert.equal(warned.length, 2, `one warning per fallen-back file (the two commands), got ${warned.length}`);
+  for (const f of ["commands/saf.md", "commands/saf-plan.md"]) {
+    assert.equal(warned.filter((w) => w.includes(`templates/xx/${f}`)).length, 1, f);
+  }
+  assert.equal(new Set(warned).size, warned.length, "no warning repeats");
+  assert.ok(warned.every((w) => w.includes('"xx"') && w.includes("the English template is used")), warned.join("\n"));
+  assert.ok(!warned.some((w) => /docs\/|CLAUDE\.template/.test(w)), "refreshKitFiles only reads commands and skills");
+  const english = tmp("saf-en-up-");
+  gen.generate(english, ANSWERS("en"));
+  for (const f of [".claude/commands/saf.md", ".claude/commands/saf-plan.md"]) assert.equal(read(root, f), read(english, f), `${f} is the English command`);
+  // the shipped engine has no xx entry: the same project, language en again, gives no warning
+  cfg.people.docLanguage = "en";
+  writeFileSync(cfgFile, `${JSON.stringify(cfg, null, 2)}\n`);
+  assert.deepEqual(gen.refreshKitFiles(root).warnings.filter((w) => w.includes("is missing")), []);
+});
+
 test("LANG-AC-03 choices lists the fixture language in the chat- and document-language entries and in the report-language entry for other languages, and its coverage rule still holds", async () => {
   const { engine, choices } = await fixture();
   const run = (group) => spawnSync(process.execPath, [join(engine, "bin", "saf.mjs"), "choices", "--group", String(group), "--lang", "en"], { cwd: tmp("saf-cwd-"), encoding: "utf8" });
