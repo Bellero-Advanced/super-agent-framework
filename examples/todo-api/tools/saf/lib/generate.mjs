@@ -368,7 +368,7 @@ function actionFor(abs, text) {
   return readText(abs) === text.replace(/\r\n/g, "\n") ? "same" : "update";
 }
 
-export const GITIGNORE_LINES = [".claude/settings.local.json", `${ARCHIVE}/${SETTINGS_LOCAL}*`, ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
+export const GITIGNORE_LINES = [".claude/settings.local.json", `${ARCHIVE}/${SETTINGS_LOCAL}*`, `${ARCHIVE}/${SETTINGS}*`, ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
 
 /** The `.gitignore` merge as data: the lines to add and the new text (`text: null` when nothing is missing). */
 function planGitignore(root, config) {

@@ -79,3 +79,12 @@ test("RERUN-AC-09 a settings.json holding [] is archived and replaced by an obje
   const now = JSON.parse(read(root, SETTINGS));
   assert.ok(now.hooks.SessionStart && now.hooks.Stop);
 });
+
+test("RERUN-AC-08 an archived unreadable settings.json (and its .2 suffix) is git-ignored too", () => {
+  const root = gitRepo();
+  put(root, SETTINGS, `{ "env": { "API_KEY": "${SECRET}" }, }`);
+  generate(root, ANSWERS, { now: NOW });
+  const dest = `${ARCHIVE}/${SETTINGS}`;
+  assert.ok(existsSync(join(root, dest)), "the unreadable settings.json was archived");
+  for (const p of [dest, `${dest}.2`]) assert.equal(spawnSync("git", ["check-ignore", "-q", p], { cwd: root }).status, 0, p);
+});
