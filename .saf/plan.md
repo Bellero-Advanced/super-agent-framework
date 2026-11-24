@@ -94,7 +94,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-28 A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai — passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate
 - [x] T-M3-29 The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists — passed 2026-11-24 09:12 (5 commands) · full suite deferred to gate
 - [x] T-M3-30 The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass — passed 2026-11-24 09:26 (6 commands) · full suite deferred to gate
-- [ ] T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path
+- [ ] T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path — started 2026-11-24 09:28 · not verified yet · lane 1 · .claude/worktrees/T-M3-31
 - [ ] T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read
 - [ ] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
 - [ ] T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names
