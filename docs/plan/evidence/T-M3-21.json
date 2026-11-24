@@ -1,0 +1,14 @@
+{
+  "id": "T-M3-21",
+  "milestone": "M3",
+  "status": "in_progress",
+  "started": {
+    "at": "2026-11-24T16:52:48.800Z",
+    "base": "a8a63fb59ce8a6ac957244b8fe86447abd6c6850",
+    "dirty": {}
+  },
+  "attempts": 0,
+  "lane": 2,
+  "branch": "card/T-M3-21",
+  "worktree": ".claude/worktrees/T-M3-21"
+}
