@@ -60,8 +60,9 @@ the CLI and the tests all read the same words.
 
 12. `choices --group <g> [--lang en|th]` prints, for every question of group `g` (`1`–`8` or `flow`) in `QUESTIONS`
     order, its keys and each option's four fields under the `LABELS` of that language. Options of `project.rigor` are
-    followed by the values their rigor derives (card sizes, test caps, review, merge-check kinds — from `RIGOR` in
-    `config.mjs`); options of `models.preset` by the planner and builder model ids (from `MODEL_PRESETS`).
+    followed by the card sizes and test caps (M / L, from `SIZE_CAPS` — the same for every rigor since D-021,
+    [card-sizes.md](card-sizes.md) rule 15) and the values their rigor derives (review, merge-check kinds — from `RIGOR`
+    in `config.mjs`); options of `models.preset` by the planner and builder model ids (from `MODEL_PRESETS`).
 13. `choices --not-asked [--lang en|th]` prints every `NOT_ASKED` key with its one-line summary in that language and
     where to change it: `saf.config.json` (checked with `node tools/saf/bin/saf.mjs config --check`, or set by re-running
     `/saf-setup`) and the `DOCS_URL` link to the key's section of the config reference — the anchor is the key's
@@ -170,7 +171,7 @@ the CLI and the tests all read the same words.
 | SETUP-AC-01 | the schema and `choices.mjs` | the coverage test walks the schema leaf keys | each leaf is in exactly one of asked keys · `NOT_ASKED` · `INTERNAL_KEYS`; no listed key is missing from the schema; a fixture schema with one extra key fails naming it | unit |
 | SETUP-AC-02 | `QUESTIONS` and `questions.md` | the keys are compared | the asked keys equal the Key-column keys both ways; each `choice` question with a source has option values equal to that source (schema enum · yes/no · optional roles · `SKILL_PACKS`) | unit |
 | SETUP-AC-03 | no `saf.config.json`; then one with `chatLanguage: "th"` | `choices --not-asked`; then `choices --not-asked` and `--lang en` | every `NOT_ASKED` key appears with its en summary, `saf.config.json` and the `DOCS_URL` link; the per-machine block names every `LOCAL_KEYS` key, `SAF_TEST_MODE` and `SAF_STOP_HOOK`; with the th config the summaries are Thai; `--lang en` wins over the config; exit 0; no file written | unit |
-| SETUP-AC-04 | group 2 | `choices --group 2 --lang th`; `--group 9`; `--lang fr`; no flag | every option of `project.type` · `project.stage` · `project.rigor` is printed with four Thai-labelled fields; each rigor option is followed by its sizes from `RIGOR`; the bad calls exit 2 listing the valid groups / languages / flags | unit |
+| SETUP-AC-04 | group 2 | `choices --group 2 --lang th`; `--group 9`; `--lang fr`; no flag | every option of `project.type` · `project.stage` · `project.rigor` is printed with four Thai-labelled fields; each rigor option is followed by the M / L sizes from `SIZE_CAPS` (card-sizes rule 15); the bad calls exit 2 listing the valid groups / languages / flags | unit |
 | SETUP-AC-05 | the entries of `CHOICES` | the data test runs | every entry has `what` · `good` · `cost` · `when` in en and th, non-empty, ≤ `FIELD_MAX`, without two adjacent digits or `claude-`; every option value of a question with entries is covered exactly once | unit |
 | SETUP-AC-06 | the full `QUESTIONS` list | the completeness test runs | every `choice` question has entries covering all its values, every `value` question has exactly one, every `identity` question has none, and the `flow` group holds the adopt and commit questions | unit |
 | SETUP-AC-07 | `docs/config-reference.md` and the output of `choices --not-asked` | the docs test runs | every schema leaf key is named in backticks in the section of its top-level key; every `DOCS_URL` anchor printed is lowercase and equals the GitHub anchor of a heading in the file | unit |

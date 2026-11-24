@@ -60,6 +60,20 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - **Friction triage and self-fix** ([spec](../../specs/friction-log.md) rules 15–22, D-017): T-M3-07 (`task:report`
   friction section and designer brief, `task:friction draft`) → T-M3-08 (`self_fix` cards, `workflow.selfFix`, cap
   and kinds enforced by the plan check, passing verify closes the entry; on in this repository)
+- **Card sizes M and L** (owner order 2026-11-25, [spec](../../specs/card-sizes.md), D-021 proposed — the owner's four
+  answers plus recommended defaults (a)–(e) the cards follow unless he says otherwise): S is retired; M = one
+  self-contained subsystem, L = one whole-line feature; warning cap per size, `task:verify` fails above twice it; old
+  `size: S` is read as M with a note, no card file or evidence is rewritten; by-size effort M medium · L high. Runs
+  after T-M3-08 and before the release cards, so 0.2.0 ships it.
+  - T-M3-35 — engine: `SIZE_CAPS` / `HARD_STOP_FACTOR`, the hard stop, `countedSize`, plan validation (S only in
+    active/paused/done milestones or on started cards), the effort table, self-fix size M, every rendered cap line
+    (templates, this repository, the example), both configs drop their old `{ S, M }` caps
+  - T-M3-36 — wording: `saf choices` explanations (en, th), `questions.md`, `SKILL.md`, `/saf`, CLAUDE templates'
+    m-cards line, `card-lifecycle.md`, `config-reference.md`, `setup-questions.md`. Role effort: high (text for users)
+  - T-M3-37 — L cards in steps: `## Steps` required on L (plan check), `task:diff` splits an L card's diff by step
+    commit for the read-only reviewer; one commit per step and resuming are agent conventions
+  - from T-M3-35 on, new cards in this repository are M or L; the open S cards of M3 (T-M3-12 · T-M3-15 · T-M3-26)
+    stay as written and count as M
 - **Automatic release** ([spec](../../specs/auto-release.md), D-015): T-M3-09 (`task:release <M>` dry run and every
   guard, `policies.release` with the kill switch) → T-M3-10 (`--prepare` bumps versions, moves `Unreleased`, writes
   the release log, commits and pushes; `--tag` checks CI on the exact commit and pushes the tag) and T-M3-11
@@ -126,6 +140,9 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-06 SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer — passed 2026-11-24 17:45 (4 commands) · full suite deferred to gate
 - [x] T-M3-07 At milestone end task:report lists open friction with a brief for the designer, and task:friction draft prints card drafts for recurring friction — passed 2026-11-24 17:46 (6 commands) · full suite deferred to gate
 - [x] T-M3-08 With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces — passed 2026-11-24 18:07 (7 commands) · full suite deferred to gate
+- [ ] T-M3-35 Card sizes are M and L: task:verify warns above the cap and fails above twice it, old S cards count as M, and every generated file shows the new caps
+- [ ] T-M3-36 Setup explanations and the user docs describe sizes M and L, the hard stop and legacy S cards, in English and Thai, true to the code
+- [ ] T-M3-37 An L card lists its steps: the plan check demands them, task:diff splits the review diff by step commit, and the agents build and review step by step
 - [ ] T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off
 - [ ] T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit
 - [ ] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again
@@ -152,6 +169,10 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
   the product default stays `fixed` until this repository's numbers say otherwise (D-016)
 - **Variant agent files and routing:** two agent files per role could confuse Claude's automatic routing; the variant
   description says to use it only when `task:start` names it, and the `/saf` loop names the agent explicitly
+- **Size change hits existing projects** (T-M3-35): after upgrading, a `planned` milestone's S card (or one without
+  size) becomes a plan issue and an old `{ S, M }` caps config is ignored with a warning — both named in the CHANGELOG
+  (`### Breaking` candidate, T-M3-12); active, paused and done milestones and started cards keep loading. The hard
+  stop is new dogfooding too: T-M3-35 is verified by the engine it changes (`saf:refresh` before verify)
 - **Dogfooding:** T-M3-02 and T-M3-08 change `task:verify` behaviour while being verified by it; this repository keeps
   `workflow.testMode: targeted`, so each card gets one full run before it reaches `main`
 - **Skill packs are third-party instructions** (T-M3-13 … T-M3-15): a malicious skill can tell an agent to run

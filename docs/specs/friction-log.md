@@ -79,7 +79,8 @@ repository it is how SAF finds its own problems.
 18. New setting `workflow.selfFix`: `off` (product default) · `on` (this repository). A card may carry
     `self_fix: F-<nnn>` in its frontmatter.
 19. A self-fix card is valid only when: `workflow.selfFix` is `on` · the entry exists and is `open`, or `carded` to this
-    card · its kind is in `SELF_FIX_KINDS` (`friction.mjs`) · the card is size S · its milestone is the active one ·
+    card · its kind is in `SELF_FIX_KINDS` (`friction.mjs`) · the card's counted size is M (D-021,
+    [card-sizes.md](card-sizes.md) rule 13: a legacy S counts as M, L is refused) · its milestone is the active one ·
     its `touch` holds at least one test file and a "Done when" command names that test file · the milestone holds no
     more self-fix cards than `SELF_FIX_LIMITS.perMilestone` (`friction.mjs`). Any other `self_fix` card is a plan
     issue naming the broken condition.
@@ -90,7 +91,7 @@ repository it is how SAF finds its own problems.
     friction's evidence).
 21. When a self-fix card passes `task:verify` in the main folder, or a self-fix lane card is merged by `task:merge`,
     the engine appends `- F-<nnn> → fixed · <date> · <card id>` to the main folder's log (never inside a lane).
-22. Any friction that does not qualify (another kind, size M, cap reached, selfFix off) waits for the designer and the
+22. Any friction that does not qualify (another kind, size L, cap reached, selfFix off) waits for the designer and the
     owner's Go — the generated `/saf` command says so.
 
 ## 3. Data

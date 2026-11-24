@@ -1,12 +1,14 @@
 # Spec — effort by card size
 
-Decision: [D-016](../DECISIONS.md) (decided, amends D-002). Cards: T-M3-03 (setting, variant agents, docs:check) ·
+Decision: [D-016](../DECISIONS.md) (decided, amends D-002); the size keys and values amended by
+[D-021](../DECISIONS.md) (owner order 2026-11-25, card T-M3-35 — sizes M and L, [card-sizes.md](card-sizes.md)).
+Cards: T-M3-03 (setting, variant agents, docs:check) ·
 T-M3-04 (task:start names the agent, evidence, summary, report) · T-M3-05 (setup question and explanations) ·
 T-M3-06 (this repository uses it). Measurement: [review-rounds.md](review-rounds.md).
 
 ## 1. Purpose
 
-Today every role has one effort level for every card (D-002). A size S card rarely needs the implementer at high
+Today every role has one effort level for every card (D-002). A size M card rarely needs the implementer at high
 effort, and most design work is not a new system. `models.effort: by-size` lets a project spend less effort on small
 cards and keep high effort where mistakes are expensive. Because cheaper effort may cause more review bounces, the
 engine records the agent and effort of each card and the report puts them next to the review rounds.
@@ -19,11 +21,14 @@ that role. The engine tells the main session which agent to use for each card.
 ### Setting and table
 
 1. New setting `models.effort`: `fixed` (product default — one effort per role, today's behaviour) · `by-size`.
-2. `EFFORT_BY_SIZE` (`kit/tools-saf/lib/config.mjs`) holds, per role, the effort for size S and size M cards. Roles not
-   in the table keep their role effort in every mode. The table's values are the decision D-016 — the spec does not
-   copy them.
+2. `EFFORT_BY_SIZE` (`kit/tools-saf/lib/config.mjs`) holds, per role, the effort for size M and size L cards. Roles not
+   in the table keep their role effort in every mode. The table's values are the decisions D-016 and D-021 (implementer
+   and designer by size; spec-reviewer, qa-runner and release-operator one effort for both sizes) — the spec does not
+   copy them. The size looked up is the card's counted size ([card-sizes.md](card-sizes.md) rule 4: a legacy `S` or
+   a missing size counts as M).
 3. Effort for a card (`cardEffort(config, card)` in `kit/tools-saf/lib/effort.mjs`): `models.overrides[role].effort`
-   when set → in `by-size` mode `EFFORT_BY_SIZE[role][size]` when present → the role's effort from `roleTable`.
+   when set → in `by-size` mode `EFFORT_BY_SIZE[role][counted size]` when present → the role's effort from
+   `roleTable`.
 4. The agent for a card is `<role>` when its effort equals the effort in `<role>.md` (the role effort), otherwise
    `<role>-<effort>`.
 5. The designer's large design work — a plan that adds a new spec file or a decision row affecting more than one card
@@ -65,7 +70,8 @@ that role. The engine tells the main session which agent to use for each card.
 
 ### Shown and measured
 
-11. `task:start <id>` prints `agent <name> · effort <effort> · size <S|M> · models.effort <mode> (<source>)` and stores
+11. `task:start <id>` prints `agent <name> · effort <effort> · size <M|L> · models.effort <mode> (<source>)` (the counted
+    size, followed by ` (<note>)` for a legacy S or a missing size — card-sizes rule 9) and stores
     `started.effort: { agent, effort, mode, source }` in the evidence. The session-start summary shows the agent on
     the in-progress card's line, and the generated `/saf` card loop's build step says: use the agent `task:start`
     named.
@@ -77,7 +83,7 @@ that role. The engine tells the main session which agent to use for each card.
 
 13. `saf choices` group 4 has the question `effort` (key `models.effort`, options `fixed` · `by-size`) with what it is
     · good for · cost · pick it when, in en and th, every sentence true to the code: by-size lowers effort only for
-    the roles and sizes the table lists; S cards at lower effort may bounce more in review; the report shows rounds by
+    the roles and sizes the table lists; M cards at lower effort may bounce more in review; the report shows rounds by
     size and effort; a person can override it per machine. No digits and no model ids in the text (as every
     explanation).
 14. `questions.md` group 4 has a row for `models.effort` (default `fixed`); `docs/setup-questions.md`,
@@ -95,7 +101,8 @@ that role. The engine tells the main session which agent to use for each card.
 
 ## 4. Edge cases and errors
 
-- A card without `size` (legacy) → treated as M for effort, and `task:start` says so.
+- A card without `size`, or a legacy `size: S` card → treated as M for effort (counted size), and `task:start` says
+  so with the note of card-sizes rule 4.
 - A role in `models.overrides` with an effort → the override wins in both modes and for every size, and no variant is
   planned for it (rule 6): its `<role>.md` already carries the override.
 - A role disabled later → its unedited variant files are removed by upgrade and re-run (rule 8).
@@ -105,12 +112,12 @@ that role. The engine tells the main session which agent to use for each card.
 
 | id | given | when | then | test layer |
 |---|---|---|---|---|
-| EFFORT-AC-01 | configs in `fixed` and `by-size` mode, with and without an override | `cardEffort` for S and M cards of each table role and a role outside the table | effort and agent name follow rules 3–4 | unit |
+| EFFORT-AC-01 | configs in `fixed` and `by-size` mode, with and without an override | `cardEffort` for M and L cards (and a legacy S card) of each table role and a role outside the table | effort and agent name follow rules 3–4 | unit |
 | EFFORT-AC-02 | a `by-size` config | setup plans files | one variant file per role and differing effort, with the name, effort, model, tools, description and base body of rule 7; none for a role with an effort override; none in `fixed` mode | unit |
 | EFFORT-AC-03 | a project switched from `by-size` to `fixed`, one variant edited | `saf upgrade` | the unedited variant is removed, the edited one kept and listed; base agent files untouched | integration |
 | EFFORT-AC-04 | variant files present | `docs:check` | passes for valid variants; fails for an effort/suffix mismatch or a variant of a disabled role; a custom role named like a variant is a config error | unit |
 | EFFORT-AC-05 | tracked `fixed`, local file `by-size` | config resolves and `cardEffort` runs | mode `by-size` with source the local file and `models.effortTracked` `fixed`; `cardEffort` names the base agent and returns `MISSING_VARIANTS_WARNING` for a card whose rule-3 effort differs from the role effort, and no warning for a card whose rule-3 effort equals it; with tracked `by-size` too it names the variant and returns no warning | unit |
-| EFFORT-AC-06 | a `by-size` project and an S card | `task:start` | prints the agent line of rule 11, evidence has `started.effort`, the session summary shows the agent | unit |
+| EFFORT-AC-06 | a `by-size` project and an M card | `task:start` | prints the agent line of rule 11, evidence has `started.effort`, the session summary shows the agent | unit |
 | EFFORT-AC-07 | cards of both sizes with review rounds, one started before this change | `task:report <M>` | the table has one row per (size, effort) pair and a `—` row with correct counts | unit |
 | EFFORT-AC-08 | the choices table | `saf choices --group 4` in en and th | the `effort` question and both options are explained in every field, within `FIELD_MAX`, with no digits or model ids; `models.effort` is asked, not in the not-asked list | unit |
 

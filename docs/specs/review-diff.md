@@ -28,6 +28,8 @@ and prints the path, and the `/saf` review step passes "card id · review types 
    size (`cardSize`: code and test lines against the caps) — then per file in sorted order a unified diff against the
    base that includes uncommitted work. A new file appears as all added lines, a deleted file as all removed lines, a
    binary file as git's "Binary files differ" line. No changed files → the header and `no changed files`, exit 0.
+   A card with steps (an L card) is split into one section per step commit — [card-sizes.md](card-sizes.md) rule 21
+   (D-021, card T-M3-37).
 6. Git runs with argument arrays (no shell string); paths with spaces work; Windows works.
 7. Exit 0 written · 1 a git call failed (message names it) · 2 usage errors and refusals (unknown flag, stray word).
 8. Wiring: `ENGINE_SCRIPTS` `task:diff` (`config.mjs`), `generate.mjs` `cmd.taskDiff`, the script in this repository's
