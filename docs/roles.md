@@ -38,7 +38,8 @@ its cards then queue in the main folder.
   whose `touch` overlaps still wait for each other.
 - **What it costs.** One checkout plus the lane install step (`workflow.laneInstall`) per card, disk for large media in
   every worktree, and git cannot merge generated binary files when two branches change the same file (the `touch` check
-  prevents that inside the plan, not outside it).
+  prevents that inside the plan, not outside it). Generated media must be committed on the lane branch to reach main
+  through `task:merge`; untracked or gitignored output stays in the worktree.
 - **Locked roles.** `designer`, `spec-reviewer` and `release-operator` cannot move. The designer edits plan files that the
   main folder reads (cards on a branch stay invisible to `task:state` until merged), the spec-reviewer is read-only and
   runs no cards, and the release-operator acts on live systems and must work from the merged main folder. A custom role

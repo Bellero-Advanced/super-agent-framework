@@ -223,7 +223,7 @@ export function resolveConfig(raw = {}) {
 export function roleTable(c) {
   const out = [];
   for (const name of c.roles.enabled) {
-    const lib = ROLE_LIBRARY[name];
+    const lib = Object.hasOwn(ROLE_LIBRARY, name) ? ROLE_LIBRARY[name] : undefined;
     const custom = c.roles.custom.find((r) => r.name === name);
     const base = lib ?? custom;
     if (!base) continue;
@@ -233,7 +233,7 @@ export function roleTable(c) {
       name,
       custom: !lib,
       tier,
-      lane: c.roles.lanes?.[name] ?? base.lane ?? (tier === "planner" ? "main" : "code"),
+      lane: (Object.hasOwn(c.roles.lanes ?? {}, name) ? c.roles.lanes[name] : undefined) ?? base.lane ?? (tier === "planner" ? "main" : "code"),
       effort: o.effort ?? base.effort ?? "medium",
       model: o.model ?? (tier === "planner" ? c.models.planner : c.models.builder),
       tools: base.tools ?? "",
@@ -260,7 +260,7 @@ function laneKeyErrors(raw) {
   if (!isObj(lanes)) return [];
   const customNames = Array.isArray(raw.roles.custom) ? raw.roles.custom.map((r) => r?.name) : [];
   return Object.keys(lanes).flatMap((name) => {
-    const lib = ROLE_LIBRARY[name];
+    const lib = Object.hasOwn(ROLE_LIBRARY, name) ? ROLE_LIBRARY[name] : undefined;
     if (lib?.laneLocked) return [`$.roles.lanes.${name}: the lane of ${name} is fixed (main folder) and cannot be moved`];
     if (lib) return [];
     if (customNames.includes(name)) return [`$.roles.lanes.${name}: ${name} is a custom role — set its lane in roles.custom[].lane`];

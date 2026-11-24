@@ -66,6 +66,9 @@ test("RLANE-AC-04 validateConfig gives one error per bad key (locked, custom, un
   assert.equal(errors.filter((e) => e.includes("roles.lanes.implementer") && e.includes('must be one of "code", "main"')).length, 1);
   assert.deepEqual(validateConfig(raw({ "qa-runner": "main", "art-producer": "code", "content-writer": "main" })), []);
   assert.deepEqual(validateConfig(raw({})), []);
+  const inherited = validateConfig(JSON.parse('{"version":1,"roles":{"lanes":{"constructor":"code","toString":"main","__proto__":"code","hasOwnProperty":"code"}}}'));
+  assert.equal(inherited.filter((e) => /not a role of the library/.test(e)).length, 4, inherited.join("\n"));
+  assert.deepEqual(roleTable(resolveConfig({ roles: { enabled: ["constructor"] } })).map((r) => r.name).filter((n) => n === "constructor"), [], "an inherited property name is not a role");
   assert.ok(validateConfig({ version: 1, roles: { lanes: ["code"] } }).length > 0, "an array is not a map");
   const root = tmp();
   write(root, "saf.config.json", raw({ designer: "code", ghost: "main" }));
@@ -130,7 +133,7 @@ test("RLANE-AC-06 choices --group 6 prints role-lanes in en and th within FIELD_
     assert.ok(out.stdout.includes("roles.lanes") && Object.values(e[0][lang]).every((t) => out.stdout.includes(t)), lang);
   }
   const keyRow = readFileSync(join(REPO, "kit", "claude", "skills", "saf-setup", "questions.md"), "utf8").split(/\r?\n/).find((l) => l.startsWith("|") && l.includes("`roles.lanes`"));
-  assert.ok(keyRow && /leave empty/.test(keyRow) && /worktree lanes are on/.test(keyRow));
+  assert.ok(keyRow && /leave empty/.test(keyRow) && /worktree lanes are on/.test(keyRow) && /any library role/.test(keyRow) && /custom role sets its own `lane`/.test(keyRow));
   for (const role of Object.keys(ROLE_LIBRARY).filter((r) => !ROLE_LIBRARY[r].core)) {
     const x = entry("extra-roles", role);
     for (const [lang, by] of [["en", /by default/i], ["th", /โดยปกติ/]]) {
@@ -151,5 +154,6 @@ test("RLANE-AC-07 roles.md and config-reference.md name roles.lanes, and the loc
   const bullet = roles.split("\n").find((l) => l.startsWith("- **Locked roles.**"));
   const listed = [...bullet.split("cannot move")[0].matchAll(/`([a-z-]+)`/g)].map((m) => m[1]).sort();
   assert.deepEqual(listed, Object.keys(ROLE_LIBRARY).filter((r) => ROLE_LIBRARY[r].laneLocked).sort());
-  for (const f of ["card-lifecycle.md"]) assert.match(read(f), /By default the roles of the main-folder lane[\s\S]*roles\.lanes/);
+  assert.match(read("card-lifecycle.md"), /By default the roles of the main-folder lane[\s\S]*submodule cards, which cannot move[\s\S]*library role other than designer/);
+  assert.match(roles, /committed on the lane branch/);
 });
