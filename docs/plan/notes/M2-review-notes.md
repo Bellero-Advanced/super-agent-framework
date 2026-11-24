@@ -157,3 +157,10 @@ EFFORT DATA POINT (D-016): first S card run at implementer effort `medium`; 1 re
 N5. the skill gives no guidance for quoting paths with spaces (POSIX '…', Windows "…"); the dry-run line separates path and reason with two spaces; a comma inside a path would split the comma form
 N6. "yours is archived to docs/archive/pre-saf/" — with an older archive the name gets a `.1`, `.2` suffix; the dry run does not print the target (only the real run's `archived:` lines do)
 N7. "without the `same` lines" is slightly unclear (the merges block also prints `<path>: same`)
+
+## T-M2-01 (review FAIL → fixed → merged) — notes for the designer
+
+4. docs/config-reference.md:20 and :52 still list the languages by hand ("`en` or `th`") — add to the "Add a document language" steps or name the source; docs/faq.md:29 is Thai-specific (fine)
+5. spec tension: rule 2 says each table has `langName` and `names` but LANG-AC-02's fixture table has only `langName` (code and CONTRIBUTING treat `names` as optional); rule 7 says the report-language text is "worded without naming a language" but the entry says "not English" / "แทนภาษาอังกฤษ" — reword the rules
+8. the upgrade path's fallback warning (generate.mjs ~721, `refreshKitFiles`) is not covered by any test
+9. the cmp.mjs old-vs-new comparison covers fresh runs only (re-run, adopt, upgrade follow by reading) — a re-run + adopt comparison would complete it
