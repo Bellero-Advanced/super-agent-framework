@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, commitAll, git, gitRepo, lib, tmp, write, card, milestone } from "../helpers.mjs";
@@ -76,17 +76,18 @@ const FILES = ["package\\.json", "pkg\\/b\\/package\\.json", "VERSION", "CHANGEL
 const BRANCH = "[A-Za-z0-9][A-Za-z0-9._/-]*";
 const SHA = "[0-9a-f]{40,64}";
 const ALLOWED = [
-  new RegExp(`^fetch --quiet origin ${BRANCH}$`), /^rev-parse FETCH_HEAD$/, /^--no-optional-locks status --porcelain$/,
-  /^rev-parse (--abbrev-ref HEAD|HEAD)$/, new RegExp(`^show (HEAD|${SHA}):saf\\.config\\.json$`),
+  new RegExp(`^fetch --quiet origin refs/heads/${BRANCH}$`), /^rev-parse FETCH_HEAD\^\{commit\}$/, /^--no-optional-locks status --porcelain$/,
+  /^rev-parse (--abbrev-ref HEAD|HEAD|HEAD\^)$/, new RegExp(`^show (HEAD|${SHA}):saf\\.config\\.json$`),
   /^diff --name-only --no-renames -z [0-9a-f]{7,64} HEAD --$/, /^log -1 --format=%s HEAD$/,
   /^tag --list v\d+\.\d+\.\d+$/, /^ls-remote --tags origin refs\/tags\/v\d+\.\d+\.\d+$/, new RegExp(`^ls-remote origin refs/heads/${BRANCH}$`),
   new RegExp(`^--literal-pathspecs add -- (${FILES})( (${FILES}))*$`),
   new RegExp(`^--literal-pathspecs commit -q -m chore\\(release\\): v\\d+\\.\\d+\\.\\d+ \\(M\\d+\\) -- (${FILES})( (${FILES}))*$`),
   new RegExp(`^--literal-pathspecs reset -q -- (${FILES})( (${FILES}))*$`),
-  new RegExp(`^push --no-follow-tags origin refs/heads/(${BRANCH}):refs/heads/\\1$`),
+  new RegExp(`^push --no-follow-tags origin ${SHA}:refs/heads/${BRANCH}$`),
   /^cat-file -t refs\/tags\/v\d+\.\d+\.\d+$/, /^rev-parse refs\/tags\/v\d+\.\d+\.\d+\^\{commit\}$/,
   new RegExp(`^tag -a v\\d+\\.\\d+\\.\\d+ --cleanup=whitespace -m [\\s\\S]+ ${SHA}$`),
-  /^push origin refs\/tags\/v\d+\.\d+\.\d+$/,
+  /^push --no-follow-tags origin refs\/tags\/v\d+\.\d+\.\d+$/,
+  /^ls-remote --tags origin refs\/tags\/v(\d+\.\d+\.\d+) refs\/tags\/v\1\^\{\}$/,
 ];
 const offenders = (calls) => gitCalls(calls).filter((a) => !ALLOWED.some((re) => re.test(a.join(" "))));
 
@@ -126,7 +127,7 @@ test("REL-AC-05 --prepare bumps every package, the dependency and the version fi
   assert.deepEqual(git(f.root, "show", "--name-only", "--format=", "HEAD").split("\n").sort(), ["CHANGELOG.md", "VERSION", "docs/plan/releases.md", "package.json", "pkg/b/package.json"]);
   assert.equal(git(f.root, "status", "--porcelain"), "", "nothing else is left dirty");
   assert.equal(git(f.remote, "rev-parse", "main"), head(f.root), "the release commit is on the remote");
-  assert.deepEqual(pushes(ctx.run.calls), [["push", "--no-follow-tags", "origin", "refs/heads/main:refs/heads/main"]], "exactly one ref, no force");
+  assert.deepEqual(pushes(ctx.run.calls), [["push", "--no-follow-tags", "origin", `${head(f.root)}:refs/heads/main`]], "exactly one ref (the release commit), no force");
   assert.deepEqual(offenders(ctx.run.calls), []);
   assert.doesNotMatch(JSON.stringify(ctx.run.calls), /--force|"-f"|--delete|--mirror|\+refs/);
 });
@@ -188,6 +189,7 @@ test("REL-AC-05 a rejected push keeps the local commit and exits 1 with the reas
   assert.equal(r.code, 1, r.text);
   assert.match(r.text, /push was rejected/);
   assert.match(r.text, /the release commit stays/);
+  assert.match(r.text, /reset the local commit, pull, then run --prepare again — or rebase it onto origin and push it yourself, then run --tag/, "advice that works (after a pull the version is already bumped)");
   assert.equal(git(f.root, "log", "-1", "--format=%s"), "chore(release): v0.5.0 (M1)", "the local commit stays");
   assert.notEqual(git(f.remote, "rev-parse", "main"), head(f.root));
   assert.equal(git(f.remote, "log", "-1", "--format=%s", "main"), "someone first", "only the other person's commit is there");
@@ -198,6 +200,7 @@ test("REL-AC-05 a rejected push keeps the local commit and exits 1 with the reas
   const r2 = run(rel.prepareRelease, again);
   assert.equal(r2.code, 1, r2.text);
   assert.match(r2.text, /already the release commit/);
+  assert.match(r2.text, /reset the local commit, pull, then run --prepare again — or rebase it onto origin and push it yourself, then run --tag/);
   assert.deepEqual(writeCalls(again.run.calls), []);
   assert.deepEqual(snap(), state);
 });
@@ -309,7 +312,7 @@ test("REL-AC-06 --tag is refused while CI has a skipped job (no tag, no push of 
   assert.match(message, /## 0\.5\.0 — 2026-02-03/);
   assert.match(message, /### Added\n\n- a thing/);
   assert.doesNotMatch(message, /## 0\.4\.0/, "only this release's section");
-  assert.deepEqual(pushes(green.run.calls), [["push", "origin", "refs/tags/v0.5.0"]]);
+  assert.deepEqual(pushes(green.run.calls), [["push", "--no-follow-tags", "origin", "refs/tags/v0.5.0"]]);
   assert.equal(git(f.remote, "tag", "--list"), "v0.5.0", "the remote gained only the tag");
   assert.equal(git(f.remote, "rev-parse", "main"), f.sha, "the branch did not move");
   assert.deepEqual(offenders(green.run.calls), []);
@@ -345,7 +348,7 @@ test("REL-AC-06 a failed tag push is resumed without a second tag; a second --ta
   assert.equal(gitCalls(resume.run.calls).filter((a) => verbOf(a) === "tag" && !a.includes("--list")).length, 0, "the existing tag is pushed, not made again");
   assert.equal(git(f.root, "rev-parse", "refs/tags/v0.5.0"), tagObject, "the tag object is untouched");
   assert.equal(git(f.remote, "rev-parse", "refs/tags/v0.5.0"), tagObject);
-  assert.deepEqual(pushes(resume.run.calls), [["push", "origin", "refs/tags/v0.5.0"]]);
+  assert.deepEqual(pushes(resume.run.calls), [["push", "--no-follow-tags", "origin", "refs/tags/v0.5.0"]]);
   const third = tagCtx(f, ["success"]);
   const r3 = run(rel.tagRelease, third);
   assert.equal(r3.code, 1, r3.text);
@@ -392,14 +395,20 @@ test("REL-AC-06 --tag refuses when HEAD is not the release commit, when a local 
 const SRC = readFileSync(join(REPO, "kit", "tools-saf", "lib", "release.mjs"), "utf8").replace(/\r\n/g, "\n");
 const CODE = SRC.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
 
+// "rebase" is only forbidden as a command: the advice a person reads says it in words
 test("REL-AC-07 the release engine has no force push, tag deletion, unpublish, deprecate or npm publish — nor a deleting or rewriting refspec", () => {
-  for (const re of [/unpublish/, /deprecate/, /--force/, /push\s+-f/, /tag\s+-d/, /--delete/, /npm\s+publish/, /'publish'/, /"publish"/, /--mirror/, /--prune/, /reset\s+--hard/, /--amend/, /\brebase\b/, /update-ref/, /branch\s+-[dD]/, /filter-branch/, /\+refs/, /[`"' ]:refs\//]) assert.doesNotMatch(SRC, re, String(re));
-  assert.doesNotMatch(CODE, /"-f"|"-d"|"-D"|"--force-with-lease"/);
+  for (const re of [/unpublish/, /deprecate/, /--force/, /push\s+-f/, /tag\s+-d/, /--delete/, /npm\s+publish/, /'publish'/, /"publish"/, /--mirror/, /--prune/, /reset\s+--hard/, /--amend/, /["'`]rebase["'`]|git\s+rebase/, /update-ref/, /branch\s+-[dD]/, /filter-branch/, /\+refs/, /[`"' ]:refs\//, /[`"' ]:\$\{/, /[`"' ]\+\$\{/, /--force-with-lease/]) assert.doesNotMatch(SRC, re, String(re));
+  assert.doesNotMatch(CODE, /["'`]-{1,2}(f|d|D|force|delete)["'`]/, "no flag literal that deletes or forces");
+  assert.doesNotMatch(CODE, /["'`]-+["'`]\s*\+|\+\s*["'`]-+["'`]/, "no flag built by joining strings");
+  // every push names its refspec from the one builder, with --no-follow-tags
+  const pushLines = CODE.split("\n").filter((l) => /"push"/.test(l));
+  assert.equal(pushLines.length, 2, "two push call sites: the branch and the tag");
+  for (const l of pushLines) assert.match(l, /"push", PUSH_SAFE, RELEASE\.remote, `(\$\{release\}:refs\/heads\/\$\{branch\}|refs\/tags\/\$\{tag\})`/, l);
 });
 
 test("REL-AC-07 imports and writes are confined: fs writes cannot hide behind another import, and every outside call has a known shape", () => {
   const imports = [...CODE.matchAll(/^import (.+?) from "([^"]+)";$/gm)].map((m) => [m[2], m[1]]);
-  const allowed = { "node:child_process": ["spawnSync"], "node:fs": ["existsSync", "lstatSync", "readFileSync", "rmSync", "writeFileSync"], "node:path": ["join", "posix"], "./config.mjs": null, "./plan.mjs": null };
+  const allowed = { "node:child_process": ["spawnSync"], "node:fs": ["existsSync", "lstatSync", "readFileSync", "realpathSync", "rmSync", "writeFileSync"], "node:path": ["dirname", "join", "posix", "relative"], "./config.mjs": null, "./plan.mjs": null };
   for (const [mod, what] of imports) {
     assert.ok(Object.hasOwn(allowed, mod), `import from ${mod} is not allowed`);
     if (allowed[mod]) {
@@ -421,6 +430,147 @@ test("REL-AC-07 imports and writes are confined: fs writes cannot hide behind an
   // the git verbs the source can name
   const verbs = new Set([...CODE.matchAll(/\bgitw?\(ctx,(?:\s*out,)?((?:\s*"-[^"]*",)*)\s*"([a-z-]+)"/g)].map((m) => m[2]));
   const known = ["add", "cat-file", "commit", "diff", "fetch", "log", "ls-remote", "push", "reset", "rev-parse", "show", "status", "tag"];
+  assert.match(CODE, /"fetch", "--quiet", RELEASE\.remote, `refs\/heads\/\$\{s\.branch\}`/, "the fetch names the full ref: a tag called like the branch cannot win");
   for (const v of verbs) assert.ok(known.includes(v), `git ${v} is not a known verb`);
   for (const v of ["push", "tag", "commit", "add"]) assert.ok(verbs.has(v), `git ${v} is among the verbs`);
+});
+
+// ── round 1 review: tags, a moving HEAD, ambiguous names, advice, paths, bytes ──
+
+test("REL-AC-06 with push.followTags on, --tag pushes only the release tag, not a local tag that is merely reachable", () => {
+  const f = prepared();
+  git(f.root, "config", "push.followTags", "true");
+  git(f.root, "tag", "-a", "v0.4.1", "-m", "stale local tag", `${f.sha}~1`);
+  const ctx = tagCtx(f, ["success"]);
+  const r = run(rel.tagRelease, ctx);
+  assert.equal(r.code, 0, r.text);
+  assert.equal(git(f.remote, "tag", "--list"), "v0.5.0", "the remote gained only v0.5.0 (a stale tag would start the release workflow)");
+  assert.deepEqual(pushes(ctx.run.calls), [["push", "--no-follow-tags", "origin", "refs/tags/v0.5.0"]]);
+});
+
+// a guard, not a red-first test: the branch push already carried --no-follow-tags; this pins it so it cannot be dropped
+test("REL-AC-05 with push.followTags on, --prepare pushes the branch and no tag", () => {
+  const f = fixture();
+  git(f.root, "config", "push.followTags", "true");
+  git(f.root, "tag", "-a", "v0.0.1", "-m", "local only");
+  assert.equal(run(rel.prepareRelease, ctxOf(f)).code, 0);
+  assert.equal(git(f.remote, "tag", "--list"), "", "no tag went with the branch");
+});
+
+test("REL-AC-05 a commit that lands while the guards run stops --prepare before anything is written", () => {
+  const f = fixture();
+  let landed = false;
+  const ctx = ctxOf(f, { intercept: (cmd) => { if (cmd === "npm" && !landed) { landed = true; git(f.root, "commit", "-q", "--allow-empty", "-m", "from another session"); } } });
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /HEAD moved/);
+  assert.deepEqual(writeCalls(ctx.run.calls), []);
+  assert.equal(read(f.root, "package.json").includes("0.5.0"), false);
+});
+
+test("REL-AC-05 a commit that lands under the release commit is never pushed: the local commit stays and the reason is printed", () => {
+  const f = fixture();
+  let landed = false;
+  const ctx = ctxOf(f, {
+    intercept: (cmd, args) => {
+      if (cmd === "git" && verbOf(args) === "add" && !landed) {
+        landed = true; // another session commits (plumbing, so the index stays as --prepare left it)
+        const tip = git(f.root, "commit-tree", "HEAD^{tree}", "-p", "HEAD", "-m", "landed meanwhile");
+        git(f.root, "update-ref", "HEAD", tip);
+      }
+    },
+  });
+  const remoteBefore = remoteRefs(f.remote);
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /another commit landed/);
+  assert.match(r.text, /nothing was pushed/);
+  assert.deepEqual(pushes(ctx.run.calls), []);
+  assert.equal(remoteRefs(f.remote), remoteBefore, "the remote did not change");
+  assert.equal(git(f.root, "log", "-1", "--format=%s"), "chore(release): v0.5.0 (M1)", "the local commit stays");
+});
+
+test("REL-AC-05 a remote tag named like the branch does not become the commit the guards read: the fetch names refs/heads/<branch>", () => {
+  const f = fixture();
+  const other = tmp("saf-run-other-");
+  git(other, "clone", "-q", f.remote, ".");
+  write(other, "saf.config.json", { ...f.raw, policies: { ...f.raw.policies, release: { ...f.raw.policies.release, auto: "off" } } });
+  commitAll(other, "a commit that is only a tag");
+  git(other, "tag", "main");
+  git(other, "push", "-q", "origin", "refs/tags/main");
+  const ctx = ctxOf(f);
+  const g = byId(rel.releaseGuards(ctx, "M1"));
+  assert.equal(g["G-switch"].ok, true, g["G-switch"].reason);
+  assert.equal(g["G-branch"].ok, true, g["G-branch"].reason);
+  assert.ok(ctx.run.calls.some((c) => c.join(" ") === "git fetch --quiet origin refs/heads/main"));
+});
+
+test("REL-AC-05 the failure paths print the commands they run, and the tag command is printed exactly", () => {
+  const f = fixture();
+  const ctx = ctxOf(f, { intercept: (cmd, args) => (cmd === "git" && verbOf(args) === "commit" ? { code: 1, out: "", err: "hook failed: no" } : undefined) });
+  const r = run(rel.prepareRelease, ctx);
+  assert.match(r.text, /^\$ git --literal-pathspecs reset -q -- /m, "the reset is shown");
+  const p = prepared();
+  const t = run(rel.tagRelease, tagCtx(p, ["success"]));
+  assert.ok(t.lines.some((l) => l.startsWith(`$ git tag -a v0.5.0 --cleanup=whitespace -m ## 0.5.0 — 2026-02-03`) && l.endsWith(` ${p.sha}`)), t.text);
+});
+
+test("REL-AC-05 a version file under a linked folder is never written outside the project", (t) => {
+  const f = fixture();
+  const outside = tmp("saf-run-outside-");
+  write(outside, "VERSION", "0.4.0\n");
+  try {
+    symlinkSync(outside, join(f.root, "linked"), "junction");
+  } catch {
+    return t.skip("links cannot be made here");
+  }
+  write(f.root, ".git/info/exclude", "linked\n");
+  const raw = { ...f.raw, policies: { ...f.raw.policies, release: { ...f.raw.policies.release, versionFiles: ["VERSION", "linked/VERSION"] } } };
+  const ctx = ctxOf({ ...f, config: config.resolveConfig(raw) });
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /linked\/VERSION .*outside the project/);
+  assert.equal(read(outside, "VERSION"), "0.4.0\n", "the file outside was not touched");
+  assert.equal(read(f.root, "package.json").includes("0.5.0"), false, "nothing inside was written either");
+  assert.deepEqual(writeCalls(ctx.run.calls), []);
+});
+
+test("REL-AC-05 a symbolic link as a release file keeps its message (nothing is written, nothing is lost)", (t) => {
+  const f = fixture();
+  const outside = tmp("saf-run-outside-");
+  write(outside, "v.txt", "0.4.0\n");
+  try {
+    symlinkSync(join(outside, "v.txt"), join(f.root, "LINK"), "file");
+  } catch {
+    return t.skip("links cannot be made here");
+  }
+  write(f.root, ".git/info/exclude", "LINK\n");
+  const raw = { ...f.raw, policies: { ...f.raw.policies, release: { ...f.raw.policies.release, versionFiles: ["VERSION", "LINK"] } } };
+  const r = run(rel.prepareRelease, ctxOf({ ...f, config: config.resolveConfig(raw) }));
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /LINK is a symbolic link/);
+  assert.equal(read(outside, "v.txt"), "0.4.0\n");
+  assert.equal(read(f.root, "VERSION"), "0.4.0\n");
+});
+
+test("REL-AC-05 a file that is not UTF-8 comes back byte for byte when the commit fails", () => {
+  const f = fixture();
+  const bytes = Buffer.concat([Buffer.from('{"name":"demo-b","version":"0.4.0","description":"caf'), Buffer.from([0xe9]), Buffer.from('","dependencies":{"demo-pkg":"0.4.0"}}\n')]);
+  writeFileSync(join(f.root, "pkg/b/package.json"), bytes);
+  commitAll(f.root, "latin-1 description");
+  git(f.root, "push", "-q", "origin", "main");
+  const ctx = ctxOf(f, { intercept: (cmd, args) => (cmd === "git" && verbOf(args) === "commit" ? { code: 1, out: "", err: "hook failed: no" } : undefined) });
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.ok(readFileSync(join(f.root, "pkg/b/package.json")).equals(bytes) && git(f.root, "status", "--porcelain") === "", "byte-identical, nothing dirty");
+});
+
+test("REL-AC-06 the tag confirmation needs the peeled line to be the release commit", () => {
+  const f = prepared();
+  const lie = (cmd, args) => (cmd === "git" && verbOf(args) === "ls-remote" && args.length === 5 ? { code: 0, out: `${"a".repeat(40)}\trefs/tags/v0.5.0\n${"b".repeat(40)}\trefs/tags/v0.5.0^{}\n`, err: "" } : undefined);
+  const r = run(rel.tagRelease, tagCtx(f, ["success"], { intercept: lie }));
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /does not show v0\.5\.0 pointing at the release commit/);
+  const none = (cmd, args) => (cmd === "git" && verbOf(args) === "ls-remote" && args.length === 5 ? { code: 0, out: `${"a".repeat(40)}\trefs/tags/v0.5.0\n`, err: "" } : undefined);
+  assert.equal(run(rel.tagRelease, tagCtx(prepared(), ["success"], { intercept: none })).code, 1, "no peeled line: refused");
 });

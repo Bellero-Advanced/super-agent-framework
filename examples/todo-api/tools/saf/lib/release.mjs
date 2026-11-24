@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, lstatSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join, posix } from "node:path";
+import { existsSync, lstatSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, posix, relative } from "node:path";
 import { CONFIG_FILE } from "./config.mjs";
 import { activeCards, cardStatus, gateResults, isDone, loadPlan } from "./plan.mjs";
 
@@ -375,8 +375,8 @@ export function releaseGuards(ctx, mid, { step = "prepare" } = {}) {
   const s = settings(ctx);
   let fetched = { error: s.errors.branch };
   if (!s.errors.branch) {
-    const r = git(ctx, "fetch", "--quiet", RELEASE.remote, s.branch);
-    const sha = r.code === 0 ? git(ctx, "rev-parse", "FETCH_HEAD") : r; // the commit this fetch brought, not a remote-tracking ref a narrow refspec may leave stale
+    const r = git(ctx, "fetch", "--quiet", RELEASE.remote, `refs/heads/${s.branch}`); // the full ref name: a tag called like the branch would win over a bare name
+    const sha = r.code === 0 ? git(ctx, "rev-parse", "FETCH_HEAD^{commit}") : r; // the commit this fetch brought, not a remote-tracking ref a narrow refspec may leave stale
     if (r.code !== 0) fetched = { error: why(r) };
     else fetched = sha.code === 0 && RELEASE.fullSha.test(sha.out.trim()) ? { sha: sha.out.trim() } : { error: `FETCH_HEAD is not a commit (${why(sha)})` };
   }
@@ -393,7 +393,6 @@ export function releaseGuards(ctx, mid, { step = "prepare" } = {}) {
 }
 
 const PUSH_SAFE = "--no-follow-tags"; // a push of a branch must never carry a tag along
-const branchRef = (branch) => `refs/heads/${branch}:refs/heads/${branch}`;
 /** Every printed line: no control character from a CHANGELOG heading, a config path or a log field reaches the terminal (the indent stays). */
 const printer = (write) => (line) => write(clean(line));
 
@@ -417,9 +416,9 @@ export function planRelease(ctx, mid, { step = "prepare" } = {}) {
     `rename "## Unreleased" to "## ${d.next} — ${date}" in ${RELEASE.changelog} and add a new empty "## Unreleased" above it`,
     `append to ${RELEASE_LOG}: ${line}`,
     `git commit those files as "${RELEASE.subject(d.next, mid)}"`,
-    `git push ${PUSH_SAFE} ${RELEASE.remote} ${branchRef(d.s.branch)}`,
+    `git push ${PUSH_SAFE} ${RELEASE.remote} <the release commit>:refs/heads/${d.s.branch}`,
   ];
-  const tag = [`git tag -a v${d.next} on HEAD (message: the ${RELEASE.changelog} section of ${d.next})`, `git push ${RELEASE.remote} refs/tags/v${d.next}`];
+  const tag = [`git tag -a v${d.next} on HEAD (message: the ${RELEASE.changelog} section of ${d.next})`, `git push ${PUSH_SAFE} ${RELEASE.remote} refs/tags/v${d.next}`];
   return { version: d.next, previous: d.current, bump: bump.bump, reason: bump.reason, step, prepare, done, tag };
 }
 
@@ -448,20 +447,34 @@ export function runRelease(ctx, mid, { step, out: write }) {
 
 // ── --prepare and --tag: the steps that change the outside world ─────────────
 
-/** The one place a file is written: only a planned path, never through a symbolic link. */
-function putFile(ctx, file, text, planned) {
+/** The absolute path of a planned release file: inside the project (links resolved), not itself a link. Throws a plain message. */
+function plannedPath(ctx, file, planned) {
   if (!planned.has(file)) throw new Error(`refusing to write ${oneLine(file)}: it is not one of the release files`);
   const abs = join(ctx.root, file);
+  const inside = relative(realpathSync(ctx.root), realpathSync(dirname(abs)));
+  if (/^\.\.([\\/]|$)/.test(inside) || /^([A-Za-z]:)?[\\/]/.test(inside)) throw new Error(`${oneLine(file)} is outside the project (a linked folder)`);
   if (existsSync(abs) && lstatSync(abs).isSymbolicLink()) throw new Error(`${oneLine(file)} is a symbolic link`);
-  writeFileSync(abs, text);
+  return abs;
 }
 
-/** Put the files back as they were (`before` null = the file did not exist). */
-function restore(ctx, files) {
-  for (const [file, f] of files) {
-    if (f.before !== null) putFile(ctx, file, f.before, files);
-    else if (existsSync(join(ctx.root, file))) rmSync(join(ctx.root, file));
+/** The one place a file is written. */
+function putFile(ctx, file, data, planned) {
+  writeFileSync(plannedPath(ctx, file, planned), data);
+}
+
+/** Put the named files back byte for byte (`bytes` null = the file did not exist). Never throws: returns the files it could not put back. */
+function restore(ctx, files, touched) {
+  const failed = [];
+  for (const file of touched) {
+    try {
+      const f = files.get(file);
+      if (f.bytes !== null) putFile(ctx, file, f.bytes, files);
+      else if (existsSync(join(ctx.root, file))) rmSync(plannedPath(ctx, file, files));
+    } catch {
+      failed.push(file);
+    }
   }
+  return failed;
 }
 
 const eolOf = (text) => (text.includes("\r\n") ? "\r\n" : "\n");
@@ -510,6 +523,7 @@ function releaseFiles(ctx, mid, d, date) {
   const log = readText(ctx, RELEASE_LOG);
   const eol = log === null ? "\n" : eolOf(log);
   files.set(RELEASE_LOG, { before: log, after: `${log === null ? RELEASE.logHeader : log + (/\n$/.test(log) ? "" : eol)}${entry}${eol}` });
+  for (const [file, f] of files) f.bytes = existsSync(join(ctx.root, file)) ? readFileSync(join(ctx.root, file)) : null; // what a restore writes back
   return { files, problems };
 }
 
@@ -528,51 +542,72 @@ function showGuards(ctx, out, mid, step) {
 }
 const stopLine = (guards) => `✗ ${guards.filter((g) => !g.ok).length} guard(s) failed — nothing was changed`;
 
-/** `task:release <M> --prepare` (rule 10). Returns the exit code: 0 pushed · 1 a guard failed or the push did not go through · 2 not a milestone id. */
+/** What a person does after a rejected push or a release commit that never reached origin (pulling alone does not help: the version is then already bumped). */
+const NEXT_AFTER_REJECTED = "reset the local commit, pull, then run --prepare again — or rebase it onto origin and push it yourself, then run --tag";
+
+/** `task:release <M> --prepare` (rule 10). Returns the exit code: 0 pushed · 1 a guard failed, a step failed (and was undone) or the push did not go through · 2 not a milestone id. */
 export function prepareRelease(ctx, mid, { out: write }) {
   const out = printer(write);
   if (!RELEASE.milestoneId.test(String(mid))) return out(`✗ "${oneLine(mid)}" is not a milestone id`), 2;
+  const before = git(ctx, "rev-parse", "HEAD");
   const guards = showGuards(ctx, out, mid, "prepare");
   if (chooseStep(ctx, mid) === "tag") {
-    out(`✗ HEAD is already the release commit "${RELEASE.subject(describe(ctx, "tag").current, mid)}" — there is nothing to prepare: run --tag once CI is green on it (if its push was rejected, a person decides: SAF never rewrites history)`);
+    out(`✗ HEAD is already the release commit "${RELEASE.subject(describe(ctx, "tag").current, mid)}" — there is nothing to prepare: run --tag once CI is green on it (if its push was rejected: ${NEXT_AFTER_REJECTED})`);
     return 1;
   }
   if (guards.some((g) => !g.ok)) return out(stopLine(guards)), 1;
+  const now = git(ctx, "rev-parse", "HEAD");
+  const base = now.out.trim(); // the commit every guard looked at: the release commit must sit directly on it
+  if (before.code !== 0 || now.code !== 0 || before.out.trim() !== base || !RELEASE.fullSha.test(base)) return out("✗ HEAD moved while the guards ran — nothing was changed; run it again"), 1;
   const d = describe(ctx, "prepare");
   const date = (ctx.now?.() ?? new Date()).toISOString().slice(0, 10);
   const { files, problems } = releaseFiles(ctx, mid, d, date);
+  try {
+    for (const file of files.keys()) plannedPath(ctx, file, files); // every path is checked before the first byte is written
+  } catch (e) {
+    problems.push(oneLine(e?.message));
+  }
   if (problems.length) {
     problems.forEach((p) => out(`✗ ${p}`));
     return out("✗ nothing was changed"), 1;
   }
   const paths = [...files.keys()];
-  const failed = (what, r) => {
-    git(ctx, "--literal-pathspecs", "reset", "-q", "--", ...paths); // unstage what git add took
-    restore(ctx, files);
-    out(`✗ ${what} failed (${why(r)}) — every file is back as it was, nothing was committed or pushed`);
-    return 1;
+  const touched = [];
+  const undo = (why) => {
+    const left = restore(ctx, files, touched);
+    return out(`✗ ${why} — ${left.length ? `could not put back: ${left.join(", ")}` : "every file is back as it was"}, nothing was committed or pushed`), 1;
   };
   try {
-    for (const [file, f] of files) putFile(ctx, file, f.after, files);
+    for (const [file, f] of files) {
+      touched.push(file);
+      putFile(ctx, file, f.after, files);
+    }
   } catch (e) {
-    restore(ctx, files);
-    return out(`✗ ${oneLine(e?.message)} — every file is back as it was`), 1;
+    return undo(oneLine(e?.message));
   }
-  const subject = RELEASE.subject(d.next, mid);
+  const failed = (what, r) => {
+    gitw(ctx, out, "--literal-pathspecs", "reset", "-q", "--", ...paths); // unstage what git add took
+    return undo(`${what} failed (${why(r)})`);
+  };
   const added = gitw(ctx, out, "--literal-pathspecs", "add", "--", ...paths);
   if (added.code !== 0) return failed("git add", added);
-  const made = gitw(ctx, out, "--literal-pathspecs", "commit", "-q", "-m", subject, "--", ...paths);
+  const made = gitw(ctx, out, "--literal-pathspecs", "commit", "-q", "-m", RELEASE.subject(d.next, mid), "--", ...paths);
   if (made.code !== 0) return failed("git commit", made);
   const branch = d.s.branch;
-  const pushed = gitw(ctx, out, "push", PUSH_SAFE, RELEASE.remote, branchRef(branch));
+  const release = git(ctx, "rev-parse", "HEAD").out.trim();
+  const parent = git(ctx, "rev-parse", "HEAD^");
+  if (!RELEASE.fullSha.test(release) || parent.code !== 0 || parent.out.trim() !== base) {
+    out(`✗ another commit landed while the release commit was made (it does not sit directly on ${base.slice(0, RELEASE.shortHead)}) — nothing was pushed; the release commit stays in your local ${branch}: a person decides (${NEXT_AFTER_REJECTED})`);
+    return 1;
+  }
+  const pushed = gitw(ctx, out, "push", PUSH_SAFE, RELEASE.remote, `${release}:refs/heads/${branch}`);
   if (pushed.code !== 0) {
-    out(`✗ the push was rejected or failed (${why(pushed)}) — the release commit stays in your local ${branch}; SAF never rewrites history or forces a push: a person decides (pull and release again, or reset the local commit)`);
+    out(`✗ the push was rejected or failed (${why(pushed)}) — the release commit stays in your local ${branch}; SAF never rewrites history or forces a push. To go on: ${NEXT_AFTER_REJECTED}`);
     return 1;
   }
   const remote = gitw(ctx, out, "ls-remote", RELEASE.remote, `refs/heads/${branch}`);
-  const sha = git(ctx, "rev-parse", "HEAD").out.trim();
-  if (remote.code !== 0 || remote.out.split(/\s/)[0] !== sha) return out(`✗ the push went through but ${RELEASE.remote} does not show the release commit (${why(remote)})`), 1;
-  out(`✓ v${d.next} is committed and pushed to ${RELEASE.remote}/${branch} (${sha.slice(0, RELEASE.shortHead)}) — next: wait until every CI job is green on it, then --tag`);
+  if (remote.code !== 0 || remote.out.split(/\s/)[0] !== release) return out(`✗ the push went through but ${RELEASE.remote} does not show the release commit (${why(remote)})`), 1;
+  out(`✓ v${d.next} is committed and pushed to ${RELEASE.remote}/${branch} (${release.slice(0, RELEASE.shortHead)}) — next: wait until every CI job is green on it, then --tag`);
   return 0;
 }
 
@@ -595,17 +630,17 @@ export function tagRelease(ctx, mid, { out: write }) {
   if (!section) return out(`✗ ${RELEASE.changelog} has no section for ${oneLine(d.next)} — nothing was changed`), 1;
   if (git(ctx, "tag", "--list", tag).out.trim()) out(`${tag} already exists here as an annotated tag on this commit — it is pushed as it is`);
   else {
-    out(`$ git tag -a ${tag} --cleanup=whitespace -m <the ${RELEASE.changelog} section of ${d.next}> ${sha.slice(0, RELEASE.shortHead)}`);
-    const made = git(ctx, "tag", "-a", tag, "--cleanup=whitespace", "-m", tagMessage(section), sha);
+    const made = gitw(ctx, out, "tag", "-a", tag, "--cleanup=whitespace", "-m", tagMessage(section), sha);
     if (made.code !== 0) return out(`✗ git tag failed (${why(made)}) — nothing was pushed`), 1;
   }
-  const pushed = gitw(ctx, out, "push", RELEASE.remote, `refs/tags/${tag}`);
+  const pushed = gitw(ctx, out, "push", PUSH_SAFE, RELEASE.remote, `refs/tags/${tag}`);
   if (pushed.code !== 0) {
     out(`✗ the tag push failed (${why(pushed)}) — the tag stays in your local repository (SAF never moves or deletes a tag); run --tag again to retry the push`);
     return 1;
   }
-  const remote = gitw(ctx, out, "ls-remote", "--tags", RELEASE.remote, `refs/tags/${tag}`);
-  if (remote.code !== 0 || !remote.out.split("\n").some((l) => l.split("\t")[1] === `refs/tags/${tag}`)) return out(`✗ the push went through but ${RELEASE.remote} does not show ${tag} (${why(remote)})`), 1;
+  const remote = gitw(ctx, out, "ls-remote", "--tags", RELEASE.remote, `refs/tags/${tag}`, `refs/tags/${tag}^{}`);
+  const seen = new Map(remote.out.split("\n").map((l) => l.split("\t")).filter((x) => x.length === 2).map(([id, ref]) => [ref.trim(), id.trim()]));
+  if (remote.code !== 0 || !seen.has(`refs/tags/${tag}`) || seen.get(`refs/tags/${tag}^{}`) !== sha) return out(`✗ the push went through but ${RELEASE.remote} does not show ${tag} pointing at the release commit (${why(remote)})`), 1;
   out(`✓ ${tag} is on ${RELEASE.remote} (${sha.slice(0, RELEASE.shortHead)}) — the release workflow takes it from here`);
   return 0;
 }

@@ -63,7 +63,7 @@ import {
  *   task diff <id>   write the reviewer's diff of a started card to .saf/memory/review/<id>.diff (exit 0 written · 1 git failed · 2 usage or refused)
  *     (exactly the files task:verify counts as the card's · a lane card is read and written in its worktree · prints the absolute path)
  *   task release <M>   the release dry run: every release guard and the plan, nothing is changed (exit 0 every guard holds · 1 one fails · 2 usage)
- *   task release <M> --prepare | --tag   commit + push the version bump, or tag + push the tag when CI is green on that commit (exit 0 done · 1 a guard failed or a push did not go through · 2 usage, or a lane worktree)
+ *   task release <M> --prepare | --tag   commit + push the version bump, or tag + push the tag when CI is green on that commit (exit 0 pushed · 1 a guard refused, a step failed and was undone, or a push did not go through · 2 usage: a bad milestone id, both flags together, or a lane worktree)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status

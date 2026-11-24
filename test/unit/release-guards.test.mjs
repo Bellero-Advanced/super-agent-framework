@@ -77,9 +77,9 @@ function snapshot(dir, skip = []) {
 /** The exact shapes of git call the dry run may make — all read-only; a refspec (`:`), a commit, a tag creation or a push matches none. */
 const BRANCH = "[A-Za-z0-9][A-Za-z0-9._/-]*";
 const READ_ONLY_GIT = [
-  new RegExp(`^fetch --quiet origin ${BRANCH}$`),
+  new RegExp(`^fetch --quiet origin refs/heads/${BRANCH}$`),
   /^--no-optional-locks status --porcelain$/,
-  /^rev-parse (--abbrev-ref HEAD|HEAD|FETCH_HEAD)$/, // FETCH_HEAD: the commit the fetch brought (a remote-tracking ref may be stale)
+  /^rev-parse (--abbrev-ref HEAD|HEAD|FETCH_HEAD\^\{commit\})$/, // FETCH_HEAD: the commit the fetch brought (a remote-tracking ref may be stale)
   /^show (HEAD|[0-9a-f]{40,64}):saf\.config\.json$/,
   /^diff --name-only --no-renames -z [0-9a-f]{7,64} HEAD --$/,
   /^log -1 --format=%s HEAD$/,
@@ -218,7 +218,7 @@ test("REL-AC-04 every guard passes, the plan lists the actions, exit 0, and neit
   for (const id of ["G-switch", "G-branch", "G-milestone", "G-version"]) assert.match(text, new RegExp(`✓ ${id} `));
   assert.doesNotMatch(text, /✗/);
   assert.match(text, /v0\.4\.0 → v0\.5\.0 \(minor: Added\)/);
-  for (const action of [/set version 0\.5\.0 in package\.json/, /set version 0\.5\.0 in VERSION/, /rename "## Unreleased" to "## 0\.5\.0 — 2026-02-03"/, /append to docs\/plan\/releases\.md: - v0\.5\.0 · 2026-02-03 · M1 · gate/, /chore\(release\): v0\.5\.0 \(M1\)/, /git push --no-follow-tags origin refs\/heads\/main:refs\/heads\/main$/m, /git tag -a v0\.5\.0/, /git push origin refs\/tags\/v0\.5\.0/]) assert.match(text, action);
+  for (const action of [/set version 0\.5\.0 in package\.json/, /set version 0\.5\.0 in VERSION/, /rename "## Unreleased" to "## 0\.5\.0 — 2026-02-03"/, /append to docs\/plan\/releases\.md: - v0\.5\.0 · 2026-02-03 · M1 · gate/, /chore\(release\): v0\.5\.0 \(M1\)/, /git push --no-follow-tags origin <the release commit>:refs\/heads\/main$/m, /git tag -a v0\.5\.0/, /git push --no-follow-tags origin refs\/tags\/v0\.5\.0/]) assert.match(text, action);
   assert.deepEqual(snapshot(f.root, [".git"]), before.tree, "the worktree is byte-identical");
   assert.deepEqual(snapshot(f.remote), before.remote, "the remote is byte-identical");
   assert.deepEqual(localRefs(f.root), before.refs, "no ref or HEAD of the local repository changed (a tag or a commit would show here)");
@@ -230,7 +230,7 @@ test("REL-AC-04 every guard passes, the plan lists the actions, exit 0, and neit
 test("REL-AC-04 the read-only check itself rejects a tag, a commit, a fetch refspec, a push and a write behind a global option", () => {
   const bad = [["git", "tag", "v0.5.0"], ["git", "--no-optional-locks", "commit", "--allow-empty", "-m", "x"], ["git", "fetch", "--quiet", "origin", "main:main"], ["git", "push"], ["git", "tag", "--list", "v0.5.0", "-a"], ["npm", "publish"], ["gh", "release", "create"], ["sh", "-c", "x"]];
   assert.deepEqual(offenders(bad), bad);
-  assert.deepEqual(offenders([["git", "fetch", "--quiet", "origin", "main"], ["git", "tag", "--list", "v0.5.0"], ["npm", "view", "x", "versions", "--json"], ["gh", "run", "list"]]), []);
+  assert.deepEqual(offenders([["git", "fetch", "--quiet", "origin", "refs/heads/main"], ["git", "tag", "--list", "v0.5.0"], ["npm", "view", "x", "versions", "--json"], ["gh", "run", "list"]]), []);
   const f = fixture();
   const before = localRefs(f.root);
   git(f.root, "tag", "v0.5.0");
@@ -330,7 +330,7 @@ test("REL-AC-04 at the tag step the dry run prints only the --tag actions and wh
   assert.match(text, /next step: --tag/);
   assert.match(text, /--prepare already done: - v0\.5\.0 · 2026-02-03 · M1 · gate .* · from v0\.4\.0 · bump minor \(Added\)/);
   assert.match(text, /git tag -a v0\.5\.0/);
-  assert.match(text, /git push origin refs\/tags\/v0\.5\.0/);
+  assert.match(text, /git push --no-follow-tags origin refs\/tags\/v0\.5\.0/);
   assert.doesNotMatch(text, /--prepare would|set version|rename "## Unreleased"|append to|bump none/);
   assert.deepEqual(rel.readReleaseLog(lines.filter((l) => l.startsWith("--prepare already done: ")).map((l) => l.slice("--prepare already done: ".length)).join("\n")).length, 1, "the printed entry is a valid release-log line");
   const bare = released(false);
