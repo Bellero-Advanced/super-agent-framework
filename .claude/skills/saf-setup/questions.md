@@ -101,7 +101,7 @@ Each person can override the repo's choice on their own machine, without changin
 variable `SAF_TEST_MODE`, or an untracked `saf.config.local.json`; order: env, then local file, then `saf.config.json`, then the
 default (`milestone`). The two caps (`workflow.lanes.code`, `workflow.sideLanes.max`): the local file, then `saf.config.json`, then
 the default — there is no environment variable for lane caps, so every session on a machine counts the same caps. The local file
-may hold only those three keys (any other key is refused, including `$schema` and `workflow.lanes.main`). When the person says
+may hold only those three keys and `models.effort` (any other key is refused, including `$schema` and `workflow.lanes.main`). When the person says
 the machine is weak or strong, offer to write the caps there. The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart; the code cap is at most
 `LANE_CEILING` (`config.mjs`).
 

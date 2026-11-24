@@ -27,13 +27,27 @@ export const TEST_MODES = ["every-card", "targeted", "milestone"];
 export const DEFAULT_TEST_MODE = "milestone";
 export const TEST_MODE_ENV = "SAF_TEST_MODE";
 /** Keys saf.config.local.json (per machine, not tracked) may set — any other key is an error. */
-export const LOCAL_KEYS = ["workflow.testMode", "workflow.lanes.code", "workflow.sideLanes.max"];
+export const LOCAL_KEYS = ["workflow.testMode", "workflow.lanes.code", "workflow.sideLanes.max", "models.effort"];
 /** Typo guard for the lane caps (the schema maximum of workflow.lanes.code and workflow.sideLanes.max equals it). */
 export const LANE_CEILING = 32;
 /** The highest TCP port; the highest lane port must stay at or below it. */
 export const MAX_PORT = 65535;
 /** `stack.commands` keys whose command is "the full test suite". */
 export const FULL_SUITE_KEYS = ["test", "e2e"];
+
+/** Effort modes (docs/specs/effort-by-size.md): fixed = one effort per role · by-size = `EFFORT_BY_SIZE`. Keep in step with the schema enum. */
+export const EFFORT_MODES = ["fixed", "by-size"];
+export const DEFAULT_EFFORT_MODE = "fixed";
+/** The efforts an agent file may carry (the schema `effort` enum). */
+export const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
+/** Decision D-016: per role, the effort of size S and size M cards in by-size mode. Roles not listed keep their role effort. */
+export const EFFORT_BY_SIZE = {
+  implementer: { S: "medium", M: "high" },
+  designer: { S: "medium", M: "medium" },
+  "spec-reviewer": { S: "high", M: "high" },
+  "qa-runner": { S: "medium", M: "medium" },
+  "release-operator": { S: "medium", M: "medium" },
+};
 
 /** Planner/reviewer roles get `planner`; builder roles get `builder`. Effort is set per role, not per preset. */
 export const MODEL_PRESETS = {
@@ -98,7 +112,7 @@ const DEFAULTS = {
     database: "none",
     submodules: false,
   },
-  models: { preset: "balanced", planner: "", builder: "", sessionDefault: "", overrides: {} },
+  models: { preset: "balanced", planner: "", builder: "", sessionDefault: "", overrides: {}, effort: DEFAULT_EFFORT_MODE },
   roles: { enabled: [...CORE_ROLES], custom: [], reportLanguage: "en", lanes: {} },
   skills: { packs: null },
   workflow: {
@@ -221,6 +235,20 @@ export function resolveConfig(raw = {}) {
   return c;
 }
 
+/**
+ * Variant agent names `<role>-<effort>` of the library roles in `enabled`, by the table — whatever the mode.
+ * A role with an effort override gets none (docs/specs/effort-by-size.md rule 6). `overrides` = `models.overrides`.
+ */
+export function variantNames(enabled, overrides = {}) {
+  const out = [];
+  for (const role of enabled) {
+    if (!Object.hasOwn(ROLE_LIBRARY, role) || !Object.hasOwn(EFFORT_BY_SIZE, role) || overrides?.[role]?.effort) continue;
+    for (const effort of new Set(Object.values(EFFORT_BY_SIZE[role])))
+      if (effort !== ROLE_LIBRARY[role].effort) out.push({ role, effort, name: `${role}-${effort}` });
+  }
+  return out;
+}
+
 /** Every enabled role with its model, effort, lane and tools. */
 export function roleTable(c) {
   const out = [];
@@ -253,7 +281,17 @@ export function loadSchema() {
 
 /** Validate a raw (possibly partial) config/answers object. @returns {string[]} */
 export function validateConfig(raw) {
-  return [...validate(loadSchema(), raw), ...laneKeyErrors(raw)];
+  return [...validate(loadSchema(), raw), ...laneKeyErrors(raw), ...variantNameErrors(raw)];
+}
+
+/** One error per custom role named like a variant agent of an enabled role (the file `.claude/agents/<name>.md` would clash). */
+function variantNameErrors(raw) {
+  const custom = raw?.roles?.custom;
+  if (!Array.isArray(custom)) return [];
+  const enabled = [...CORE_ROLES, ...(Array.isArray(raw.roles.enabled) ? raw.roles.enabled : [])];
+  const overrides = isObj(raw.models?.overrides) ? raw.models.overrides : {};
+  const taken = new Set(variantNames(enabled, overrides).map((v) => v.name));
+  return custom.filter((r) => taken.has(r?.name)).map((r) => `$.roles.custom: "${r.name}" is the file name of a variant agent of ${r.name.slice(0, r.name.lastIndexOf("-"))} — pick another name`);
 }
 
 /** One error per key of `roles.lanes` that names no movable role (the values are checked by the schema). */
@@ -334,6 +372,9 @@ export function loadConfig(root, env = process.env) {
     if (!TEST_MODES.includes(fromEnv)) throw new ConfigError(`${TEST_MODE_ENV}=${fromEnv} is not a test mode — use one of: ${TEST_MODES.join(", ")}`);
     [mode, source] = [fromEnv, "env"];
   }
+  config.models.effortTracked = raw.models?.effort ?? DEFAULT_EFFORT_MODE;
+  config.models.effortSource = raw.models?.effort ? "repo" : "default";
+  if (localKeys.includes("models.effort")) config.models.effortSource = "local";
   const w = config.workflow;
   const top = w.lanePorts.base + w.lanePorts.step * w.lanes.code;
   if (w.worktrees && w.lanes.code >= 1 && w.lanePorts.env.length && top > MAX_PORT)

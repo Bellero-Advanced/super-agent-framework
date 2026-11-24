@@ -163,7 +163,7 @@ passes without a real test run when its "Done when" names one; the mode only mov
   Exit **0** found · **2** already failing before the first card · **3** passes at HEAD (flaky, or already fixed) · **1** error
   (for example no card of the milestone has started). `--cmd "<command>"` picks another command.
 - **Per machine.** Pick a mode for your own machine without touching tracked files: `SAF_TEST_MODE=<mode>` for one shell, or an
-  untracked `saf.config.local.json` (it may also hold `workflow.lanes.code` and `workflow.sideLanes.max`; [config-reference.md](config-reference.md#safconfiglocaljson)).
+  untracked `saf.config.local.json` (it may also hold `workflow.lanes.code`, `workflow.sideLanes.max` and `models.effort`; [config-reference.md](config-reference.md#safconfiglocaljson)).
   Mode order: env, local file, `saf.config.json`, default. Generated files never depend on either. `saf.config.local.json` is
   git-ignored, so it is absent inside a lane worktree: engine commands run there, such as a lane card's `task:verify`, use
   the repository's lane caps, and its test mode unless `SAF_TEST_MODE` is set.

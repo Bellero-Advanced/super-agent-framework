@@ -238,6 +238,7 @@ const ns = (en, th) => ({ en, th });
 /** Settings no question sets: key → one-line summary. */
 export const NOT_ASKED = {
   "models.overrides": ns('Change the model or effort of single roles, e.g. {"qa-runner": {"effort": "low"}}; agent files and CLAUDE.md change when setup runs again, the /saf command also on upgrade; a model change fails docs:check until setup runs again', 'เปลี่ยนโมเดลหรือ effort ของ role ใด role หนึ่ง เช่น {"qa-runner": {"effort": "low"}} ไฟล์ agent และ CLAUDE.md เปลี่ยนเมื่อรัน setup ใหม่ (/saf-setup) คำสั่ง /saf เปลี่ยนตอน upgrade ด้วย ถ้าเปลี่ยนโมเดล docs:check จะไม่ผ่านจนกว่าจะรัน setup ใหม่'),
+  "models.effort": ns("How much effort each role's agent uses: fixed (one effort per role) or by-size (lower effort for small cards, for the roles and sizes the effort table lists; setup writes one extra agent file per role and lower effort); a change takes effect when setup runs again", "ระดับ effort ของ agent แต่ละ role: fixed (หนึ่งระดับต่อ role) หรือ by-size (ลด effort สำหรับการ์ดเล็ก เฉพาะ role และขนาดที่ตาราง effort ระบุ; setup เขียนไฟล์ agent เพิ่มหนึ่งไฟล์ต่อ role และต่อ effort ที่ต่ำลง) มีผลเมื่อรัน setup ใหม่"),
   "workflow.review": ns("Which cards get a spec review: m-cards (size M only), every-card, or every-card+security (plus a security audit per milestone); only the generated CLAUDE.md and /saf command use it; CLAUDE.md changes when setup runs again, the /saf command also on upgrade; default follows rigor", "การ์ดไหนได้รับการตรวจเทียบ spec: m-cards (เฉพาะขนาด M), every-card หรือ every-card+security (เพิ่มการตรวจความปลอดภัยทุก milestone) ใช้กับ CLAUDE.md และคำสั่ง /saf ที่สร้างเท่านั้น CLAUDE.md เปลี่ยนเมื่อรัน setup ใหม่ (/saf-setup) คำสั่ง /saf เปลี่ยนตอน upgrade ด้วย ค่าเริ่มต้นตาม rigor"),
   "workflow.worktreeDir": ns("Folder where lane worktrees are created", "โฟลเดอร์ที่สร้าง worktree ของแต่ละ lane"),
   "workflow.branchPrefix": ns("Prefix of lane branch names (ends with a slash)", "คำนำหน้าชื่อ branch ของแต่ละ lane (ลงท้ายด้วย /)"),
@@ -257,6 +258,7 @@ export const MACHINE_SWITCHES = {
   "workflow.testMode": ns("How often the full test suite runs, for this machine only", "ความถี่ที่รันชุดทดสอบทั้งหมด เฉพาะเครื่องนี้"),
   "workflow.lanes.code": ns("How many code lanes may run at once, for this machine only", "จำนวนเลนโค้ดที่รันพร้อมกันได้ เฉพาะเครื่องนี้"),
   "workflow.sideLanes.max": ns("How many side cards may be in progress at once, for this machine only", "จำนวนการ์ดข้างที่ทำพร้อมกันได้ เฉพาะเครื่องนี้"),
+  "models.effort": ns("Whether the agents use a lower effort for small cards (fixed or by-size), for this machine only", "ใช้ effort ที่ต่ำลงกับการ์ดเล็กหรือไม่ (fixed หรือ by-size) เฉพาะเครื่องนี้"),
   [TEST_MODE_ENV]: ns("Environment variable: the test mode for this shell or run; it beats the local file and saf.config.json", "ตัวแปรสภาพแวดล้อม: โหมดทดสอบของ shell หรือการรันนี้ ชนะทั้งไฟล์ local และ saf.config.json"),
   [`${STOP_HOOK_ENV}=off`]: ns("Environment variable: turns off the Stop-hook reminder about a card that has not passed", "ตัวแปรสภาพแวดล้อม: ปิดการเตือนของ Stop hook เรื่องการ์ดที่ยังไม่ผ่าน"),
 };

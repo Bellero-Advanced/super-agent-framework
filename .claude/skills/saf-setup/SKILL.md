@@ -38,7 +38,7 @@ detection (say what you detected instead):
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")
 
 Test mode and the two lane caps are per-machine choices. The untracked `saf.config.local.json` may hold `workflow.testMode`,
-`workflow.lanes.code` and `workflow.sideLanes.max` and nothing else (the engine refuses anything outside `LOCAL_KEYS`,
+`workflow.lanes.code`, `workflow.sideLanes.max` and `models.effort` and nothing else (the engine refuses anything outside `LOCAL_KEYS`,
 `$schema` and `workflow.lanes.main` included). When the person says their machine is slow (or fast), offer to write the
 test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
 code-lane cap (`workflow.lanes.code`, at most `LANE_CEILING` in `config.mjs`) or a side-card cap (`workflow.sideLanes.max`)

@@ -32,8 +32,8 @@ How often the **full** test suite runs is `workflow.testMode` (`every-card` · `
 `milestone`). In the deferred modes a card proves itself with its own tests and its evidence says "full suite deferred to
 gate". In `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card
 merges (when the gate fails, `{{cmd.taskCulprit}}` finds the card that broke it). Each person can override the mode with
-`SAF_TEST_MODE` or an untracked `saf.config.local.json` (it may hold `workflow.testMode`, `workflow.lanes.code` and
-`workflow.sideLanes.max`; any other key, including `$schema`, is refused). Lane caps have no environment variable (every
+`SAF_TEST_MODE` or an untracked `saf.config.local.json` (it may hold `workflow.testMode`, `workflow.lanes.code`,
+`workflow.sideLanes.max` and `models.effort`; any other key, including `$schema`, is refused). Lane caps have no environment variable (every
 session must count the same caps) and are at most `LANE_CEILING` in `tools/saf/lib/config.mjs`.
 
 ## 2. Card format

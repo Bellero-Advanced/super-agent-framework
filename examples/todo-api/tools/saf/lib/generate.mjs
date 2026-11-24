@@ -1,10 +1,11 @@
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, posix, relative } from "node:path";
-import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
+import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, ROLE_LIBRARY, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
+import { variantAgents } from "./effort.mjs";
 import { FRICTION_FILE } from "./friction.mjs";
 import { loadPlan } from "./plan.mjs";
 import { generatedFiles } from "./task.mjs";
@@ -248,12 +249,37 @@ function plannedFiles(config, data, detected) {
     const src = role.custom ? join(TEMPLATES, "agents", "_custom.md") : join(TEMPLATES, "agents", `${role.name}.md`);
     out.push({ dest: `.claude/agents/${role.name}.md`, content: render(readTemplate(src), { ...data, role: { ...role, summaryYaml: JSON.stringify(role.summary || role.name) } }) });
   }
+  out.push(...variantFiles(config, data));
   for (const rule of ruleSet(config, detected)) {
     out.push({ dest: `.claude/rules/${rule.name}.md`, content: render(readTemplate(join(TEMPLATES, "rules", `${rule.name}.md`)), { ...data, rulePathsYaml: rule.paths.map((p) => `  - ${JSON.stringify(p)}`).join("\n") }) });
   }
   out.push(...skillFiles(config, data));
   return out;
 }
+
+/** The prefix a variant agent's description starts with (docs/specs/effort-by-size.md rule 7). */
+const variantNote = (role, effort) => `Same as ${role} at ${effort} effort — use it only when task:start names it.`;
+
+/** Variant agent files of by-size mode: the base role template rendered with the variant effort, then `name:` and `description:` rewritten. */
+function variantFiles(config, data) {
+  const out = [];
+  for (const v of variantAgents(config)) {
+    const role = data.roles.find((r) => r.name === v.role);
+    if (!role) continue;
+    const base = render(readTemplate(join(TEMPLATES, "agents", `${role.name}.md`)), { ...data, role: { ...role, effort: v.effort, summaryYaml: JSON.stringify(role.summary || role.name) } });
+    const content = base
+      .replace(/^name:.*$/m, `name: ${v.name}`)
+      .replace(/^description:[ \t]*(.*)$/m, (_, d) => `description: ${JSON.stringify(`${variantNote(v.role, v.effort)} ${d.startsWith('"') ? JSON.parse(d) : d}`)}`);
+    out.push({ dest: `.claude/agents/${v.name}.md`, content });
+  }
+  return out;
+}
+
+/** Whether `rel` is a variant agent file of a role of this project (`.claude/agents/<role>-<effort>.md`). */
+const isVariantDest = (rel, config) => {
+  const m = rel.match(/^\.claude\/agents\/(.+)-(low|medium|high|xhigh|max)\.md$/);
+  return !!m && (Object.hasOwn(ROLE_LIBRARY, m[1]) || config.roles.custom.some((r) => r.name === m[1]));
+};
 
 /** Skill files rendered with the project's data (commands, languages) — core skills + chosen packs. */
 function skillFiles(config, data) {
@@ -811,8 +837,9 @@ export function refreshKitFiles(root) {
   const pkg = config.stack.packageManager === "none" ? null : readJson(join(root, "package.json"), null);
   const data = templateData(config, detected, { scripts: pkg?.scripts ?? null, version: SAF_VERSION() });
   const kitDirs = [".claude/commands/", ".claude/skills/"];
+  const inKit = (rel) => kitDirs.some((d) => rel.startsWith(d)) || isVariantDest(rel, config);
   const planned = plannedFiles(config, data, detected);
-  for (const f of planned.filter((x) => kitDirs.some((d) => x.dest.startsWith(d)))) {
+  for (const f of planned.filter((x) => inKit(x.dest))) {
     if (f.fallback) report.warnings.push(fallbackWarning(f, config.people.docLanguage));
     const abs = join(root, f.dest);
     if (existsSync(abs)) {
@@ -832,7 +859,7 @@ export function refreshKitFiles(root) {
     manifest.files[f.dest] = sha(f.content);
     report.written.push(f.dest);
   }
-  const scoped = { files: Object.fromEntries(Object.entries(manifest.files).filter(([rel]) => kitDirs.some((d) => rel.startsWith(d)))) };
+  const scoped = { files: Object.fromEntries(Object.entries(manifest.files).filter(([rel]) => inKit(rel))) };
   const before = Object.keys(scoped.files);
   applyRetire(root, planRetire(root, scoped.files, new Set(planned.map((x) => x.dest))), scoped.files, report);
   for (const rel of before) if (!(rel in scoped.files)) delete manifest.files[rel];

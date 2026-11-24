@@ -33,7 +33,7 @@
 (เลื่อนไปที่ประตู) · ในโหมด `milestone` ประตูออกรัน test ทั้งชุดเสมอ ส่วนในโหมด `targeted` test ทั้งชุดรันตอนรวมการ์ดสาย
 (ถ้าประตูล้ม `{{cmd.taskCulprit}}` หาการ์ดที่ทำให้ล้ม) · แต่ละคนเปลี่ยนโหมดในเครื่องตัวเองได้ด้วย `SAF_TEST_MODE`
 หรือไฟล์ `saf.config.local.json` ที่ git ไม่ track (ใส่ได้ `workflow.testMode` · `workflow.lanes.code` ·
-`workflow.sideLanes.max` · key อื่นรวมถึง `$schema` ถูกปฏิเสธ) · เพดาน lane ไม่มีตัวแปรสภาพแวดล้อม (ทุก session
+`workflow.sideLanes.max` · `models.effort` · key อื่นรวมถึง `$schema` ถูกปฏิเสธ) · เพดาน lane ไม่มีตัวแปรสภาพแวดล้อม (ทุก session
 ต้องนับเพดานเดียวกัน) และตั้งได้ไม่เกิน `LANE_CEILING` ใน `tools/saf/lib/config.mjs`
 
 ## 2. รูปแบบการ์ด
