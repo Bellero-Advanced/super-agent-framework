@@ -30,7 +30,8 @@ for (const bad of ["{ nope", "[]", "null"]) {
     const dest = plan.merges.settings.localArchivedTo;
     assert.equal(dest, `${ARCHIVE}/${LOCAL}`, "the plan names the archive target");
     const line = planLines(plan).find((l) => l.includes(`${SETTINGS}:`));
-    assert.ok(line.includes(`${LOCAL} not valid JSON, archived to ${dest}`), line);
+    const reason = bad === "{ nope" ? "not valid JSON" : "root is not a JSON object";
+    assert.ok(line.includes(`${LOCAL} ${reason}, archived to ${dest}`), line);
     assert.ok(!planLines(plan).join("\n").includes(SECRET), "no env value in the dry run");
     assert.equal(read(root, LOCAL), bad, "a dry run writes nothing");
 
