@@ -574,3 +574,50 @@ test("REL-AC-06 the tag confirmation needs the peeled line to be the release com
   const none = (cmd, args) => (cmd === "git" && verbOf(args) === "ls-remote" && args.length === 5 ? { code: 0, out: `${"a".repeat(40)}\trefs/tags/v0.5.0\n`, err: "" } : undefined);
   assert.equal(run(rel.tagRelease, tagCtx(prepared(), ["success"], { intercept: none })).code, 1, "no peeled line: refused");
 });
+
+// ── round 2 review: a dangling link, a commit that happened anyway, a reset that failed ──
+
+test("REL-AC-05 a committed dangling link at the release log is never written through: exit 1, its target is not created, no write call", (t) => {
+  const f = fixture();
+  const outside = tmp("saf-run-outside-");
+  const target = join(outside, "missing-startup-file");
+  try {
+    symlinkSync(target, join(f.root, "docs/plan/releases.md"), "file");
+  } catch {
+    return t.skip("links cannot be made here");
+  }
+  commitAll(f.root, "a dangling link where the release log goes");
+  git(f.root, "push", "-q", "origin", "main");
+  const ctx = ctxOf(f);
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /docs\/plan\/releases\.md is a symbolic link/);
+  assert.equal(existsSync(target), false, "nothing was created where the link points");
+  assert.deepEqual(writeCalls(ctx.run.calls), []);
+  assert.equal(read(f.root, "package.json").includes("0.5.0"), false, "no file was written before the refusal");
+});
+
+test("REL-AC-05 a commit that fails after git made it is reported as made: the files stay, nothing is reset or pushed, and the advice is printed", () => {
+  const f = fixture();
+  const real = rel.commandRunner(f.root);
+  const ctx = ctxOf(f, { intercept: (cmd, args) => (cmd === "git" && verbOf(args) === "commit" ? { ...real(cmd, args), code: 1, err: "post-commit hook failed" } : undefined) });
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /the release commit exists in your local main/);
+  assert.match(r.text, /reset the local commit, pull, then run --prepare again — or rebase it onto origin and push it yourself, then run --tag/);
+  assert.doesNotMatch(r.text, /nothing was committed|back as it was/);
+  assert.equal(git(f.root, "log", "-1", "--format=%s"), "chore(release): v0.5.0 (M1)");
+  assert.equal(read(f.root, "VERSION"), "0.5.0\n", "the committed bytes are not restored over");
+  assert.deepEqual(pushes(ctx.run.calls), []);
+  assert.ok(!gitCalls(ctx.run.calls).some((a) => verbOf(a) === "reset"), "no reset after the commit exists");
+});
+
+test("REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back", () => {
+  const f = fixture();
+  const ctx = ctxOf(f, { intercept: (cmd, args) => (cmd === "git" && verbOf(args) === "commit" ? { code: 1, out: "", err: "hook failed: no" } : cmd === "git" && verbOf(args) === "reset" ? { code: 1, out: "", err: "index.lock exists" } : undefined) });
+  const r = run(rel.prepareRelease, ctx);
+  assert.equal(r.code, 1, r.text);
+  assert.match(r.text, /still staged: package\.json.*index\.lock exists/);
+  assert.doesNotMatch(r.text, /every file is back as it was/);
+  assert.deepEqual(pushes(ctx.run.calls), []);
+});

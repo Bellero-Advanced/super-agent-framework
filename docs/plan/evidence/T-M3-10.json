@@ -13,19 +13,19 @@
       "source": "repo"
     }
   },
-  "attempts": 5,
+  "attempts": 6,
   "lane": 1,
   "branch": "card/T-M3-10",
   "worktree": ".claude/worktrees/T-M3-10",
   "verified": {
-    "at": "2026-11-24T20:35:19.948Z",
-    "head": "293b351167201cebe38d2d214e4b92bf9c15343d",
+    "at": "2026-11-24T20:42:53.288Z",
+    "head": "c37a2f4f0ce5149b65a096fecf2f590f5605579f",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 893,
+        "ms": 441,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -52,40 +52,40 @@
       {
         "cmd": "node --test test/unit/release-run.test.mjs test/unit/release-guards.test.mjs",
         "exit": 0,
-        "ms": 35486,
+        "ms": 36832,
         "tail": [
-          "ok 44 - REL-AC-05 a file that is not UTF-8 comes back byte for byte when the commit fails",
+          "ok 47 - REL-AC-05 a commit that fails after git made it is reported as made: the files stay, nothing is reset or pushed, and the advice is printed",
           "  ---",
-          "  duration_ms: 644.0115",
+          "  duration_ms: 592.512042",
           "  type: 'test'",
           "  ...",
-          "# Subtest: REL-AC-06 the tag confirmation needs the peeled line to be the release commit",
-          "ok 45 - REL-AC-06 the tag confirmation needs the peeled line to be the release commit",
+          "# Subtest: REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
+          "ok 48 - REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
           "  ---",
-          "  duration_ms: 1775.742833",
+          "  duration_ms: 462.491708",
           "  type: 'test'",
           "  ...",
-          "1..45",
-          "# tests 45",
+          "1..48",
+          "# tests 48",
           "# suites 0",
-          "# pass 45",
+          "# pass 48",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 35406.168333"
+          "# duration_ms 36778.84925"
         ]
       },
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/release.mjs','utf8');if(/unpublish|deprecate|--force|push\\s+-f|tag\\s+-d|--delete|npm\\s+publish|'publish'/.test(s))process.exit(1)\"",
         "exit": 0,
-        "ms": 56,
+        "ms": 53,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 409,
+        "ms": 433,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -95,7 +95,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 419,
+        "ms": 407,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -105,28 +105,28 @@
       {
         "cmd": "node --test 'test/unit/release-guards.test.mjs' 'test/unit/release-run.test.mjs'",
         "exit": 0,
-        "ms": 35592,
+        "ms": 32377,
         "tail": [
-          "ok 44 - REL-AC-05 a file that is not UTF-8 comes back byte for byte when the commit fails",
+          "ok 47 - REL-AC-05 a commit that fails after git made it is reported as made: the files stay, nothing is reset or pushed, and the advice is printed",
           "  ---",
-          "  duration_ms: 699.488042",
+          "  duration_ms: 498.255125",
           "  type: 'test'",
           "  ...",
-          "# Subtest: REL-AC-06 the tag confirmation needs the peeled line to be the release commit",
-          "ok 45 - REL-AC-06 the tag confirmation needs the peeled line to be the release commit",
+          "# Subtest: REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
+          "ok 48 - REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
           "  ---",
-          "  duration_ms: 2058.175292",
+          "  duration_ms: 456.587083",
           "  type: 'test'",
           "  ...",
-          "1..45",
-          "# tests 45",
+          "1..48",
+          "# tests 48",
           "# suites 0",
-          "# pass 45",
+          "# pass 48",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 35537.245916"
+          "# duration_ms 32325.310042"
         ]
       }
     ],
@@ -147,11 +147,11 @@
         ".claude/commands/saf.md": "6a7281dd3fa36b15142988c8043b88b558ac21ec",
         "kit/tools-saf/bin/saf.mjs": "2478768dca24871624e334b7fe364bd404545cc5",
         "kit/tools-saf/lib/generate.mjs": "23208a07d41ab259b10e299d757c729b388e8763",
-        "kit/tools-saf/lib/release.mjs": "4342ab78bbcffd968505b5821783280a57392d83",
+        "kit/tools-saf/lib/release.mjs": "9dcfd464b88d1df68c23b3ca3a7bba72d8312184",
         "kit/tools-saf/templates/en/commands/saf.md": "a8de5ddb403bb5465f07430f3fdf4aeeacd73ea0",
         "kit/tools-saf/templates/th/commands/saf.md": "caaab0d74adfff5ed79ee2379e17c002ca47e665",
         "test/unit/release-guards.test.mjs": "39b10c64b478214163e8d7cea9ab0ff961a77e13",
-        "test/unit/release-run.test.mjs": "defae943a9cd3f19461db90f62f00a9c0a474e2f"
+        "test/unit/release-run.test.mjs": "f13a8fba1f241b20510cf9ab1bff1eab73b325c9"
       }
     },
     "scenarios": {
@@ -165,12 +165,12 @@
     "size": {
       "size": "M",
       "code": {
-        "lines": 330,
+        "lines": 337,
         "cap": 800,
         "stop": 1600
       },
       "test": {
-        "lines": 603,
+        "lines": 650,
         "cap": 600,
         "stop": 1200
       },

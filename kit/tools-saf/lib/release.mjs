@@ -453,13 +453,14 @@ function plannedPath(ctx, file, planned) {
   const abs = join(ctx.root, file);
   const inside = relative(realpathSync(ctx.root), realpathSync(dirname(abs)));
   if (/^\.\.([\\/]|$)/.test(inside) || /^([A-Za-z]:)?[\\/]/.test(inside)) throw new Error(`${oneLine(file)} is outside the project (a linked folder)`);
-  if (existsSync(abs) && lstatSync(abs).isSymbolicLink()) throw new Error(`${oneLine(file)} is a symbolic link`);
+  if (lstatSync(abs, { throwIfNoEntry: false })?.isSymbolicLink()) throw new Error(`${oneLine(file)} is a symbolic link`); // lstat, not existsSync: a dangling link must be seen too
   return abs;
 }
 
-/** The one place a file is written. */
+/** The one place a file is written; a file that is not there yet is created exclusively (never through something that appeared meanwhile). */
 function putFile(ctx, file, data, planned) {
-  writeFileSync(plannedPath(ctx, file, planned), data);
+  const abs = plannedPath(ctx, file, planned);
+  writeFileSync(abs, data, { flag: lstatSync(abs, { throwIfNoEntry: false }) ? "w" : "wx" });
 }
 
 /** Put the named files back byte for byte (`bytes` null = the file did not exist). Never throws: returns the files it could not put back. */
@@ -469,7 +470,7 @@ function restore(ctx, files, touched) {
     try {
       const f = files.get(file);
       if (f.bytes !== null) putFile(ctx, file, f.bytes, files);
-      else if (existsSync(join(ctx.root, file))) rmSync(plannedPath(ctx, file, files));
+      else if (lstatSync(join(ctx.root, file), { throwIfNoEntry: false })) rmSync(plannedPath(ctx, file, files));
     } catch {
       failed.push(file);
     }
@@ -573,9 +574,10 @@ export function prepareRelease(ctx, mid, { out: write }) {
   }
   const paths = [...files.keys()];
   const touched = [];
-  const undo = (why) => {
+  const undo = (reason, staged = "") => {
     const left = restore(ctx, files, touched);
-    return out(`✗ ${why} — ${left.length ? `could not put back: ${left.join(", ")}` : "every file is back as it was"}, nothing was committed or pushed`), 1;
+    const trouble = [left.length ? `could not put back: ${left.join(", ")}` : "", staged].filter(Boolean);
+    return out(`✗ ${reason} — ${trouble.length ? trouble.join("; ") : "every file is back as it was"}; nothing was committed or pushed`), 1;
   };
   try {
     for (const [file, f] of files) {
@@ -586,8 +588,13 @@ export function prepareRelease(ctx, mid, { out: write }) {
     return undo(oneLine(e?.message));
   }
   const failed = (what, r) => {
-    gitw(ctx, out, "--literal-pathspecs", "reset", "-q", "--", ...paths); // unstage what git add took
-    return undo(`${what} failed (${why(r)})`);
+    if (git(ctx, "rev-parse", "HEAD").out.trim() !== base) {
+      // git made the commit although it reported a failure (a hook after the commit): never write over it, never say it was not made
+      out(`✗ ${what} reported a failure (${why(r)}) but the release commit exists in your local ${d.s.branch} — nothing was pushed and no file was touched: a person decides (${NEXT_AFTER_REJECTED})`);
+      return 1;
+    }
+    const reset = gitw(ctx, out, "--literal-pathspecs", "reset", "-q", "--", ...paths); // unstage what git add took
+    return undo(`${what} failed (${why(r)})`, reset.code === 0 ? "" : `still staged: ${paths.join(", ")} (the reset failed: ${why(reset)})`);
   };
   const added = gitw(ctx, out, "--literal-pathspecs", "add", "--", ...paths);
   if (added.code !== 0) return failed("git add", added);
