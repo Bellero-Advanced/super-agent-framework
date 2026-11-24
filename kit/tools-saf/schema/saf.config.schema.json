@@ -96,7 +96,8 @@
             }
           }
         },
-        "reportLanguage": { "enum": ["en", "th"] }
+        "reportLanguage": { "enum": ["en", "th"] },
+        "lanes": { "type": "object", "additionalProperties": { "enum": ["code", "main"] } }
       }
     },
     "skills": {
