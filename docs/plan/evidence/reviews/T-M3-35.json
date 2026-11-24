@@ -1,0 +1,18 @@
+{
+  "id": "T-M3-35",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T18:51:36.936Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "effortLines returns nothing for a card without an agent line; rule 9 needs the size note line (role-less legacy S)",
+      "head": "79c710877e24a860819248c0d7fde8db6812c403",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T18:45:06.808Z"
+    }
+  ]
+}
