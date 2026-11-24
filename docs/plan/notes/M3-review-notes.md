@@ -69,3 +69,15 @@ P5. task:prerun is not in the generated CLAUDE.md / plan README command lists no
 P6. untested: the plan-with-problems refusal and yarn/bun command forms
 P7. the card's own `npm run saf:refresh -- --check` mark is redundant in this repo (it is a merge check and so already a guard)
 P8. /tmp diff file omitted examples/todo-api/package.json — build review diffs from verified.files.changed (T-M3-31 `task:diff` does this)
+
+## T-M3-31 (review PASS at round 1) — notes for the designer
+
+Q1. reviewdiff.mjs ~220/233: for a lane card run from the MAIN folder `cardFiles`/`cardSize` use the main folder's `ctx.config` (incl. local overrides), verify in the worktree uses the worktree's config — a card that changes `workflow.alwaysAllowed` or the size caps (or local overrides) can make the main-folder diff differ from verify and from the worktree run (AC-03 "same content") — load the config from the worktree
+Q2. reviewdiff.mjs ~190: a file in both the tracked diff and the untracked list (existed at base, `git rm --cached` but kept on disk) is shown as a brand-new file instead of a diff against the base (list complete, one file's content misleading)
+Q3. the /saf sentence says "files task:verify counted" but the command recomputes at run time — a header line saying whether the files match `verified.files.hashes` would close it
+Q4. submodule card: the header shows only the root base, not the submodule `repoBase`
+Q5. saf.mjs:60 "1 git failed" but a failed write/rename also exits 1; the AC-04 exit-1 test goes through the generic error path (3 stack lines); `runGit`'s DiffError path (incl. output-too-large) is untested
+Q6. a merged lane card whose worktree was removed gets `--worktree --resume` advice (wrong for a merged card; the spec mandates the wording for a missing worktree)
+Q7. en "none fits → none" vs th "ไม่มีข้อไหนตรง → ไม่ระบุ" say slightly different things
+Q8. examples/todo-api/.claude/commands/saf.md and its CLAUDE.md are stale against the templates; no sync test for this repo's `.claude/commands/*` vs the rendered templates (agents have one) — F-009 root cause: card
+Q9. AC-04 refusal inside a lane does not check that nothing was written in the lane folder
