@@ -49,7 +49,7 @@ import {
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
- *   setup --answers <file.json> [--adopt|--no-adopt] [--dry-run] · detect · config --check · version
+ *   setup --answers <file.json> [--adopt|--no-adopt] [--dry-run [--diff]] [--keep <path>[,<path>…]] · detect · config --check · version
  *   choices --group <1-8|flow> [--lang en|th]   what each option of an interview group means (exit 2 usage)
  *   choices --not-asked [--lang en|th]          settings the setup interview does not ask, and where to change them (exit 2 usage)
  *
@@ -355,8 +355,16 @@ async function main() {
     case "setup": {
       const i = rawArgv.indexOf("--answers");
       const file = i >= 0 ? rawArgv[i + 1] : undefined;
-      if (!file) {
-        err("usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run]");
+      const keep = [];
+      let keepUsage = false;
+      rawArgv.forEach((a, n) => {
+        if (a !== "--keep") return;
+        const v = rawArgv[n + 1];
+        if (!v || v.startsWith("--")) keepUsage = true;
+        else keep.push(...v.split(",").map((p) => p.trim()).filter(Boolean));
+      });
+      if (!file || keepUsage || (rawArgv.includes("--diff") && !rawArgv.includes("--dry-run"))) {
+        err("usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run] [--diff] [--keep <path>[,<path>…]]  (--diff needs --dry-run)");
         return 2;
       }
       let root = process.cwd();
@@ -367,21 +375,29 @@ async function main() {
           root = process.cwd();
         }
       }
-      const { generate, planSetup, planLines } = await import("../lib/generate.mjs");
+      const { generate, planSetup, planLines, planDiffs } = await import("../lib/generate.mjs");
       const answers = JSON.parse(readFileSync(resolve(file), "utf8"));
       const adopt = rawArgv.includes("--adopt") ? true : rawArgv.includes("--no-adopt") ? false : undefined;
-      if (rawArgv.includes("--dry-run")) {
-        const lines = planLines(planSetup(root, answers, { adopt }));
-        out("setup --dry-run: nothing was written");
-        for (const line of lines) out(line);
+      try {
+        if (rawArgv.includes("--dry-run")) {
+          const plan = planSetup(root, answers, { adopt, keep });
+          const lines = planLines(plan);
+          if (rawArgv.includes("--diff")) lines.push("", ...planDiffs(plan));
+          out("setup --dry-run: nothing was written");
+          for (const line of lines) out(line);
+          return 0;
+        }
+        const { report } = generate(root, answers, { adopt, keep });
+        out(`✓ SAF setup generated ${report.written.length} file(s)`);
+        for (const a of report.archived) out(`  archived: ${a}`);
+        for (const r of report.removed) out(`  removed (no longer shipped): ${r}`);
+        for (const w of report.warnings) err(`  ⚠ ${w}`);
         return 0;
+      } catch (e) {
+        if (e?.code !== "SETUP_KEEP") throw e;
+        err(`✗ ${e.message}`);
+        return 2;
       }
-      const { report } = generate(root, answers, { adopt });
-      out(`✓ SAF setup generated ${report.written.length} file(s)`);
-      for (const a of report.archived) out(`  archived: ${a}`);
-      for (const r of report.removed) out(`  removed (no longer shipped): ${r}`);
-      for (const w of report.warnings) err(`  ⚠ ${w}`);
-      return 0;
     }
     case "choices": {
       const rest = [sub, ...more];

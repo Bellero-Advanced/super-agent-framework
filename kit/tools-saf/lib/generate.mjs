@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative } from "node:path";
+import { dirname, isAbsolute, join, posix, relative } from "node:path";
 import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
+import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
 import { loadPlan } from "./plan.mjs";
 import { generatedFiles } from "./task.mjs";
@@ -248,6 +249,7 @@ const REASONS = {
   update: "SAF wrote it, nobody edited it — new content",
   "replace-edited": `edited, or not written by SAF — moved to ${ARCHIVE}/ and replaced`,
   "keep-edited": "edited living file — kept, the new settings do not reach it",
+  "keep-asked": "kept as you asked (--keep) — the new settings do not reach it",
   remove: "no longer shipped, unedited — removed",
   "keep-unplanned": "no longer shipped, but edited in this project — kept",
   adopt: "existing file SAF did not write — moved aside first",
@@ -449,13 +451,38 @@ function planStatus(root, config, writes, moved) {
   }
 }
 
+/** A path as `--keep` may give it: forward slashes, no "./" or "a/../", relative to the project root. */
+export function keepPath(root, p) {
+  const raw = String(p).trim();
+  const rel = isAbsolute(raw) ? relative(root, raw) : raw;
+  return posix.normalize(rel.split("\\").join("/"));
+}
+
+/**
+ * Matches the `--keep` paths with the planned rendered files (exact, else the one file that differs only in letter case) and
+ * returns the set of planned paths to keep. A path that is not planned, or whose file is missing, is an error naming it.
+ */
+function resolveKeep(root, keepAsked, files) {
+  const planned = files.map((f) => f.dest);
+  const found = new Set();
+  const bad = [];
+  for (const [norm, typed] of keepAsked) {
+    const hits = planned.includes(norm) ? [norm] : planned.filter((d) => d.toLowerCase() === norm.toLowerCase());
+    if (hits.length !== 1) bad.push(`--keep ${typed}: not a file setup plans to write`);
+    else if (!existsSync(join(root, hits[0]))) bad.push(`--keep ${typed}: ${hits[0]} does not exist yet, so there is nothing to keep`);
+    else found.add(hits[0]);
+  }
+  if (bad.length) throw Object.assign(new Error(bad.join("\n")), { code: "SETUP_KEEP" });
+  return found;
+}
+
 /**
  * Computes everything a setup run would do and writes nothing (no file, folder, manifest or `.saf/`).
  * Returns the per-file `actions` (create · same · update · replace-edited · keep-edited · remove · keep-unplanned, each with
  * a reason), the `merges` as data, the `report` the real run returns, and the resolved `config`. `applySetup` performs it.
  * @param {string} root project folder
  * @param {object} answers partial or full config
- * @param {{now?:Date, adopt?:boolean}} opts
+ * @param {{now?:Date, adopt?:boolean, keep?:string[]}} opts `keep`: paths to keep as they are (a planned rendered file, not written, manifest entry unchanged)
  */
 export function planSetup(root, answers, opts = {}) {
   const errors = validateConfig(answers);
@@ -470,6 +497,8 @@ export function planSetup(root, answers, opts = {}) {
   // a project SAF already set up (manifest present) is a re-run: never archive in bulk, only replace files one by one
   const rerun = existsSync(join(root, MANIFEST));
   const adopt = !rerun && (opts.adopt ?? detected.adopt);
+  const keepAsked = new Map((opts.keep ?? []).map((p) => [keepPath(root, p), p])); // normalised path → as the person typed it
+  const keptLower = new Set([...keepAsked.keys()].map((k) => k.toLowerCase())); // a kept file is not moved aside by adopt
   const taken = new Set();
   const archiveLine = (rel, to) => `${rel} → ${to}`;
 
@@ -479,7 +508,7 @@ export function planSetup(root, answers, opts = {}) {
     for (const dir of [".claude/agents", ".claude/commands", ".claude/rules", "docs/plan"]) {
       for (const abs of walk(join(root, dir))) {
         const rel = relative(root, abs).split("\\").join("/");
-        if (manifest.files[rel]) continue;
+        if (manifest.files[rel] || keptLower.has(rel.toLowerCase())) continue;
         const to = archiveDest(root, rel, taken);
         adoptMoves.push({ path: rel, to, reason: REASONS.adopt });
         report.archived.push(archiveLine(rel, to));
@@ -510,6 +539,7 @@ export function planSetup(root, answers, opts = {}) {
   // 3. rendered files: one action each
   const data = templateData(config, detected, { now: opts.now, scripts, version: SAF_VERSION() });
   const files = plannedFiles(config, data, detected);
+  const asked = resolveKeep(root, keepAsked, files);
   const next = { version: SAF_VERSION(), files: {} };
   const actions = [];
   for (const f of files) {
@@ -518,23 +548,28 @@ export function planSetup(root, answers, opts = {}) {
     if (present && !statSync(abs).isFile()) throw new Error(`${f.dest} is a folder — SAF plans a file there`);
     let action = "create";
     let to;
-    if (moved.has(f.dest)) action = "replace-edited"; // already moved aside by the adopt step
-    else if (present) {
+    let current;
+    if (moved.has(f.dest)) {
+      action = "replace-edited"; // already moved aside by the adopt step
+      current = readText(abs);
+    } else if (present) {
       const cur = readText(abs);
+      current = cur;
       const edited = cur !== f.content && !ownedUnchanged(f.dest);
-      action = cur === f.content ? "same" : !edited ? "update" : rerun && isLiving(f.dest) ? "keep-edited" : "replace-edited";
+      action = asked.has(f.dest) ? "keep-edited" : cur === f.content ? "same" : !edited ? "update" : rerun && isLiving(f.dest) ? "keep-edited" : "replace-edited";
       if (action === "replace-edited") {
         to = archiveDest(root, f.dest, taken);
         report.archived.push(archiveLine(f.dest, to));
       }
     }
-    const reason = moved.has(f.dest) ? REASONS.adopt : REASONS[action];
-    actions.push({ path: f.dest, action, reason, content: f.content, ...(to ? { to } : {}) });
+    const reason = moved.has(f.dest) ? REASONS.adopt : asked.has(f.dest) ? REASONS["keep-asked"] : REASONS[action];
+    const showsCurrent = current !== undefined && action !== "same";
+    actions.push({ path: f.dest, action, reason, content: f.content, ...(showsCurrent ? { current } : {}), ...(to ? { to } : {}) });
     if (action === "keep-edited") {
       // the team's own working file: keep its old manifest entry so the next run still sees it as edited
       if (manifest.files[f.dest]) next.files[f.dest] = manifest.files[f.dest];
       report.kept.push(f.dest);
-      report.warnings.push(`${f.dest} has your edits — kept, the new settings did not reach it`);
+      report.warnings.push(asked.has(f.dest) ? `${f.dest} kept as you asked (--keep) — the new settings did not reach it` : `${f.dest} has your edits — kept, the new settings did not reach it`);
       continue;
     }
     next.files[f.dest] = sha(f.content);
@@ -577,7 +612,7 @@ export function planSetup(root, answers, opts = {}) {
       adopt: adoptMoves,
       gitignore,
       packageJson,
-      config: { action: actionFor(join(root, CONFIG_FILE), configText), text: configText },
+      config: { action: actionFor(join(root, CONFIG_FILE), configText), text: configText, current: existsSync(join(root, CONFIG_FILE)) ? readText(join(root, CONFIG_FILE)) : undefined },
       settings,
       status,
       manifest: { action: manifestAction, text: manifestText },
@@ -640,6 +675,16 @@ export function planLines(plan) {
   for (const f of [...m.status, { path: MANIFEST, action: m.manifest.action }]) lines.push(`  ${f.path}: ${f.action}`);
   if (plan.report.warnings.length) lines.push("", "warnings:", ...plan.report.warnings.map((w) => `  ⚠ ${w}`));
   return lines;
+}
+
+/** What `--diff` shows, as lines: one unified diff (disk → new) per update · replace-edited · keep-edited file and for saf.config.json. */
+export function planDiffs(plan) {
+  const shown = new Set(["update", "replace-edited", "keep-edited"]);
+  const pairs = plan.actions.filter((a) => shown.has(a.action) && a.current !== undefined).map((a) => [a.path, a.current, a.content]);
+  if (plan.merges.config.action === "update") pairs.push([CONFIG_FILE, plan.merges.config.current, plan.merges.config.text]);
+  const lines = [];
+  for (const [path, a, b] of pairs) lines.push(...(unifiedDiff(path, a, b) || `${path}: no differences`).split("\n"));
+  return lines.length ? lines : ["no file to show a diff for"];
 }
 
 /**
