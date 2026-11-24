@@ -18,3 +18,5 @@ Earlier record, from before this log existed: [notes/M2-review-notes.md](notes/M
 - F-009 · 2026-11-24 · workaround · T-M3-31 · .claude/commands · the repo's own /saf command drifts from its template and needs a hand edit on every template change · evidence: T-M3-31 report: saf:refresh keeps the edited .claude/commands/saf.md so the repo's own /saf command must be hand-edited when the template changes
 - F-008 → carded · 2026-11-24 · T-M3-32
 - F-009 → carded · 2026-11-24 · T-M3-33
+- F-008 → fixed · 2026-11-24 · T-M3-32
+- F-010 · 2026-11-24 · command-failed · T-M3-33 · node --test · node --test with an existing and a missing file exits 0 so a combined Done-when command hides a missing new test file · evidence: T-M3-33 planning: task:prerun showed a combined Done-when command with one existing and one missing test file exits 0 on Node 22
