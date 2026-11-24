@@ -2,9 +2,9 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 12/34
+## M3 SAF builds itself — cards done 13/34
 
-- In progress: **T-M3-18** task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — started 2026-11-24 16:29 · not verified yet · lane 1 · .claude/worktrees/T-M3-18 · **T-M3-23** The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list — started 2026-11-24 16:31 · not verified yet · lane 2 · .claude/worktrees/T-M3-23
+- In progress: **T-M3-18** task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — started 2026-11-24 16:29 · not verified yet · lane 1 · .claude/worktrees/T-M3-18
 - Next: T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
 
 | Card | Work | Status | Evidence |
@@ -26,7 +26,7 @@
 | [T-M3-20](tasks/M3/T-M3-20.md) | saf choices and config --check refuse arguments they do not know, and a verify fallback names its real cause | · not started | – |
 | [T-M3-21](tasks/M3/T-M3-21.md) | Setup messages say what happened: "not a JSON object" for a valid non-object file, the archive path in every settings warning and dry-run line, and a minified package.json stays minified | · not started | – |
 | [T-M3-22](tasks/M3/T-M3-22.md) | The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception | ✓ passed | [T-M3-22.json](evidence/T-M3-22.json) · passed 2026-11-24 16:28 (5 commands) · full suite deferred to gate |
-| [T-M3-23](tasks/M3/T-M3-23.md) | The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list | ▶ in progress | [T-M3-23.json](evidence/T-M3-23.json) · started 2026-11-24 16:31 · not verified yet |
+| [T-M3-23](tasks/M3/T-M3-23.md) | The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list | ✓ passed | [T-M3-23.json](evidence/T-M3-23.json) · passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate |
 | [T-M3-24](tasks/M3/T-M3-24.md) | Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt) | · not started | – |
 | [T-M3-25](tasks/M3/T-M3-25.md) | Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested | · not started | – |
 | [T-M3-03](tasks/M3/T-M3-03.md) | models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check | · not started | – |
@@ -57,7 +57,7 @@
 
 ## Latest evidence
 
-- T-M3-23 The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list — started 2026-11-24 16:31 · not verified yet
+- T-M3-23 The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list — passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate
 - T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — started 2026-11-24 16:29 · not verified yet
 - T-M3-22 The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception — passed 2026-11-24 16:28 (5 commands) · full suite deferred to gate
 - T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read — passed 2026-11-24 16:26 (5 commands) · full suite deferred to gate

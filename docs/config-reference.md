@@ -17,7 +17,7 @@ validates; every engine command validates on load. Missing keys get the defaults
 | Key | Default | Notes |
 |---|---|---|
 | `ownerTitle` | `owner` | how documents and agents refer to you |
-| `docLanguage` · `chatLanguage` | `en` | `en` or `th`; generated docs and STATE use `docLanguage` |
+| `docLanguage` · `chatLanguage` | `en` | one of the keys of `TEXT` in `lib/text.mjs` (the same values as the enums in `tools/saf/schema/saf.config.schema.json`); generated docs and STATE use `docLanguage`; to add a language see [Add a document language](../CONTRIBUTING.md#add-a-document-language) |
 | `uiLanguages` · `i18nRequired` | `["en"]` · false | adds the i18n rule and the UI rule text |
 | `timeZone` | `UTC` | timestamps in STATE.md and reports |
 
@@ -49,7 +49,7 @@ See [roles.md](roles.md).
 |---|---|---|
 | `enabled` | the core roles | optional library roles to add; the core roles are always on |
 | `custom` | [] | your own roles, each with `name` and `description` |
-| `reportLanguage` | `en` | `en` or `th`; the language agents report in |
+| `reportLanguage` | `en` | one of the keys of `TEXT` in `lib/text.mjs`, like `docLanguage`; the language agents report in |
 | `lanes` | {} | role name → `code` or `main`: moves a library role to the other lane, e.g. `{"art-producer": "code"}` runs its cards in a worktree beside other cards. `designer`, `spec-reviewer` and `release-operator` are fixed, a custom role sets `lane` in `custom`, any other name is refused; no effect with `workflow.worktrees` off or `workflow.lanes.code` 0 — [roles.md](roles.md#moving-a-role-to-the-other-lane) |
 
 ## skills

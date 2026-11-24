@@ -19,12 +19,13 @@ export const VERIFY_DEFERS = {
 
 /**
  * Rule 15, merge column and exit-gate column: does `task:merge` skip the full-suite commands of `mergeChecks`,
- * and does the milestone exit gate add the full suite when no gate runs it? Unknown mode = neither.
+ * and does the milestone exit gate add a `full-suite` gate for the full-suite commands that no declared gate runs?
+ * Unknown mode = neither.
  */
 export const MERGE_SKIPS_FULL_SUITE = { "every-card": false, targeted: false, milestone: true };
 export const GATE_ADDS_FULL_SUITE = { "every-card": false, targeted: false, milestone: true };
 
-/** The extra exit gate of rule 19 (text: the en entry of the text table, rule 29; the `run` list is every full-suite command, see `fullSuiteCommands`). */
+/** The extra exit gate of rule 19 (text: the en entry of the text table, rule 29; `gatesWithFullSuite` fills its `run` list with the full-suite commands (see `fullSuiteCommands`) that no declared gate runs). */
 export const FULL_SUITE_GATE = { id: "full-suite", text: TEXT.en.fullSuiteGate };
 
 /** Placeholder in `stack.commands.testFiles` that is replaced by the quoted file paths. */
