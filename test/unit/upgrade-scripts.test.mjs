@@ -31,7 +31,7 @@ function rewritePkg(root, { drop = ["task:culprit"], indent = 2, eol = "\n", tai
 
 test("UPG-AC-01 upgrade adds the missing task:culprit and nothing else", async () => {
   const root = await project();
-  rewritePkg(root);
+  rewritePkg(root, { edit: (p) => Object.assign(p, { version: "1.2.3", dependencies: { left: "^1.0.0" }, custom: { keep: [1, "two", null] } }) });
   const before = JSON.parse(readPkg(root));
   assert.equal(before.scripts["task:culprit"], undefined);
   const lines = [];
@@ -44,6 +44,10 @@ test("UPG-AC-01 upgrade adds the missing task:culprit and nothing else", async (
   assert.deepEqual(res.scripts.added, ["task:culprit"]);
   assert.ok(lines.some((l) => l.includes("added script: task:culprit")));
   assert.deepEqual(Object.keys(after.scripts).at(-1), "task:culprit", "appended last");
+  const { scripts: _s1, ...otherAfter } = after;
+  const { scripts: _s2, ...otherBefore } = before;
+  assert.deepEqual(otherAfter, otherBefore, "UPG-AC-04 every top-level key besides scripts is unchanged");
+  assert.deepEqual(Object.keys(after), Object.keys(before), "UPG-AC-04 top-level key order is unchanged");
 });
 
 test("UPG-AC-02 a different existing script is kept and listed, the missing one is added", async () => {
@@ -87,6 +91,49 @@ test("UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept 
   rewritePkg(bare, { tail: false });
   await upgrade(bare);
   assert.ok(readPkg(bare).endsWith("}"), "no trailing newline stays none");
+});
+
+test("UPG-AC-04 a byte-order mark is kept when adding, with the indentation and line endings after it", async () => {
+  const root = await project();
+  rewritePkg(root, { indent: "\t", eol: "\r\n", tail: false });
+  writeFileSync(join(root, "package.json"), `\uFEFF${readPkg(root)}`);
+  const res = await upgrade(root);
+  const text = readPkg(root);
+  assert.deepEqual(res.scripts.added, ["task:culprit"]);
+  assert.ok(text.startsWith('\uFEFF{\r\n\t"'), "BOM, CRLF and tab kept");
+  assert.ok(!text.slice(1).includes("\uFEFF"), "one BOM only");
+  assert.ok(text.endsWith("}") && !text.endsWith("\n"), "no trailing newline stays none");
+  assert.equal(JSON.parse(text.slice(1)).scripts["task:culprit"], CULPRIT);
+});
+
+test("UPG-AC-05 a saf.config.json that fails the schema, and a package.json with a non-object root or scripts, are left alone with a line", async () => {
+  const schemaBad = await project();
+  const text = rewritePkg(schemaBad);
+  const cfg = JSON.parse(readFileSync(join(schemaBad, "saf.config.json"), "utf8"));
+  cfg.stack.packageManager = "not-a-manager";
+  writeFileSync(join(schemaBad, "saf.config.json"), JSON.stringify(cfg, null, 2));
+  const lines0 = [];
+  const r0 = await upgrade(schemaBad, { log: (s) => lines0.push(s) });
+  assert.equal(readPkg(schemaBad), text, "package.json untouched");
+  assert.deepEqual(r0.scripts.added, []);
+  assert.ok(lines0.some((l) => l.includes("saf.config.json") && l.includes("package.json scripts were not checked")), lines0.join("\n"));
+  assert.ok(r0.errors.length > 0, "the schema errors are returned");
+
+  for (const [name, body, words] of [
+    ["array root", "[1, 2]", "package.json is not a JSON object"],
+    ["null root", "null", "package.json is not a JSON object"],
+    ["string scripts", '{ "name": "x", "scripts": "nope" }', "`scripts` is not a JSON object"],
+    ["null scripts", '{ "name": "x", "scripts": null }', "`scripts` is not a JSON object"],
+    ["array scripts", '{ "name": "x", "scripts": [] }', "`scripts` is not a JSON object"],
+  ]) {
+    const root = await project();
+    writeFileSync(join(root, "package.json"), body);
+    const lines = [];
+    const res = await upgrade(root, { log: (s) => lines.push(s) });
+    assert.equal(readPkg(root), body, `${name}: untouched`);
+    assert.deepEqual(res.scripts.added, [], name);
+    assert.ok(lines.some((l) => l.includes(words) && l.includes("scripts were not added")), `${name}: ${lines.join("\n")}`);
+  }
 });
 
 test("UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone", async () => {

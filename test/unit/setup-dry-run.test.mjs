@@ -111,8 +111,8 @@ test("RERUN-AC-03 the CLI --dry-run in a set-up project and in an empty folder: 
   assert.match(e.stdout, /^create\s+CLAUDE\.md\s+\S/m);
   assert.deepEqual(readdirSync(empty), [], "no .saf/ or anything else appears");
 
-  const bad = cli(empty, "--dry-run");
-  assert.equal(bad.status, 0);
+  const again = cli(empty, "--dry-run");
+  assert.equal(again.status, 0, "a second dry run in the still-empty folder also exits 0");
   const wrong = spawnSync(process.execPath, [SAF_CLI, "setup", "--answers", answersFile({ project: { type: "nope" } }), "--dry-run"], { cwd: empty, encoding: "utf8" });
   assert.equal(wrong.status, 1, "invalid answers fail like setup");
   assert.equal(wrong.stdout, "", "the nothing-written line only follows a plan that worked");
@@ -169,7 +169,7 @@ test("RERUN-AC-04 one fixture with every action: the plan's actions match the re
   assert.equal(act[".claude/rules/gone.md"], "remove");
   assert.equal(act[".claude/rules/mine.md"], "keep-unplanned");
   assert.ok(plan.actions.every((a) => a.reason), "every line says why");
-  assert.deepEqual(plan.merges.packageJson.added.length > 5, true);
+  assert.ok(plan.merges.packageJson.added.length > 5);
 
   const { report } = generate(root, ANSWERS, { now: NOW });
 

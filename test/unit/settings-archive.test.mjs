@@ -48,13 +48,20 @@ for (const bad of ["{ nope", "[]", "null"]) {
   });
 }
 
-test("RERUN-AC-08 a second archive takes the next free name", () => {
+test("RERUN-AC-08 a second archive takes the next free name — in the plan and after a real run, which the ignore rule also covers", () => {
   const root = gitRepo();
   put(root, SETTINGS, withEnv());
   put(root, LOCAL, "{ nope");
   put(root, `${ARCHIVE}/${LOCAL}`, "older");
   const plan = planSetup(root, ANSWERS, { now: NOW });
   assert.equal(plan.merges.settings.localArchivedTo, `${ARCHIVE}/${LOCAL}.1`);
+  const { report } = generate(root, ANSWERS, { now: NOW });
+  assert.equal(read(root, `${ARCHIVE}/${LOCAL}`), "older", "the older archive is not overwritten");
+  assert.equal(read(root, `${ARCHIVE}/${LOCAL}.1`), "{ nope", "the new archive is the old local file, byte for byte");
+  assert.deepEqual(JSON.parse(read(root, LOCAL)), { env: { API_KEY: SECRET } });
+  assert.ok(report.archived.some((a) => a.includes(LOCAL) && a.endsWith(`${ARCHIVE}/${LOCAL}.1`)));
+  assert.ok(report.warnings.some((w) => w.includes(LOCAL) && w.includes(`${LOCAL}.1`)));
+  assert.equal(spawnSync("git", ["check-ignore", "-q", `${ARCHIVE}/${LOCAL}.1`], { cwd: root }).status, 0, "the .1 archive is git-ignored");
 });
 
 test("RERUN-AC-09 no env block: an invalid local file stays byte-identical and is not archived", () => {
@@ -77,6 +84,41 @@ test("RERUN-AC-09 a settings.json holding [] is archived and replaced by an obje
   const { report } = generate(root, ANSWERS, { now: NOW });
   assert.equal(read(root, dest), "[]");
   assert.ok(report.archived.some((a) => a.includes(dest)));
+  const now = JSON.parse(read(root, SETTINGS));
+  assert.ok(now.hooks.SessionStart && now.hooks.Stop);
+});
+
+for (const [what, body] of [["null", "null"], ["a string", '"hello"'], ["a number", "42"], ["a boolean", "true"]]) {
+  test(`RERUN-AC-09 a settings.json whose root is ${what} is archived and replaced by an object with the SAF hooks`, () => {
+    const root = gitRepo();
+    put(root, SETTINGS, body);
+    const plan = planSetup(root, ANSWERS, { now: NOW });
+    const dest = plan.merges.settings.archivedTo;
+    assert.equal(dest, `${ARCHIVE}/${SETTINGS}`);
+    assert.ok(planLines(plan).some((l) => l.includes(`root is not a JSON object, archived to ${dest}`)), planLines(plan).join("\n"));
+    assert.equal(read(root, SETTINGS), body, "a dry run writes nothing");
+    const { report } = generate(root, ANSWERS, { now: NOW });
+    assert.equal(read(root, dest), body, "archive is byte-identical");
+    assert.ok(report.archived.some((a) => a.includes(dest)));
+    assert.ok(report.warnings.some((w) => w.includes(SETTINGS) && w.includes(dest)));
+    const now = JSON.parse(read(root, SETTINGS));
+    assert.ok(now.hooks.SessionStart && now.hooks.Stop);
+    assert.ok(!("env" in now));
+  });
+}
+
+test("RERUN-AC-09 both settings files unreadable: settings.json is archived and replaced, the unreadable local file stays byte-identical and is not archived", () => {
+  const root = gitRepo();
+  put(root, SETTINGS, "{ nope");
+  put(root, LOCAL, "{ also nope");
+  const plan = planSetup(root, ANSWERS, { now: NOW });
+  assert.equal(plan.merges.settings.archivedTo, `${ARCHIVE}/${SETTINGS}`);
+  assert.equal(plan.merges.settings.localArchivedTo, null, "no env to move, so the local file is not in play");
+  const { report } = generate(root, ANSWERS, { now: NOW });
+  assert.equal(read(root, `${ARCHIVE}/${SETTINGS}`), "{ nope");
+  assert.equal(read(root, LOCAL), "{ also nope", "local file untouched");
+  assert.ok(!existsSync(join(root, ARCHIVE, LOCAL)));
+  assert.ok(!report.archived.some((a) => a.includes(LOCAL)));
   const now = JSON.parse(read(root, SETTINGS));
   assert.ok(now.hooks.SessionStart && now.hooks.Stop);
 });

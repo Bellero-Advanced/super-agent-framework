@@ -1,14 +1,184 @@
 {
   "id": "T-M3-24",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:59:50.654Z",
     "base": "fab1a9b00ee1d5856a6cd7ecc53927affe4c4ca1",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-24",
-  "worktree": ".claude/worktrees/T-M3-24"
+  "worktree": ".claude/worktrees/T-M3-24",
+  "verified": {
+    "at": "2026-11-24T17:06:34.813Z",
+    "head": "9b60a044f58b49d8608b7bc85e4a3902f1285400",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/upgrade-scripts.test.mjs test/unit/setup-rerun.test.mjs test/unit/setup-diff.test.mjs test/unit/setup-dry-run.test.mjs test/unit/settings-archive.test.mjs test/unit/doc-languages.test.mjs",
+        "exit": 0,
+        "ms": 4581,
+        "tail": [
+          "ok 59 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+          "  ---",
+          "  duration_ms: 569.822209",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "ok 60 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "  ---",
+          "  duration_ms: 1.170916",
+          "  type: 'test'",
+          "  ...",
+          "1..60",
+          "# tests 60",
+          "# suites 0",
+          "# pass 60",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 4515.054792"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 417,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 145 · gaps 29 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 354,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 589 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 276,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 271 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/doc-languages.test.mjs' 'test/unit/settings-archive.test.mjs' 'test/unit/setup-diff.test.mjs' 'test/unit/setup-dry-run.test.mjs' 'test/unit/setup-rerun.test.mjs' 'test/unit/upgrade-scripts.test.mjs'",
+        "exit": 0,
+        "ms": 4546,
+        "tail": [
+          "ok 59 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+          "  ---",
+          "  duration_ms: 586.824334",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "ok 60 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "  ---",
+          "  duration_ms: 0.732375",
+          "  type: 'test'",
+          "  ...",
+          "1..60",
+          "# tests 60",
+          "# suites 0",
+          "# pass 60",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 4488.48925"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "test/unit/doc-languages.test.mjs",
+        "test/unit/settings-archive.test.mjs",
+        "test/unit/setup-diff.test.mjs",
+        "test/unit/setup-dry-run.test.mjs",
+        "test/unit/setup-rerun.test.mjs",
+        "test/unit/upgrade-scripts.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "test/unit/doc-languages.test.mjs": "c6bc2ba8a5d6de86e781dfef1174236d53807a4e",
+        "test/unit/settings-archive.test.mjs": "e375e62873333e9faf8cf8c8797d04fe4fbe4aa0",
+        "test/unit/setup-diff.test.mjs": "d2b8f71ca1eb333f25b44a600dd191af0fc1ecdb",
+        "test/unit/setup-dry-run.test.mjs": "914a7767718efddd44d9adada0146646943681db",
+        "test/unit/setup-rerun.test.mjs": "944b3052978a2030f5e7f7a9365c9ff76924e79d",
+        "test/unit/upgrade-scripts.test.mjs": "1b0f7fdb11f2da984f8ed827580c4515705d54f9"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "UPG-AC-04",
+        "UPG-AC-05",
+        "RERUN-AC-01",
+        "RERUN-AC-05",
+        "RERUN-AC-06",
+        "RERUN-AC-08",
+        "RERUN-AC-09",
+        "LANG-AC-02"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 0,
+        "cap": 150
+      },
+      "test": {
+        "lines": 240,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/doc-languages.test.mjs",
+        "test/unit/settings-archive.test.mjs",
+        "test/unit/setup-diff.test.mjs",
+        "test/unit/setup-dry-run.test.mjs",
+        "test/unit/setup-rerun.test.mjs",
+        "test/unit/upgrade-scripts.test.mjs"
+      ]
+    }
+  }
 }

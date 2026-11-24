@@ -2,7 +2,7 @@ import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, gitRepo, lib, tmp } from "../helpers.mjs";
@@ -73,21 +73,73 @@ test("RERUN-AC-05 diffLines turns a known pair of texts into the expected hunk",
   assert.ok(DIFF_LIMITS.context >= 1 && DIFF_LIMITS.maxLines >= 100);
 });
 
+/**
+ * Checks one diff against both texts, the way a reader of the hunks would: the `-` and context lines are exactly the old
+ * lines at oldStart / oldLines, the `+` and context lines exactly the new lines at newStart / newLines, hunks are in order
+ * and apart, the context around a change is at most `context` lines, and the hunks rebuild the new text.
+ */
+function assertDiff(a, b, context, label) {
+  const split = (t) => (lf(t) === "" ? [] : lf(t).replace(/\n$/, "").split("\n"));
+  const [oldL, newL] = [split(a), split(b)];
+  const hunks = diffLines(a, b, { context });
+  assert.equal(hunks.length === 0, lf(a) === lf(b), `${label}: no hunks exactly when the texts are equal`);
+  let prevOldEnd = 0;
+  let prevNewEnd = 0;
+  for (const h of hunks) {
+    const body = h.lines.filter((l) => l[0] !== "\\");
+    assert.ok(body.every((l) => " -+".includes(l[0])), label);
+    const oldSide = body.filter((l) => l[0] !== "+").map((l) => l.slice(1));
+    const newSide = body.filter((l) => l[0] !== "-").map((l) => l.slice(1));
+    assert.equal(h.oldLines, oldSide.length, `${label}: oldLines`);
+    assert.equal(h.newLines, newSide.length, `${label}: newLines`);
+    const oldFrom = h.oldLines ? h.oldStart - 1 : h.oldStart;
+    const newFrom = h.newLines ? h.newStart - 1 : h.newStart;
+    assert.deepEqual(oldSide, oldL.slice(oldFrom, oldFrom + h.oldLines), `${label}: - and context lines are the old text at oldStart`);
+    assert.deepEqual(newSide, newL.slice(newFrom, newFrom + h.newLines), `${label}: + and context lines are the new text at newStart`);
+    assert.ok(oldFrom >= prevOldEnd && newFrom >= prevNewEnd, `${label}: hunks in order, not overlapping`);
+    [prevOldEnd, prevNewEnd] = [oldFrom + h.oldLines, newFrom + h.newLines];
+    const lead = body.findIndex((l) => l[0] !== " ");
+    const trail = body.length - 1 - body.findLastIndex((l) => l[0] !== " ");
+    assert.ok(lead <= context && trail <= context, `${label}: context at most ${context}`);
+  }
+  assert.deepEqual(apply(a, hunks), newL, `${label}: the hunks rebuild the new text`);
+}
+
 test("RERUN-AC-05 far-apart changes make separate hunks and every diff rebuilds the new text", () => {
   const a = Array.from({ length: 30 }, (_, i) => `line ${i}`).join("\n") + "\n";
   const b = a.replace("line 2\n", "two\n").replace("line 25\n", "");
   const hunks = diffLines(a, b);
   assert.equal(hunks.length, 2);
   assert.deepEqual(apply(a, hunks), lf(b).replace(/\n$/, "").split("\n"));
-  // a small seeded property run: random edits of random texts always rebuild
+  assertDiff(a, b, DIFF_LIMITS.context, "far apart");
+  // a small seeded property run: random edits of random texts — random final newline and CRLF too — always rebuild
   let seed = 7;
-  const rnd = (n) => (seed = (seed * 1103515245 + 12345) % 2147483648) % n;
-  for (let t = 0; t < 200; t++) {
+  const rnd = (n) => ((seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) >>> 16) % n; // 32-bit integer maths, high bits
+  const seen = [];
+  const text = (lines) => {
+    const eol = rnd(2) ? "\r\n" : "\n";
+    const out = lines.join(eol) + (lines.length && rnd(2) ? eol : "");
+    seen.push(out);
+    return out;
+  };
+  for (let t = 0; t < 300; t++) {
     const x = Array.from({ length: rnd(12) }, () => `l${rnd(4)}`);
     const y = Array.from({ length: rnd(12) }, () => `l${rnd(4)}`);
-    const [tx, ty] = [x.map((l) => `${l}\n`).join(""), y.map((l) => `${l}\n`).join("")];
-    assert.deepEqual(apply(tx, diffLines(tx, ty, { context: rnd(3) })), y, `${JSON.stringify(x)} -> ${JSON.stringify(y)}`);
+    assertDiff(text(x), text(y), rnd(3), `${JSON.stringify(x)} -> ${JSON.stringify(y)}`);
   }
+  const all = seen.join("");
+  assert.ok(seen.some((t) => t.includes("\r\n")) && seen.some((t) => /\S$/.test(t)) && seen.some((t) => t.endsWith("\n")), "the run has CRLF, no-final-newline and final-newline texts");
+  for (const l of ["l0", "l1", "l2", "l3"]) assert.ok(all.includes(l), `${l} was drawn`);
+});
+
+test("RERUN-AC-05 pairs with no final newline and with CRLF: the hunks match both texts and the markers sit on the last line", () => {
+  assertDiff("a\nb", "a\nb\n", 1, "newline added");
+  assertDiff("a\nb\n", "a\nb", 1, "newline dropped");
+  assertDiff("a\r\nb\r\nc", "a\r\nB\r\nc", 1, "CRLF, no final newline, middle changed");
+  assertDiff("a\r\nb\r\n", "a\nb\nc\n", 0, "CRLF on one side only");
+  const h = diffLines("a\nb", "a\nb\nc", { context: 1 });
+  assert.deepEqual(h, [{ oldStart: 1, oldLines: 2, newStart: 1, newLines: 3, lines: [" a", "-b", "\\ No newline at end of file", "+b", "+c", "\\ No newline at end of file"] }]);
+  assert.deepEqual(diffLines("a\r\nb\r\n", "a\nb\n"), []);
 });
 
 test("RERUN-AC-05 identical texts have no diff, and a CRLF-only difference is not a diff (line endings read as LF)", () => {
@@ -199,6 +251,41 @@ test("RERUN-AC-06 planSetup keep: the action carries the disk text and the new t
   assert.ok(!plan.report.archived.some((x) => x.startsWith("CLAUDE.md")));
   assert.throws(() => planSetup(root, ANSWERS, { now: NOW, keep: ["nope.md", "src/x.js"] }), (e) => e.code === "SETUP_KEEP" && e.message.includes("nope.md") && e.message.includes("src/x.js"));
   assert.throws(() => planSetup(root, ANSWERS, { now: NOW, keep: ["../outside.md"] }), /outside\.md/);
+});
+
+test("RERUN-AC-06 --keep on a first run with adopt keeps the file, moves the others aside, and --diff says no differences for a kept file equal to the new one", async () => {
+  const root = gitRepo();
+  writeFileSync(join(root, "mine.txt"), "x\n");
+  mkdirSync(join(root, ".claude/agents"), { recursive: true });
+  mkdirSync(join(root, "docs/plan"), { recursive: true });
+  writeFileSync(join(root, ".claude/agents/mine.md"), "mine\n");
+  writeFileSync(join(root, ".claude/agents/theirs.md"), "theirs\n");
+  writeFileSync(join(root, "docs/plan/README.md"), "# our own plan notes\n");
+  writeFileSync(join(root, "CLAUDE.md"), "# our own rules\n");
+  const plan = planSetup(root, ANSWERS, { now: NOW, adopt: true, keep: ["docs/plan/README.md", "CLAUDE.md"] });
+  assert.ok(!plan.merges.adopt.some((m) => m.path === "docs/plan/README.md"), "a kept file is not moved aside");
+  assert.deepEqual(plan.merges.adopt.map((m) => m.path).sort(), [".claude/agents/mine.md", ".claude/agents/theirs.md"]);
+  assert.equal(plan.actions.find((x) => x.path === "docs/plan/README.md").action, "keep-edited");
+  assert.equal(plan.actions.find((x) => x.path === "CLAUDE.md").action, "keep-edited");
+  const dry = cli(root, "--dry-run", "--adopt", "--keep", "docs/plan/README.md,CLAUDE.md");
+  assert.equal(dry.status, 0, dry.stderr);
+  assert.match(dry.stdout, /^keep-edited\s+docs\/plan\/README\.md\s/m);
+  assert.match(dry.stdout, /^adopt\s+\.claude\/agents\/mine\.md\s/m, "a file not asked for is adopted");
+  const r = cli(root, "--adopt", "--keep", "docs/plan/README.md,CLAUDE.md");
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(read(root, "docs/plan/README.md"), "# our own plan notes\n");
+  assert.equal(read(root, "CLAUDE.md"), "# our own rules\n");
+  assert.ok(!existsSync(join(root, "docs/archive/pre-saf/docs/plan/README.md")), "not archived");
+  assert.ok(!existsSync(join(root, "docs/archive/pre-saf/CLAUDE.md")), "not archived");
+  assert.ok(existsSync(join(root, "docs/archive/pre-saf/.claude/agents/mine.md")), "the file not asked for is adopted");
+  assert.ok(!("docs/plan/README.md" in manifest(root)) && !("CLAUDE.md" in manifest(root)), "no manifest entry is invented for a kept file");
+
+  const same = await project();
+  const d = cli(same, "--dry-run", "--diff", "--keep", "CLAUDE.md");
+  assert.equal(d.status, 0, d.stderr);
+  assert.match(d.stdout, /^keep-edited\s+CLAUDE\.md\s/m);
+  assert.match(d.stdout, /^CLAUDE\.md: no differences$/m);
+  assert.ok(!d.stdout.includes("--- a/CLAUDE.md"));
 });
 
 test("RERUN-AC-06 --keep nope.md exits 2 naming the path, and writes nothing", async () => {
