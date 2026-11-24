@@ -7,46 +7,46 @@
     "base": "3f4864791be5b2ebbd7969a872a6565ae5d1180c",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-30",
   "worktree": ".claude/worktrees/T-M3-30",
   "verified": {
-    "at": "2026-11-24T09:18:16.570Z",
-    "head": "9ffbf5ba52e2817179f3a2b4b0a8dd87cad733f6",
+    "at": "2026-11-24T09:26:51.497Z",
+    "head": "4fefc5a17e2be0bbb391b5905160b6ac2b145d19",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/designer-prerun.test.mjs test/unit/generate.test.mjs",
         "exit": 0,
-        "ms": 4731,
+        "ms": 5478,
         "tail": [
-          "ok 23 - generated CLAUDE.md lists task:culprit in en and th, and the plan README names the test mode",
+          "ok 28 - generated CLAUDE.md lists task:culprit in en and th, and the plan README names the test mode",
           "  ---",
-          "  duration_ms: 139.999875",
+          "  duration_ms: 83.009666",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
-          "ok 24 - SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
+          "ok 29 - SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
           "  ---",
-          "  duration_ms: 169.291708",
+          "  duration_ms: 90.183209",
           "  type: 'test'",
           "  ...",
-          "1..24",
-          "# tests 24",
+          "1..29",
+          "# tests 29",
           "# suites 0",
-          "# pass 24",
+          "# pass 29",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 4670.952083"
+          "# duration_ms 5417.563292"
         ]
       },
       {
         "cmd": "npm run saf:refresh -- --check",
         "exit": 0,
-        "ms": 306,
+        "ms": 278,
         "tail": [
           "> super-agent-framework@0.1.0 saf:refresh",
           "> node scripts/refresh-copies.mjs --check",
@@ -56,7 +56,7 @@
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 349,
+        "ms": 324,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -83,7 +83,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 350,
+        "ms": 326,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -93,7 +93,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 280,
+        "ms": 274,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -103,28 +103,28 @@
       {
         "cmd": "node --test 'test/unit/designer-prerun.test.mjs'",
         "exit": 0,
-        "ms": 4424,
+        "ms": 5322,
         "tail": [
-          "ok 11 - PRERUN-AC-06 the rendered templates carry the rule, the card and spec lines and the /saf-plan step (en and th)",
+          "ok 16 - PRERUN-AC-06 the rendered templates carry the rule, the card and spec lines and the /saf-plan step (en and th)",
           "  ---",
-          "  duration_ms: 80.908416",
+          "  duration_ms: 82.326583",
           "  type: 'test'",
           "  ...",
           "# Subtest: PRERUN-AC-06 this repository: the designer agent, templates and package.json already carry the rule",
-          "ok 12 - PRERUN-AC-06 this repository: the designer agent, templates and package.json already carry the rule",
+          "ok 17 - PRERUN-AC-06 this repository: the designer agent, templates and package.json already carry the rule",
           "  ---",
-          "  duration_ms: 0.525916",
+          "  duration_ms: 0.490084",
           "  type: 'test'",
           "  ...",
-          "1..12",
-          "# tests 12",
+          "1..17",
+          "# tests 17",
           "# suites 0",
-          "# pass 12",
+          "# pass 17",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 4372.730958"
+          "# duration_ms 5270.338209"
         ]
       }
     ],
@@ -154,22 +154,22 @@
       "hashes": {
         ".claude/agents/designer.md": "cf764abc7ad72ac591472a07b0b1bb897d558523",
         ".claude/commands/saf-plan.md": "f91fd72a9b98390f0ac73a848e17df0cac8bbcc1",
-        "docs/plan/tasks/_template.md": "207d6408b136e9168ef7b1de1fec559b64e488f6",
-        "docs/specs/_template.md": "685b5d6e925a3157c3551528a0d620b26d7e2015",
+        "docs/plan/tasks/_template.md": "49694f183246a808835c416e2095614e26ec39b8",
+        "docs/specs/_template.md": "4d9f9b03b3816be6171925f38e0bc4f46e5b454a",
         "examples/todo-api/package.json": "6cf8bf4a522b0a16292af0efe136cc3304d00ad7",
-        "kit/tools-saf/bin/saf.mjs": "41e0167f5e2fe9a7cf6a2544500fa891040d14ab",
+        "kit/tools-saf/bin/saf.mjs": "980f320b7d03171b6c25c7c75810e5ea67641614",
         "kit/tools-saf/lib/config.mjs": "247eab57f1fab60dc11316a1e02d976c2232de12",
         "kit/tools-saf/lib/generate.mjs": "72d971d0470050bc9a4a0c3206ac680579df4a27",
-        "kit/tools-saf/lib/prerun.mjs": "5cb1326c3270b59cfbb5c618fac3b73403f6c7ef",
+        "kit/tools-saf/lib/prerun.mjs": "a12b0639f8d7ece45fdec78ccee13911fad496c0",
         "kit/tools-saf/templates/agents/designer.md": "45ce564cb2cffda08477fb407c53d886afc025f8",
         "kit/tools-saf/templates/en/commands/saf-plan.md": "9711615777f1d4a618d4f2a89e88734c4528cb5f",
-        "kit/tools-saf/templates/en/docs/plan/tasks/_template.md": "88e75457878f9142fa5479726006a21068ef597c",
-        "kit/tools-saf/templates/en/docs/specs/_template.md": "685b5d6e925a3157c3551528a0d620b26d7e2015",
+        "kit/tools-saf/templates/en/docs/plan/tasks/_template.md": "23fe7cfe6925a99a92f971ad3036ce6f50ffa25a",
+        "kit/tools-saf/templates/en/docs/specs/_template.md": "4d9f9b03b3816be6171925f38e0bc4f46e5b454a",
         "kit/tools-saf/templates/th/commands/saf-plan.md": "545b169f28590357d707f5ec6e92f4f516c05b4d",
-        "kit/tools-saf/templates/th/docs/plan/tasks/_template.md": "6ca6b2b94925a6d05f4ad8d1970fd33432ce6f47",
-        "kit/tools-saf/templates/th/docs/specs/_template.md": "92366d0d03a0b3390c4c7dcd368081034210e6e9",
+        "kit/tools-saf/templates/th/docs/plan/tasks/_template.md": "1515187e6afe029a5adb90f6d5536f2dded79ca7",
+        "kit/tools-saf/templates/th/docs/specs/_template.md": "27b82fbd3588a0058dc3b6a716b80ca04de34abc",
         "package.json": "af22cc3362c57ae2f270bb39d79b653b69a7083c",
-        "test/unit/designer-prerun.test.mjs": "b08189e5f472f26e5754ef36ecd1823839d37c7a"
+        "test/unit/designer-prerun.test.mjs": "d1184909b2e30a26671ea19b7025fc45cc547c45"
       }
     },
     "scenarios": {
@@ -186,11 +186,11 @@
     "size": {
       "size": "M",
       "code": {
-        "lines": 150,
+        "lines": 177,
         "cap": 400
       },
       "test": {
-        "lines": 214,
+        "lines": 271,
         "cap": 600
       },
       "over": []

@@ -34,7 +34,7 @@ The user-visible reason in one or two sentences. Link the spec section.
 
 ## Done when
 
-Each command fails before the card (check: `{{cmd.taskPrerun}}`) or carries `— passes by design: <reason>` after it. Guard commands (the full suite, the engine checks) need no mark.
+Each command fails before the card (check: `{{cmd.taskPrerun}}`) or carries `— passes by design: <reason>` after the backticked command (anywhere else it is not read). Guard commands (the full suite, the engine checks) need no mark.
 
 - `{{cmd.specMatrixCheck}}`
 {{#each projectChecks}}

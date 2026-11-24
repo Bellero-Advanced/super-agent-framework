@@ -55,7 +55,7 @@ import {
  *     (docs/plan/evidence/reviews/<id>.json · fail reopens the card for verify · main folder only · exit 0 recorded · 1 refused · 2 usage)
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
  *   task prerun <id>   which "Done when" commands of a card that has not started already pass (exit 0 none unmarked · 1 some do · 2 usage or refused)
- *     (runs those commands like task:verify does — same runner, folder and time limit, guards are not run — and writes nothing · main folder or lane)
+ *     (runs those commands like task:verify does — same runner, folder and time limit, guards are not run — and writes no evidence, STATE.md or mirror (the commands themselves may write, as at task:verify) · main folder or lane)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -560,6 +560,8 @@ async function main() {
   }
 }
 
+const isPrerun = argv[0] === "task" && argv[1] === "prerun";
+
 main().then(
   (code) => {
     process.exitCode = code;
@@ -567,6 +569,6 @@ main().then(
   (e) => {
     err(`✗ ${e instanceof Error ? e.message : String(e)}`);
     if (!(e instanceof TaskError) && !(e instanceof ConfigError) && e instanceof Error && e.stack) err(e.stack.split("\n").slice(1, 4).join("\n"));
-    process.exitCode = e instanceof StartIncomplete || e instanceof MergeStop ? e.exitCode : 1;
+    process.exitCode = e instanceof StartIncomplete || e instanceof MergeStop ? e.exitCode : isPrerun && (e instanceof TaskError || e instanceof ConfigError) ? 2 : 1; // prerun: exit 1 means "some command passes"
   },
 );

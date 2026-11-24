@@ -6,7 +6,7 @@ import { after, test } from "node:test";
 import { REPO, card, cleanup, commitAll, gitRepo, lib, planRepo, write } from "../helpers.mjs";
 
 const { generate } = await lib("generate.mjs");
-const { doneWhenItems, guardKind } = await lib("prerun.mjs");
+const { doneWhenItems, guardKind, strayMarks } = await lib("prerun.mjs");
 after(cleanup);
 
 const BIN = join(REPO, "kit", "tools-saf", "bin", "saf.mjs");
@@ -55,6 +55,8 @@ test("PRERUN-AC-02 the same card without the unmarked passing command exits 0", 
   const r = prerun(root, "T-M1-01");
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /no unmarked command passes already/);
+  assert.match(r.stdout, /writes no evidence, STATE\.md or mirror — the commands themselves may write, as at task:verify/);
+  assert.doesNotMatch(r.stdout, /writes nothing/, "the commands may write (a marker file), so the line must not promise nothing");
 });
 
 test("PRERUN-AC-02 a command that hangs is stopped at the engine time limit and counts as failing now", async () => {
@@ -113,6 +115,58 @@ test("PRERUN-AC-05 guardKind knows the command form of every package manager and
   assert.equal(guardKind(cfg("npm"), "make lint"), "merge check");
   assert.equal(guardKind(cfg("npm"), "npm run docs:checkers"), null);
   assert.equal(guardKind(cfg("npm"), "npm run saf:refresh"), null);
+});
+
+const SHELL_TAILS = ["&& node prove.js", "; node -e \"1\"", "| cat", "> out.txt", "< in.txt", "`node x`", "$(node x)", "\nnode x"];
+test("PRERUN-AC-05 an engine-check line with shell control text after it is not a guard: a proof hidden behind &&, ;, | or a redirect is run", () => {
+  for (const pm of ["npm", "pnpm", "none"]) {
+    const cfg = { stack: { packageManager: pm, commands: { test: "make test" } }, workflow: { mergeChecks: [] } };
+    const base = { npm: "npm run spec:matrix -- --check", pnpm: "pnpm docs:check", none: "node tools/saf/bin/saf.mjs spec-matrix --check" }[pm];
+    assert.equal(guardKind(cfg, base), "engine check", `${pm} plain`);
+    for (const tail of SHELL_TAILS) assert.equal(guardKind(cfg, `${base} ${tail}`), null, `${pm}: ${JSON.stringify(tail)}`);
+    assert.equal(guardKind(cfg, `${base}&& node prove.js`), null, `${pm}: no space before &&`);
+  }
+});
+
+test("PRERUN-AC-05 end to end: `<engine check> -- --check && <passing command>` runs and is reported as passing already (exit 1)", async () => {
+  const { root } = await project([`\`npm run spec:matrix -- --check && ${RAN("hidden-ran.txt")}\``, `\`${FAIL}\``]);
+  write(root, "package.json", { scripts: { "spec:matrix": `${PASS} --` } }); // the engine check itself passes here; the proof behind && is what must be reported
+  const r = prerun(root, "T-M1-01");
+  assert.equal(r.status, 1, r.stdout + r.stderr);
+  assert.match(r.stdout, /⚠ passes already/);
+  assert.doesNotMatch(r.stdout, /guard — not run/);
+});
+
+test("PRERUN-AC-01 a mark outside its place gives one warning each: unbackticked line, wrapped line, no reason; a mark inside the backticks or in a fence does not", () => {
+  const src = [
+    "---", "id: T-M1-01", "---", "", "## Done when", "",
+    "- `ok` — passes by design: fine",
+    "- node plain.js — passes by design: not backticked",
+    "- `wrapped`",
+    "  — passes by design: on the next line",
+    "- `noreason` — passes by design:",
+    "- `node -e \"console.log('passes by design: inside')\"`",
+    "```", "- `fenced` — passes by design: x", "```", "",
+  ].join("\n");
+  const warned = strayMarks(src);
+  assert.equal(warned.length, 3, JSON.stringify(warned));
+  assert.match(warned[0], /node plain\.js/);
+  assert.match(warned[1], /on the next line/);
+  assert.match(warned[2], /noreason/);
+});
+
+test("PRERUN-AC-01 prerun prints that warning before running anything", async () => {
+  const { root } = await project([`\`${FAIL}\``, `${PASS} — passes by design: unbackticked`]);
+  const r = prerun(root, "T-M1-01");
+  assert.match(r.stdout, /⚠ .*passes by design.*only read after a backticked command/);
+});
+
+test("PRERUN-AC-03 an unreadable saf.config.json exits 2 (1 is reserved for 'some command passes')", async () => {
+  const { root } = await project([`\`${FAIL}\``]);
+  write(root, "saf.config.json", "{ not json");
+  const r = prerun(root, "T-M1-01");
+  assert.equal(r.status, 2, r.stdout + r.stderr);
+  assert.equal(r.stdout.includes("▶"), false);
 });
 
 test("PRERUN-AC-01 the parser reads the mark only after a backticked command, with a non-empty reason, in en and th sections", () => {
@@ -192,11 +246,14 @@ test("PRERUN-AC-06 the rendered templates carry the rule, the card and spec line
     const cardTpl = read("docs/plan/tasks/_template.md");
     assert.match(cardTpl, /npm run task:prerun -- <id>/, `${lang} card template`);
     assert.match(cardTpl, /`— passes by design: <reason>`/);
+    assert.match(cardTpl, lang === "en" ? /after the backticked command/ : /หลังคำสั่งที่อยู่ใน backtick/, `${lang} card template says where the mark goes`);
+    if (lang === "th") assert.doesNotMatch(cardTpl, /ยามเฝ้า/);
     const doneAt = cardTpl.search(/^## (Done when|เกณฑ์ผ่าน)$/m);
     assert.ok(doneAt > 0 && cardTpl.indexOf("task:prerun") > doneAt, "the line sits under the Done when heading");
     const specTpl = read("docs/specs/_template.md");
     const accAt = specTpl.search(/^## 5\. /m);
     assert.ok(accAt > 0 && specTpl.indexOf(lang === "en" ? "Each row must be able to fail" : "ทุกแถวต้องล้มได้") > accAt, `${lang} spec template Acceptance line`);
+    assert.match(specTpl, lang === "en" ? /or the spec says under the table why it passes by design/ : /หรือสเปกบอกใต้ตารางว่าทำไมผ่านโดยเจตนา/, `${lang} spec template carries the escape`);
     assert.match(read(".claude/commands/saf-plan.md"), /npm run task:prerun -- <id>.*\n?.*passes by design: <reason>/, `${lang} /saf-plan`);
     for (const f of [".claude/agents/designer.md", "docs/plan/tasks/_template.md", "docs/specs/_template.md", ".claude/commands/saf-plan.md"]) assert.doesNotMatch(read(f), /\{\{|\}\}/, `${f} has no unrendered placeholder`);
     assert.equal(JSON.parse(read("package.json")).scripts["task:prerun"], "node tools/saf/bin/saf.mjs task prerun");

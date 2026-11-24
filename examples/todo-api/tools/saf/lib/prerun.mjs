@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { scriptCommand } from "./config.mjs";
-import { codeSpans, findSection, sections } from "./markdown.mjs";
+import { codeSpans, findSection, maskCodeSpans, sections } from "./markdown.mjs";
 import { CRITERIA_HEADINGS, cardStatus, criteriaCommands, loadPlan } from "./plan.mjs";
 import { redactSecrets } from "./run.mjs";
 import { isFullSuite } from "./testmode.mjs";
@@ -12,9 +12,10 @@ import { isFullSuite } from "./testmode.mjs";
  *
  * What it executes: the card's "Done when" commands, each through the same runner `task:verify` uses (same shell, same
  * folder, same `workflow.commandTimeoutMs` limit that kills a hung command) — except guards, which are never run. The
- * commands come from a card file committed in the repository, like package.json scripts, and `task:verify` would run
- * the very same ones: no new trust surface. Their own side effects (files a command writes) are the command's, as at
- * verify. This module itself writes nothing: no evidence, no STATE.md, no mirror, no review or friction file.
+ * commands come from the card file as it stands in the working tree (often not committed yet), and `task:verify` would
+ * run the very same ones: no new trust surface beyond what verify already runs. A command's own side effects (files it
+ * writes) are the command's, as at verify. This module itself writes no evidence, no STATE.md, no mirror, no review or
+ * friction file.
  */
 
 /** Rule 6: the engine's own check scripts — a "Done when" line that calls one is a guard, not a proof. Data, not logic. */
@@ -47,6 +48,26 @@ export function doneWhenItems(src) {
   return out;
 }
 
+/** Shell control text: after an engine-check command it means more than the check runs (`&&`, `;`, `|`, a redirect, a substitution, a new line). */
+const SHELL_CONTROL = /[&|;<>`\n\r]|\$\(/;
+
+/**
+ * Lines of the "Done when" section that mention `passes by design` where the mark is not read: a line whose command is
+ * not backticked, a continuation line, a mark without a reason. Text inside backticks or a fence does not count.
+ * @returns {string[]} the trimmed lines
+ */
+export function strayMarks(src) {
+  const sec = findSection(sections(src), CRITERIA_HEADINGS) ?? [];
+  return sec
+    .filter((l) => !l.inFence && /passes by design/i.test(maskCodeSpans(l.text)))
+    .filter((l) => {
+      const item = l.text.match(/^\s*[-*]\s+(.+)$/)?.[1]?.trim() ?? "";
+      const first = codeSpans(item)[0];
+      return !(first && first.start === 0 && MARK.test(item.slice(first.end)));
+    })
+    .map((l) => l.text.trim());
+}
+
 /** Rule 6: why a command is a guard (`full suite` · `merge check` · `engine check`), or null when it is not. */
 export function guardKind(config, cmd) {
   const c = cmd.trim();
@@ -55,7 +76,7 @@ export function guardKind(config, cmd) {
   const pm = config.stack?.packageManager;
   const engine = GUARD_SCRIPTS.some((s) => {
     const base = scriptCommand(pm, s);
-    return c === base || c.startsWith(`${base} `);
+    return c === base || (c.startsWith(`${base} `) && !SHELL_CONTROL.test(c.slice(base.length)));
   });
   return engine ? "engine check" : null;
 }
@@ -75,10 +96,12 @@ export async function prerunCard(ctx, id, say = () => {}) {
   if (!card) return refused(`no card ${id} — check the id`);
   const status = cardStatus(plan, id);
   if (status !== "todo") return refused(`${id} is ${status} — task:prerun only judges a card that has not started (after start the code already changed, so the result would mean nothing)`);
-  const items = doneWhenItems(readFileSync(join(ctx.root, card.file), "utf8"));
+  const src = readFileSync(join(ctx.root, card.file), "utf8");
+  const items = doneWhenItems(src);
   const kinds = items.map((it) => guardKind(ctx.config, it.cmd));
   const safe = (s) => redactSecrets(s);
-  say(`task:prerun ${id} — runs the Done-when commands as task:verify does (same runner, folder and time limit; guards are not run) · writes nothing`);
+  say(`task:prerun ${id} — runs the Done-when commands as task:verify does (same runner, folder and time limit; guards are not run) · writes no evidence, STATE.md or mirror — the commands themselves may write, as at task:verify`);
+  for (const line of strayMarks(src)) say(`  ⚠ "${safe(line)}" — passes by design is only read after a backticked command, with a reason: \`cmd\` — passes by design: <reason>`);
   items.forEach((it, i) => say(`  ${i + 1}. ${safe(it.cmd)} — ${kinds[i] ? `guard — not run (${kinds[i]})` : "will run"}`));
   const results = [];
   for (const [i, it] of items.entries()) {
