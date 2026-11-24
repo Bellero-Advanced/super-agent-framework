@@ -9,7 +9,8 @@ packs from other repositories, a card size check and an evidence viewer. Plus (o
 interview that explains every option and shows every setting it does not ask.
 
 ## Scope
-- Drafted from the roadmap; the designer rewrites the cards with `/saf-plan M2` after M1 feedback, and the owner says Go
+- The four roadmap items were rewritten with `/saf-plan M2` (2026-11-24) into specs and chains of S/M cards, listed in
+  work order after the merged cards; their decisions D-011 … D-014 are **proposed** until the owner decides
 - T-M2-04 (card size check) is a **side card**: it touches only the verify step, its tests and the engine copies that
   `npm run saf:refresh` rewrites, so it may run in a side lane while M1 is active. It also fixes the lane guard that
   refuses a SAF project in a subfolder (`examples/todo-api`) inside any lane worktree — without that fix `npm test`
@@ -43,12 +44,11 @@ interview that explains every option and shows every setting it does not ask.
   `npm run task:verify -- M2` (the `cards` gate); they change only `kit/tools-saf/lib/` and test-mode tests, so they
   may run beside T-M2-10 and T-M2-12 … T-M2-15 (no shared `touch`)
 - T-M2-18 closes a gap the spec review of T-M2-09 found ([spec](../../specs/upgrade-scripts.md), decision D-010
-  proposed): `saf upgrade` never added new engine scripts to `package.json`, so existing projects had no
+  decided): `saf upgrade` never added new engine scripts to `package.json`, so existing projects had no
   `task:culprit` while the exit-gate hint prints `npm run task:culprit -- <M>`. Upgrade now adds missing
   `ENGINE_SCRIPTS` keys and never changes an existing script (chosen over printing the raw `node tools/saf/bin/saf.mjs`
   form: one fix covers every future engine command, and the docs keep one command style). A regular card after
-  T-M2-09; **T-M2-10 waits for it** because T-M2-10 puts `{{cmd.taskCulprit}}` in the generated CLAUDE.md. It shares
-  `generate.mjs` and `docs/upgrade.md` with the draft cards T-M2-02 and T-M2-03, so those cannot run beside it
+  T-M2-09; **T-M2-10 waits for it** because T-M2-10 puts `{{cmd.taskCulprit}}` in the generated CLAUDE.md.
 
 - T-M2-15 also closes review note N2 of T-M2-14 before the explanations reach users: the skill asks the adopt
   question and passes `--no-adopt` for "no" (without a flag `setup` archives by detection), and it lowercases the
@@ -57,17 +57,33 @@ interview that explains every option and shows every setting it does not ask.
   card, not part of T-M2-15: it changes a template and explanation text in `choices.mjs`, a different outcome than
   the interview wiring. It **waits for T-M2-15** because both touch `choices.mjs`
 
+- **Guided upgrade** ([spec](../../specs/setup-rerun.md), D-011): T-M2-20 first — a re-run keeps edited living files
+  (decision log, index, milestone and card files) instead of archiving them and writing the template back (reproduced:
+  an active `M1.md` returned to `planned`), and leaves `package.json` byte-identical unless a script is missing (one
+  merge function shared with `saf upgrade`). Then T-M2-02 (`planSetup` + `setup --dry-run`, one code path with the real
+  run) → T-M2-21 (`--diff` with an in-engine line diff, `--keep <path>`) → T-M2-22 (`/saf-setup` asks per edited
+  file). A chain: all share `generate.mjs` / `saf.mjs` / the setup skill
+- **Evidence viewer** ([spec](../../specs/evidence-viewer.md), D-012): T-M2-05 — `task:report <M> --html`, one file,
+  no JavaScript, no network, no dependency. No `touch` overlap with T-M2-20, so the two can run in parallel lanes;
+  T-M2-02 waits for both (`saf.mjs`, `generate.mjs`)
+- **Document languages** ([spec](../../specs/doc-languages.md), D-014): T-M2-01 — the mechanism only (registry, English
+  fallback with a warning, explanations that cover any language, contributor steps); no third language ships. After
+  T-M2-21 and T-M2-05 (`generate.mjs`, `text.mjs`); may run beside T-M2-22 and T-M2-03
+- **Skill packs** ([spec](../../specs/skill-packs.md), D-013 — **recommended for deferral**): T-M2-03 (format +
+  read-only `saf pack show`) → T-M2-23 (setup and upgrade install pinned packs) → T-M2-24 (interview asks, explicit
+  yes). Local folders only, content pinned by sha256, `.md` files only, SAF never fetches or runs anything. Last in
+  the order so cutting them changes nothing else; every card uses the `security-review` skill
+- Every new card that changes `kit/` runs `npm run saf:refresh` and the example upgrade, then restores
+  `examples/todo-api/.claude` and `examples/todo-api/package.json` (the stale example skill copy is review note C,
+  batched for milestone end)
+
 ## Done When
 - [ ] cards every card of M2 passed task:verify and the spec review (manual check)
 - [ ] project-checks the project's own checks pass on Linux, macOS and Windows (CI matrix green)
 - [ ] owner the owner tried each item in a fresh project and accepts it (manual check)
 
 ## Task List
-- [ ] T-M2-01 Add a document language by adding a template folder and a text table
-- [ ] T-M2-02 Show what /saf-setup would change before regenerating project docs
-- [ ] T-M2-03 Skill packs from other repositories
 - [x] T-M2-04 task:verify reports changed code and test lines against the card's size cap — passed 2026-11-23 18:42 (2 commands)
-- [ ] T-M2-05 Evidence viewer: a static HTML page from docs/plan/evidence/
 - [x] T-M2-06 Choose how often the full test suite runs, per project and per machine (workflow.testMode) — passed 2026-11-23 19:28 (4 commands)
 - [x] T-M2-07 task:verify runs the card's own tests instead of the full suite when the test mode defers it — passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate
 - [x] T-M2-08 task:merge skips the deferred full suite and the milestone gate always runs it — passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate
@@ -82,9 +98,31 @@ interview that explains every option and shows every setting it does not ask.
 - [x] T-M2-17 STATE.md, the plan mirror and the milestone report show the full-suite gate and its result — passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate
 - [x] T-M2-18 saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones — passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate
 - [x] T-M2-19 The release-operator agent says pushing is allowed when policies.push is allowed, and the push explanation says so — passed 2026-11-23 21:34 (4 commands) · full suite deferred to gate
+- [ ] T-M2-20 A setup re-run keeps your edited decision log, index and plan files, and leaves package.json alone unless a script is missing
+- [ ] T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence
+- [ ] T-M2-02 saf setup --dry-run lists, per file, what a setup run would do — and writes nothing
+- [ ] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it
+- [ ] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff
+- [ ] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning
+- [ ] T-M2-03 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it
+- [ ] T-M2-23 Setup and upgrade install skill packs named in skills.external only when their content hash matches
+- [ ] T-M2-24 /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes
 
 ## Risks
-- M1 feedback may reorder or replace these cards — that is expected; this is a draft
+- **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the
+  template now keeps theirs; the setup output warns per kept file that the new settings did not reach it, and the
+  dry run (T-M2-02 … T-M2-21) shows the difference
+- **Refactoring `generate()`** (T-M2-02): setup and upgrade both run through it; the refactor must keep every existing
+  generate, e2e and upgrade test green unchanged, and RERUN-AC-04 proves the dry run equals the real run. It does not
+  change `task:verify`, so the dogfooding risk of the test-mode cards does not apply
+- **HTML from evidence** (T-M2-05): output tails are untrusted text — one escape function for every value, no script,
+  a CSP meta tag; AC-02 checks it
+- **Skill packs are third-party instructions** (T-M2-03 … T-M2-24): a malicious skill can tell an agent to run
+  commands even without scripts. The trust model limits what SAF does (no fetch, no run, `.md` only, pinned hash,
+  explicit yes after `pack show`) but cannot vet the text — the docs and the interview say so; `security-review`
+  is required on each card
+- **Languages and the schema** (T-M2-01): the schema enums stay static; a test fails when they differ from the
+  registry, so a contributor cannot add half a language unnoticed
 - **Test mode and this repo (dogfooding):** cards here change the engine that runs `task:verify` and writes the
   evidence. If one card breaks the engine and the full suite only runs at the gate, every later card is verified by a
   broken tool and its evidence cannot be trusted. So this repo's tracked `saf.config.json` pins
@@ -107,7 +145,7 @@ interview that explains every option and shows every setting it does not ask.
   reserving `full-suite` turns an existing gate with that id into a plan problem — the error names the id, so the fix
   is a rename
 - **Upgrade now edits `package.json`:** until T-M2-18, `upgrade` promised to touch only kit-owned files. Adding a
-  missing script is the one exception (D-010, proposed); it never overwrites, never creates the file and never
+  missing script is the one exception (D-010, decided); it never overwrites, never creates the file and never
   rewrites it when nothing is missing, so a project that customised a SAF script keeps it
 - **Batched review notes:** the non-blocking notes of the spec reviews (T-M2-09: 9 notes, note 2 became T-M2-18)
   are listed one line each in [M2-review-notes.md](../notes/M2-review-notes.md) and go to the designer at milestone

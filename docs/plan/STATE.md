@@ -2,18 +2,14 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 15/19
+## M2 Roadmap: next — cards done 15/24
 
 - In progress: none
-- Next: T-M2-01 Add a document language by adding a template folder and a text table · T-M2-02 Show what /saf-setup would change before regenerating project docs · T-M2-03 Skill packs from other repositories
+- Next: T-M2-20 A setup re-run keeps your edited decision log, index and plan files, and leaves package.json alone unless a script is missing · T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
-| [T-M2-01](tasks/M2/T-M2-01.md) | Add a document language by adding a template folder and a text table | · not started | – |
-| [T-M2-02](tasks/M2/T-M2-02.md) | Show what /saf-setup would change before regenerating project docs | · not started | – |
-| [T-M2-03](tasks/M2/T-M2-03.md) | Skill packs from other repositories | · not started | – |
 | [T-M2-04](tasks/M2/T-M2-04.md) | task:verify reports changed code and test lines against the card's size cap | ✓ passed | [T-M2-04.json](evidence/T-M2-04.json) · passed 2026-11-23 18:42 (2 commands) |
-| [T-M2-05](tasks/M2/T-M2-05.md) | Evidence viewer: a static HTML page from docs/plan/evidence/ | · not started | – |
 | [T-M2-06](tasks/M2/T-M2-06.md) | Choose how often the full test suite runs, per project and per machine (workflow.testMode) | ✓ passed | [T-M2-06.json](evidence/T-M2-06.json) · passed 2026-11-23 19:28 (4 commands) |
 | [T-M2-07](tasks/M2/T-M2-07.md) | task:verify runs the card's own tests instead of the full suite when the test mode defers it | ✓ passed | [T-M2-07.json](evidence/T-M2-07.json) · passed 2026-11-23 19:32 (3 commands) · full suite deferred to gate |
 | [T-M2-08](tasks/M2/T-M2-08.md) | task:merge skips the deferred full suite and the milestone gate always runs it | ✓ passed | [T-M2-08.json](evidence/T-M2-08.json) · passed 2026-11-23 19:47 (3 commands) · full suite deferred to gate |
@@ -28,6 +24,15 @@
 | [T-M2-17](tasks/M2/T-M2-17.md) | STATE.md, the plan mirror and the milestone report show the full-suite gate and its result | ✓ passed | [T-M2-17.json](evidence/T-M2-17.json) · passed 2026-11-23 20:35 (5 commands) · full suite deferred to gate |
 | [T-M2-18](tasks/M2/T-M2-18.md) | saf upgrade adds the engine's new package.json scripts (task:culprit) without touching existing ones | ✓ passed | [T-M2-18.json](evidence/T-M2-18.json) · passed 2026-11-23 20:18 (4 commands) · full suite deferred to gate |
 | [T-M2-19](tasks/M2/T-M2-19.md) | The release-operator agent says pushing is allowed when policies.push is allowed, and the push explanation says so | ✓ passed | [T-M2-19.json](evidence/T-M2-19.json) · passed 2026-11-23 21:34 (4 commands) · full suite deferred to gate |
+| [T-M2-20](tasks/M2/T-M2-20.md) | A setup re-run keeps your edited decision log, index and plan files, and leaves package.json alone unless a script is missing | · not started | – |
+| [T-M2-05](tasks/M2/T-M2-05.md) | task:report <M> --html writes one self-contained HTML page of the milestone's evidence | · not started | – |
+| [T-M2-02](tasks/M2/T-M2-02.md) | saf setup --dry-run lists, per file, what a setup run would do — and writes nothing | · not started | – |
+| [T-M2-21](tasks/M2/T-M2-21.md) | saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it | · not started | – |
+| [T-M2-22](tasks/M2/T-M2-22.md) | /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff | · not started | – |
+| [T-M2-01](tasks/M2/T-M2-01.md) | A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning | · not started | – |
+| [T-M2-03](tasks/M2/T-M2-03.md) | A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it | · not started | – |
+| [T-M2-23](tasks/M2/T-M2-23.md) | Setup and upgrade install skill packs named in skills.external only when their content hash matches | · not started | – |
+| [T-M2-24](tasks/M2/T-M2-24.md) | /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 
