@@ -1,5 +1,6 @@
 import { posix } from "node:path";
 import { EFFORTS, scriptCommand } from "./config.mjs";
+import { groupFriction } from "./friction.mjs";
 import { buildMatrix, isSpecFile } from "./matrix.mjs";
 import { parseReviews, reviewsPath } from "./reviews.mjs";
 import { EVIDENCE_DIR, PLAN_DIR, cardStatus, formatTime, gateResults, gateWord, titleOf, undeclaredGates } from "./plan.mjs";
@@ -56,7 +57,7 @@ export function renderReport(input, mid) {
   const results = gateResults(plan.gateEvidence.get(m.id));
   for (const g of m.gates) out.push(`| ${g.id} | ${cell(g.text)} | ${gateWord(t, g, results.find((x) => x.id === g.id))} |`);
   for (const g of undeclaredGates(plan, m)) out.push(`| ${g.id} | ${cell(g.text)} | ${gateWord(t, g, g.result)} |`);
-  out.push("", r.matrix, "");
+  out.push("", ...frictionRows(plan, r), "", r.matrix, "");
   const specs = [...new Set(m.cards.flatMap((id) => plan.cards.get(id)?.spec ?? []))].filter(isSpecFile).sort();
   if (!specs.length) out.push(r.noSpecs(m.id));
   else {
@@ -93,4 +94,24 @@ function effortRows(plan, m, roundsOf, r) {
   const rank = (key) => (key === "—|—" ? 99 : `SM`.indexOf(key[0]) * 10 + EFFORTS.indexOf(key.split("|")[1]));
   const rows = [...groups].sort((a, b) => rank(a[0]) - rank(b[0])).map(([key, g]) => `| ${key.split("|").join(" | ")} | ${g.cards} | ${g.reviewed} | ${g.first} | ${g.rounds} | ${g.attempts} |`);
   return [r.effortTable, "|---|---|---|---|---|---|---|", ...rows];
+}
+
+/** The "Friction" section (spec friction-log rule 15): open and carded entries, then the brief for the designer grouped by kind and area. */
+function frictionRows(plan, r) {
+  const shown = plan.friction.entries.filter((e) => e.status === "open" || e.status === "carded");
+  if (!shown.length) return [r.friction, "", r.frictionNone];
+  const groups = groupFriction(shown);
+  return [
+    r.friction,
+    "",
+    r.frictionTable,
+    "|---|---|---|---|---|---|",
+    ...shown.map((e) => `| ${[e.id, e.status, e.kind, e.card, e.area, e.summary].map(cell).join(" | ")} |`),
+    "",
+    r.frictionBrief,
+    "",
+    ...(groups.length
+      ? [r.frictionBriefTable, "|---|---|---|---|---|---|", ...groups.map((g) => `| ${[g.kind, g.area, g.count, g.ids.join(", "), g.evidence, g.recurring ? r.frictionRecurring : ""].map((v) => cell(String(v))).join(" | ")} |`)]
+      : [r.frictionBriefNone]),
+  ];
 }

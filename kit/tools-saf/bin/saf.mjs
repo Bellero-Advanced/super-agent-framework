@@ -7,7 +7,7 @@ import { CONFIG_FILE, ConfigError, findRoot, loadConfig, scriptCommand, validate
 import { culpritLines, findCulprit } from "../lib/culprit.mjs";
 import { detectProject } from "../lib/detect.mjs";
 import { docsInputFor, runDocsCheck } from "../lib/docs.mjs";
-import { CLOSE_STATUSES, FRICTION_FILE, FRICTION_MARKER, FrictionError, appendClose, appendEntry, countByStatus, entryLine } from "../lib/friction.mjs";
+import { CLOSE_STATUSES, FRICTION_FILE, FRICTION_MARKER, FrictionError, appendClose, appendEntry, countByStatus, entryLine, renderDrafts } from "../lib/friction.mjs";
 import { listRepoFiles } from "../lib/git.mjs";
 import { blockingGaps, buildMatrix, completeGaps, countsHere, renderMatrix, summarize } from "../lib/matrix.mjs";
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
@@ -51,8 +51,8 @@ import {
  *   task abandon <id> · task merge <id>    (merge exit 3 refused · 4 conflict · 5 merge checks failed)
  *   task state [--check] · task next [--parallel] [--json] · task probe [--bin <claude>] · task env · task report <M> [--html]
  *     (task next lists the active milestone's cards first, then side cards of planned milestones — --json has a `side` list)
- *   task friction [add --kind <kind> --area <area> --evidence <text> [--card <id>] <summary…> | close <F-id> carded|fixed|dropped <card id or reason…>]
- *     (the friction log docs/plan/friction.md: no sub-command lists open and carded entries · add/close are refused in a lane)
+ *   task friction [add --kind <kind> --area <area> --evidence <text> [--card <id>] <summary…> | close <F-id> carded|fixed|dropped <card id or reason…> | draft]
+ *     (the friction log docs/plan/friction.md: no sub-command lists open and carded entries · add/close are refused in a lane · draft prints card drafts and writes nothing)
  *   task review <id> [pass|fail] [--kind <k>[,<k>…]] [--note <text>] [--area <area>]   record one spec review round (no result lists the rounds)
  *     (docs/plan/evidence/reviews/<id>.json · fail reopens the card for verify · main folder only · exit 0 recorded · 1 refused · 2 usage)
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
@@ -367,12 +367,22 @@ function friction(ctx, rest) {
     out(Object.entries(countByStatus(entries)).map(([k, n]) => `${k} ${n}`).join(" · "));
     return 0;
   }
+  if (sub === "draft") {
+    if (args.length) {
+      err(`usage: ${c("task:friction", "draft")}`);
+      return 2;
+    }
+    for (const i of plan.friction.issues) err(`⚠ ${i}`);
+    const drafts = renderDrafts(plan);
+    out(drafts.length ? drafts.join("\n") : textFor(config.people.docLanguage).friction.noDrafts);
+    return 0;
+  }
   const usage = {
     add: `${c("task:friction", "add --kind <kind> --area <area> --evidence <text> [--card <id>] <summary…>")}`,
     close: `${c("task:friction", `close <F-id> ${CLOSE_STATUSES.join("|")} <card id or reason…>`)}`,
   };
   if (!usage[sub]) {
-    err(`usage: ${usage.add} · ${usage.close} · ${c("task:friction")}`);
+    err(`usage: ${usage.add} · ${usage.close} · ${c("task:friction", "draft")} · ${c("task:friction")}`);
     return 2;
   }
   const lane = laneFolder(root, plan);

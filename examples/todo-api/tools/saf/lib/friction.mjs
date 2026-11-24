@@ -1,5 +1,6 @@
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { textFor } from "./text.mjs";
 
 /**
  * Friction log — docs/specs/friction-log.md (rules 1-8, 13). One append-only file where the workflow notes where it got
@@ -11,6 +12,10 @@ export const FRICTION_FILE = "docs/plan/friction.md";
 export const FRICTION_MARKER = "<!-- entries: append only -->";
 export const FRICTION_KINDS = ["review-bounce", "command-failed", "doc-drift", "workaround"];
 export const CLOSE_STATUSES = ["carded", "fixed", "dropped"];
+/** Triage (rules 15-16): `recurring` = open entries of one kind and area that make a group recurring. */
+export const FRICTION_LIMITS = { recurring: 2 };
+/** Kinds a self-fix card may carry (rule 19, D-017). */
+export const SELF_FIX_KINDS = ["command-failed", "doc-drift"];
 
 const SEP = " · ";
 const TODAY_PLACEHOLDER = "2000-01-01";
@@ -213,3 +218,77 @@ export function appendClose(root, id, status, ref, opts = {}) {
 
 /** One line of the friction listing. */
 export const entryLine = (e) => [e.id, e.status, e.kind, e.card, e.area, e.summary].join(SEP);
+
+/**
+ * Open entries grouped by kind and area (rule 15), recurring groups first, then the larger, then in order of the first id.
+ * → [{ kind, area, count, ids, evidence (of the highest id), summaries, recurring }]
+ */
+export function groupFriction(entries) {
+  const groups = new Map();
+  for (const e of entries.filter((x) => x.status === "open")) {
+    const key = `${e.kind}${SEP}${e.area}`;
+    const g = groups.get(key) ?? { kind: e.kind, area: e.area, count: 0, ids: [], evidence: "", summaries: [], recurring: false };
+    g.count += 1;
+    g.ids.push(e.id);
+    g.evidence = e.evidence;
+    g.summaries.push(e.summary);
+    g.recurring = g.count >= FRICTION_LIMITS.recurring;
+    groups.set(key, g);
+  }
+  return [...groups.values()].sort((a, b) => Number(b.recurring) - Number(a.recurring) || b.count - a.count);
+}
+
+/** The milestone a draft belongs to: the active one, else the first planned one. */
+const targetMilestone = (plan) => plan.milestones.find((m) => m.status === "active") ?? plan.milestones.find((m) => m.status === "planned");
+
+/**
+ * Card drafts (rule 16): one per recurring group and one per open entry whose kind is in SELF_FIX_KINDS while workflow.selfFix is "on".
+ * Each is a string in the shape of docs/plan/tasks/_template.md with touch and "Done when" left as TODO; nothing is written anywhere.
+ */
+export function renderDrafts(plan) {
+  const t = textFor(plan.config?.people?.docLanguage).friction;
+  const entries = plan.friction.entries.filter((e) => e.status === "open");
+  const mid = targetMilestone(plan)?.id ?? "M?";
+  const id = `T-${mid}-??`;
+  const draft = ({ title, why, fix }) =>
+    [
+      "---",
+      `id: ${id}`,
+      `milestone: ${mid}`,
+      `title: ${JSON.stringify(title)}`,
+      "spec: []",
+      "depends: []",
+      "size: S",
+      "role: implementer",
+      "touch:",
+      "  - TODO",
+      "dont_touch: []",
+      "scenarios: []",
+      ...(fix ? [`self_fix: ${fix}`] : []),
+      "---",
+      "",
+      `# ${id} — ${title}`,
+      "",
+      "## Why",
+      "",
+      ...why.map((e) => `- ${e.id}${SEP}${e.date}${SEP}${e.kind}${SEP}${e.area}${SEP}${e.summary}${SEP}evidence: ${e.evidence}`),
+      "",
+      "## What to do",
+      "",
+      `- ${t.todoDo}`,
+      "",
+      "## Done when",
+      "",
+      `- ${t.todoDone}`,
+      "",
+    ].join("\n");
+  const out = [];
+  for (const g of groupFriction(entries).filter((x) => x.recurring)) {
+    const why = entries.filter((e) => g.ids.includes(e.id));
+    out.push(draft({ title: t.groupTitle(g.summaries[g.summaries.length - 1], g.count), why }));
+  }
+  if (plan.config?.workflow?.selfFix === "on") {
+    for (const e of entries.filter((x) => SELF_FIX_KINDS.includes(x.kind))) out.push(draft({ title: e.summary, why: [e], fix: e.id }));
+  }
+  return out;
+}
