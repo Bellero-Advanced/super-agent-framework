@@ -36,6 +36,26 @@ npm run test:unit        # one suite
 node scripts/demo.mjs    # rebuild docs/assets/demo.svg from a real run
 ```
 
+## Add a document language
+
+A document language is one entry in the text table plus a template folder (spec: `docs/specs/doc-languages.md`). Any
+document the folder lacks is read from `templates/en/`, and setup (and its dry run) warns once per such file, so a
+language can ship in parts. Agent, rule and skill templates stay English.
+
+1. **Table entry.** Add a table for the language code to `TEXT` in `kit/tools-saf/lib/text.mjs`. It needs `langName`
+   (the language's own name); `names` (the names of other languages in this one) and `sessionWork` (the three work labels
+   of the session summary) are optional, and any key the table lacks reads in English.
+2. **Templates.** Copy `kit/tools-saf/templates/en/` to `kit/tools-saf/templates/<code>/` and translate; a file you leave
+   out falls back to English with a warning.
+3. **Schema.** Add the code to the three enums in `kit/tools-saf/schema/saf.config.schema.json`: `people.docLanguage`,
+   `people.chatLanguage` and `roles.reportLanguage`.
+4. **Tests.** Run `npm test`. The language test names any enum that differs from the languages in `TEXT` and any table
+   without `langName`; the setup-choices tests list the new language automatically (the explanations of the three
+   questions cover every language, so no explanation text is added). Then run `npm run saf:refresh`.
+
+A native reader must review the text before it ships; machine translation alone is not enough. Setup's own explanations
+(`saf choices --lang`) stay in the languages that have explanation text, and a new language reads them in English.
+
 ## Pull requests
 
 1. One change per pull request; describe the problem first, then the change.

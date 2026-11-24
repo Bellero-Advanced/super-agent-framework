@@ -4,6 +4,9 @@
  */
 
 const en = {
+  langName: "English",
+  names: { en: "English", th: "Thai" },
+  sessionWork: { both: "design · review · build", planner: "design · write cards/specs · review against specs", builder: "build cards · test · specialist work" },
   stateTitle: "# Work status (generated — do not edit by hand)",
   stateNote: (c) =>
     `> Written by \`${c("task:state")}\` · \`${c("task:start")}\` · \`${c("task:verify")}\` from the files in \`docs/plan/\` · a card becomes "done" only through \`${c("task:verify", "<id>")}\` · how it works: [README.md](README.md)`,
@@ -133,6 +136,9 @@ const en = {
 
 const th = {
   ...en,
+  langName: "ภาษาไทย",
+  names: { th: "ภาษาไทย", en: "ภาษาอังกฤษ" },
+  sessionWork: { both: "ออกแบบ · ตรวจ · ลงมือ", planner: "ออกแบบ · เขียนการ์ด/สเปก · ตรวจงานกับสเปก", builder: "ลงมือทำการ์ด · ทดสอบ · งานเฉพาะทาง" },
   stateTitle: "# สถานะงาน (สร้างอัตโนมัติ — ห้ามแก้มือ)",
   stateNote: (c) =>
     `> เขียนโดย \`${c("task:state")}\` · \`${c("task:start")}\` · \`${c("task:verify")}\` จากไฟล์ใน \`docs/plan/\` · การ์ดเป็น "เสร็จ" ได้ทางเดียวคือ \`${c("task:verify", "<รหัส>")}\` ผ่าน · วิธีใช้: [README.md](README.md)`,
@@ -260,5 +266,26 @@ const th = {
   },
 };
 
+/** The document languages: one table per language in `TEXT` (docs/specs/doc-languages.md). Add a language by adding its table here. */
 export const TEXT = { en, th };
-export const textFor = (lang) => TEXT[lang] ?? en;
+export const LANGUAGES = Object.keys(TEXT);
+
+const isTable = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+/** `table` laid over `base` key by key, nested objects included: a key the table lacks keeps the base value. Returns a new object. */
+export function mergeText(base, table) {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(table ?? {})) out[k] = isTable(v) && isTable(base[k]) ? mergeText(base[k], v) : v ?? base[k];
+  return out;
+}
+
+const merged = new WeakMap();
+/** The text of a language: its table over English; an unknown language reads English. Do not modify the result. */
+export function textFor(lang) {
+  const table = TEXT[lang];
+  if (!table || table === en) return en;
+  if (!merged.has(table)) merged.set(table, mergeText(en, table));
+  return merged.get(table);
+}
+
+/** The name of language `code` written in document language `docLang`: that table's `names`, else English `names`, else the language's own `langName`, else the code. */
+export const languageName = (code, docLang) => textFor(docLang).names?.[code] ?? TEXT[code]?.langName ?? code;
