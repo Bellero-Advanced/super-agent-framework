@@ -114,16 +114,22 @@ test("RERUN-AC-05 far-apart changes make separate hunks and every diff rebuilds 
   assertDiff(a, b, DIFF_LIMITS.context, "far apart");
   // a small seeded property run: random edits of random texts — random final newline and CRLF too — always rebuild
   let seed = 7;
-  const rnd = (n) => (seed = (seed * 1103515245 + 12345) % 2147483648) % n;
+  const rnd = (n) => ((seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) >>> 16) % n; // 32-bit integer maths, high bits
+  const seen = [];
   const text = (lines) => {
     const eol = rnd(2) ? "\r\n" : "\n";
-    return lines.join(eol) + (lines.length && rnd(2) ? eol : "");
+    const out = lines.join(eol) + (lines.length && rnd(2) ? eol : "");
+    seen.push(out);
+    return out;
   };
   for (let t = 0; t < 300; t++) {
     const x = Array.from({ length: rnd(12) }, () => `l${rnd(4)}`);
     const y = Array.from({ length: rnd(12) }, () => `l${rnd(4)}`);
     assertDiff(text(x), text(y), rnd(3), `${JSON.stringify(x)} -> ${JSON.stringify(y)}`);
   }
+  const all = seen.join("");
+  assert.ok(seen.some((t) => t.includes("\r\n")) && seen.some((t) => /\S$/.test(t)) && seen.some((t) => t.endsWith("\n")), "the run has CRLF, no-final-newline and final-newline texts");
+  for (const l of ["l0", "l1", "l2", "l3"]) assert.ok(all.includes(l), `${l} was drawn`);
 });
 
 test("RERUN-AC-05 pairs with no final newline and with CRLF: the hunks match both texts and the markers sit on the last line", () => {

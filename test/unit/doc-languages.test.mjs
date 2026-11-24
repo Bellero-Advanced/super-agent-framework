@@ -119,7 +119,7 @@ test("LANG-AC-02 upgrade's refreshKitFiles warns once per command or skill whose
   const english = tmp("saf-en-up-");
   gen.generate(english, ANSWERS("en"));
   for (const f of [".claude/commands/saf.md", ".claude/commands/saf-plan.md"]) assert.equal(read(root, f), read(english, f), `${f} is the English command`);
-  // the shipped engine has no xx entry: the same project, language en again, gives no warning
+  // language en again: every template exists, so no fallback warning
   cfg.people.docLanguage = "en";
   writeFileSync(cfgFile, `${JSON.stringify(cfg, null, 2)}\n`);
   assert.deepEqual(gen.refreshKitFiles(root).warnings.filter((w) => w.includes("is missing")), []);
