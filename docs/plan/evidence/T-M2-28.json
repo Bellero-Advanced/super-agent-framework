@@ -1,14 +1,202 @@
 {
   "id": "T-M2-28",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T06:08:46.236Z",
     "base": "1f78758785466c40074cd9ae3956300d7a939b16",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-28",
-  "worktree": ".claude/worktrees/T-M2-28"
+  "worktree": ".claude/worktrees/T-M2-28",
+  "verified": {
+    "at": "2026-11-24T06:13:34.324Z",
+    "head": "690889d36c01b419606b33fdd96269d37d648613",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 203,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "99 scenario(s) in 12 spec(s) · with test 57 · gaps 42 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs",
+        "exit": 0,
+        "ms": 1557,
+        "tail": [
+          "ok 16 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 0.529458",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 17 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 0.557709",
+          "  type: 'test'",
+          "  ...",
+          "1..17",
+          "# tests 17",
+          "# suites 0",
+          "# pass 17",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1522.659625"
+        ]
+      },
+      {
+        "cmd": "node tools/saf/bin/saf.mjs choices --group 2 --lang th",
+        "exit": 0,
+        "ms": 46,
+        "tail": [
+          "    เลือกเมื่อ: ตรงกับระยะจริงของโปรเจกต์ และแก้เมื่อโปรเจกต์ขยับไปต่อ",
+          "## project.rigor",
+          "- light",
+          "    คืออะไร: ค่าเริ่มต้นแบบหลวมที่สุด: การ์ดใหญ่ขึ้น ตรวจเทียบ spec การ์ดขนาด M (การ์ด S ตรวจรวมที่ gate) และตอน merge รันคำสั่ง test เป็นเช็กเดียวของโปรเจกต์",
+          "    เหมาะกับ: โปรโตไทป์และงานทดลองคนเดียวที่ความเร็วสำคัญกว่าขั้นตอน",
+          "    ข้อเสีย: ตรวจและเช็กน้อยลง จึงเจอข้อผิดพลาดช้าและแก้แพงกว่า",
+          "    เลือกเมื่อ: เป็นโปรโตไทป์เร็ว ๆ หรืองานทดลองที่ทิ้งได้",
+          "    ขนาดการ์ด S / M (บรรทัดโค้ดที่เปลี่ยน): 200 / 500 · เพดานเทสต์ S / M (บรรทัดเทสต์ที่เปลี่ยน): 300 / 800 · การตรวจ: ตรวจเทียบ spec การ์ดขนาด M ส่วนการ์ด S ตรวจรวมที่ประตูออก milestone · เช็กตอน merge: test",
+          "- standard",
+          "    คืออะไร: ค่าเริ่มต้นระดับกลาง: ทุกการ์ดถูกตรวจเทียบ spec และตอน merge รัน typecheck, lint และ test เท่าที่โปรเจกต์มี",
+          "    เหมาะกับ: โปรเจกต์ส่วนใหญ่ที่ตั้งใจเก็บโค้ดไว้ใช้ต่อ",
+          "    ข้อเสีย: ทุกการ์ดต้องรอการตรวจ ซึ่งใช้เวลาและ token ของ agent",
+          "    เลือกเมื่อ: ไม่มีเหตุผลชัดเจนให้ไปทางอื่น",
+          "    ขนาดการ์ด S / M (บรรทัดโค้ดที่เปลี่ยน): 150 / 400 · เพดานเทสต์ S / M (บรรทัดเทสต์ที่เปลี่ยน): 250 / 600 · การตรวจ: ตรวจเทียบ spec ทุกการ์ด · เช็กตอน merge: typecheck · lint · test",
+          "- strict",
+          "    คืออะไร: ค่าเริ่มต้นเข้มที่สุด: การ์ดเล็กลง ตรวจเทียบ spec ทุกการ์ด ตรวจความปลอดภัยทุก milestone และเพิ่ม build ในเช็กตอน merge",
+          "    เหมาะกับ: ระบบจริงที่มีผู้ใช้ และผลิตภัณฑ์ที่จัดการเงินหรือข้อมูลส่วนบุคคล",
+          "    ข้อเสีย: ใช้เวลาและ token มากที่สุด Definition of done บังคับให้ security-auditor ตรวจทุก milestone แม้ไม่ได้เปิด role นี้ จึงควรเปิด",
+          "    เลือกเมื่อ: ความผิดพลาดจะกระทบผู้ใช้หรือเงิน การสัมภาษณ์จะเสนอ role security-auditor",
+          "    ขนาดการ์ด S / M (บรรทัดโค้ดที่เปลี่ยน): 100 / 300 · เพดานเทสต์ S / M (บรรทัดเทสต์ที่เปลี่ยน): 200 / 500 · การตรวจ: ตรวจเทียบ spec ทุกการ์ด และ security-auditor ตรวจทุก milestone · เช็กตอน merge: typecheck · lint · test · build"
+        ]
+      },
+      {
+        "cmd": "node -e \"import('./kit/tools-saf/lib/choices.mjs').then(m=>{const t=JSON.stringify(m.CHOICES.filter(e=>e.question==='custom-models'));if(!t.includes('models.overrides')||/only the server rule/i.test(JSON.stringify(m.CHOICES)))process.exit(1)})\"",
+        "exit": 0,
+        "ms": 43,
+        "tail": []
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 225,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 495 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 178,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 245 markdown file(s) · 190 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-choices-facts.test.mjs' 'test/unit/setup-choices.test.mjs'",
+        "exit": 0,
+        "ms": 1535,
+        "tail": [
+          "ok 16 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 0.512666",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 17 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 0.569209",
+          "  type: 'test'",
+          "  ...",
+          "1..17",
+          "# tests 17",
+          "# suites 0",
+          "# pass 17",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1500.171709"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/choices.mjs",
+        "test/unit/setup-choices-facts.test.mjs",
+        "test/unit/setup-choices.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/choices.mjs": "ce9f95c4ad0bf1481a21067311f5a84318a897de",
+        "test/unit/setup-choices-facts.test.mjs": "4eefde1c8fc0c371d054942221f85b9d1048446a",
+        "test/unit/setup-choices.test.mjs": "5cf855ab706efb567156ba93065d19f31e4b105a"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-05",
+        "SETUP-AC-06",
+        "SETUP-AC-11"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 41,
+        "cap": 150
+      },
+      "test": {
+        "lines": 128,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-choices-facts.test.mjs",
+        "test/unit/setup-choices.test.mjs"
+      ]
+    }
+  }
 }

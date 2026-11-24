@@ -114,7 +114,7 @@ test("SETUP-AC-04 choices --group 2 --lang th prints every option with four Thai
   const count = (text) => r.stdout.split(text).length - 1;
   for (const label of LABELS.th.fields) assert.equal(count(`    ${label}: `), CHOICES.filter((e) => QUESTIONS.find((q) => q.id === e.question).group === 2).length, label);
   for (const [name, v] of Object.entries(RIGOR)) {
-    const line = r.stdout.split("\n").find((l) => l.includes(`${LABELS.th.sizes}: ${v.sizes.S} / ${v.sizes.M}`) && l.includes(`${v.testCaps.S} / ${v.testCaps.M}`) && l.includes(`${LABELS.th.review}: ${v.review}`));
+    const line = r.stdout.split("\n").find((l) => l.includes(`${LABELS.th.sizes}: ${v.sizes.S} / ${v.sizes.M}`) && l.includes(`${v.testCaps.S} / ${v.testCaps.M}`) && l.includes(`${LABELS.th.review}: ${LABELS.th.reviewWords[v.review]}`) && !l.includes(v.review));
     assert.ok(line && line.includes(v.merge.join(" · ")), name);
   }
   assert.ok(!r.stdout.includes(LABELS.en.fields[0]), "no English labels");
