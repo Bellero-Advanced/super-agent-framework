@@ -56,7 +56,7 @@ import {
 } from "./plan.mjs";
 import { IS_WINDOWS, RUN_LIMITS, quoteWindowsArg } from "./run.mjs";
 import { findScenarioTests, isTestFile } from "./scenarios.mjs";
-import { defersAtVerify, gatesWithFullSuite, isFullSuite, mergeChecksFor, targetedCommand, targetedFiles } from "./testmode.mjs";
+import { FILES_PLACEHOLDER, defersAtVerify, gatesWithFullSuite, isFullSuite, mergeChecksFor, targetedCommand, targetedFiles } from "./testmode.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -507,6 +507,14 @@ export function laneFilesBase(root, ev) {
   return ev.started.base;
 }
 
+/** Why no targeted run is possible (test-mode rule 13): the command is missing, lacks the placeholder, or there are no files. */
+function fallbackReason(config, files) {
+  const template = (config.stack?.commands?.testFiles ?? "").trim();
+  if (!template) return "no stack.commands.testFiles command";
+  if (!template.includes(FILES_PLACEHOLDER)) return `stack.commands.testFiles has no ${FILES_PLACEHOLDER} placeholder`;
+  return "no targeted test files";
+}
+
 /**
  * Which commands verify runs (spec test-mode rules 9-14): full-suite criteria are replaced by one targeted run when the
  * mode defers them and a targeted run is possible; otherwise every criterion runs and `targeted.fallback` says why.
@@ -517,7 +525,7 @@ function planVerifyRun(ctx, card, ev, filesBase, inLane) {
   // files are listed before the run, so the selection uses the card's real changes
   const files = targetedFiles(ctx.root, card, cardFiles(ctx, card, ev, filesBase).changed);
   const command = targetedCommand(ctx.config, files);
-  if (!command) return { run: card.criteria, deferred: [], targeted: { fallback: files.length ? "no stack.commands.testFiles command" : "no targeted test files" } };
+  if (!command) return { run: card.criteria, deferred: [], targeted: { fallback: fallbackReason(ctx.config, files) } };
   return { run: [...card.criteria.filter((c) => !full.includes(c)), command], deferred: full, targeted: { files } };
 }
 
