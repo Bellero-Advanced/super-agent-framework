@@ -29,6 +29,10 @@ const readText = (abs) => readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
 const readTemplate = (p) => readFileSync(p, "utf8").replace(/\r\n/g, "\n");
 export const COMMANDS = ["saf", "saf-plan"];
 /** Agent-facing folders SAF owns files in — a file SAF wrote there that is no longer planned is removed when unedited. */
+/** Files the team keeps writing in after setup: a re-run keeps them when edited (a trailing "/" = everything under that folder). */
+export const LIVING_FILES = ["docs/DECISIONS.md", "docs/INDEX.md", "docs/plan/milestones/", "docs/plan/tasks/"];
+const isLiving = (rel) => LIVING_FILES.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
+
 const OWNED_DIRS = [".claude/commands/", ".claude/skills/", ".claude/agents/", ".claude/rules/"];
 /** Skills shipped in this project: core + chosen packs (one skill per pack). */
 export const skillsFor = (config) => [...CORE_SKILLS, ...config.skills.packs];
@@ -315,22 +319,54 @@ export function engineScripts(config) {
   return want;
 }
 
+/**
+ * The one package.json script merge — setup and `saf upgrade` both call it. Adds the scripts in `want` that are missing,
+ * never changes an existing one, and returns the new text only when something was added (`text: null` otherwise, so the
+ * caller leaves the file byte-identical). Keeps the byte-order mark, indentation, line endings and trailing newline.
+ * @returns {{text:string|null, added:string[], kept:string[], scripts:object|null, invalid:boolean}}
+ */
+export function mergeScriptsText(text, want) {
+  const bom = text.startsWith("\uFEFF") ? "\uFEFF" : "";
+  const body = text.slice(bom.length);
+  let pkg = null;
+  try {
+    pkg = JSON.parse(body);
+  } catch {}
+  if (!pkg || typeof pkg !== "object" || Array.isArray(pkg)) return { text: null, added: [], kept: [], scripts: null, invalid: true };
+  if (!pkg.scripts || typeof pkg.scripts !== "object" || Array.isArray(pkg.scripts)) pkg.scripts = {};
+  const added = [];
+  const kept = [];
+  for (const [name, value] of Object.entries(want)) {
+    if (pkg.scripts[name] === undefined) {
+      pkg.scripts[name] = value;
+      added.push(name);
+    } else if (pkg.scripts[name] !== value) kept.push(name);
+  }
+  if (!added.length) return { text: null, added, kept, scripts: pkg.scripts, invalid: false };
+  const indent = body.match(/^([ \t]+)\S/m)?.[1] ?? 2;
+  const eol = body.includes("\r\n") ? "\r\n" : "\n";
+  const tail = /\r?\n$/.test(body) ? eol : "";
+  return { text: `${bom}${JSON.stringify(pkg, null, indent).replace(/\n/g, eol)}${tail}`, added, kept, scripts: pkg.scripts, invalid: false };
+}
+
+/** Setup's package.json step: create the file when missing, otherwise write only when a script is added. */
 function mergePackageJson(root, config, report) {
   if (config.stack.packageManager === "none") return null;
   const file = join(root, "package.json");
-  const pkg = existsSync(file) ? readJson(file, null) : { name: config.project.name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "project", private: true };
-  if (!pkg) {
+  const name = config.project.name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "project";
+  const text = existsSync(file) ? readFileSync(file, "utf8") : `${JSON.stringify({ name, private: true }, null, 2)}\n`;
+  const want = engineScripts(config);
+  const res = mergeScriptsText(text, want);
+  if (res.invalid) {
     report.warnings.push("package.json is not valid JSON — scripts were not added (see docs/plan/README.md for the commands)");
     return null;
   }
-  pkg.scripts ??= {};
-  for (const [k, v] of Object.entries(engineScripts(config))) {
-    if (pkg.scripts[k] === undefined) pkg.scripts[k] = v;
-    else if (pkg.scripts[k] !== v) report.warnings.push(`package.json already has a different "${k}" script — kept yours; SAF docs assume "${v}"`);
+  for (const k of res.kept) report.warnings.push(`package.json already has a different "${k}" script — kept yours; SAF docs assume "${want[k]}"`);
+  if (res.text !== null) {
+    writeFileSync(file, res.text);
+    report.written.push("package.json (scripts merged)");
   }
-  writeFileSync(file, `${JSON.stringify(pkg, null, 2)}\n`);
-  report.written.push("package.json (scripts merged)");
-  return pkg.scripts;
+  return res.scripts;
 }
 
 function archive(root, rel, report) {
@@ -398,7 +434,15 @@ export function generate(root, answers, opts = {}) {
     const abs = join(root, f.dest);
     if (existsSync(abs) && statSync(abs).isFile()) {
       const cur = readText(abs);
-      if (cur !== f.content && !ownedUnchanged(f.dest)) archive(root, f.dest, report);
+      const edited = cur !== f.content && !ownedUnchanged(f.dest);
+      if (edited && rerun && isLiving(f.dest)) {
+        // the team's own working file: keep it, keep its old manifest entry so the next run still sees it as edited
+        if (manifest.files[f.dest]) next.files[f.dest] = manifest.files[f.dest];
+        report.kept.push(f.dest);
+        report.warnings.push(`${f.dest} has your edits — kept, the new settings did not reach it`);
+        continue;
+      }
+      if (edited) archive(root, f.dest, report);
     }
     mkdirSync(dirname(abs), { recursive: true });
     writeFileSync(abs, f.content);
