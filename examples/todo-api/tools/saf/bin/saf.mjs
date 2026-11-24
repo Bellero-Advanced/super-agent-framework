@@ -14,7 +14,7 @@ import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/me
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, MILESTONE_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { prerunCard } from "../lib/prerun.mjs";
-import { commandRunner, runRelease } from "../lib/release.mjs";
+import { commandRunner, prepareRelease, runRelease, tagRelease } from "../lib/release.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
 import { writeReviewDiff } from "../lib/reviewdiff.mjs";
 import { REVIEW_KINDS, listRounds, recordReview, reviewsPath } from "../lib/reviews.mjs";
@@ -62,7 +62,8 @@ import {
  *     (runs those commands like task:verify does — same runner, folder and time limit, guards are not run — and writes no evidence, STATE.md or mirror (the commands themselves may write, as at task:verify) · main folder or lane)
  *   task diff <id>   write the reviewer's diff of a started card to .saf/memory/review/<id>.diff (exit 0 written · 1 git failed · 2 usage or refused)
  *     (exactly the files task:verify counts as the card's · a lane card is read and written in its worktree · prints the absolute path)
- *   task release <M>   the release dry run: every release guard and the plan, nothing is changed (exit 0 every guard holds · 1 one fails · 2 usage; --prepare and --tag are not built yet)
+ *   task release <M>   the release dry run: every release guard and the plan, nothing is changed (exit 0 every guard holds · 1 one fails · 2 usage)
+ *   task release <M> --prepare | --tag   commit + push the version bump, or tag + push the tag when CI is green on that commit (exit 0 pushed · 1 a guard refused, a step failed and was undone, or a push did not go through · 2 usage: a bad milestone id, both flags together, or a lane worktree)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -310,11 +311,16 @@ async function task(sub, rest) {
         err(`✗ ${bad.length ? `unknown option ${bad[0]}` : words.length > 1 ? `unexpected argument "${words[1]}"` : words.length ? (steps.length > 1 ? "give one of --prepare and --tag" : `"${words[0]}" is not a milestone id`) : "give a milestone id"} — ${usage}`);
         return 2;
       }
+      const ctx = { root, config, run: commandRunner(root, { timeoutMs: config.workflow.commandTimeoutMs }) };
       if (steps.length) {
-        err(`✗ ${steps[0]} is not built yet (T-M3-10) — ${c("task:release", words[0])} is the dry run`);
-        return 2;
+        const lane = laneFolder(root, loadPlan(root, config));
+        if (lane) {
+          err(`✗ ${steps[0]} pushes from the main folder only — this folder is the worktree of lane ${lane.lane}, card ${lane.card}: run ${c("task:release", `${words[0]} ${steps[0]}`)} there`);
+          return 2;
+        }
+        return (steps[0] === "--prepare" ? prepareRelease : tagRelease)(ctx, words[0], { out });
       }
-      return runRelease({ root, config, run: commandRunner(root, { timeoutMs: config.workflow.commandTimeoutMs }) }, words[0], { out });
+      return runRelease(ctx, words[0], { out });
     }
     case "culprit": {
       const mid = requireId();

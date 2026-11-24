@@ -75,3 +75,8 @@ Show the owner, in English:
 - **Card commands:** `npm run task:start -- <id>` → work → `npm run task:verify -- <id>` → review → commit · status `docs/plan/STATE.md` ·
   how it works `docs/plan/README.md`
 - **Try:** `/saf what is the next card?` · `/saf the login page crashes on submit` · `/saf run the tests`
+
+## 5. Releases
+
+`policies.release.auto` is `off`: a release (a version bump pushed, a tag, a publish) happens only when the owner orders it.
+`npm run task:release -- <M>` is always safe to run — it only shows every guard and the next version.

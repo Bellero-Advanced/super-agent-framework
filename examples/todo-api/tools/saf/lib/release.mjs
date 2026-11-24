@@ -1,14 +1,15 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
-import { join, posix } from "node:path";
+import { existsSync, lstatSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, posix, relative } from "node:path";
 import { CONFIG_FILE } from "./config.mjs";
 import { activeCards, cardStatus, gateResults, isDone, loadPlan } from "./plan.mjs";
 
 /**
- * Automatic release, the read-only part (docs/specs/auto-release.md rules 1-9, decision D-015). The guards and the dry run
- * only READ: every call to the outside world (git, the registry, `gh`) goes through one injected `run(cmd, args)` that
- * returns `{ code, out, err }`, so tests use fakes and the engine never touches the network by itself. Nothing here pushes,
- * tags, publishes or writes a file; the steps that do are a later card.
+ * Automatic release (docs/specs/auto-release.md rules 1-13, decision D-015). The guards and the dry run only READ.
+ * `prepareRelease` and `tagRelease` are the only functions that change anything: one commit and one branch push, then one
+ * annotated tag and one tag push, each only after every guard holds. Every call to the outside world (git, the registry,
+ * `gh`) goes through one injected `run(cmd, args)` that returns `{ code, out, err }`, so tests use fakes and the engine
+ * never touches the network by itself. Files are written in one place (`putFile`), never outside the planned list.
  */
 
 /** Where the release log lives (append-only, written by the prepare step). */
@@ -25,6 +26,10 @@ export const RELEASE = {
   version: /^(\d+)\.(\d+)\.(\d+)$/,
   branchName: /^[A-Za-z0-9][A-Za-z0-9._/-]*$/,
   hexHead: /^[0-9a-f]{7,64}$/i,
+  fullSha: /^[0-9a-f]{40}([0-9a-f]{24})?$/,
+  milestoneId: /^M\d+$/,
+  badBranch: /\.\.|\/\/|\/$|\.$|\.lock$|\/\.|@\{/, // shapes git refuses or reads as something else
+  logHeader: "# Releases\n\nOne line per release, added by `task:release --prepare`. Append only: never edit or remove a line.\n\n",
   packageName: /^(@[a-z0-9~][a-z0-9-._~]*\/)?[a-z0-9~][a-z0-9-._~]*$/, // no leading "-" (it would read as an npm option) and no shell characters
   shortHead: 7,
   maxBuffer: 64 * 1024 * 1024,
@@ -40,7 +45,8 @@ export const RELEASE = {
 };
 
 const num = (v) => (typeof v === "string" ? v.match(RELEASE.version)?.slice(1).map(Number) : null) ?? null;
-const oneLine = (s) => String(s ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim();
+const clean = (s) => String(s ?? "").replace(/[\u0000-\u001f\u007f]/g, " ");
+const oneLine = (s) => clean(s).trim();
 /** First line of a failed call's message; a user name and token inside a URL are hidden. */
 const why = (r) => oneLine(String(r.err || r.out || "").split(/\r?\n/).find((l) => l.trim()) ?? `exit ${r.code}`).replace(/\/\/[^/@\s]+@/g, "//***@");
 const noCr = (text) => String(text ?? "").replace(/\r\n/g, "\n");
@@ -144,7 +150,7 @@ function settings(ctx) {
   const rel = ctx.config.policies.release;
   const branch = ctx.config.policies.protectedBranches[0] ?? RELEASE.fallbackBranch;
   const errors = {};
-  if (!RELEASE.branchName.test(branch)) errors.branch = `the release branch "${oneLine(branch)}" is not a plain branch name`;
+  if (!RELEASE.branchName.test(branch) || RELEASE.badBranch.test(branch)) errors.branch = `the release branch "${oneLine(branch)}" is not a plain branch name`;
   const badPaths = [...rel.packages, ...rel.versionFiles].filter((p) => !safeDir(p));
   if (badPaths.length) errors.packages = `${badPaths.map(oneLine).join(", ")} is not a folder inside the project`;
   if (!safeDir(rel.ciWorkflow) || /[\\/]/.test(rel.ciWorkflow)) errors.ciWorkflow = `ciWorkflow "${oneLine(rel.ciWorkflow)}" is not a workflow file name`;
@@ -219,7 +225,7 @@ function guardSwitch(ctx, s, fetched) {
   at("HEAD");
   if (s.errors.branch) problems.push(s.errors.branch);
   else if (fetched.error) problems.push(`${RELEASE.remote}/${s.branch} not read: ${fetched.error}`);
-  else at(`refs/remotes/${RELEASE.remote}/${s.branch}`, `${RELEASE.remote}/${s.branch}`);
+  else at(fetched.sha, `${RELEASE.remote}/${s.branch}`);
   return verdict("G-switch", problems, `policies.release.auto is on at HEAD and on ${RELEASE.remote}/${s.branch}`);
 }
 
@@ -236,8 +242,7 @@ function guardBranch(ctx, s, fetched, plan, step, d, mid) {
   if (fetched.error) problems.push(`fetch failed (${fetched.error})`);
   else if (!s.errors.branch) {
     const head = git(ctx, "rev-parse", "HEAD");
-    const origin = git(ctx, "rev-parse", `refs/remotes/${RELEASE.remote}/${s.branch}`);
-    if (head.code !== 0 || origin.code !== 0 || head.out.trim() !== origin.out.trim()) problems.push(`HEAD is not ${RELEASE.remote}/${s.branch}`);
+    if (head.code !== 0 || head.out.trim() !== fetched.sha) problems.push(`HEAD is not ${RELEASE.remote}/${s.branch}`);
   }
   if (step === "tag") {
     const subject = git(ctx, "log", "-1", "--format=%s", "HEAD");
@@ -286,6 +291,14 @@ function registryVersions(ctx, name) {
   }
 }
 
+/** Is the local tag an annotated tag whose commit is HEAD (a --tag whose push failed leaves exactly this)? */
+function localTagOnHead(ctx, tag) {
+  const kind = git(ctx, "cat-file", "-t", `refs/tags/${tag}`);
+  const at = git(ctx, "rev-parse", `refs/tags/${tag}^{commit}`);
+  const head = git(ctx, "rev-parse", "HEAD");
+  return kind.code === 0 && kind.out.trim() === "tag" && at.code === 0 && head.code === 0 && at.out.trim() === head.out.trim();
+}
+
 function guardVersion(ctx, d, step) {
   const problems = [...d.problems];
   if (!problems.length && d.changelog === null) problems.push(`${RELEASE.changelog} is missing`);
@@ -303,7 +316,7 @@ function guardVersion(ctx, d, step) {
     const tag = `v${d.next}`;
     const local = git(ctx, "tag", "--list", tag);
     if (local.code !== 0) problems.push(`git tag --list failed (${why(local)})`);
-    else if (local.out.trim()) problems.push(`tag ${tag} exists locally`);
+    else if (local.out.trim() && !(step === "tag" && localTagOnHead(ctx, tag))) problems.push(`tag ${tag} exists locally${step === "tag" ? " and is not an annotated tag on HEAD" : ""}`);
     const remote = git(ctx, "ls-remote", "--tags", RELEASE.remote, `refs/tags/${tag}`);
     if (remote.code !== 0) problems.push(`the tags of ${RELEASE.remote} could not be read (${why(remote)})`);
     else if (remote.out.trim()) problems.push(`tag ${tag} exists on ${RELEASE.remote}`);
@@ -318,7 +331,7 @@ function guardCi(ctx, s) {
   if (head.code !== 0) return verdict("G-ci", [`HEAD is unknown (${why(head)})`]);
   const sha = head.out.trim();
   const short = sha.slice(0, RELEASE.shortHead);
-  const list = ctx.run("gh", ["run", "list", "--workflow", s.ciWorkflow, "--commit", sha, "--json", "databaseId,status,conclusion"]);
+  const list = ctx.run("gh", ["run", "list", "--workflow", s.ciWorkflow, "--commit", sha, "--json", "databaseId,status,conclusion,headSha"]);
   if (list.code !== 0) return verdict("G-ci", [`gh failed (${why(list)})`]);
   let runs;
   try {
@@ -329,16 +342,18 @@ function guardCi(ctx, s) {
   const latest = Array.isArray(runs) ? runs[0] : null;
   if (!latest) return verdict("G-ci", [`no run of ${s.ciWorkflow} for ${short}`]);
   if (!Number.isSafeInteger(latest.databaseId)) return verdict("G-ci", ["gh run list gave no run id"]);
+  if (latest.headSha !== sha) return verdict("G-ci", [`gh did not say that run ${latest.databaseId} is for ${short}`]);
   const problems = [];
   if (latest.status !== "completed" || latest.conclusion !== "success") problems.push(`the newest run ${latest.databaseId} is ${oneLine(latest.status)}/${oneLine(latest.conclusion)}, not completed/success`);
-  const view = ctx.run("gh", ["run", "view", String(latest.databaseId), "--json", "status,conclusion,jobs"]);
+  const view = ctx.run("gh", ["run", "view", String(latest.databaseId), "--json", "status,conclusion,headSha,jobs"]);
   let jobs = null;
   try {
-    jobs = view.code === 0 ? JSON.parse(view.out).jobs : null;
+    const shown = view.code === 0 ? JSON.parse(view.out) : null;
+    jobs = shown?.headSha === sha ? shown.jobs : null;
   } catch {
     jobs = null;
   }
-  if (!Array.isArray(jobs) || !jobs.length) problems.push(view.code === 0 ? `run ${latest.databaseId} lists no jobs` : `gh failed (${why(view)})`);
+  if (!Array.isArray(jobs) || !jobs.length) problems.push(view.code === 0 ? `run ${latest.databaseId} lists no jobs for ${short}` : `gh failed (${why(view)})`);
   else for (const j of jobs.filter((x) => x?.conclusion !== "success")) problems.push(`job ${oneLine(j?.name)} is ${oneLine(j?.conclusion || j?.status)}`);
   return verdict("G-ci", problems, `run ${latest.databaseId} of ${s.ciWorkflow} for ${short} succeeded in all ${jobs?.length} jobs`);
 }
@@ -360,8 +375,10 @@ export function releaseGuards(ctx, mid, { step = "prepare" } = {}) {
   const s = settings(ctx);
   let fetched = { error: s.errors.branch };
   if (!s.errors.branch) {
-    const r = git(ctx, "fetch", "--quiet", RELEASE.remote, s.branch);
-    fetched = r.code === 0 ? {} : { error: why(r) };
+    const r = git(ctx, "fetch", "--quiet", RELEASE.remote, `refs/heads/${s.branch}`); // the full ref name: a tag called like the branch would win over a bare name
+    const sha = r.code === 0 ? git(ctx, "rev-parse", "FETCH_HEAD^{commit}") : r; // the commit this fetch brought, not a remote-tracking ref a narrow refspec may leave stale
+    if (r.code !== 0) fetched = { error: why(r) };
+    else fetched = sha.code === 0 && RELEASE.fullSha.test(sha.out.trim()) ? { sha: sha.out.trim() } : { error: `FETCH_HEAD is not a commit (${why(sha)})` };
   }
   let plan;
   try {
@@ -374,6 +391,10 @@ export function releaseGuards(ctx, mid, { step = "prepare" } = {}) {
   if (step === "tag") guards.push(guardCi(ctx, s), guardLog(ctx, d, mid));
   return guards;
 }
+
+const PUSH_SAFE = "--no-follow-tags"; // a push of a branch must never carry a tag along
+/** Every printed line: no control character from a CHANGELOG heading, a config path or a log field reaches the terminal (the indent stays). */
+const printer = (write) => (line) => write(clean(line));
 
 // ── the plan ─────────────────────────────────────────────────────────────────
 
@@ -395,16 +416,16 @@ export function planRelease(ctx, mid, { step = "prepare" } = {}) {
     `rename "## Unreleased" to "## ${d.next} — ${date}" in ${RELEASE.changelog} and add a new empty "## Unreleased" above it`,
     `append to ${RELEASE_LOG}: ${line}`,
     `git commit those files as "${RELEASE.subject(d.next, mid)}"`,
-    "git push",
+    `git push ${PUSH_SAFE} ${RELEASE.remote} <the release commit>:refs/heads/${d.s.branch}`,
   ];
-  const tag = [`git tag -a v${d.next} on HEAD (message: the ${RELEASE.changelog} section of ${d.next})`, `git push ${RELEASE.remote} refs/tags/v${d.next}`];
+  const tag = [`git tag -a v${d.next} on HEAD (message: the ${RELEASE.changelog} section of ${d.next})`, `git push ${PUSH_SAFE} ${RELEASE.remote} refs/tags/v${d.next}`];
   return { version: d.next, previous: d.current, bump: bump.bump, reason: bump.reason, step, prepare, done, tag };
 }
 
 /** `task:release <M>` without a step flag: print every guard of the next step and the plan, change nothing. Returns the exit code (0 all hold · 1 one failed). */
 export function runRelease(ctx, mid, { step, out: write }) {
   const at = step ?? chooseStep(ctx, mid);
-  const out = (line) => write(oneLine(line)); // every printed line: no control character from a CHANGELOG heading, a config path or a log field reaches the terminal
+  const out = printer(write);
   out(`task:release ${mid} — dry run, nothing is written (next step: ${at === "tag" ? "--tag" : "--prepare"})`);
   const guards = releaseGuards(ctx, mid, { step: at });
   for (const g of guards) out(`${g.ok ? "✓" : "✗"} ${g.id} — ${g.reason}`);
@@ -422,4 +443,211 @@ export function runRelease(ctx, mid, { step, out: write }) {
   const failed = guards.filter((g) => !g.ok);
   out(failed.length ? `✗ ${failed.length} guard(s) failed — nothing was changed` : "✓ every guard holds — nothing was changed");
   return failed.length ? 1 : 0;
+}
+
+// ── --prepare and --tag: the steps that change the outside world ─────────────
+
+/** The absolute path of a planned release file: inside the project (links resolved), not itself a link. Throws a plain message. */
+function plannedPath(ctx, file, planned) {
+  if (!planned.has(file)) throw new Error(`refusing to write ${oneLine(file)}: it is not one of the release files`);
+  const abs = join(ctx.root, file);
+  const inside = relative(realpathSync(ctx.root), realpathSync(dirname(abs)));
+  if (/^\.\.([\\/]|$)/.test(inside) || /^([A-Za-z]:)?[\\/]/.test(inside)) throw new Error(`${oneLine(file)} is outside the project (a linked folder)`);
+  if (lstatSync(abs, { throwIfNoEntry: false })?.isSymbolicLink()) throw new Error(`${oneLine(file)} is a symbolic link`); // lstat, not existsSync: a dangling link must be seen too
+  return abs;
+}
+
+/** The one place a file is written; a file that is not there yet is created exclusively (never through something that appeared meanwhile). */
+function putFile(ctx, file, data, planned) {
+  const abs = plannedPath(ctx, file, planned);
+  writeFileSync(abs, data, { flag: lstatSync(abs, { throwIfNoEntry: false }) ? "w" : "wx" });
+}
+
+/** Put the named files back byte for byte (`bytes` null = the file did not exist). Never throws: returns the files it could not put back. */
+function restore(ctx, files, touched) {
+  const failed = [];
+  for (const file of touched) {
+    try {
+      const f = files.get(file);
+      if (f.bytes !== null) putFile(ctx, file, f.bytes, files);
+      else if (lstatSync(join(ctx.root, file), { throwIfNoEntry: false })) rmSync(plannedPath(ctx, file, files));
+    } catch {
+      failed.push(file);
+    }
+  }
+  return failed;
+}
+
+const eolOf = (text) => (text.includes("\r\n") ? "\r\n" : "\n");
+
+/** A package.json with the new version and the exact new version for its dependencies on the other released packages; layout (indent, line ends, final newline) kept. */
+function bumpedPackage(text, own, names, next) {
+  const json = JSON.parse(text);
+  json.version = next;
+  for (const key of RELEASE.dependencyKeys) for (const n of names) if (n !== own && json[key] && Object.hasOwn(json[key], n)) json[key][n] = next;
+  const indent = text.match(/^([ \t]+)"/m)?.[1] ?? 2;
+  const eol = eolOf(text);
+  return JSON.stringify(json, null, indent).replace(/\n/g, eol) + (/\n$/.test(text) ? eol : "");
+}
+
+/** The files --prepare changes: `Map<path, { before, after }>` and the reasons it cannot (nothing is written here). */
+function releaseFiles(ctx, mid, d, date) {
+  const files = new Map();
+  const problems = [];
+  const names = d.packages.map((p) => p.name);
+  for (const p of d.packages) files.set(p.file, { before: readText(ctx, p.file), after: null });
+  for (const p of d.packages) {
+    try {
+      files.get(p.file).after = bumpedPackage(files.get(p.file).before, p.name, names, d.next);
+    } catch {
+      problems.push(`${p.file} could not be rewritten`);
+    }
+  }
+  for (const v of d.s.versionFiles) {
+    const file = asPath(".", v);
+    const before = readText(ctx, file);
+    if (before === null) problems.push(`${file} is missing`);
+    else if (before.trim() !== d.current) problems.push(`${file} holds "${oneLine(before)}", not ${d.current}`);
+    else files.set(file, { before, after: `${d.next}${/\n$/.test(before) ? eolOf(before) : ""}` });
+  }
+  const lines = d.changelog.split(/(?<=\n)/);
+  const at = lines.findIndex((l) => /^##\s+\[?unreleased\]?\s*$/i.test(l));
+  if (at < 0) problems.push(`${RELEASE.changelog} has no "## Unreleased" heading`);
+  else {
+    const eol = lines[at].match(/\r?\n$/)?.[0] ?? eolOf(d.changelog);
+    lines[at] = `## Unreleased${eol}${eol}## ${d.next} — ${date}${eol}`;
+    files.set(RELEASE.changelog, { before: d.changelog, after: lines.join("") });
+  }
+  const gate = readJson(ctx, `${RELEASE.evidenceDir}${mid}.json`)?.verified?.head;
+  const entry = releaseLogLine({ version: d.next, date, mid, head: oneLine(gate), from: d.current, bump: d.bump.bump, reason: oneLine(d.bump.reason) });
+  if (readReleaseLog(entry).length !== 1) problems.push("the release-log line could not be built from this milestone");
+  const log = readText(ctx, RELEASE_LOG);
+  const eol = log === null ? "\n" : eolOf(log);
+  files.set(RELEASE_LOG, { before: log, after: `${log === null ? RELEASE.logHeader : log + (/\n$/.test(log) ? "" : eol)}${entry}${eol}` });
+  for (const [file, f] of files) f.bytes = existsSync(join(ctx.root, file)) ? readFileSync(join(ctx.root, file)) : null; // what a restore writes back
+  return { files, problems };
+}
+
+/** Run one git command and print it first (rule 13). */
+const gitw = (ctx, out, ...args) => {
+  out(`$ git ${args.map((a) => oneLine(a)).join(" ")}`);
+  return git(ctx, ...args);
+};
+
+/** The opening lines of --prepare and --tag: what runs, then every guard. Returns the guards. */
+function showGuards(ctx, out, mid, step) {
+  out(`task:release ${mid} --${step} — guards first, then the change`);
+  const guards = releaseGuards(ctx, mid, { step });
+  for (const g of guards) out(`${g.ok ? "✓" : "✗"} ${g.id} — ${g.reason}`);
+  return guards;
+}
+const stopLine = (guards) => `✗ ${guards.filter((g) => !g.ok).length} guard(s) failed — nothing was changed`;
+
+/** What a person does after a rejected push or a release commit that never reached origin (pulling alone does not help: the version is then already bumped). */
+const NEXT_AFTER_REJECTED = "reset the local commit, pull, then run --prepare again — or rebase it onto origin and push it yourself, then run --tag";
+
+/** `task:release <M> --prepare` (rule 10). Returns the exit code: 0 pushed · 1 a guard failed, a step failed (and was undone) or the push did not go through · 2 not a milestone id. */
+export function prepareRelease(ctx, mid, { out: write }) {
+  const out = printer(write);
+  if (!RELEASE.milestoneId.test(String(mid))) return out(`✗ "${oneLine(mid)}" is not a milestone id`), 2;
+  const before = git(ctx, "rev-parse", "HEAD");
+  const guards = showGuards(ctx, out, mid, "prepare");
+  if (chooseStep(ctx, mid) === "tag") {
+    out(`✗ HEAD is already the release commit "${RELEASE.subject(describe(ctx, "tag").current, mid)}" — there is nothing to prepare: run --tag once CI is green on it (if its push was rejected: ${NEXT_AFTER_REJECTED})`);
+    return 1;
+  }
+  if (guards.some((g) => !g.ok)) return out(stopLine(guards)), 1;
+  const now = git(ctx, "rev-parse", "HEAD");
+  const base = now.out.trim(); // the commit every guard looked at: the release commit must sit directly on it
+  if (before.code !== 0 || now.code !== 0 || before.out.trim() !== base || !RELEASE.fullSha.test(base)) return out("✗ HEAD moved while the guards ran — nothing was changed; run it again"), 1;
+  const d = describe(ctx, "prepare");
+  const date = (ctx.now?.() ?? new Date()).toISOString().slice(0, 10);
+  const { files, problems } = releaseFiles(ctx, mid, d, date);
+  try {
+    for (const file of files.keys()) plannedPath(ctx, file, files); // every path is checked before the first byte is written
+  } catch (e) {
+    problems.push(oneLine(e?.message));
+  }
+  if (problems.length) {
+    problems.forEach((p) => out(`✗ ${p}`));
+    return out("✗ nothing was changed"), 1;
+  }
+  const paths = [...files.keys()];
+  const touched = [];
+  const undo = (reason, staged = "") => {
+    const left = restore(ctx, files, touched);
+    const trouble = [left.length ? `could not put back: ${left.join(", ")}` : "", staged].filter(Boolean);
+    return out(`✗ ${reason} — ${trouble.length ? trouble.join("; ") : "every file is back as it was"}; nothing was committed or pushed`), 1;
+  };
+  try {
+    for (const [file, f] of files) {
+      touched.push(file);
+      putFile(ctx, file, f.after, files);
+    }
+  } catch (e) {
+    return undo(oneLine(e?.message));
+  }
+  const failed = (what, r) => {
+    if (git(ctx, "rev-parse", "HEAD").out.trim() !== base) {
+      // git made the commit although it reported a failure (a hook after the commit): never write over it, never say it was not made
+      out(`✗ ${what} reported a failure (${why(r)}) but the release commit exists in your local ${d.s.branch} — nothing was pushed and no file was touched: a person decides (${NEXT_AFTER_REJECTED})`);
+      return 1;
+    }
+    const reset = gitw(ctx, out, "--literal-pathspecs", "reset", "-q", "--", ...paths); // unstage what git add took
+    return undo(`${what} failed (${why(r)})`, reset.code === 0 ? "" : `still staged: ${paths.join(", ")} (the reset failed: ${why(reset)})`);
+  };
+  const added = gitw(ctx, out, "--literal-pathspecs", "add", "--", ...paths);
+  if (added.code !== 0) return failed("git add", added);
+  const made = gitw(ctx, out, "--literal-pathspecs", "commit", "-q", "-m", RELEASE.subject(d.next, mid), "--", ...paths);
+  if (made.code !== 0) return failed("git commit", made);
+  const branch = d.s.branch;
+  const release = git(ctx, "rev-parse", "HEAD").out.trim();
+  const parent = git(ctx, "rev-parse", "HEAD^");
+  if (!RELEASE.fullSha.test(release) || parent.code !== 0 || parent.out.trim() !== base) {
+    out(`✗ another commit landed while the release commit was made (it does not sit directly on ${base.slice(0, RELEASE.shortHead)}) — nothing was pushed; the release commit stays in your local ${branch}: a person decides (${NEXT_AFTER_REJECTED})`);
+    return 1;
+  }
+  const pushed = gitw(ctx, out, "push", PUSH_SAFE, RELEASE.remote, `${release}:refs/heads/${branch}`);
+  if (pushed.code !== 0) {
+    out(`✗ the push was rejected or failed (${why(pushed)}) — the release commit stays in your local ${branch}; SAF never rewrites history or forces a push. To go on: ${NEXT_AFTER_REJECTED}`);
+    return 1;
+  }
+  const remote = gitw(ctx, out, "ls-remote", RELEASE.remote, `refs/heads/${branch}`);
+  if (remote.code !== 0 || remote.out.split(/\s/)[0] !== release) return out(`✗ the push went through but ${RELEASE.remote} does not show the release commit (${why(remote)})`), 1;
+  out(`✓ v${d.next} is committed and pushed to ${RELEASE.remote}/${branch} (${release.slice(0, RELEASE.shortHead)}) — next: wait until every CI job is green on it, then --tag`);
+  return 0;
+}
+
+/** The CHANGELOG section as a tag message: line ends kept, other control characters replaced. */
+const tagMessage = (section) => noCr(section).replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, " ");
+
+/** `task:release <M> --tag` (rule 11). Returns the exit code: 0 tag pushed · 1 a guard failed or the push did not go through · 2 not a milestone id. */
+export function tagRelease(ctx, mid, { out: write }) {
+  const out = printer(write);
+  if (!RELEASE.milestoneId.test(String(mid))) return out(`✗ "${oneLine(mid)}" is not a milestone id`), 2;
+  const before = git(ctx, "rev-parse", "HEAD");
+  const guards = showGuards(ctx, out, mid, "tag"); // includes G-ci: the CI run of this exact commit, read just now
+  if (guards.some((g) => !g.ok)) return out(stopLine(guards)), 1;
+  const now = git(ctx, "rev-parse", "HEAD");
+  const sha = now.out.trim();
+  if (before.code !== 0 || now.code !== 0 || before.out.trim() !== sha || !RELEASE.fullSha.test(sha)) return out("✗ HEAD moved while the guards ran — nothing was changed; run it again"), 1;
+  const d = describe(ctx, "tag");
+  const tag = `v${d.next}`;
+  const section = RELEASE.version.test(String(d.next)) ? changelogSection(d.changelog, d.next) : null;
+  if (!section) return out(`✗ ${RELEASE.changelog} has no section for ${oneLine(d.next)} — nothing was changed`), 1;
+  if (git(ctx, "tag", "--list", tag).out.trim()) out(`${tag} already exists here as an annotated tag on this commit — it is pushed as it is`);
+  else {
+    const made = gitw(ctx, out, "tag", "-a", tag, "--cleanup=whitespace", "-m", tagMessage(section), sha);
+    if (made.code !== 0) return out(`✗ git tag failed (${why(made)}) — nothing was pushed`), 1;
+  }
+  const pushed = gitw(ctx, out, "push", PUSH_SAFE, RELEASE.remote, `refs/tags/${tag}`);
+  if (pushed.code !== 0) {
+    out(`✗ the tag push failed (${why(pushed)}) — the tag stays in your local repository (SAF never moves or deletes a tag); run --tag again to retry the push`);
+    return 1;
+  }
+  const remote = gitw(ctx, out, "ls-remote", "--tags", RELEASE.remote, `refs/tags/${tag}`, `refs/tags/${tag}^{}`);
+  const seen = new Map(remote.out.split("\n").map((l) => l.split("\t")).filter((x) => x.length === 2).map(([id, ref]) => [ref.trim(), id.trim()]));
+  if (remote.code !== 0 || !seen.has(`refs/tags/${tag}`) || seen.get(`refs/tags/${tag}^{}`) !== sha) return out(`✗ the push went through but ${RELEASE.remote} does not show ${tag} pointing at the release commit (${why(remote)})`), 1;
+  out(`✓ ${tag} is on ${RELEASE.remote} (${sha.slice(0, RELEASE.shortHead)}) — the release workflow takes it from here`);
+  return 0;
 }

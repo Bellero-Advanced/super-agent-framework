@@ -1,7 +1,7 @@
 {
   "id": "T-M3-10",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T19:57:12.169Z",
     "base": "a3827d5ec2962f01b6aec9de1d568843aec744ce",
@@ -13,8 +13,184 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 7,
   "lane": 1,
   "branch": "card/T-M3-10",
-  "worktree": ".claude/worktrees/T-M3-10"
+  "worktree": ".claude/worktrees/T-M3-10",
+  "verified": {
+    "at": "2026-11-24T20:52:57.235Z",
+    "head": "788b295a1e505f394a31ef999ae2332034857bb8",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 456,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "190 scenario(s) in 20 spec(s) · with test 182 · gaps 8 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/release-run.test.mjs test/unit/release-guards.test.mjs",
+        "exit": 0,
+        "ms": 32240,
+        "tail": [
+          "ok 47 - REL-AC-05 a commit that fails after git made it is reported as made: the files stay, nothing is reset or pushed, and the advice is printed",
+          "  ---",
+          "  duration_ms: 503.865208",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
+          "ok 48 - REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
+          "  ---",
+          "  duration_ms: 469.756542",
+          "  type: 'test'",
+          "  ...",
+          "1..48",
+          "# tests 48",
+          "# suites 0",
+          "# pass 48",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 32186.472875"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/release.mjs','utf8');if(/unpublish|deprecate|--force|push\\s+-f|tag\\s+-d|--delete|npm\\s+publish|'publish'/.test(s))process.exit(1)\"",
+        "exit": 0,
+        "ms": 51,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 382,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 282 markdown file(s) · 313 local link(s) · 108 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 411,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 641 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/release-guards.test.mjs' 'test/unit/release-run.test.mjs'",
+        "exit": 0,
+        "ms": 33781,
+        "tail": [
+          "ok 47 - REL-AC-05 a commit that fails after git made it is reported as made: the files stay, nothing is reset or pushed, and the advice is printed",
+          "  ---",
+          "  duration_ms: 502.528792",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
+          "ok 48 - REL-AC-05 when the index cannot be reset, the files that are still staged are named instead of claiming everything is back",
+          "  ---",
+          "  duration_ms: 468.385083",
+          "  type: 'test'",
+          "  ...",
+          "1..48",
+          "# tests 48",
+          "# suites 0",
+          "# pass 48",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 33731.574792"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/commands/saf.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/release.mjs",
+        "kit/tools-saf/templates/en/commands/saf.md",
+        "kit/tools-saf/templates/th/commands/saf.md",
+        "test/unit/release-guards.test.mjs",
+        "test/unit/release-run.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/commands/saf.md": "d1dc98b325c8236b7ac45796711000f84bbc3e54",
+        "kit/tools-saf/bin/saf.mjs": "2478768dca24871624e334b7fe364bd404545cc5",
+        "kit/tools-saf/lib/generate.mjs": "23208a07d41ab259b10e299d757c729b388e8763",
+        "kit/tools-saf/lib/release.mjs": "9dcfd464b88d1df68c23b3ca3a7bba72d8312184",
+        "kit/tools-saf/templates/en/commands/saf.md": "a8de5ddb403bb5465f07430f3fdf4aeeacd73ea0",
+        "kit/tools-saf/templates/th/commands/saf.md": "caaab0d74adfff5ed79ee2379e17c002ca47e665",
+        "test/unit/release-guards.test.mjs": "39b10c64b478214163e8d7cea9ab0ff961a77e13",
+        "test/unit/release-run.test.mjs": "f13a8fba1f241b20510cf9ab1bff1eab73b325c9"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "REL-AC-05",
+        "REL-AC-06",
+        "REL-AC-07"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 345,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 650,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [
+        "test"
+      ],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/release-guards.test.mjs",
+        "test/unit/release-run.test.mjs"
+      ]
+    }
+  }
 }
