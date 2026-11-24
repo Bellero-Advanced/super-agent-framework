@@ -29,11 +29,11 @@ entry of `policies.protectedBranches`, `main` when empty). To stop every release
 2. `npm run task:release -- <M>` — a **dry run**: prints every guard with ✓ or ✗, the next version and what the next step
    would do. It writes nothing.
 3. `npm run task:release -- <M> --prepare` — sets the version everywhere, moves `## Unreleased` to the new version in
-   `CHANGELOG.md`, appends one line to `docs/plan/releases.md`, commits as `chore(release): v<version> (<M>)` and pushes with a
-   plain `git push`.
+   `CHANGELOG.md`, appends one line to `docs/plan/releases.md`, commits as `chore(release): v<version> (<M>)` and pushes only
+   that commit to the release branch: `git push --no-follow-tags origin <release commit>:refs/heads/<branch>` (never `--force`).
 4. Wait for CI on that commit.
-5. `npm run task:release -- <M> --tag` — creates the annotated tag `v<version>` and pushes only that tag.
-   (`--prepare` and `--tag`, steps 3 and 5, come with SAF's second release card, T-M3-10; until it is installed only the dry run exists.)
+5. `npm run task:release -- <M> --tag` — creates the annotated tag `v<version>` and pushes only that tag
+   (`git push --no-follow-tags origin refs/tags/v<version>`).
 6. Your tag workflow publishes (next section). SAF never runs `npm publish` itself.
 
 The version comes from `CHANGELOG.md`: a `### Breaking` section under `## Unreleased` is a major bump (minor while the

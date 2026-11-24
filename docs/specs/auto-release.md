@@ -59,11 +59,14 @@ the owner's tag ruleset is what stops the rest (rule 21).
     renames `## Unreleased` to `## <next> — <date>` and adds a new empty `## Unreleased` above it; appends to the
     release log `docs/plan/releases.md` (append-only, created with a header on first use) one entry:
     `- v<next> · <date> · <M> · gate <short head> · from v<previous> · bump <major|minor|patch> (<reason>)`; commits
-    exactly those files as `chore(release): v<next> (<M>)`; pushes the release branch with a plain `git push` (never
-    `--force`; a rejected push leaves the local commit and exits 1 with the reason).
+    exactly those files as `chore(release): v<next> (<M>)`; pushes that one commit with one explicit refspec,
+    `git push --no-follow-tags origin <release sha>:refs/heads/<branch>` (never a plain `git push`, never `--force`;
+    a rejected push leaves the local commit and exits 1 with the reason and the next step of §4). It pushes nothing
+    and exits 1 when HEAD moved while the guards ran, or when another commit landed under the release commit (its
+    parent is not the HEAD the guards checked).
 11. `task:release <M> --tag` runs only when HEAD's subject is `chore(release): v<version in package.json> (<M>)` and
     rules 4–9 hold. It creates the annotated tag `v<version>` on HEAD (message: the CHANGELOG section) and pushes only
-    that tag (`git push origin refs/tags/v<version>`). It never moves, replaces or deletes a tag.
+    that tag (`git push --no-follow-tags origin refs/tags/v<version>`). It never moves, replaces or deletes a tag.
 12. The engine source for release contains no `--force`, `-f` push, `push --delete`, `tag -d`, `unpublish` or
     `deprecate`, and never runs `npm publish` — publishing belongs to the workflow.
 13. Every `task:release` run (dry, prepare, tag) prints the guard list; `--prepare` and `--tag` print each git command
@@ -83,7 +86,8 @@ the owner's tag ruleset is what stops the rest (rule 21).
 16. No step references `secrets.NPM_TOKEN`, `NODE_AUTH_TOKEN` or any npm token; publishing authenticates through OIDC
     only, and provenance is attached (trusted publishing adds it).
 17. Before publishing, `node scripts/release-check.mjs guards <tag>` checks: the tag equals `v` + the version of every
-    released package and the version file · the tag commit's subject is the release commit · `CHANGELOG.md` has the
+    released package and the version file · the tag commit is the release commit on the release branch (G-commit,
+    rule 22) · `CHANGELOG.md` has the
     `## <version>` section · the CI run for the tag commit is green with every job successful and at least one job per
     OS of the CI matrix (`ubuntu`, `macos`, `windows`, read from `ci.yml`) · `policies.release.auto` is `on` on
     `origin/main`. Reuses `nextVersion`, the CHANGELOG reader and the release-log reader from
@@ -113,9 +117,14 @@ the owner's tag ruleset is what stops the rest (rule 21).
     repository + workflow file name + environment (not the ref), while the environment rule `v*` accepts any `v*`
     tag — so anyone with write access could push a branch whose workflow or checks skip the guards, tag it, and
     publish through OIDC (the `origin/main` ancestry and kill-switch checks do not help, because that commit's script
-    runs). Only the owner's GitHub tag ruleset stops this — restrict creations of `v*` tags with a bypass only for the
-    account or role that runs `task:release --tag`, restrict updates and deletions, no other bypass — and, optionally,
+    runs). Only the owner's GitHub tag rulesets stop this — two rulesets for `v*`: one restricts creations with a
+    bypass only for the account, role, team or app that runs `task:release --tag`; the other restricts updates and
+    deletions with no bypass (a bypass belongs to a whole ruleset) — and, optionally,
     required reviewers on the environment `npm`.
+22. **G-commit** (in `release-check guards <tag>`, rule 17): the checked-out HEAD is the commit of `<tag>`; the
+    release log has the entry for `<tag>` and HEAD's subject is the release commit subject of that entry's milestone;
+    the release branch is a plain branch name and `git merge-base --is-ancestor HEAD origin/<release branch>` holds
+    (the tagged commit is on the release branch). Any miss → the guard fails with the reason and nothing is published.
 
 ## 3. Data
 
@@ -131,7 +140,14 @@ the owner's tag ruleset is what stops the rest (rule 21).
 
 - Network down during a guard → that guard fails with the reason; never treated as success.
 - `--prepare` ran but the push was rejected (someone pushed first) → local release commit stays; dry run shows
-  G-branch failing; the fix is a person's call (reset the local commit or rebase) — SAF never rewrites history.
+  G-branch failing; the fix is a person's call: "reset the local commit, pull, then run --prepare again — or rebase
+  it onto origin and push it yourself, then run --tag" (pulling alone does not help: the version is already bumped) —
+  SAF never rewrites history.
+- HEAD moved while the `--prepare` guards ran, or another commit landed under the release commit → `--prepare`
+  pushes nothing and exits 1 (rule 10); the same person's call as above.
+- The tag push of `--tag` failed → the annotated tag stays local; running `--tag` again pushes that existing
+  annotated tag on HEAD as it is (never a second tag, never a moved one). Once the tag is on origin, a third `--tag`
+  refuses at G-version: "tag v<x> exists on origin".
 - CI red on the release commit → `--tag` refuses; the fix is a new card and a new release commit (the old release
   commit's version is never published, so the next `--prepare` reuses the version only if no tag exists).
 - Tag pushed but the workflow failed before publishing → fix the cause, then re-run the workflow job (GitHub
@@ -154,6 +170,9 @@ the owner's tag ruleset is what stops the rest (rule 21).
 | REL-AC-09 | a tag that differs from a package version, a missing CHANGELOG section, auto off on main, a CI run without a windows job | `release-check guards <tag>` (injected runners) | each fails with the reason; a consistent fixture passes | unit |
 | REL-AC-10 | the tag commit's `saf.config.json` missing, not valid JSON, or failing schema validation | `release-check guards <tag>` (injected runners) | fails naming that cause, exit 1 | unit |
 | REL-AC-11 | `npm view` (injected runner) answers the version / not found (E404) / another failure; the folder not in `policies.release.packages`; `saf.config.json` unreadable | `release-check published <dir> <version>` | exit 0 / 3 / 1 / 1 / 1 with the reason (never 3 except for E404); the workflow check fails when a publish step publishes on any exit other than 3 or skips on any exit other than 0 | unit |
+| REL-AC-12 | a fixture where the checkout is not the tag commit, the release log has no entry for the tag, HEAD's subject is not the entry's release subject, or the tagged commit is not on `origin/main` | `release-check guards <tag>` (injected runners) | G-commit fails naming each cause; a consistent fixture passes G-commit | unit |
+
+REL-AC-12 (rule 22) is covered today by the `REL-AC-09` tests in `test/unit/release-check.test.mjs` ("the release log entry, the commit subject, the tag commit and the branch are checked by G-commit") until a later card adds the id REL-AC-12 to their names; no card names REL-AC-12 yet, so `spec:matrix -- --check` lists it as a gap without failing.
 
 ## 6. Out of scope
 
