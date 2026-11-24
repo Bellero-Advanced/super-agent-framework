@@ -1,0 +1,19 @@
+{
+  "id": "T-M3-37",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T19:23:31.787Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test",
+        "docs"
+      ],
+      "note": "example README/card template not updated; plan README ignores reviewerDiff off; nested numbered items counted as steps",
+      "head": "db540529fac3a83d8a4841a93b4b98f85b156596",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T19:19:05.606Z"
+    }
+  ]
+}
