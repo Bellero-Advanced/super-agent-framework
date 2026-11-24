@@ -10,3 +10,4 @@ docs/archive/pre-saf/.claude/settings.json*
 .env.local
 .env.*.local
 .claude/worktrees/
+docs/plan/friction.md.lock
