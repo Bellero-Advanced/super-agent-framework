@@ -223,3 +223,9 @@ decided) · 05/N6 (card done). Evidence notes 20/N6 · 02/N6 · 21/10 are closed
 - **side lanes with their own slots** (owner idea 2026-11-24, not in T-M2-25): side cards get slots beside the active
   milestone's caps instead of only the slots it leaves free. Needs a decision row when carded (changes rule "side
   cards never raise the caps", card-lifecycle.md Side lanes); spec home would be lane-caps.md §6
+
+## T-M2-27 (review PASS; N1 closed inside the card) — notes for the designer
+
+N2. SAME DATA-LOSS CLASS, outside rules 19-22: in planSettings if `local.env` and `settings.env` share a key, settings.env wins and the old local value is overwritten with no archive or warning; if either `env` is a string or an array the spread turns it into index keys ("abc" → {0:"a",1:"b",2:"c"}) — card candidate
+N3. for `[]`, `null` or a string root the warning and the dry-run line say "not valid JSON" though the file is valid JSON with a non-object root (spec rule 22 uses the same wording); the settings.json warning does not name its archive path (report.archived does)
+N4. test gaps: settings.json with a `null`/string/number root; both files unreadable; the `.1` collision only at plan level, not after a real run
