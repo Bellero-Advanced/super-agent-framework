@@ -113,7 +113,7 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 - N4 multiple auto-deploy branches read "that push"; N6 spec: what "except to main" means under deploy:allowed; N7 owner-order push text changed when auto-deploy branches exist.
 
 ## T-M3-16 (setup keeps) — non-blocking
-- K1 "nothing was changed" is false after `saf init --answers` on a broken manifest (copyKit/.gitignore run before generate throws); check before copyKit or scope the sentence; maybe with T-M3-26.
+- K1 "nothing was changed" is false after `saf init --answers` on a broken manifest (copyKit/.gitignore run before generate throws); check before copyKit or scope the sentence; maybe with T-M4-03 (was T-M3-26).
 - K2 setup report counts `same` files as written ("generated N file(s)"). K3 duplicate helper isObject vs mergeable. K4 upgrade prints a kept path twice. K5 UPG-AC-07 does not run dry-run CLI. K6 no direct test for keep-unplanned in refresh.
 - T-M3-22 round 2: with deploy:none steps 2-5 still render after "stop" (wrap in unless deployNone); test name "owner-order keeps its text" misleading; owner-order wording differs a little between agent file and CLAUDE.md git line; "owner" hardcoded in agent description (pre-existing); Thai "ยกเว้น push ไป main" reads more naturally.
 
@@ -191,7 +191,21 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 - T-M3-10 round 2: saf.mjs exit-code header still omits "HEAD moved", "another commit landed", broken plan (exit 2 thrown in laneFolder before the guards). H4 another session commits our staged files with a normal commit between add and commit: our commit fails, undo restores old bytes over theirs (nothing pushed; "every file is back" wording does not fit). H5 NEXT_AFTER_REJECTED in the "another commit landed" case: the extra commit is local too. TOCTOU between realpath check and write only for a local actor who can already write the worktree (accepted).
 - T-M3-10 round 3 (pass): failed() treats an empty `rev-parse HEAD` as "HEAD differs" and says "the release commit exists" (fix: check .code and say HEAD could not be read); putFile re-runs lstat instead of reusing plannedPath's result (comment over-claims; return an `existed` flag); the "another session commits our staged files" case goes down the H2 branch and calls their commit "the release commit" (wording).
 
-## T-M3-13 (pack format, pack show) — carried to T-M3-14 (MUST) and the designer
-- T-M3-14 WRITES into the project, so it MUST: open files with O_NOFOLLOW and check with fstat; hash the SAME bytes that are copied (today readText and packHash read separately); use realpath when comparing against the project's `.claude/skills` (a symlinked parent folder passes the current path check at packs.mjs ~220); pass `taken` names; re-validate everything at install time, never trust a prior `pack show`.
+## T-M3-13 (pack format, pack show) — carried to T-M4-01 (was T-M3-14; MUST) and the designer
+- T-M4-01 (was T-M3-14) WRITES into the project, so it MUST: open files with O_NOFOLLOW and check with fstat; hash the SAME bytes that are copied (today readText and packHash read separately); use realpath when comparing against the project's `.claude/skills` (a symlinked parent folder passes the current path check at packs.mjs ~220); pass `taken` names; re-validate everything at install time, never trust a prior `pack show`.
 - Spec rule 2 should name the frontmatter allowlist (PACK.frontmatterKeys) and the stricter file/skill name rules (odd characters, upper-case .MD). Add "run from the project root" or refuse paths safe() would change (skills.external entry uses safe(given,500)). PACK.unprintable lacks U+061C, U+2060–U+2064 and the Unicode tag block U+E0000–U+E007F (needs the u flag). docs/skills.md copies PACK_LIMITS numbers/keys from the code table (point to the table or add an equality test) and omits depth 8, 50 skills, 64 KiB manifest. "a file that is not plain UTF-8 makes the pack invalid" should say "an installed file". CLAUDE.md size line was stale (fixed already: 800).
-- T-M3-13 round 2 (pass): a leading BOM is ignored by parse and hash, so adding/removing one does not change the hash — T-M3-14 installs the decoded text exactly as hashed; docs could say "a leading BOM is ignored". skills.external entry prints safe(given) (collapses whitespace, cuts at 500): refuse such paths (exit 2) or document. T-M3-14 MUST list from the T-M3-13 notes above. Case-only clash test skips on macOS, runs on ubuntu CI.
+- T-M3-13 round 2 (pass): a leading BOM is ignored by parse and hash, so adding/removing one does not change the hash — T-M4-01 installs the decoded text exactly as hashed; docs could say "a leading BOM is ignored". skills.external entry prints safe(given) (collapses whitespace, cuts at 500): refuse such paths (exit 2) or document. T-M4-01 MUST list from the T-M3-13 notes above. Case-only clash test skips on macOS, runs on ubuntu CI.
+
+## M3 cut (owner order 2026-11-25) — three cards moved to M4
+
+- By owner order ("เอาตามแนะนำ") M3 was cut so 0.2.0 can be released: T-M3-14 → **T-M4-01** (install pinned packs),
+  T-M3-15 → **T-M4-02** (interview asks, explicit yes), T-M3-26 → **T-M4-03** (reinstall keeps the plan, waits for
+  D-019, still proposed) moved to the new planned milestone [M4](../milestones/M4.md) "Skill packs and reinstall". M3
+  now has 34 cards. The two legacy `size: S` cards are written as M (D-021); content otherwise unchanged, except:
+  T-M4-01 now carries the T-M3-13 MUST list as skill-packs spec rules 14–17 and PACK-AC-08 (so `packs.mjs` moved from
+  `dont_touch` to `touch`), and all three use `npm run saf:refresh` instead of the old refresh + `git checkout -- examples/todo-api/.claude`
+  lines (the checkout would undo the example refresh since T-M3-33).
+- 0.2.0 ships the skill-pack format and read-only `saf pack show` only. `pack show` prints "Entry for skills.external
+  in saf.config.json … before you add the entry", but in 0.2.0 the config check refuses `skills.external` (`$.skills:
+  unknown setting "external"`). `docs/skills.md` now says not to add the entry yet; the CLI text is code — T-M4-01
+  makes it true by adding the key (no separate card needed if M4 runs before the next release).

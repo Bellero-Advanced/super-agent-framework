@@ -1,8 +1,8 @@
 # Spec — setup re-run: see what changes first, and never lose your edits
 
 Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22 · T-M2-27 (rules 19–22) · T-M2-29 (rules 15, 23) · T-M2-30 (rules 24–27) ·
-T-M3-16 (rules 28–31) · T-M3-17 (rules 32–34) · T-M3-21 (rules 35–36) · T-M3-23 (rules 18, 38) · T-M3-26 (rule 37, waits for
-D-019). Builds on
+T-M3-16 (rules 28–31) · T-M3-17 (rules 32–34) · T-M3-21 (rules 35–36) · T-M3-23 (rules 18, 38) · T-M4-03 (rule 37, waits for
+D-019; was T-M3-26). Builds on
 [upgrade-scripts.md](upgrade-scripts.md) (D-010) for the `package.json` rules.
 
 ## 1. Purpose

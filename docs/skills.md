@@ -39,7 +39,8 @@ if you did not edit it; edited skill files are kept. Your own skills in `.claude
 ## Packs from other repositories
 
 A team can keep its own skills in one folder, share it across projects and look at it before it is trusted. This page
-describes the format and `saf pack show`; installing a pack into a project comes in a later release.
+describes the format and `saf pack show`; installing a pack into a project comes in a later release. Until then, do not
+add a `skills.external` entry to `saf.config.json`: this release's config check refuses the key.
 
 **A skill is instructions.** Every agent session may load it and follow it, so a pack deserves the trust you give code.
 SAF never downloads a pack and never runs anything from one. Bring the folder in with your own git — a git submodule inside
@@ -96,10 +97,10 @@ anywhere, an installed file or `saf-pack.json` that is not plain UTF-8 text, or 
 node tools/saf/bin/saf.mjs pack show path/to/my-pack
 ```
 
-Run it from the project root: the `path` in the entry it prints is the path you typed, and `skills.external` reads a relative
-path from the project root. It only reads. It prints the name, version and description, each skill with its description and the tools its
+Run it from the project root: the `path` in the entry it prints is the path you typed, and `skills.external` (from the
+release that installs packs) reads a relative path from the project root. It only reads. It prints the name, version and description, each skill with its description and the tools its
 `allowed-tools` asks for, every file that would be installed with its size, every refused file, the content hash and the exact
-`skills.external` entry to add. Nothing from the pack is run, nothing is written and nothing is fetched. Exit code 0: the pack
+`skills.external` entry to add once installing ships. Nothing from the pack is run, nothing is written and nothing is fetched. Exit code 0: the pack
 is valid · 1: it is invalid and the problems are listed · 2: wrong arguments.
 
 The hash covers the installed files and `saf-pack.json` (line endings are read as LF, so a Windows checkout gives the same

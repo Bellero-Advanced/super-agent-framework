@@ -8,7 +8,10 @@ SAF is developed with SAF, so the framework should notice where it gets in the w
 ship its own releases (owner order 2026-11-24). After M3: every friction with the workflow is logged with evidence ·
 every spec review is recorded per card · effort follows card size and its cost is measured · small proven framework
 bugs become self-fix cards inside the active milestone without waiting · a closed milestone is released to npm and
-GitHub by the engine behind guards and a kill switch. The skill-pack chain deferred from M2 (D-013) runs last.
+GitHub by the engine behind guards and a kill switch. The skill-pack chain deferred from M2 (D-013) starts here with
+the format and `saf pack show` (T-M3-13); installing packs, the interview question and the reinstall fix moved to
+[M4](M4.md) by owner order 2026-11-25 so 0.2.0 can be released (T-M3-14 → T-M4-01 · T-M3-15 → T-M4-02 · T-M3-26 →
+T-M4-03).
 
 ## Scope
 - **Friction log** ([spec](../../specs/friction-log.md), D-017): T-M3-01 — `docs/plan/friction.md`, append-only,
@@ -72,8 +75,8 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
     m-cards line, `card-lifecycle.md`, `config-reference.md`, `setup-questions.md`. Role effort: high (text for users)
   - T-M3-37 — L cards in steps: `## Steps` required on L (plan check), `task:diff` splits an L card's diff by step
     commit for the read-only reviewer; one commit per step and resuming are agent conventions
-  - from T-M3-35 on, new cards in this repository are M or L; the open S cards of M3 (T-M3-12 · T-M3-15 · T-M3-26)
-    stay as written and count as M
+  - from T-M3-35 on, new cards in this repository are M or L; the open S card of M3 (T-M3-12) stays as written and
+    counts as M (T-M3-15 and T-M3-26 moved to M4 as M cards T-M4-02 · T-M4-03)
 - **Automatic release** ([spec](../../specs/auto-release.md), D-015): T-M3-09 (`task:release <M>` dry run and every
   guard, `policies.release` with the kill switch) → T-M3-10 (`--prepare` bumps versions, moves `Unreleased`, writes
   the release log, commits and pushes; `--tag` checks CI on the exact commit and pushes the tag) and T-M3-11
@@ -84,15 +87,16 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
   automatic release computes 0.2.0. From T-M3-12 on, every card that changes user-visible behaviour adds its own line
   under `## Unreleased` (the skill-pack cards list `CHANGELOG.md` in `touch` for this)
 - **Skill packs** ([spec](../../specs/skill-packs.md), D-013 — deferred from M2, last in the order): T-M3-13 (format +
-  read-only `saf pack show`) → T-M3-14 (setup and upgrade install pinned packs) → T-M3-15 (interview asks, explicit
-  yes). Local folders only, content pinned by sha256, `.md` only, SAF never fetches or runs anything. **Every card
-  needs the `security-review` skill**
+  read-only `saf pack show`) — the only skill-pack card left in M3; install (T-M4-01, was T-M3-14) and the interview
+  question (T-M4-02, was T-M3-15) moved to [M4](M4.md) by owner order 2026-11-25. Local folders only, content pinned
+  by sha256, `.md` only, SAF never fetches or runs anything. **Every card needs the `security-review` skill**
 - **M2 review notes** (owner order 2026-11-24, after T-M3-02 so their reviews are recorded): T-M3-16 … T-M3-26 turn
-  the proposed groups A–E of "Carried to M3" below into S cards — setup and upgrade data safety (T-M3-16 · T-M3-17 ·
-  T-M3-26), `task:culprit` robustness (T-M3-18), evidence views that agree (T-M3-19), wording and CLI strictness
-  (T-M3-20 · T-M3-21 · T-M3-22 · T-M3-23), test gaps (T-M3-24 · T-M3-25). Specs extended: setup-rerun (rules 28–38),
-  upgrade-scripts (12–14), test-mode (13, 22, 24–26, 31–33), evidence-viewer (10–14), setup-choices (15, 16, 26, 27),
-  lane-caps (13), doc-languages (12). T-M3-26 (adopt on reinstall) waits for **D-019** (proposed) and runs last
+  the proposed groups A–E of "Carried to M3" below into S cards — setup and upgrade data safety (T-M3-16 · T-M3-17;
+  the third, T-M3-26, moved to M4 as T-M4-03), `task:culprit` robustness (T-M3-18), evidence views that agree
+  (T-M3-19), wording and CLI strictness (T-M3-20 · T-M3-21 · T-M3-22 · T-M3-23), test gaps (T-M3-24 · T-M3-25). Specs
+  extended: setup-rerun (rules 28–38), upgrade-scripts (12–14), test-mode (13, 22, 24–26, 31–33), evidence-viewer
+  (10–14), setup-choices (15, 16, 26, 27), lane-caps (13), doc-languages (12). T-M3-26 (adopt on reinstall, waits for
+  **D-019**, proposed) moved to [M4](M4.md) as T-M4-03
 - **Text cards run at role effort high:** T-M3-22 and T-M3-23 (and any card whose output is mainly sentences for users)
   say "role effort: high" in their Why. M2 data: the text-for-users S cards built at `medium` bounced in review 3 of 4
   times at round 1; T-M2-28 at `high` with a sentence → code list passed at round 1. Until T-M3-03 … T-M3-06 make
@@ -148,9 +152,6 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again — passed 2026-11-24 20:30 (7 commands) · full suite deferred to gate
 - [x] T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 — passed 2026-11-24 21:03 (3 commands)
 - [x] T-M3-13 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it — passed 2026-11-24 21:22 (6 commands) · full suite deferred to gate
-- [ ] T-M3-14 Setup and upgrade install skill packs named in skills.external only when their content hash matches
-- [ ] T-M3-15 /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes
-- [ ] T-M3-26 Reinstalling SAF into a project that already has a plan keeps docs/plan and its evidence in place (waits for D-019)
 
 ## Risks
 - **Releasing is irreversible:** npm versions are immutable; a bad release is fixed by a new patch, never by
@@ -175,6 +176,6 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
   stop is new dogfooding too: T-M3-35 is verified by the engine it changes (`saf:refresh` before verify)
 - **Dogfooding:** T-M3-02 and T-M3-08 change `task:verify` behaviour while being verified by it; this repository keeps
   `workflow.testMode: targeted`, so each card gets one full run before it reaches `main`
-- **Skill packs are third-party instructions** (T-M3-13 … T-M3-15): a malicious skill can tell an agent to run
+- **Skill packs are third-party instructions** (T-M3-13; install and interview in M4): a malicious skill can tell an agent to run
   commands even without scripts. The trust model limits what SAF does (no fetch, no run, `.md` only, pinned hash,
   explicit yes after `pack show`) but cannot vet the text — the docs and the interview say so

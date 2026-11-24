@@ -1,7 +1,8 @@
 # Spec — skill packs from other repositories (local folder, pinned content)
 
-Decision: [D-013](../DECISIONS.md) (decided — deferred to M3). Cards: T-M3-13 · T-M3-14 · T-M3-15 (were T-M2-03 ·
-T-M2-23 · T-M2-24). **Security-relevant:** every card of this spec is built and reviewed with the `security-review` skill.
+Decision: [D-013](../DECISIONS.md) (decided — deferred to M3). Cards: T-M3-13 (rules 1–7) · T-M4-01 (rules 8–12,
+14–17) · T-M4-02 (rule 13) — were T-M2-03 · T-M2-23 · T-M2-24; T-M4-01 and T-M4-02 were T-M3-14 and T-M3-15, moved to M4
+by owner order 2026-11-25 (0.2.0 ships the format and `pack show` only). **Security-relevant:** every card of this spec is built and reviewed with the `security-review` skill.
 
 ## 1. Purpose
 
@@ -71,6 +72,23 @@ prompts still apply). So:
     line that a skill is instructions agents will follow, and asks "Install this pack?" — Yes · No, with **no**
     recommended marker. Yes → the entry with the printed hash; No → nothing.
 
+### Install safety (from the T-M3-13 review)
+
+The install is the first step that writes pack content into a project, so it trusts nothing it read earlier.
+
+14. Every install (setup, dry run, upgrade) runs `readPack` again for each entry — an earlier `pack show` is never
+    trusted — and passes the names already taken (core skills, kit packs, `saf-setup`, the skills of earlier entries)
+    so a clash (rule 5) is found at install time.
+15. Each installed file and `saf-pack.json` is opened once without following a symbolic link (`O_NOFOLLOW` where the
+    OS has it; elsewhere the `lstat` before and the `fstat` after the open agree on device, inode and type) and the open
+    handle is checked with `fstat`: a regular file within `PACK_LIMITS`. Anything else → the pack is invalid.
+16. The hash is computed over the bytes read in rule 15, and the text that is rendered and written is that same decoded
+    text (LF line endings, a leading BOM dropped, as rule 6 reads it). No file is read a second time between hashing
+    and copying.
+17. The "inside `.claude/skills/`" check (edge cases) compares the real paths (`realpath`) of the pack folder and of the
+    project's `.claude/skills/`, so a symbolic link in a parent folder cannot hide a pack that would install over itself;
+    the real parent folder of every destination stays inside the project's real `.claude/skills/<skill>/`.
+
 ## 4. Data
 
 - `PACK_LIMITS`, the name pattern, `readPack`, `packHash`: `kit/tools-saf/lib/packs.mjs`
@@ -95,6 +113,7 @@ prompts still apply). So:
 | PACK-AC-05 | the installed pack; then its content changes; then its folder is removed | `upgrade` | installed files byte-identical in both cases; warnings name the pack, the new hash and the changed file, and the missing folder; nothing written outside `.claude/skills/` | unit |
 | PACK-AC-06 | the installed pack with one file edited by hand | the entry is removed, setup runs again | unedited pack files are removed, the edited one is kept and listed | unit |
 | PACK-AC-07 | `choices.mjs`, `questions.md`, `SKILL.md` | the docs test runs | `skills.external` is a group-5 value question with one explanation in en and th and a Key-column row; the skill runs `pack show` before asking and the install question has no "(recommended)" | unit |
+| PACK-AC-08 | (a) a `skills.external` path reached through a symlinked folder whose real path is inside the project's `.claude/skills/`; (b) two entries whose packs both list a skill `team-review`; (c) an installed pack whose `skills/<skill>/SKILL.md` is then replaced by a symbolic link to a file with the same text | setup, then `upgrade` for (c) | (a) and the second entry of (b) install nothing and warn naming the reason (inside `.claude/skills/` · the clash); the first entry of (b) installs; (c) installed files byte-identical and the warning names the link | unit |
 
 ## 7. Out of scope
 
