@@ -49,7 +49,7 @@ import {
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
- *   setup --answers <file.json> [--adopt|--no-adopt] [--dry-run [--diff]] [--keep <path>[,<path>…]] · detect · config --check · version
+ *   setup --answers <file.json> [--adopt|--no-adopt] [--dry-run] [--diff] [--keep <path>[,<path>…]] · detect · config --check · version
  *   choices --group <1-8|flow> [--lang en|th]   what each option of an interview group means (exit 2 usage)
  *   choices --not-asked [--lang en|th]          settings the setup interview does not ask, and where to change them (exit 2 usage)
  *
@@ -358,10 +358,12 @@ async function main() {
       const keep = [];
       let keepUsage = false;
       rawArgv.forEach((a, n) => {
+        if (a.startsWith("--keep=")) keepUsage = true;
         if (a !== "--keep") return;
         const v = rawArgv[n + 1];
-        if (!v || v.startsWith("--")) keepUsage = true;
-        else keep.push(...v.split(",").map((p) => p.trim()).filter(Boolean));
+        const paths = v && !v.startsWith("--") ? v.split(",").map((p) => p.trim()).filter(Boolean) : [];
+        if (!paths.length) keepUsage = true;
+        else keep.push(...paths);
       });
       if (!file || keepUsage || (rawArgv.includes("--diff") && !rawArgv.includes("--dry-run"))) {
         err("usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run] [--diff] [--keep <path>[,<path>…]]  (--diff needs --dry-run)");

@@ -125,6 +125,22 @@ export async function upgrade(root, opts = {}) {
   const log = opts.log ?? (() => {});
   const before = readVersion(root);
   if (!before) throw new Error(`no ${ENGINE_DEST}/ here — run init first`);
+  const { CONFIG_FILE, validateConfig } = await import(pathToFileURL(join(KIT, "tools-saf", "lib", "config.mjs")).href);
+  let config = null;
+  if (existsSync(join(root, CONFIG_FILE))) {
+    let why = null;
+    try {
+      config = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
+      if (!config || typeof config !== "object" || Array.isArray(config)) why = "is not a JSON object";
+    } catch {
+      why = "is not valid JSON";
+    }
+    if (why) {
+      const line = `✗ ${CONFIG_FILE} ${why} — upgrade changed nothing; fix it and run upgrade again`;
+      log(line);
+      return { before, after: before, report: null, errors: [line], scripts: null };
+    }
+  }
   copyKit(root);
   log(`✓ SAF ${before} → ${kitVersion()} (${ENGINE_DEST}/ and ${SKILL_DEST}/ replaced)`);
   const scripts = await mergeUpgradeScripts(root, log);
@@ -134,12 +150,8 @@ export async function upgrade(root, opts = {}) {
   for (const r of report.removed) log(`  removed (no longer shipped): ${r}`);
   for (const k of report.kept) log(`  kept: ${k}`);
   for (const w of report.warnings) log(`  ⚠ ${w}`);
-  const { CONFIG_FILE, validateConfig } = await engineModule(root, "config.mjs");
-  let errors = [];
-  if (existsSync(join(root, CONFIG_FILE))) {
-    errors = validateConfig(JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8")));
-    for (const e of errors) log(`  ✗ ${CONFIG_FILE}: ${e}`);
-  }
+  const errors = config ? validateConfig(config) : [];
+  for (const e of errors) log(`  ✗ ${CONFIG_FILE}: ${e}`);
   log("Project docs were not changed. To regenerate them with the new templates, run /saf-setup again (edited files are archived first).");
   return { before, after: kitVersion(), report, errors, scripts };
 }

@@ -1,14 +1,362 @@
 {
   "id": "T-M2-29",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "failed",
   "started": {
     "at": "2026-11-24T06:43:39.759Z",
     "base": "e0540493b0908d7b03b74f70978aa7dff2fe48ba",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M2-29",
-  "worktree": ".claude/worktrees/T-M2-29"
+  "worktree": ".claude/worktrees/T-M2-29",
+  "verified": {
+    "at": "2026-11-24T06:45:33.342Z",
+    "head": "1a806ea402fe839d856514b6f91f1b94246e5a23",
+    "pass": false,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/setup-guards.test.mjs test/unit/setup-diff.test.mjs test/unit/upgrade-scripts.test.mjs test/unit/generate.test.mjs",
+        "exit": 0,
+        "ms": 1683,
+        "tail": [
+          "ok 33 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+          "  ---",
+          "  duration_ms: 434.843083",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "ok 34 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "  ---",
+          "  duration_ms: 0.558917",
+          "  type: 'test'",
+          "  ...",
+          "1..34",
+          "# tests 34",
+          "# suites 0",
+          "# pass 34",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1639.805291"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 223,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "126 scenario(s) in 12 spec(s) · with test 59 · gaps 67 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 1,
+        "ms": 322,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "[FAIL] docs/plan/tasks/M3/T-M3-17.md:38 — OpenAI key (value hidden)",
+          "✗ check-secrets: <redacted> finding(s) in 510 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 243,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 258 markdown file(s) · 229 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-guards.test.mjs'",
+        "exit": 0,
+        "ms": 845,
+        "tail": [
+          "ok 1 - RERUN-AC-10 a keep request the CLI cannot read exits 2 with the usage line and writes nothing",
+          "  ---",
+          "  duration_ms: 498.645709",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-11 upgrade stops before its first write on a saf.config.json it cannot read",
+          "ok 2 - RERUN-AC-11 upgrade stops before its first write on a saf.config.json it cannot read",
+          "  ---",
+          "  duration_ms: 200.514333",
+          "  type: 'test'",
+          "  ...",
+          "1..2",
+          "# tests 2",
+          "# suites 0",
+          "# pass 2",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 807.522208"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/upgrade.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "src/install.mjs",
+        "test/unit/setup-guards.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/upgrade.md": "4fb882b8d9ddf03f74516cdacf5710cba119db22",
+        "kit/tools-saf/bin/saf.mjs": "4b8c66945f0a32c00594c0e66ccdde125475330d",
+        "kit/tools-saf/lib/generate.mjs": "5be891c3a1c171df1d1503759ef3f5b385e5082e",
+        "src/install.mjs": "30937e1e2406020bde35fec29683c18b66e38fcc",
+        "test/unit/setup-guards.test.mjs": "92ed7c3d2c6114c2d2ebec535a19c772ea162147"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RERUN-AC-10",
+        "RERUN-AC-11"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 40,
+        "cap": 150
+      },
+      "test": {
+        "lines": 76,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-guards.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T06:44:43.758Z",
+      "head": "1a806ea402fe839d856514b6f91f1b94246e5a23",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/setup-guards.test.mjs test/unit/setup-diff.test.mjs test/unit/upgrade-scripts.test.mjs test/unit/generate.test.mjs",
+          "exit": 1,
+          "ms": 1598,
+          "tail": [
+            "    async Test.run (node:internal/test_runner/test:1054:7)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: RERUN-AC-10 a keep request the CLI cannot read exits 2 with the usage line and writes nothing",
+            "ok 27 - RERUN-AC-10 a keep request the CLI cannot read exits 2 with the usage line and writes nothing",
+            "  ---",
+            "  duration_ms: 607.250917",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-11 upgrade stops before its first write on a saf.config.json it cannot read",
+            "ok 28 - RERUN-AC-11 upgrade stops before its first write on a saf.config.json it cannot read",
+            "  ---",
+            "  duration_ms: 283.67975",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "ok 29 - UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "  ---",
+            "  duration_ms: 136.922958",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "ok 30 - UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "  ---",
+            "  duration_ms: 104.654791",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-03 nothing missing → package.json is byte-identical",
+            "ok 31 - UPG-AC-03 nothing missing → package.json is byte-identical",
+            "  ---",
+            "  duration_ms: 109.956791",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "ok 32 - UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "  ---",
+            "  duration_ms: 473.546708",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "ok 33 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "  ---",
+            "  duration_ms: 433.78475",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "ok 34 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "  ---",
+            "  duration_ms: 0.559083",
+            "  type: 'test'",
+            "  ...",
+            "1..34",
+            "# tests 34",
+            "# suites 0",
+            "# pass 33",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 1550.52775"
+          ]
+        },
+        {
+          "cmd": "npm run check-secrets",
+          "exit": 1,
+          "ms": 219,
+          "tail": [
+            "> super-agent-framework@0.1.0 check-secrets",
+            "> node tools/saf/bin/saf.mjs check-secrets",
+            "[FAIL] docs/plan/tasks/M3/T-M3-17.md:38 — OpenAI key (value hidden)",
+            "✗ check-secrets: <redacted> finding(s) in 510 scanned file(s)"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "2026-11-24T06:45:09.487Z",
+      "head": "1a806ea402fe839d856514b6f91f1b94246e5a23",
+      "attempts": 2,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/setup-guards.test.mjs test/unit/setup-diff.test.mjs test/unit/upgrade-scripts.test.mjs test/unit/generate.test.mjs",
+          "exit": 1,
+          "ms": 1534,
+          "tail": [
+            "    async Test.run (node:internal/test_runner/test:1054:7)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: RERUN-AC-10 a keep request the CLI cannot read exits 2 with the usage line and writes nothing",
+            "ok 27 - RERUN-AC-10 a keep request the CLI cannot read exits 2 with the usage line and writes nothing",
+            "  ---",
+            "  duration_ms: 584.148708",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-11 upgrade stops before its first write on a saf.config.json it cannot read",
+            "ok 28 - RERUN-AC-11 upgrade stops before its first write on a saf.config.json it cannot read",
+            "  ---",
+            "  duration_ms: 255.750625",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "ok 29 - UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "  ---",
+            "  duration_ms: 126.487083",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "ok 30 - UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "  ---",
+            "  duration_ms: 107.351708",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-03 nothing missing → package.json is byte-identical",
+            "ok 31 - UPG-AC-03 nothing missing → package.json is byte-identical",
+            "  ---",
+            "  duration_ms: 108.614292",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "ok 32 - UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "  ---",
+            "  duration_ms: 434.881833",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "ok 33 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "  ---",
+            "  duration_ms: 412.885208",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "ok 34 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "  ---",
+            "  duration_ms: 0.656375",
+            "  type: 'test'",
+            "  ...",
+            "1..34",
+            "# tests 34",
+            "# suites 0",
+            "# pass 33",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 1492.957917"
+          ]
+        },
+        {
+          "cmd": "npm run check-secrets",
+          "exit": 1,
+          "ms": 223,
+          "tail": [
+            "> super-agent-framework@0.1.0 check-secrets",
+            "> node tools/saf/bin/saf.mjs check-secrets",
+            "[FAIL] docs/plan/tasks/M3/T-M3-17.md:38 — OpenAI key (value hidden)",
+            "✗ check-secrets: <redacted> finding(s) in 510 scanned file(s)"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "2026-11-24T06:45:33.342Z",
+      "head": "1a806ea402fe839d856514b6f91f1b94246e5a23",
+      "attempts": 3,
+      "commands": [
+        {
+          "cmd": "npm run check-secrets",
+          "exit": 1,
+          "ms": 322,
+          "tail": [
+            "> super-agent-framework@0.1.0 check-secrets",
+            "> node tools/saf/bin/saf.mjs check-secrets",
+            "[FAIL] docs/plan/tasks/M3/T-M3-17.md:38 — OpenAI key (value hidden)",
+            "✗ check-secrets: <redacted> finding(s) in 510 scanned file(s)"
+          ]
+        }
+      ]
+    }
+  ]
 }
