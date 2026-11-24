@@ -13,6 +13,18 @@
       "head": "b6cd9f6c80bb04bc90fe3a213e7c4f0b4beef4b9",
       "verifyAttempts": 2,
       "verifyAt": "2026-11-24T19:39:47.984Z"
+    },
+    {
+      "round": 2,
+      "at": "2026-11-24T19:52:25.499Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch"
+      ],
+      "note": "some dry-run output still skips oneLine (changelog sub-section reason, log fields, config paths)",
+      "head": "a55d204b27d78fe3e1ce6a0b75acb11f44c40103",
+      "verifyAttempts": 3,
+      "verifyAt": "2026-11-24T19:50:10.721Z"
     }
   ]
 }
