@@ -1,7 +1,8 @@
 import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, normalize, sep } from "node:path";
-import { CONFIG_FILE, LOCAL_CONFIG_FILE, scriptCommand } from "./config.mjs";
+import { CONFIG_FILE, LOCAL_CONFIG_FILE, roleTable, scriptCommand } from "./config.mjs";
+import { cardEffort } from "./effort.mjs";
 import {
   changedSince,
   commitSubject,
@@ -67,6 +68,24 @@ import { textFor } from "./text.mjs";
  */
 
 export class TaskError extends Error {}
+/** Agent and effort of a card for `started.effort` (spec effort-by-size rule 11); undefined for a card without an enabled role. */
+function startEffort(config, card) {
+  if (!card.role || !roleTable(config).some((r) => r.name === card.role)) return undefined;
+  const { agent, effort, mode, source } = cardEffort(config, card);
+  return { agent, effort, mode, source };
+}
+
+/** The lines `task:start` prints about the agent: rule 11's line, the legacy-size note and the missing-variants warning. */
+export function effortLines(config, card, ev) {
+  const e = ev.started?.effort;
+  if (!e) return [];
+  const size = card.size ? card.size : "M (the card has no size — counted as M)";
+  const out = [`  agent ${e.agent} · effort ${e.effort} · size ${size} · models.effort ${e.mode} (${e.source})`];
+  const warning = cardEffort(config, card).warning;
+  if (warning) out.push(`  warning: ${warning}`);
+  return out;
+}
+
 /** Lane card started (evidence committed) but steps 3–5 failed → exit 6 · continue with --resume. */
 export class StartIncomplete extends TaskError {
   exitCode = 6;
@@ -276,7 +295,7 @@ function openLane(ctx, plan, card) {
   } catch (e) {
     throw new TaskError(`step 1: creating the worktree failed (nothing changed): ${errText(e)}`);
   }
-  const ev = { id, milestone: card.milestone, status: "in_progress", started: { at: nowIso(ctx), base: head, dirty: {} }, attempts: 0, lane, branch, worktree };
+  const ev = { id, milestone: card.milestone, status: "in_progress", started: { at: nowIso(ctx), base: head, dirty: {}, effort: startEffort(ctx.config, card) }, attempts: 0, lane, branch, worktree };
   try {
     commitPlanFiles(ctx, id, `chore(plan): start ${id} lane ${lane} (task:start --worktree)`, () => writeJson(root, evidencePath(id), ev)); // step 2
   } catch (e) {
@@ -386,7 +405,7 @@ export function startCard(ctx, id, opts = {}) {
     if (!base) throw new TaskError("the repo has no commit yet — commit first (git add -A && git commit)");
     dirty = dirtySnapshot(ctx.root);
   }
-  const ev = { id, milestone: card.milestone, status: "in_progress", started: { at: nowIso(ctx), base, dirty }, attempts: 0 };
+  const ev = { id, milestone: card.milestone, status: "in_progress", started: { at: nowIso(ctx), base, dirty, effort: startEffort(ctx.config, card) }, attempts: 0 };
   if (card.repo !== ROOT_REPO) {
     const sub = join(ctx.root, card.repo);
     if (!submoduleReady(ctx.root, card.repo)) throw new TaskError(`submodule ${card.repo} is not checked out (git submodule update --init ${card.repo})`);

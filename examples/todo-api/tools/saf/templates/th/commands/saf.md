@@ -32,7 +32,7 @@ argument-hint: <สิ่งที่คุณต้องการ เป็น
 | ขั้น | ใคร | คำสั่ง |
 |---|---|---|
 | เริ่ม | session หลัก | `{{cmd.taskStart}}`{{#if lanesOn}} (บทบาทสายโค้ด → `{{cmd.taskStartLane}}`){{/if}} |
-| ลงมือ | agent ตาม `role` ของการ์ด | แตะเฉพาะไฟล์ใน `touch` |
+| ลงมือ | agent ที่ `{{cmd.taskStart}}` ระบุ | แตะเฉพาะไฟล์ใน `touch` |
 | ตรวจ | agent เดิม | `{{cmd.taskVerify}}` จนผ่าน |
 | เทียบสเปก | `spec-reviewer` (อ่านอย่างเดียว){{#unless reviewEvery}} — การ์ดขนาด M · การ์ด S ตรวจรวมที่ประตูออก{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}` แล้วให้ {{/if}}รหัสการ์ด · ประเภทการรีวิว{{#if tokenSaving.reviewerDiff}} · path ของไฟล์ diff{{/if}} |
 | ทดสอบจริง | `qa-runner` | เมื่อการ์ดแตะ UI · multiplayer · ประสิทธิภาพ |

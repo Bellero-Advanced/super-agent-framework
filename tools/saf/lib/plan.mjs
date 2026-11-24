@@ -482,8 +482,8 @@ export function renderMirror(plan) {
 function doingLines(plan, card, laneStatus) {
   const t = T(plan);
   const ev = plan.evidence.get(card.id);
-  if (ev?.lane) return [t.sessionLaneCard(card.id, card.title, ev.lane, ev.worktree ?? "-", ev.branch ?? "-", laneStatus(ev))];
-  return [t.sessionCard(card.id, card.title, card.file, verifySummary(plan, ev)), t.sessionCriteria(card.criteria.join(" · ")), t.sessionTouch(card.touch.join(" · "), card.dontTouch.join(" · "))];
+  if (ev?.lane) return [t.sessionLaneCard(card.id, card.title, ev.lane, ev.worktree ?? "-", ev.branch ?? "-", laneStatus(ev), ev.started?.effort?.agent)];
+  return [t.sessionCard(card.id, card.title, card.file, verifySummary(plan, ev), ev?.started?.effort?.agent), t.sessionCriteria(card.criteria.join(" · ")), t.sessionTouch(card.touch.join(" · "), card.dontTouch.join(" · "))];
 }
 
 /** Text the SessionStart hook injects into every new session (short — the full view is STATE.md). */

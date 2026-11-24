@@ -1,5 +1,5 @@
 import { posix } from "node:path";
-import { scriptCommand } from "./config.mjs";
+import { EFFORTS, scriptCommand } from "./config.mjs";
 import { buildMatrix, isSpecFile } from "./matrix.mjs";
 import { parseReviews, reviewsPath } from "./reviews.mjs";
 import { EVIDENCE_DIR, PLAN_DIR, cardStatus, formatTime, gateResults, gateWord, titleOf, undeclaredGates } from "./plan.mjs";
@@ -34,10 +34,12 @@ export function renderReport(input, mid) {
     if (!got.ok) return "?";
     if (!got.rounds.length) return "—";
     reviewed.push(got.rounds);
+    roundsOf.set(id, got.rounds);
     return r.reviewCell(got.rounds.length, got.rounds.filter((x) => x.result === "fail").length);
   };
   const out = [r.title(m.id, m.title), "", r.note(c("task:report", m.id)), "", r.cards, "", r.cardsTable, "|---|---|---|---|---|---|"];
   const reviewed = [];
+  const roundsOf = new Map();
   for (const id of m.cards) {
     const ev = plan.evidence.get(id);
     const st = cardStatus(plan, id);
@@ -45,6 +47,7 @@ export function renderReport(input, mid) {
     out.push(`| ${id} | ${cell(titleOf(plan, id))} | ${t.status[st]} | ${cell(passed)} | ${ev ? ev.attempts : "—"} | ${reviewCell(id)} |`);
   }
   out.push("", r.reviewTotals(reviewed.length, reviewed.filter((x) => x[0].result === "pass").length, reviewed.reduce((n, x) => n + x.length, 0)));
+  out.push("", r.effortTitle, "", ...effortRows(plan, m, roundsOf, r));
   const done = m.cards.filter((id) => ["done", "legacy"].includes(cardStatus(plan, id))).length;
   out.push("", r.doneLine(done, m.cards.length), "", r.gates, "");
   const gates = plan.gateEvidence.get(m.id)?.verified;
@@ -67,4 +70,27 @@ export function renderReport(input, mid) {
   }
   out.push("", `${r.raw} \`${EVIDENCE_DIR}/\``, "");
   return out.join("\n");
+}
+
+/** The "Effort and review rounds" table (spec effort-by-size rule 12): one row per (size, effort) pair; cards without started.effort in the `—` row. */
+function effortRows(plan, m, roundsOf, r) {
+  const groups = new Map();
+  for (const id of m.cards) {
+    const ev = plan.evidence.get(id);
+    if (!ev) continue;
+    const e = ev.started?.effort?.effort;
+    const key = e ? `${plan.cards.get(id)?.size ?? "M"}|${e}` : "—|—";
+    const g = groups.get(key) ?? { cards: 0, reviewed: 0, first: 0, rounds: 0, attempts: 0 };
+    const rounds = roundsOf.get(id) ?? [];
+    g.cards += 1;
+    g.reviewed += rounds.length ? 1 : 0;
+    g.first += rounds[0]?.result === "pass" ? 1 : 0;
+    g.rounds += rounds.length;
+    g.attempts += ev.attempts ?? 0;
+    groups.set(key, g);
+  }
+  if (!groups.size) return [r.effortNone(m.id)];
+  const rank = (key) => (key === "—|—" ? 99 : `SM`.indexOf(key[0]) * 10 + EFFORTS.indexOf(key.split("|")[1]));
+  const rows = [...groups].sort((a, b) => rank(a[0]) - rank(b[0])).map(([key, g]) => `| ${key.split("|").join(" | ")} | ${g.cards} | ${g.reviewed} | ${g.first} | ${g.rounds} | ${g.attempts} |`);
+  return [r.effortTable, "|---|---|---|---|---|---|---|", ...rows];
 }

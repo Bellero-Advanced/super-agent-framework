@@ -32,7 +32,7 @@ Unclear between two routes → ask one short question with a recommendation.
 | Step | Who | Command |
 |---|---|---|
 | start | main session | `npm run task:start -- <id>` (code-lane role → `npm run task:start -- <id> --worktree`) |
-| build | the card's `role` agent | touch only files in `touch` |
+| build | the agent `npm run task:start -- <id>` named | touch only files in `touch` |
 | verify | same agent | `npm run task:verify -- <id>` until it passes |
 | review | `spec-reviewer` (read only) | `npm run task:diff -- <id>`, then the card id · the review types · the diff path |
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
