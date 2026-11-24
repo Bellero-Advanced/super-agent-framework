@@ -79,8 +79,8 @@ const BRANCH = "[A-Za-z0-9][A-Za-z0-9._/-]*";
 const READ_ONLY_GIT = [
   new RegExp(`^fetch --quiet origin ${BRANCH}$`),
   /^--no-optional-locks status --porcelain$/,
-  new RegExp(`^rev-parse (--abbrev-ref HEAD|HEAD|refs/remotes/origin/${BRANCH})$`),
-  new RegExp(`^show (HEAD|refs/remotes/origin/${BRANCH}):saf\\.config\\.json$`),
+  /^rev-parse (--abbrev-ref HEAD|HEAD|FETCH_HEAD)$/, // FETCH_HEAD: the commit the fetch brought (a remote-tracking ref may be stale)
+  /^show (HEAD|[0-9a-f]{40,64}):saf\.config\.json$/,
   /^diff --name-only --no-renames -z [0-9a-f]{7,64} HEAD --$/,
   /^log -1 --format=%s HEAD$/,
   /^tag --list v\d+\.\d+\.\d+$/,
@@ -218,7 +218,7 @@ test("REL-AC-04 every guard passes, the plan lists the actions, exit 0, and neit
   for (const id of ["G-switch", "G-branch", "G-milestone", "G-version"]) assert.match(text, new RegExp(`✓ ${id} `));
   assert.doesNotMatch(text, /✗/);
   assert.match(text, /v0\.4\.0 → v0\.5\.0 \(minor: Added\)/);
-  for (const action of [/set version 0\.5\.0 in package\.json/, /set version 0\.5\.0 in VERSION/, /rename "## Unreleased" to "## 0\.5\.0 — 2026-02-03"/, /append to docs\/plan\/releases\.md: - v0\.5\.0 · 2026-02-03 · M1 · gate/, /chore\(release\): v0\.5\.0 \(M1\)/, /git push$/m, /git tag -a v0\.5\.0/, /git push origin refs\/tags\/v0\.5\.0/]) assert.match(text, action);
+  for (const action of [/set version 0\.5\.0 in package\.json/, /set version 0\.5\.0 in VERSION/, /rename "## Unreleased" to "## 0\.5\.0 — 2026-02-03"/, /append to docs\/plan\/releases\.md: - v0\.5\.0 · 2026-02-03 · M1 · gate/, /chore\(release\): v0\.5\.0 \(M1\)/, /git push --no-follow-tags origin refs\/heads\/main:refs\/heads\/main$/m, /git tag -a v0\.5\.0/, /git push origin refs\/tags\/v0\.5\.0/]) assert.match(text, action);
   assert.deepEqual(snapshot(f.root, [".git"]), before.tree, "the worktree is byte-identical");
   assert.deepEqual(snapshot(f.remote), before.remote, "the remote is byte-identical");
   assert.deepEqual(localRefs(f.root), before.refs, "no ref or HEAD of the local repository changed (a tag or a commit would show here)");
@@ -291,9 +291,10 @@ function released(withLog) {
   return { ...f, sha: git(f.root, "rev-parse", "HEAD") };
 }
 const jobs = (...c) => c.map((conclusion, i) => ({ name: `job${i}`, status: "completed", conclusion }));
+// the field names are the ones `gh run list --help` and `gh run view --help` list (databaseId, status, conclusion, headSha, jobs)
 const ghFor = (sha, list, view) => (args) => {
-  if (args[0] === "run" && args[1] === "list") return args[args.indexOf("--commit") + 1] === sha && args.includes("ci.yml") ? { code: 0, out: JSON.stringify(list), err: "" } : { code: 1, out: "", err: "wrong query" };
-  return { code: 0, out: JSON.stringify({ status: "completed", conclusion: "success", jobs: view }), err: "" };
+  if (args[0] === "run" && args[1] === "list") return args[args.indexOf("--commit") + 1] === sha && args.includes("ci.yml") ? { code: 0, out: JSON.stringify(list.map((r) => ({ headSha: sha, ...r }))), err: "" } : { code: 1, out: "", err: "wrong query" };
+  return { code: 0, out: JSON.stringify({ status: "completed", conclusion: "success", headSha: sha, jobs: view }), err: "" };
 };
 const RUNS = [{ databaseId: 77, status: "completed", conclusion: "success" }];
 
@@ -397,13 +398,11 @@ test("REL-AC-04 compareVersions orders x.y.z numerically and answers null (not a
   }
 });
 
-test("REL-AC-04 usage: no milestone, an unknown option or a bad id exit 2; --prepare and --tag say they are not built yet and exit 2", () => {
+test("REL-AC-04 usage: no milestone, an unknown option, a bad id or two ids exit 2; --prepare with --tag together exits 2 and writes nothing", () => {
   const f = fixture();
   for (const args of [[], ["--bogus", "M1"], ["nope"], ["M1", "M2"]]) assert.equal(cli(f.root, ...args).status, 2, args.join(" "));
-  for (const flag of ["--prepare", "--tag"]) {
-    const r = cli(f.root, "M1", flag);
-    assert.equal(r.status, 2, flag);
-    assert.match(r.stderr, /not built yet \(T-M3-10\)/);
-  }
+  const both = cli(f.root, "M1", "--prepare", "--tag");
+  assert.equal(both.status, 2);
+  assert.match(both.stderr, /give one of --prepare and --tag/);
   assert.deepEqual(snapshot(f.root, [".git"]).filter((x) => x.startsWith(".saf")), [], "nothing was written");
 });

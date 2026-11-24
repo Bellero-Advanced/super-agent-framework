@@ -77,7 +77,12 @@ Show the owner, in Thai:
   how it works `docs/plan/README.md`
 - **Try:** `/saf what is the next card?` · `/saf the login page crashes on submit` · `/saf run the tests`
 
-## 5. Self-fix (SAF fixes its own proven bugs)
+## 5. Releases
+
+`policies.release.auto` is `off`: a release (a version bump pushed, a tag, a publish) happens only when the owner orders it.
+`npm run task:release -- <M>` is always safe to run — it only shows every guard and the next version.
+
+## 6. Self-fix (SAF fixes its own proven bugs)
 
 `workflow.selfFix` is `on`: a friction entry of kind `command-failed` or `doc-drift` that one size M card with a test can fix becomes a card
 in the **active** milestone without waiting for the owner's Go — at most 3 such cards per milestone

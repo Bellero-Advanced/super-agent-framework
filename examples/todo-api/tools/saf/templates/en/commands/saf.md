@@ -75,9 +75,27 @@ Show the {{owner}}, in {{chatLanguageName}}:
 - **Card commands:** `{{cmd.taskStart}}` → work → `{{cmd.taskVerify}}` → review → commit · status `docs/plan/STATE.md` ·
   how it works `docs/plan/README.md`
 - **Try:** `/saf what is the next card?` · `/saf the login page crashes on submit` · `/saf run the tests`
+
+## 5. Releases
+
+{{#if releaseAuto}}
+`policies.release.auto` is `on`: when the {{owner}} has closed a milestone (`status: done`), run its release yourself, one step at a
+time, and stop at the first step that is refused.
+
+1. `{{cmd.taskRelease}}` — the dry run: every guard and the plan, nothing is changed.
+2. `{{cmd.taskReleasePrepare}}` — commits the version bump with the CHANGELOG and the release log, then pushes that commit.
+3. Wait until every CI job has finished green on that exact commit (`{{cmd.taskRelease}}` shows it as `G-ci`).
+4. `{{cmd.taskReleaseTag}}` — tags the release commit and pushes the tag; it refuses while any CI job is not green.
+5. Report in {{chatLanguageName}}: the version, the commit, the tag, and every guard that refused.
+
+Never force a push, move or delete a tag, or publish by hand — a refused guard is reported to the {{owner}}, not worked around.
+{{else}}
+`policies.release.auto` is `off`: a release (a version bump pushed, a tag, a publish) happens only when the {{owner}} orders it.
+`{{cmd.taskRelease}}` is always safe to run — it only shows every guard and the next version.
+{{/if}}
 {{#if selfFixOn}}
 
-## 5. Self-fix (SAF fixes its own proven bugs)
+## 6. Self-fix (SAF fixes its own proven bugs)
 
 `workflow.selfFix` is `on`: a friction entry of kind {{selfFixKinds}} that one size M card with a test can fix becomes a card
 in the **active** milestone without waiting for the {{owner}}'s Go — at most {{selfFixCap}} such cards per milestone

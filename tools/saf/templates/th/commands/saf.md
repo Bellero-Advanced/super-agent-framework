@@ -74,9 +74,27 @@ commit ไฟล์รอบรีวิว `docs/plan/evidence/reviews/<id>.jso
 - **คำสั่งการ์ด:** `{{cmd.taskStart}}` → ทำงาน → `{{cmd.taskVerify}}` → ตรวจ → commit · สถานะ `docs/plan/STATE.md` ·
   วิธีทำงาน `docs/plan/README.md`
 - **ลองพิมพ์:** `/saf การ์ดถัดไปคืออะไร` · `/saf หน้า login ล่มตอนกดส่ง` · `/saf รัน test ให้หน่อย`
+
+## 5. การปล่อยเวอร์ชัน (release)
+
+{{#if releaseAuto}}
+`policies.release.auto` เป็น `on`: เมื่อ{{owner}}ปิด milestone แล้ว (`status: done`) ให้ปล่อยเวอร์ชันของ milestone นั้นเอง ทีละขั้น
+และหยุดที่ขั้นแรกที่ถูกปฏิเสธ
+
+1. `{{cmd.taskRelease}}` — dry run: แสดงทุก guard และแผน ไม่เปลี่ยนอะไร
+2. `{{cmd.taskReleasePrepare}}` — commit เลขเวอร์ชันใหม่พร้อม CHANGELOG และ release log แล้ว push commit นั้น
+3. รอจน CI ทุก job เขียวบน commit นั้นพอดี (`{{cmd.taskRelease}}` แสดงเป็น `G-ci`)
+4. `{{cmd.taskReleaseTag}}` — ติด tag ให้ commit ปล่อยเวอร์ชันแล้ว push tag; ปฏิเสธถ้ายังมี job ที่ไม่เขียว
+5. รายงานเป็น{{chatLanguageName}}: เวอร์ชัน commit tag และทุก guard ที่ปฏิเสธ
+
+ห้าม force push ย้ายหรือลบ tag หรือ publish เอง — guard ที่ปฏิเสธให้รายงาน{{owner}} ไม่ใช่หาทางอ้อม
+{{else}}
+`policies.release.auto` เป็น `off`: การปล่อยเวอร์ชัน (push เลขเวอร์ชัน tag publish) ทำเมื่อ{{owner}}สั่งเท่านั้น
+`{{cmd.taskRelease}}` รันได้ปลอดภัยเสมอ — แสดงแค่ทุก guard กับเวอร์ชันถัดไป
+{{/if}}
 {{#if selfFixOn}}
 
-## 5. แก้ตัวเอง (SAF แก้บั๊กของตัวเองที่พิสูจน์แล้ว)
+## 6. แก้ตัวเอง (SAF แก้บั๊กของตัวเองที่พิสูจน์แล้ว)
 
 `workflow.selfFix` เป็น `on`: รายการ friction ชนิด {{selfFixKinds}} ที่การ์ดขนาด M ใบเดียวพร้อม test แก้ได้ กลายเป็นการ์ด
 ใน milestone ที่ **active** ได้โดยไม่ต้องรอ Go ของ{{owner}} — ไม่เกิน {{selfFixCap}} ใบต่อ milestone
