@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, gitRepo, lib } from "../helpers.mjs";
 
-const { generate } = await lib("generate.mjs");
+const { generate, refreshKitFiles } = await lib("generate.mjs");
 const { CHOICES, NOT_ASKED, LABELS } = await lib("choices.mjs");
 const { EXIT_BUSY } = await lib("measure.mjs");
 const { RIGOR, ROLE_LIBRARY, resolveConfig, roleTable } = await lib("config.mjs");
@@ -30,8 +30,8 @@ test("SETUP-AC-11 the UI rule is present exactly when the type has one or transl
   const apiI18n = render({ project: { type: "api" }, people: { uiLanguages: ["en", "th"], i18nRequired: true } });
   assert.ok(has(apiI18n, ".claude/rules/ui.md") && has(apiI18n, ".claude/rules/server-authority.md"), "api with i18n: both rules");
   assert.match(read(apiI18n, ".claude/rules/ui.md"), /i18n keys/);
-  const lib = render({ project: { type: "library-cli" }, people: { uiLanguages: ["en", "th"], i18nRequired: true } });
-  assert.ok(has(lib, ".claude/rules/ui.md") && !has(lib, ".claude/rules/server-authority.md"), "library-cli with i18n: UI rule only");
+  const libCli = render({ project: { type: "library-cli" }, people: { uiLanguages: ["en", "th"], i18nRequired: true } });
+  assert.ok(has(libCli, ".claude/rules/ui.md") && !has(libCli, ".claude/rules/server-authority.md"), "library-cli with i18n: UI rule only");
   const web = render({ project: { type: "web-app" } });
   assert.match(read(web, ".claude/rules/ui.md"), /user-facing text stays in one place/, "without i18n the UI rule still keeps text in one place");
   assert.equal(resolveConfig({ project: { type: "api" }, people: { uiLanguages: ["en", "th"], i18nRequired: true } }).skills.packs.includes("i18n"), true, "several recommends the translation pack");
@@ -98,14 +98,19 @@ test("SETUP-AC-11 strict rigor puts a security-auditor review in the Definition 
   for (const lang of ["en", "th"]) assert.match(text(strictEntry, lang), /security-auditor/, lang);
   assert.match(strictEntry.en.cost, /requires a security-auditor review per milestone even if that role is off/);
   assert.match(strictEntry.th.cost, /แม้ไม่ได้เปิด role นี้/);
-  assert.match(strictEntry.en.when, /interview suggests the security-auditor role/);
+  assert.match(strictEntry.en.when, /the interview then suggests the security-auditor role/);
 
   for (const lang of ["en", "th"]) {
     assert.ok(NOT_ASKED["workflow.measure.waitMs"][lang].includes(`exit ${EXIT_BUSY}`), `${lang}: the exit code comes from EXIT_BUSY`);
-    for (const key of ["models.overrides", "workflow.review"]) assert.match(NOT_ASKED[key][lang], /\/saf-setup/, `${lang}: ${key} applies after setup runs again`);
+    for (const key of ["models.overrides", "workflow.review"]) assert.match(NOT_ASKED[key][lang], /\/saf/, `${lang}: ${key} names the /saf command`);
   }
-  assert.match(NOT_ASKED["models.overrides"].en, /only after setup runs again/);
-  assert.match(NOT_ASKED["workflow.review"].en, /only after setup runs again/);
+  for (const key of ["models.overrides", "workflow.review"]) {
+    assert.doesNotMatch(NOT_ASKED[key].en, /\bonly after\b/, `${key}: the /saf command also changes on upgrade`);
+    assert.match(NOT_ASKED[key].en, /when setup runs again.+the \/saf command also on upgrade/, key);
+    assert.match(NOT_ASKED[key].th, /ตอน upgrade ด้วย/, key);
+  }
+  assert.match(NOT_ASKED["models.overrides"].en, /docs:check/);
+  assert.match(NOT_ASKED["models.overrides"].th, /docs:check/);
 });
 
 test("SETUP-AC-11 choices --group 2 names the unit of card sizes and test caps and prints the review level as words", () => {
@@ -123,4 +128,20 @@ test("SETUP-AC-11 choices --group 2 names the unit of card sizes and test caps a
   assert.match(LABELS.en.caps, /changed test lines/);
   assert.match(LABELS.th.sizes, /บรรทัดโค้ดที่เปลี่ยน/);
   assert.match(LABELS.th.caps, /บรรทัดเทสต์ที่เปลี่ยน/);
+});
+
+test("SETUP-AC-11 after models.overrides is set, upgrade re-renders the /saf command but not the agent files or CLAUDE.md, and docs:check flags the model", () => {
+  const root = render({});
+  const before = { agent: read(root, ".claude/agents/qa-runner.md"), claude: read(root, "CLAUDE.md"), saf: read(root, ".claude/commands/saf.md") };
+  const cfg = JSON.parse(read(root, "saf.config.json"));
+  cfg.models.overrides = { "qa-runner": { model: "claude-haiku-9-3" } };
+  writeFileSync(join(root, "saf.config.json"), JSON.stringify(cfg, null, 2));
+  refreshKitFiles(root);
+  assert.notEqual(read(root, ".claude/commands/saf.md"), before.saf, "the /saf command lists the override");
+  assert.match(read(root, ".claude/commands/saf.md"), /claude-haiku-9-3/);
+  assert.equal(read(root, ".claude/agents/qa-runner.md"), before.agent, "agent files wait for setup");
+  assert.equal(read(root, "CLAUDE.md"), before.claude, "CLAUDE.md waits for setup");
+  const check = spawnSync(process.execPath, [join(REPO, "kit", "tools-saf", "bin", "saf.mjs"), "docs-check"], { cwd: root, encoding: "utf8" });
+  assert.notEqual(check.status, 0, "docs:check fails");
+  assert.match(check.stderr, /qa-runner\.md.+differs from saf\.config\.json/, "docs:check flags the model");
 });

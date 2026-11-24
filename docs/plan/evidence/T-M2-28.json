@@ -7,19 +7,19 @@
     "base": "1f78758785466c40074cd9ae3956300d7a939b16",
     "dirty": {}
   },
-  "attempts": 2,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M2-28",
   "worktree": ".claude/worktrees/T-M2-28",
   "verified": {
-    "at": "2026-11-24T06:13:34.324Z",
-    "head": "690889d36c01b419606b33fdd96269d37d648613",
+    "at": "2026-11-24T06:19:56.117Z",
+    "head": "080ca36e33c96978ec31d5bb5e144b57e280dda4",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 203,
+        "ms": 208,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,34 +46,34 @@
       {
         "cmd": "node --test test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs",
         "exit": 0,
-        "ms": 1557,
+        "ms": 1561,
         "tail": [
-          "ok 16 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "ok 17 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.529458",
+          "  duration_ms: 0.596167",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
-          "ok 17 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 18 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.557709",
+          "  duration_ms: 0.596791",
           "  type: 'test'",
           "  ...",
-          "1..17",
-          "# tests 17",
+          "1..18",
+          "# tests 18",
           "# suites 0",
-          "# pass 17",
+          "# pass 18",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1522.659625"
+          "# duration_ms 1523.990792"
         ]
       },
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group 2 --lang th",
         "exit": 0,
-        "ms": 46,
+        "ms": 49,
         "tail": [
           "    เลือกเมื่อ: ตรงกับระยะจริงของโปรเจกต์ และแก้เมื่อโปรเจกต์ขยับไปต่อ",
           "## project.rigor",
@@ -93,20 +93,20 @@
           "    คืออะไร: ค่าเริ่มต้นเข้มที่สุด: การ์ดเล็กลง ตรวจเทียบ spec ทุกการ์ด ตรวจความปลอดภัยทุก milestone และเพิ่ม build ในเช็กตอน merge",
           "    เหมาะกับ: ระบบจริงที่มีผู้ใช้ และผลิตภัณฑ์ที่จัดการเงินหรือข้อมูลส่วนบุคคล",
           "    ข้อเสีย: ใช้เวลาและ token มากที่สุด Definition of done บังคับให้ security-auditor ตรวจทุก milestone แม้ไม่ได้เปิด role นี้ จึงควรเปิด",
-          "    เลือกเมื่อ: ความผิดพลาดจะกระทบผู้ใช้หรือเงิน การสัมภาษณ์จะเสนอ role security-auditor",
+          "    เลือกเมื่อ: ความผิดพลาดจะกระทบผู้ใช้หรือเงิน จากนั้นการสัมภาษณ์จะเสนอ role security-auditor",
           "    ขนาดการ์ด S / M (บรรทัดโค้ดที่เปลี่ยน): 100 / 300 · เพดานเทสต์ S / M (บรรทัดเทสต์ที่เปลี่ยน): 200 / 500 · การตรวจ: ตรวจเทียบ spec ทุกการ์ด และ security-auditor ตรวจทุก milestone · เช็กตอน merge: typecheck · lint · test · build"
         ]
       },
       {
         "cmd": "node -e \"import('./kit/tools-saf/lib/choices.mjs').then(m=>{const t=JSON.stringify(m.CHOICES.filter(e=>e.question==='custom-models'));if(!t.includes('models.overrides')||/only the server rule/i.test(JSON.stringify(m.CHOICES)))process.exit(1)})\"",
         "exit": 0,
-        "ms": 43,
+        "ms": 45,
         "tail": []
       },
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 225,
+        "ms": 290,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -116,7 +116,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 178,
+        "ms": 213,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -126,28 +126,28 @@
       {
         "cmd": "node --test 'test/unit/setup-choices-facts.test.mjs' 'test/unit/setup-choices.test.mjs'",
         "exit": 0,
-        "ms": 1535,
+        "ms": 1570,
         "tail": [
-          "ok 16 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "ok 17 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.512666",
+          "  duration_ms: 0.780583",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
-          "ok 17 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 18 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.569209",
+          "  duration_ms: 0.688667",
           "  type: 'test'",
           "  ...",
-          "1..17",
-          "# tests 17",
+          "1..18",
+          "# tests 18",
           "# suites 0",
-          "# pass 17",
+          "# pass 18",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1500.171709"
+          "# duration_ms 1535.233166"
         ]
       }
     ],
@@ -160,8 +160,8 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "kit/tools-saf/lib/choices.mjs": "ce9f95c4ad0bf1481a21067311f5a84318a897de",
-        "test/unit/setup-choices-facts.test.mjs": "4eefde1c8fc0c371d054942221f85b9d1048446a",
+        "kit/tools-saf/lib/choices.mjs": "b51dfa8470fc4e5274e9c58484577a39601ced1a",
+        "test/unit/setup-choices-facts.test.mjs": "688fafee8b5b41c0bc89e3095a6568849a1df341",
         "test/unit/setup-choices.test.mjs": "5cf855ab706efb567156ba93065d19f31e4b105a"
       }
     },
@@ -180,7 +180,7 @@
         "cap": 150
       },
       "test": {
-        "lines": 128,
+        "lines": 149,
         "cap": 250
       },
       "over": []
