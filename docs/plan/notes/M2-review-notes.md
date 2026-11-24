@@ -103,3 +103,13 @@ G (decided here). the test-mode table in `questions.md` was removed (pointer to 
 N-a. `release-operator.md:27`/`:31`: with `push: allowed`, `deploy: owner-order` and `autoDeployBranches` set the agent says "Pushing is allowed" but later "Pushing <branches> deploys automatically — treat that push as a release"; consistent if read closely, could add "except branches that deploy automatically" (CLAUDE.md line 80 has the same layout)
 N-b. `release-operator.md:3` says live changes only "on an explicit owner order" even with `deploy: allowed` (same as T-M2-14 N6)
 N-c. with `push: allowed` the agent line does not mention protected branches (CLAUDE.md carries them) — a short pointer would help
+
+## T-M2-20 (review PASS) — notes for the designer
+
+N1. `generate.mjs:31` the OWNED_DIRS JSDoc is detached from it (the LIVING_FILES comment sits between); OWNED_DIRS (line 36) has no doc comment
+N2. test "an unedited living file is still updated" asserts only not-kept/not-warned/not-archived; nothing asserts an actual update (second half of spec rule 5) — assert `report.written.includes("docs/DECISIONS.md")` after changing a setting
+N3. the LIVING_FILES test re-implements the matcher (`isLiving` not exported); by rule 3 `docs/plan/tasks/_template.md` counts as living, so an edited template never receives format updates — decide whether `_template.md` should be excluded
+N4. `report.kept` mixes plain paths (living files) with decorated strings from `retireUnplanned` — T-M2-02/21 (`planSetup`) should settle on one shape
+N5. a non-object `scripts` value is replaced with `{}` when scripts are added (also upgrade's old behaviour); undocumented
+N6. evidence records `npm test` as deferred (targeted mode) — the milestone exit gate must run the full suite (137 tests ran by hand)
+N7. docs/upgrade.md "your working plan is never reset" is accurate for edited files only (a deleted living file is recreated)
