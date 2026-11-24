@@ -1,0 +1,19 @@
+{
+  "id": "T-M3-03",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T17:20:11.733Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "docs",
+        "missing-test"
+      ],
+      "note": "6 blockers: SKILL.md:92 'three keys'; NOT_ASKED omits upgrade; MACHINE_SWITCHES condition; warning narrower than rule 10; AC-02 body assertion; isVariantDest rewrites custom role base file",
+      "head": "524d0e36c1ab7026ff214d184123d97192f3d942",
+      "verifyAttempts": 5,
+      "verifyAt": "2026-11-24T17:16:16.526Z"
+    }
+  ]
+}
