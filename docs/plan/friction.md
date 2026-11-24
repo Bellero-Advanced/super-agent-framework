@@ -23,3 +23,4 @@ Earlier record, from before this log existed: [notes/M2-review-notes.md](notes/M
 - F-009 → fixed · 2026-11-24 · T-M3-33
 - F-011 · 2026-11-24 · command-failed · T-M3-33 · task:merge · a card that changes workflow.alwaysAllowed cannot merge because main still uses the old list (bootstrap, second time after F-005) · evidence: T-M3-33 merge refused: changed after verification for .saf/manifest.json and example files — the merging main config predates the new alwaysAllowed globs; fixed by copying the lane's saf.config.json to main first
 - F-011 → carded · 2026-11-24 · T-M3-34
+- F-011 → fixed · 2026-11-24 · T-M3-34

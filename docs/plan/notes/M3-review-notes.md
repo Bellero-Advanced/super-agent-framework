@@ -102,3 +102,8 @@ R5. the re-render is skipped silently without an example config (not even `examp
 R6. `TABLE.rerender.only` and `TABLE.ownedGlobs` overlap and nothing checks the re-render paths stay inside ownedGlobs (a one-line assertion in AC-12 would lock it)
 R7. AC-10 asserts the edited agent's manifest entry only as "not equal to the edited file's hash" — assert equality with the seeded entry
 R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs does not export it); only AC-10 would catch a change of setup's hash
+
+## T-M3-34 (merge allowed globs) — non-blocking
+- S1 docs/card-lifecycle.md:100 sentence lacks the condition "only when the branch's saf.config.json is the one the lane verified"; also ~170-char line.
+- S2 no test for a malformed/missing branch config (rule 5) or rule 3 alone.
+- S3 spec wording: a lane with unchanged config uses the base list, slightly wider than "nothing new is skipped".
