@@ -1,14 +1,169 @@
 {
   "id": "T-M2-27",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T05:47:22.541Z",
     "base": "33ddebccf45beb421874849d9794efcfb9fa8e15",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-27",
-  "worktree": ".claude/worktrees/T-M2-27"
+  "worktree": ".claude/worktrees/T-M2-27",
+  "verified": {
+    "at": "2026-11-24T05:48:17.822Z",
+    "head": "bc77dfb38fcadd3eb5fbc4d216bee946abedbd43",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 205,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "99 scenario(s) in 12 spec(s) · with test 50 · gaps 49 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/settings-archive.test.mjs test/unit/setup-dry-run.test.mjs test/unit/generate.test.mjs test/unit/test-mode-config.test.mjs",
+        "exit": 0,
+        "ms": 1060,
+        "tail": [
+          "ok 36 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "  ---",
+          "  duration_ms: 70.665709",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 37 - this repo pins targeted with a testFiles command and ignores the local file",
+          "  ---",
+          "  duration_ms: 0.225041",
+          "  type: 'test'",
+          "  ...",
+          "1..37",
+          "# tests 37",
+          "# suites 0",
+          "# pass 37",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1025.379625"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 217,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 489 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 189,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 245 markdown file(s) · 186 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/settings-archive.test.mjs'",
+        "exit": 0,
+        "ms": 330,
+        "tail": [
+          "ok 5 - RERUN-AC-09 no env block: an invalid local file stays byte-identical and is not archived",
+          "  ---",
+          "  duration_ms: 22.3135",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-09 a settings.json holding [] is archived and replaced by an object with the SAF hooks",
+          "ok 6 - RERUN-AC-09 a settings.json holding [] is archived and replaced by an object with the SAF hooks",
+          "  ---",
+          "  duration_ms: 28.074042",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
+          "# suites 0",
+          "# pass 6",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 295.733792"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".gitignore",
+        "examples/todo-api/.gitignore",
+        "kit/tools-saf/lib/generate.mjs",
+        "test/unit/settings-archive.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".gitignore": "b37d38e153948ce2fbf1cda17591951bbf0a4146",
+        "examples/todo-api/.gitignore": "d3b03dda3255419622277e5d9d48ae65f5577dd8",
+        "kit/tools-saf/lib/generate.mjs": "6908f3abe783abe69a616f92998edd88f15a6d72",
+        "test/unit/settings-archive.test.mjs": "9517c37c27d8c98ade5d946800dc106a93695b9e"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RERUN-AC-08",
+        "RERUN-AC-09"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 30,
+        "cap": 150
+      },
+      "test": {
+        "lines": 81,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/settings-archive.test.mjs"
+      ]
+    }
+  }
 }

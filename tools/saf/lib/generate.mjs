@@ -318,19 +318,31 @@ const SETTINGS_HOOKS = {
 const SETTINGS = ".claude/settings.json";
 const SETTINGS_LOCAL = ".claude/settings.local.json";
 
+/** Unreadable: not valid JSON (`undefined` here) or valid JSON whose root is not an object. */
+const unreadable = (json) => json === undefined || json === null || typeof json !== "object" || Array.isArray(json);
+const NOT_READ = Symbol("not-read");
+
 /** `.claude/settings.json` merge as data: hooks to add, the env block that moves, the new texts. Computes only. */
 function planSettings(root, taken, report) {
   const file = join(root, SETTINGS);
-  const cur = readJson(file, existsSync(file) ? null : {});
+  const read = readJson(file, existsSync(file) ? NOT_READ : {});
+  const cur = read === NOT_READ ? undefined : read;
   let archivedTo = null;
-  if (cur === null) {
+  if (existsSync(file) && unreadable(cur)) {
     report.warnings.push(`${SETTINGS} is not valid JSON — archived and replaced`);
     archivedTo = archiveDest(root, SETTINGS, taken);
   }
-  const s = cur ?? {};
+  const s = unreadable(cur) ? {} : cur;
   let localText = null;
+  let localArchivedTo = null;
   if (s.env) {
-    const local = readJson(join(root, SETTINGS_LOCAL), {});
+    const localFile = join(root, SETTINGS_LOCAL);
+    let local = readJson(localFile, existsSync(localFile) ? NOT_READ : {});
+    if (local === NOT_READ || unreadable(local)) {
+      localArchivedTo = archiveDest(root, SETTINGS_LOCAL, taken);
+      report.warnings.push(`${SETTINGS_LOCAL} is not valid JSON — archived to ${localArchivedTo} and replaced by the moved env block`);
+      local = {};
+    }
     local.env = { ...(local.env ?? {}), ...s.env };
     localText = `${JSON.stringify(local, null, 2)}\n`;
     delete s.env;
@@ -347,7 +359,7 @@ function planSettings(root, taken, report) {
   const text = `${JSON.stringify(s, null, 2)}\n`;
   const action = archivedTo ? "update" : actionFor(file, text);
   report.written.push(`${SETTINGS} (merged)`);
-  return { action, hooks, envMoved: localText !== null, text, localText, archivedTo };
+  return { action, hooks, envMoved: localText !== null, text, localText, archivedTo, localArchivedTo };
 }
 
 /** create / same / update for a whole-file write, compared as LF text. */
@@ -356,7 +368,7 @@ function actionFor(abs, text) {
   return readText(abs) === text.replace(/\r\n/g, "\n") ? "same" : "update";
 }
 
-export const GITIGNORE_LINES = [".claude/settings.local.json", ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
+export const GITIGNORE_LINES = [".claude/settings.local.json", `${ARCHIVE}/${SETTINGS_LOCAL}*`, ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
 
 /** The `.gitignore` merge as data: the lines to add and the new text (`text: null` when nothing is missing). */
 function planGitignore(root, config) {
@@ -589,6 +601,7 @@ export function planSetup(root, answers, opts = {}) {
   for (const e of retire) if (e.action === "remove") report.removed.push(e.path);
   const settings = planSettings(root, taken, report);
   if (settings.archivedTo) report.archived.push(archiveLine(SETTINGS, settings.archivedTo));
+  if (settings.localArchivedTo) report.archived.push(archiveLine(SETTINGS_LOCAL, settings.localArchivedTo));
 
   // 4. generated status files (and the evidence folder's .gitkeep), as they will be after the apply
   const writes = new Map(actions.filter((a) => a.content !== undefined && a.action !== "keep-edited").map((a) => [a.path, a.content]));
@@ -648,6 +661,7 @@ export function applySetup(root, plan) {
   }
   applyRetire(root, plan.actions.filter((a) => a.content === undefined), {}, { kept: [], removed: [] });
   const s = m.settings;
+  if (s.localArchivedTo) moveAside(root, SETTINGS_LOCAL, s.localArchivedTo);
   if (s.localText !== null) writeAt(root, SETTINGS_LOCAL, s.localText);
   if (s.archivedTo) moveAside(root, SETTINGS, s.archivedTo);
   writeAt(root, SETTINGS, s.text);
@@ -678,7 +692,7 @@ export function planLines(plan) {
   const p = m.packageJson;
   lines.push(`  package.json: ${p.state}${p.added.length ? ` — add scripts ${p.added.join(", ")}` : ""}${p.kept.length ? ` — keep yours ${p.kept.join(", ")}` : ""}`);
   const s = m.settings;
-  lines.push(`  ${SETTINGS}: ${s.action}${s.archivedTo ? ` — not valid JSON, archived to ${s.archivedTo}` : ""}${s.hooks.length ? ` — add hooks ${s.hooks.join(", ")}` : ""}${s.envMoved ? ` — env block moves to ${SETTINGS_LOCAL}` : ""}`);
+  lines.push(`  ${SETTINGS}: ${s.action}${s.archivedTo ? ` — not valid JSON, archived to ${s.archivedTo}` : ""}${s.hooks.length ? ` — add hooks ${s.hooks.join(", ")}` : ""}${s.envMoved ? ` — env block moves to ${SETTINGS_LOCAL}` : ""}${s.localArchivedTo ? ` — ${SETTINGS_LOCAL} not valid JSON, archived to ${s.localArchivedTo}` : ""}`);
   lines.push(`  ${CONFIG_FILE}: ${m.config.action}`);
   for (const f of [...m.status, { path: MANIFEST, action: m.manifest.action }]) lines.push(`  ${f.path}: ${f.action}`);
   if (plan.report.warnings.length) lines.push("", "warnings:", ...plan.report.warnings.map((w) => `  ⚠ ${w}`));
