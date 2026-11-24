@@ -107,3 +107,7 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 - S1 docs/card-lifecycle.md:100 sentence lacks the condition "only when the branch's saf.config.json is the one the lane verified"; also ~170-char line.
 - S2 no test for a malformed/missing branch config (rule 5) or rule 3 alone.
 - S3 spec wording: a lane with unchanged config uses the base list, slightly wider than "nothing new is skipped".
+
+## T-M3-22 (release-operator text) — non-blocking from round 1
+- N1 choices.mjs:205 deploy:allowed cost text still says the agent "describes an order step" (false now; needs a card, rule 24 en+th). N2 config.mjs:57 role summary "only on an explicit owner order" ignores deploy:allowed (also docs/roles.md:14).
+- N4 multiple auto-deploy branches read "that push"; N6 spec: what "except to main" means under deploy:allowed; N7 owner-order push text changed when auto-deploy branches exist.
