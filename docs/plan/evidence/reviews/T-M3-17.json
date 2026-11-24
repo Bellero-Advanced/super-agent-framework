@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-17",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T16:49:45.838Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch"
+      ],
+      "note": "loadPlan without io: friction.md read changed (links, folder, non-folder docs/plan); needs io.has existence check + parity test",
+      "head": "6cfbd88004bd6840279a1775c1c3caa3cf628538",
+      "verifyAttempts": 1,
+      "verifyAt": "2026-11-24T16:44:57.554Z"
+    }
+  ]
+}
