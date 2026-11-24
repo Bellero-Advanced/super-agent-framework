@@ -28,6 +28,13 @@ The user-visible reason in one or two sentences. Link the spec section.
 
 - Concrete steps. Name files and functions. No time estimates.
 
+## Steps
+
+Required for an L card, optional for an M card: numbered steps, each one piece of work a single commit can finish. Finish each step with one commit whose subject contains `<card id> step <k>/<n> <what the step did>` (`<n>` = the number of steps). The plan check refuses an L card with too few steps.
+
+1. First step — what it finishes
+2. Second step — what it finishes
+
 ## Out of scope
 
 - What this card must not do (another card does it).

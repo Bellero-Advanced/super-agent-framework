@@ -28,6 +28,14 @@ owner says Go on a milestone
 A card is **done** only when `task:verify` passes. A failed verify keeps the card open and records why (failed commands ·
 files outside `touch` · files in `dont_touch` · scenarios without a test).
 
+How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default
+`milestone`). In the deferred modes a card proves itself with its own tests and its evidence says "full suite deferred to
+gate". In `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card
+merges (when the gate fails, `npm run task:culprit -- <M>` finds the card that broke it). Each person can override the mode with
+`SAF_TEST_MODE` or an untracked `saf.config.local.json` (it may hold `workflow.testMode`, `workflow.lanes.code`,
+`workflow.sideLanes.max` and `models.effort`; any other key, including `$schema`, is refused). Lane caps have no environment variable (every
+session must count the same caps) and are at most `LANE_CEILING` in `tools/saf/lib/config.mjs`.
+
 ## 2. Card format
 
 Copy [tasks/_template.md](tasks/_template.md). Frontmatter fields:
@@ -46,11 +54,13 @@ Copy [tasks/_template.md](tasks/_template.md). Frontmatter fields:
 
 The "Done when" section: every list item is one command (a leading backticked command, or the whole line). All must exit 0.
 
+An L card also has a "Steps" section (`## Steps`, in Thai `## ขั้นตอน`) of numbered items; each step is one piece of work a single commit can finish, and `npm run task:state -- --check` refuses an L card with too few steps (an M card may have the section; nothing checks it). Each step ends with one commit whose subject contains `<card id> step <k>/<n>` (`<n>` = the number of steps), for example `feat(M4): T-M4-03 step 2/4 server routes`. A card that stopped midway resumes at the first step with no such commit (`git log --oneline <start commit>..HEAD`); `task:verify` runs once, after the last step. `npm run task:diff -- <id>` splits the diff file it writes at those commits — one section per step, then a last section for the work after the last step commit — and the reviewer reads it section by section and names the step of each finding.
+
 ## 3. Milestones and exit gates
 
 A milestone file has `status: planned | active | paused | done`, a `cards:` list (order = work order) and `gates:`.
 Each gate has `id`, `text` and optional `run:` commands — a gate without commands is a manual check by the owner.
-`npm run task:verify -- <M>` runs every gate and writes `docs/plan/evidence/<M>.json`; `npm run task:report -- <M>` writes the report.
+`npm run task:verify -- <M>` runs every gate and writes `docs/plan/evidence/<M>.json`; `npm run task:report -- <M>` writes the report (`--html` also writes a page for people who do not read JSON).
 
 Only the owner moves a milestone to `active` ("Go") or `done`.
 
@@ -68,7 +78,7 @@ side_cards: [T-M3-01]
 - side cards start, verify, merge and get reviewed exactly like other cards — same spec, `touch`, `depends`, size caps and evidence
 - the active milestone always comes first: `npm run task:next -- --parallel` lists its cards before side cards (tagged `[side lane M<n>]`),
   and a side card starts only in capacity the active milestone leaves free
-- at most 1 side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json`)
+- at most 1 side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json` — the project's cap; a machine may set its own `workflow.sideLanes.max` in `saf.config.local.json`, and it never adds slots the lane caps do not leave; at most `LANE_CEILING`, no environment variable)
 - a side card may depend only on cards that are done or can start themselves
 - `docs/plan/STATE.md` and the session summary show each side lane in its own block; side cards never count toward the
   active milestone's done count or its exit gates — they count when their own milestone becomes active
@@ -85,5 +95,19 @@ started card lacks a test for one of its scenarios.
 - "Done" means a real run: attach the command output, never a guess or a ticked box
 - `docs/plan/evidence/` is written by the engine; never edit or delete it by hand
 - If a check is flaky, fix the flakiness first — never retry until green and call it done
+
+## 8. Friction log
+
+When the workflow itself gets in the way of a card, record it in `docs/plan/friction.md` — one append-only file. Kinds:
+`review-bounce` (a spec review failed because of a gap in SAF, not in the card's work) · `command-failed` (an engine command
+failed, crashed or did the wrong thing) · `doc-drift` (a document, card or template contradicted the code) · `workaround`
+(the work needed a step the workflow does not support).
+
+- add: `npm run task:friction -- add --kind <kind> --area <area> --evidence <text> <summary>` appends one line dated today (in `people.timeZone`) and prints its id. `--card <id>` links a card of the plan; `area` says where the friction lives (for example `task:merge` or a file path); no field may contain ` · ` or a line break
+- close: `npm run task:friction -- close <F-id> carded|fixed|dropped <card id or reason>` appends a closing line: `carded` and `fixed` need a card id of the plan, `dropped` needs a reason. An entry that is `fixed` or `dropped` cannot be closed again
+- `npm run task:friction` without an argument lists the open and carded entries and the count per status
+- lines are never edited or removed: a mistake is closed with `dropped` (and, if needed, a new entry). A line that breaks the format is a plan problem — `npm run task:state -- --check` names its line number
+- the commands only write the file and never commit: commit it on its own, `git commit -m "chore(plan): friction F-<nnn>" -- docs/plan/friction.md`
+- while an entry is open or carded the session summary shows `Friction: <open> open · <carded> carded`
 
 npm passes arguments after `--`: `npm run task:start -- T-M1-01`.

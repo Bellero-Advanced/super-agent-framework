@@ -25,6 +25,12 @@ const ID = "T-M1-01";
 /** A started card in a fresh plan repo, a ctx that records what it logs and what it ran. */
 async function started(over = {}, config = {}) {
   const { root, config: cfg } = await planRepo({ config, cards: [{ id: ID, touch: ["src/**", "test/**"], ...over }] });
+  if (over.size === "L") {
+    // rule 19: an L card lists its steps (the plan check refuses it otherwise)
+    const file = `docs/plan/tasks/M1/${ID}.md`;
+    write(root, file, readFileSync(join(root, file), "utf8").replace("## Done when", "## Steps\n\n1. first step\n2. second step\n\n## Done when"));
+    commitAll(root, "L card steps");
+  }
   const ctx = fakeCtx(root, cfg, { logged: [] });
   ctx.log = (s) => ctx.logged.push(s);
   task.startCard(ctx, ID);

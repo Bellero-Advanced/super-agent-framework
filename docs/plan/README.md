@@ -54,6 +54,8 @@ Copy [tasks/_template.md](tasks/_template.md). Frontmatter fields:
 
 The "Done when" section: every list item is one command (a leading backticked command, or the whole line). All must exit 0.
 
+An L card also has a "Steps" section (`## Steps`, in Thai `## ขั้นตอน`) of numbered items; each step is one piece of work a single commit can finish, and `npm run task:state -- --check` refuses an L card with too few steps (an M card may have the section; nothing checks it). Each step ends with one commit whose subject contains `<card id> step <k>/<n>` (`<n>` = the number of steps), for example `feat(M4): T-M4-03 step 2/4 server routes`. A card that stopped midway resumes at the first step with no such commit (`git log --oneline <start commit>..HEAD`); `task:verify` runs once, after the last step. `npm run task:diff -- <id>` splits the diff file it writes at those commits — one section per step, then a last section for the work after the last step commit — and the reviewer reads it section by section and names the step of each finding.
+
 ## 3. Milestones and exit gates
 
 A milestone file has `status: planned | active | paused | done`, a `cards:` list (order = work order) and `gates:`.

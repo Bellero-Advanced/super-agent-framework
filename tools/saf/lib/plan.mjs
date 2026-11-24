@@ -35,6 +35,9 @@ export const MILESTONE_ID = /^M\d+$/;
 const MILESTONE_STATUS = ["planned", "active", "paused", "done"];
 
 export const CRITERIA_HEADINGS = ["Done when", "Pass criteria", "Criteria", "เกณฑ์ผ่าน"];
+/** Rule 19 of docs/specs/card-sizes.md: the section of numbered steps, and how few an L card may list (data, not logic). */
+export const STEPS_HEADINGS = ["Steps", "ขั้นตอน"];
+export const L_MIN_STEPS = 2;
 export const MILESTONE_HEADINGS = { goal: ["Goal", "เป้าหมาย"], scope: ["Scope", "ขอบเขต"], risks: ["Risks", "ความเสี่ยง"] };
 
 export const alwaysAllowed = (config) => [`${EVIDENCE_DIR}/**`, STATE_FILE, MIRROR_FILE, ".saf/memory/**", FRICTION_FILE, `${FRICTION_FILE}.lock`, ...(config?.workflow?.alwaysAllowed ?? [])];
@@ -53,6 +56,22 @@ export function criteriaCommands(lines) {
     const first = codeSpans(item)[0];
     const cmd = first && first.start === 0 ? first.content.trim() : stripComment(item).trim();
     if (cmd) out.push(cmd);
+  }
+  return out;
+}
+
+/** Steps: the numbered items (`1. text`) of the steps section, outside code fences, in order · no section → []. */
+export function cardSteps(sectionLines) {
+  const out = [];
+  let indent = null;
+  for (const l of sectionLines ?? []) {
+    if (l.inFence) continue;
+    const m = l.text.match(/^( *)\d+[.)]\s+(.+?)\s*$/);
+    if (!m) continue;
+    // top level = the indent of the first numbered item, at most 3 spaces (4 or more is code); a nested list is indented deeper
+    if (m[1].length > 3) continue;
+    indent ??= m[1].length;
+    if (m[1].length === indent) out.push(m[2]);
   }
   return out;
 }
@@ -88,10 +107,14 @@ export function parseCard(src, file, roles) {
   if (role && roles && !roles.includes(role)) issues.push(`${file}: role must be one of ${roles.join(", ")}`);
   const touch = strList(data.touch);
   if (!touch.length) issues.push(`${file}: needs at least one touch entry (files this card may change)`);
-  const crit = findSection(sections(src), CRITERIA_HEADINGS);
+  const parts = sections(src);
+  const crit = findSection(parts, CRITERIA_HEADINGS);
+  const steps = cardSteps(findSection(parts, STEPS_HEADINGS));
   const criteria = crit ? criteriaCommands(crit) : [];
   if (!criteria.length) issues.push(`${file}: the "## ${CRITERIA_HEADINGS[0]}" section needs at least one command`);
   if (issues.length) return { issues };
+  // rule 19: too few steps is a plan issue, but the card itself still reads (the rest of the plan stays checkable)
+  const stepIssues = size === "L" && steps.length < L_MIN_STEPS ? [`${file}: an L card needs a "## ${STEPS_HEADINGS[0]}" section with at least ${L_MIN_STEPS} numbered steps`] : [];
   return {
     card: {
       id,
@@ -108,8 +131,9 @@ export function parseCard(src, file, roles) {
       scenarios: strList(data.scenarios),
       selfFix: str(data.self_fix) || undefined,
       criteria,
+      steps,
     },
-    issues,
+    issues: stepIssues,
   };
 }
 
