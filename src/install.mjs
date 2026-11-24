@@ -86,7 +86,7 @@ export async function init(root, opts = {}) {
 async function mergeUpgradeScripts(root, log) {
   const result = { added: [], kept: [] };
   const { CONFIG_FILE, validateConfig, resolveConfig } = await engineModule(root, "config.mjs");
-  const { engineScripts } = await engineModule(root, "generate.mjs");
+  const { engineScripts, mergeScriptsText } = await engineModule(root, "generate.mjs");
   let raw = null;
   try {
     raw = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
@@ -103,33 +103,16 @@ async function mergeUpgradeScripts(root, log) {
     log(`  • no package.json — scripts were not added; ${hint}`);
     return result;
   }
-  const text = readFileSync(file, "utf8");
-  const bom = text.startsWith("\uFEFF") ? "\uFEFF" : "";
-  const body = text.slice(bom.length);
-  let pkg = null;
-  try {
-    pkg = JSON.parse(body);
-  } catch {}
-  if (!pkg || typeof pkg !== "object" || Array.isArray(pkg)) {
+  const want = engineScripts(config);
+  const res = mergeScriptsText(readFileSync(file, "utf8"), want);
+  if (res.invalid) {
     log(`  ⚠ package.json is not valid JSON — scripts were not added; ${hint}`);
     return result;
   }
-  if (!pkg.scripts || typeof pkg.scripts !== "object" || Array.isArray(pkg.scripts)) pkg.scripts = {};
-  for (const [name, value] of Object.entries(engineScripts(config))) {
-    if (pkg.scripts[name] === undefined) {
-      pkg.scripts[name] = value;
-      result.added.push(name);
-    } else if (pkg.scripts[name] !== value) {
-      result.kept.push(name);
-      log(`  kept script: ${name} (SAF expects "${value}")`);
-    }
-  }
-  if (result.added.length) {
-    const indent = body.match(/^([ \t]+)\S/m)?.[1] ?? 2;
-    const eol = body.includes("\r\n") ? "\r\n" : "\n";
-    const tail = /\r?\n$/.test(body) ? eol : "";
-    writeFileSync(file, `${bom}${JSON.stringify(pkg, null, indent).replace(/\n/g, eol)}${tail}`);
-  }
+  result.added = res.added;
+  result.kept = res.kept;
+  for (const name of res.kept) log(`  kept script: ${name} (SAF expects "${want[name]}")`);
+  if (res.text !== null) writeFileSync(file, res.text);
   for (const name of result.added) log(`  added script: ${name}`);
   return result;
 }

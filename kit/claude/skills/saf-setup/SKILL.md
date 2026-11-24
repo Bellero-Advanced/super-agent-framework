@@ -116,4 +116,4 @@ Show the user the card list and **stop**. Work starts only when the user says Go
 ## Re-running
 
 `/saf-setup` can run again at any time to change settings. Files SAF wrote and nobody edited are replaced; edited ones are
-archived to `docs/archive/pre-saf/` first. Plan cards, specs and evidence are never deleted.
+archived to `docs/archive/pre-saf/` first, except your edited decision log, index, milestone and card files, which a re-run keeps as they are (it lists them as kept). Plan cards, specs and evidence are never deleted.
