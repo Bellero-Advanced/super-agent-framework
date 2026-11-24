@@ -16,7 +16,7 @@ This file = unbreakable rules + commands + where to start. Everything else lives
 
 ## Open a session per role
 
-Agents live in `.claude/agents/` (model + effort fixed per role — `{{cmd.docsCheck}}` verifies) · `/saf <anything in plain words>` routes the work (card loop · plan · bug · test · security · help) · skills in `.claude/skills/` load by themselves.
+Agents live in `.claude/agents/` (model + {{#if effortBySize}}effort by card size{{else}}effort fixed per role{{/if}} — `{{cmd.docsCheck}}` verifies) · `/saf <anything in plain words>` routes the work (card loop · plan · bug · test · security · help) · skills in `.claude/skills/` load by themselves.
 
 | Work | Roles | Open the main session with |
 |---|---|---|

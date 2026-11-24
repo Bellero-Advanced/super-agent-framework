@@ -1,14 +1,193 @@
 {
   "id": "T-M3-04",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T17:26:08.870Z",
     "base": "4da9c9e0daae16e4b0db55765529db1b7f49cf35",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M3-04",
-  "worktree": ".claude/worktrees/T-M3-04"
+  "worktree": ".claude/worktrees/T-M3-04",
+  "verified": {
+    "at": "2026-11-24T17:32:39.074Z",
+    "head": "c79bb23dc7fc0f522cc4e4e9482b6082e72ff30a",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 381,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 152 · gaps 22 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/effort-shown.test.mjs test/unit/effort-by-size.test.mjs test/unit/review-rounds.test.mjs test/unit/task.test.mjs",
+        "exit": 0,
+        "ms": 6914,
+        "tail": [
+          "ok 33 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.05725",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 34 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 215.888792",
+          "  type: 'test'",
+          "  ...",
+          "1..34",
+          "# tests 34",
+          "# suites 0",
+          "# pass 33",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 6860.03125"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 299,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 274 local link(s) · 88 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 367,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 600 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/effort-shown.test.mjs'",
+        "exit": 0,
+        "ms": 2617,
+        "tail": [
+          "ok 5 - EFFORT-AC-07 without any started card the table is replaced by one line, and the Thai report has the same table",
+          "  ---",
+          "  duration_ms: 169.129583",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: EFFORT-AC-06 the generated /saf build step names the agent task:start named, and /saf-plan and CLAUDE.md follow the mode (en and th)",
+          "ok 6 - EFFORT-AC-06 the generated /saf build step names the agent task:start named, and /saf-plan and CLAUDE.md follow the mode (en and th)",
+          "  ---",
+          "  duration_ms: 348.95725",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
+          "# suites 0",
+          "# pass 6",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2565.978041"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/commands/saf-plan.md",
+        ".claude/commands/saf.md",
+        "docs/card-lifecycle.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/report.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/lib/text.mjs",
+        "kit/tools-saf/templates/en/CLAUDE.template.md",
+        "kit/tools-saf/templates/en/commands/saf-plan.md",
+        "kit/tools-saf/templates/en/commands/saf.md",
+        "kit/tools-saf/templates/th/CLAUDE.template.md",
+        "kit/tools-saf/templates/th/commands/saf-plan.md",
+        "kit/tools-saf/templates/th/commands/saf.md",
+        "test/unit/effort-shown.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/commands/saf-plan.md": "703e6e3c14f4b67e9a9d3be27f9b329ad42b0e9c",
+        ".claude/commands/saf.md": "99b4c3185a631fd0b57374d9aa29ef9f487ef2c9",
+        "docs/card-lifecycle.md": "eb2b2baa68c911d4f5cfe67f24eb4485474dcc1b",
+        "kit/tools-saf/bin/saf.mjs": "1de07089ef2bdf0f621e509db32258dd2b000294",
+        "kit/tools-saf/lib/generate.mjs": "c1a6253d01cc456e91c30b8e6efcc59aa327d76c",
+        "kit/tools-saf/lib/plan.mjs": "2b35b1925f7d96c40b2c8e01667803898ba507c3",
+        "kit/tools-saf/lib/report.mjs": "cbae3aef49d469a80bbd0b9470557c4b393c6760",
+        "kit/tools-saf/lib/task.mjs": "116024926b736ffb68fc887ddea4b7e3dae63bd9",
+        "kit/tools-saf/lib/text.mjs": "4aac67c29677e9e1c3d62056216d163c283747c0",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "73e1fa6dd3f0eaf6918480818551018d39cca4cb",
+        "kit/tools-saf/templates/en/commands/saf-plan.md": "3eea8dca39822c33d3f7dde73d2053ce4fd220ac",
+        "kit/tools-saf/templates/en/commands/saf.md": "a1f6c6343ef8c861b4d865e858b81b6c60902330",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "7cd9480280a93b76daea3a5eba6ae208f4906ea5",
+        "kit/tools-saf/templates/th/commands/saf-plan.md": "2ce200a6e59c5c79be2bf91b780844d1f63e67a9",
+        "kit/tools-saf/templates/th/commands/saf.md": "8b91644af815352bbdf59def1d2f9613fc4f124c",
+        "test/unit/effort-shown.test.mjs": "8c428dac1bf44ed062cacb5b65917cea1c6ee21f"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "EFFORT-AC-06",
+        "EFFORT-AC-07"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 102,
+        "cap": 400
+      },
+      "test": {
+        "lines": 136,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/effort-shown.test.mjs"
+      ]
+    }
+  }
 }

@@ -154,6 +154,8 @@ export function templateData(config, detected, opts = {}) {
     reportLanguageName: languageName(config.roles.reportLanguage, dl),
     uiLanguagesText: config.people.uiLanguages.join(", "),
     presetName,
+    effortBySize: config.models.effort === "by-size",
+    designerVariant: variantAgents(config).find((v) => v.role === "designer")?.name ?? "",
     presetIsStandard: !!MODEL_PRESETS[config.models.preset],
     roles,
     coreRoles: roles.filter((r) => ["designer", "spec-reviewer", "implementer", "qa-runner"].includes(r.name)),

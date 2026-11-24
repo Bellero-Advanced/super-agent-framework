@@ -27,6 +27,7 @@ import {
   TaskError,
   abandonCard,
   checkStop,
+  effortLines,
   evidencePath,
   laneEnvLines,
   laneFolder,
@@ -147,6 +148,7 @@ async function task(sub, rest) {
       out(`▶ started ${id} ${card?.title ?? ""}`);
       if (ev.lane) out(`  lane ${ev.lane} · branch ${ev.branch} · worktree ${ev.worktree} (evidence committed in the main folder)`);
       const dirty = Object.keys(ev.started.dirty).length;
+      for (const l of effortLines(config, card ?? {}, ev)) out(l);
       out(`  files are compared with commit ${ev.started.base.slice(0, 7)}${dirty ? ` · ${dirty} file(s) already changed before do not count (unless edited again)` : ""}`);
       out(`  may touch: ${card?.touch.join(" · ")}`);
       out(`  criteria: ${card?.criteria.join(" · ")}`);

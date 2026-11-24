@@ -7,7 +7,7 @@ argument-hint: <รหัส milestone หรือเป้าหมาย>
 
 เป้า: $ARGUMENTS
 
-1. ส่งงานให้ agent `designer` พร้อม: รหัส milestone (หรือเป้าหมาย) · `docs/plan/README.md` · ไฟล์ milestone เดิมถ้ามี ·
+1. ส่งงานให้{{#if designerVariant}} agent designer: `designer` สำหรับงานออกแบบใหญ่ (แผนที่เพิ่มไฟล์สเปกใหม่ หรือแถวการตัดสินใจที่กระทบการ์ดมากกว่าหนึ่งใบ) · `{{designerVariant}}` สำหรับงานวางแผนอย่างอื่น{{else}} agent `designer`{{/if}} พร้อม: รหัส milestone (หรือเป้าหมาย) · `docs/plan/README.md` · ไฟล์ milestone เดิมถ้ามี ·
    สเปกใน `docs/specs/` ที่เกี่ยวข้อง
 2. designer เขียนหรือแก้:
    - `docs/plan/milestones/M<n>.md` — เป้าหมาย · ขอบเขต · ความเสี่ยง · ประตูออก · ลำดับ `cards:` · `status: planned`

@@ -32,7 +32,7 @@ Unclear between two routes → ask one short question with a recommendation.
 | Step | Who | Command |
 |---|---|---|
 | start | main session | `{{cmd.taskStart}}`{{#if lanesOn}} (code-lane role → `{{cmd.taskStartLane}}`){{/if}} |
-| build | the card's `role` agent | touch only files in `touch` |
+| build | the agent `{{cmd.taskStart}}` named | touch only files in `touch` |
 | verify | same agent | `{{cmd.taskVerify}}` until it passes |
 | review | `spec-reviewer` (read only){{#unless reviewEvery}} — size M cards; S cards at the milestone gate{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}`, then {{/if}}the card id · the review types{{#if tokenSaving.reviewerDiff}} · the diff path{{/if}} |
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |

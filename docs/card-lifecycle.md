@@ -16,7 +16,12 @@ Status is never typed by hand — it is computed from three kinds of files:
 1. The owner says **Go** on a milestone (`status: active`; one at a time). The designer has written its cards (`/saf-plan`).
 2. `task:start <id>` — refuses when the milestone is not active (and the card is not a [side card](#side-lanes)), a dependency has not passed, or another main-folder card is
    open. Records the start commit and a hash of every already-dirty file (so pre-existing changes are not blamed on the card).
-3. The card's role does the work, touching only files matched by `touch` and never `dont_touch`.
+   It prints `agent <name> · effort <effort> · size <S|M> · models.effort <mode> (<source>)` and records the same in the
+   evidence (`started.effort`). The agent is the card's role, or — with `models.effort: by-size` — that role's variant file
+   `<role>-<effort>` when the card's size asks for a different effort; `task:start` names it, and `task:report` compares
+   review rounds by size and effort. Without the variant files (setup ran with `fixed`) it prints a warning and names the
+   role's own agent.
+3. The agent `task:start` named does the work, touching only files matched by `touch` and never `dont_touch`.
 4. `task:verify <id>` — runs every "Done when" command, then compares changed files with `touch`/`dont_touch`, then checks
    every id in `scenarios` has a test with the id in its name. Pass → `done`; otherwise `failed` with the reasons.
    Flaky passes (failed before, passed now) are reported.
