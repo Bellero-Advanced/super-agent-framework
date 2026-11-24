@@ -7,19 +7,19 @@
     "base": "c79bb23dc7fc0f522cc4e4e9482b6082e72ff30a",
     "dirty": {}
   },
-  "attempts": 3,
+  "attempts": 4,
   "lane": 2,
   "branch": "card/T-M3-05",
   "worktree": ".claude/worktrees/T-M3-05",
   "verified": {
-    "at": "2026-11-24T17:32:44.423Z",
-    "head": "64cef71ca91f96be7cc3d993363987cf4aad9919",
+    "at": "2026-11-24T17:38:12.953Z",
+    "head": "8c27f79791ad75cf7f02357dc30ceeb0a3ebfe22",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 370,
+        "ms": 377,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -46,34 +46,34 @@
       {
         "cmd": "node --test test/unit/effort-setup.test.mjs test/unit/setup-choices.test.mjs",
         "exit": 0,
-        "ms": 2518,
+        "ms": 2527,
         "tail": [
-          "ok 21 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "ok 22 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.855292",
+          "  duration_ms: 0.866584",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
-          "ok 22 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 23 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 1.092167",
+          "  duration_ms: 1.108125",
           "  type: 'test'",
           "  ...",
-          "1..22",
-          "# tests 22",
+          "1..23",
+          "# tests 23",
           "# suites 0",
-          "# pass 22",
+          "# pass 23",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2466.897917"
+          "# duration_ms 2472.012083"
         ]
       },
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group 4 --lang th",
         "exit": 0,
-        "ms": 76,
+        "ms": 74,
         "tail": [
           "    คืออะไร: ให้ CLAUDE.md แนะนำให้เปิด session ที่ไม่ใส่ --model ด้วยโมเดลฝั่งลงมือ SAF เขียนแค่คำแนะนำ คุณต้องตั้งเองใน .claude/settings.local.json",
           "    เหมาะกับ: งานทำการ์ดประจำวันด้วยค่าใช้จ่ายที่ต่ำกว่า",
@@ -100,7 +100,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 304,
+        "ms": 303,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -110,28 +110,28 @@
       {
         "cmd": "node --test 'test/unit/effort-setup.test.mjs'",
         "exit": 0,
-        "ms": 280,
+        "ms": 285,
         "tail": [
-          "ok 6 - EFFORT-AC-08 docs: setup-questions lists the effort question, config-reference defines the table and the variant files, roles names the variant agents",
-          "  ---",
-          "  duration_ms: 0.531166",
-          "  type: 'test'",
-          "  ...",
-          "# Subtest: EFFORT-AC-08 SKILL.md per-machine paragraph says by-size on this machine needs a project whose saf.config.json says by-size",
           "ok 7 - EFFORT-AC-08 SKILL.md per-machine paragraph says by-size on this machine needs a project whose saf.config.json says by-size",
           "  ---",
-          "  duration_ms: 0.590791",
+          "  duration_ms: 0.604709",
           "  type: 'test'",
           "  ...",
-          "1..7",
-          "# tests 7",
+          "# Subtest: EFFORT-AC-08 shipped texts name decision D-016 as SAF's own, the designer variant is explained, and SKILL.md lists the effort question in group 4",
+          "ok 8 - EFFORT-AC-08 shipped texts name decision D-016 as SAF's own, the designer variant is explained, and SKILL.md lists the effort question in group 4",
+          "  ---",
+          "  duration_ms: 0.659792",
+          "  type: 'test'",
+          "  ...",
+          "1..8",
+          "# tests 8",
           "# suites 0",
-          "# pass 7",
+          "# pass 8",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 229.483959"
+          "# duration_ms 232.478833"
         ]
       }
     ],
@@ -148,13 +148,13 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/config-reference.md": "3db59833145d6282d0c850b18125ec1de456ab4a",
-        "docs/roles.md": "9cd10d6e3ab17242daae4d63f6000dd1e2677fb5",
+        "docs/config-reference.md": "a66a0364b7e6ec54a078dac4739acd4f0d0828d7",
+        "docs/roles.md": "14f18673b7e710ee113e5032508404c9dc6d9f59",
         "docs/setup-questions.md": "0970384ea69423b79a9f576096856c10c9881e0e",
-        "kit/claude/skills/saf-setup/SKILL.md": "95a4ee43a25bcc2b11ef249728ffe2a7dae6a10e",
-        "kit/claude/skills/saf-setup/questions.md": "eb0fbd04178858cbd0f8fa943b3f0c0b778e0c2d",
-        "kit/tools-saf/lib/choices.mjs": "453ea4f241f2fd96b469b1b972152dde4eba82f8",
-        "test/unit/effort-setup.test.mjs": "e063b458cf30f2c3c5eb9748716a481766d3a9ca"
+        "kit/claude/skills/saf-setup/SKILL.md": "769abbf1a3b125345bfde3cc4d5a3d7679e99cc1",
+        "kit/claude/skills/saf-setup/questions.md": "e9156c2cd099bdc96530012e218632486a3e07af",
+        "kit/tools-saf/lib/choices.mjs": "f2ab3508fd08bb88873e83d794fbb3001f31f6cb",
+        "test/unit/effort-setup.test.mjs": "1bd7b7129d20e5ff6db4910751b3b7888094057a"
       }
     },
     "scenarios": {
@@ -166,11 +166,11 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 63,
+        "lines": 67,
         "cap": 150
       },
       "test": {
-        "lines": 132,
+        "lines": 143,
         "cap": 250
       },
       "over": []

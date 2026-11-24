@@ -87,8 +87,8 @@ test("EFFORT-AC-08 the model-preset explanations name the exception: a set model
       assert.ok(e[lang].what.includes("models.planner") && e[lang].what.includes("models.builder"), `${value} ${lang}`);
       assert.ok(e[lang].what.length <= FIELD_MAX, `${value} ${lang}: ${e[lang].what.length}`);
     }
-    assert.match(e.en.what, /unless models\.planner or models\.builder sets an id/);
-    assert.match(e.th.what, /เว้นแต่ models\.planner หรือ models\.builder/);
+    assert.match(e.en.what, /a set models\.planner \/ models\.builder id replaces that tier's model/);
+    assert.match(e.th.what, /id ที่ตั้งใน models\.planner \/ models\.builder จะแทนโมเดลของฝั่งนั้น/);
   }
   const resolved = resolveConfig({ stack: { packageManager: "none" }, models: { preset: "max", planner: "claude-fable-9-1", builder: "claude-haiku-9-2" } });
   assert.deepEqual([resolved.models.planner, resolved.models.builder], ["claude-fable-9-1", "claude-haiku-9-2"], "set ids replace the preset's models");
@@ -129,4 +129,15 @@ test("EFFORT-AC-08 SKILL.md per-machine paragraph says by-size on this machine n
   const para = skill.slice(skill.indexOf("Test mode and the two lane caps are per-machine"));
   assert.match(para, /^Test mode and the two lane caps are per-machine choices, and so is the effort mode\./);
   assert.match(para.slice(0, 900), /`by-size` there lowers effort only when the project's `saf\.config\.json` also says `by-size`[^.]*otherwise the role's own agent is used[^.]*`fixed` there always turns it off/);
+});
+
+test("EFFORT-AC-08 shipped texts name decision D-016 as SAF's own, the designer variant is explained, and SKILL.md lists the effort question in group 4", () => {
+  for (const [file, text] of [["questions.md", read("kit", "claude", "skills", "saf-setup", "questions.md")], ["SKILL.md", read("kit", "claude", "skills", "saf-setup", "SKILL.md")], ["roles.md", read("docs", "roles.md")], ["config-reference.md", read("docs", "config-reference.md")]]) {
+    for (const m of text.matchAll(/D-016/g)) assert.match(text.slice(Math.max(0, m.index - 20), m.index), /SAF's decision (\[)?$/, `${file}: D-016 is introduced as SAF's decision`);
+  }
+  const who = section(read("docs", "roles.md"), "Variant agent files").replace(/\s+/g, " ");
+  assert.match(who, /`\/saf-plan` hands plan work to `designer-medium` and keeps `designer` for large design work/);
+  assert.match(who, /a plan that adds a new spec file, or a decision row that affects more than one card/);
+  const skill = read("kit", "claude", "skills", "saf-setup", "SKILL.md");
+  assert.match(skill.split("\n").find((l) => l.startsWith("4. **Models**")), /effort \(fixed · by-size\)/);
 });

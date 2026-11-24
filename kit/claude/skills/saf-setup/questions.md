@@ -62,7 +62,7 @@ npm needs `--` before arguments (`npm run task:verify -- T-M1-01`); the generate
 A preset changes the models only; a role's own effort is the same in every preset (designer high · spec-reviewer high ·
 implementer high · qa-runner medium · …). `models.effort` decides how that effort is used: `fixed` keeps one effort per
 role for every card and the agent files as they are; `by-size` lowers it only for the roles and card sizes in the effort
-table (`EFFORT_BY_SIZE` in `config.mjs`, decision D-016) and setup then writes one extra agent file
+table (`EFFORT_BY_SIZE` in `config.mjs`, SAF's decision D-016) and setup then writes one extra agent file
 `.claude/agents/<role>-<effort>.md` per role and lowered effort, which `task:start` names for the card. Cards of size S at
 a lower effort may bounce more in review; `task:report` shows review rounds by size and effort. Per-role changes go in
 `models.overrides` (`{"qa-runner": {"effort": "low"}}`) and win over both modes; a role with an effort override gets no

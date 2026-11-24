@@ -31,7 +31,7 @@ detection (say what you detected instead):
 1. **Language and people** — chat language · document language · owner title · UI languages / i18n
 2. **Project** — name + one-line pitch + users/market (one free-text message) · type · stage · rigor
 3. **Stack** — package manager · confirm the detected commands · database · monorepo / submodules
-4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model
+4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model · effort (fixed · by-size)
 5. **Roles and skills** — optional roles (multi-select) · custom role? · report language · optional skill packs (multi-select)
 6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · **test mode** (how often the full suite runs — explain the modes from the `choices --group 6` output, shown as printed (see below), recommend `milestone`) and the command that runs only some test files · measure lock · performance budgets file
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
