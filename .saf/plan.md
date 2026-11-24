@@ -116,7 +116,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [ ] T-M3-19 STATE.md, the plan mirror, the report and the HTML page give every exit gate the same result word, and broken evidence never crashes them
 - [ ] T-M3-20 saf choices and config --check refuse arguments they do not know, and a verify fallback names its real cause
 - [ ] T-M3-21 Setup messages say what happened: "not a JSON object" for a valid non-object file, the archive path in every settings warning and dry-run line, and a minified package.json stays minified
-- [ ] T-M3-22 The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception
+- [ ] T-M3-22 The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception — started 2026-11-24 16:22 · not verified yet · lane 2 · .claude/worktrees/T-M3-22
 - [ ] T-M3-23 The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list
 - [ ] T-M3-24 Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt)
 - [ ] T-M3-25 Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested
