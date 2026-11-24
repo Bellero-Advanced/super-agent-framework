@@ -111,7 +111,7 @@ export function releaseBump(current, changelog) {
   const kindOf = (name) => RELEASE.sectionBump[name.trim().toLowerCase()] ?? RELEASE.otherBump;
   const top = RELEASE.bumpOrder.find((k) => named.some((n) => kindOf(n) === k));
   const reason = named.find((n) => kindOf(n) === top);
-  return { bump: now[0] === 0 ? (RELEASE.zeroMajor[top] ?? top) : top, reason: reason || "Unreleased" };
+  return { bump: now[0] === 0 ? (RELEASE.zeroMajor[top] ?? top) : top, reason: oneLine(reason) || "Unreleased" };
 }
 
 /** The next version after `current` for the Unreleased section of `changelog`, or `null` (nothing to release). */
@@ -136,7 +136,7 @@ export function readReleaseLog(text) {
 
 // ── settings and project facts ───────────────────────────────────────────────
 
-const safeDir = (p) => typeof p === "string" && p.trim() !== "" && !/^([A-Za-z]:)?[\\/]/.test(p) && !p.split(/[\\/]/).includes("..") && !p.startsWith("-");
+const safeDir = (p) => typeof p === "string" && p.trim() !== "" && !/[\u0000-\u001f\u007f]/.test(p) && !/^([A-Za-z]:)?[\\/]/.test(p) && !p.split(/[\\/]/).includes("..") && !p.startsWith("-");
 const asPath = (dir, file) => posix.normalize(`${dir.split("\\").join("/")}/${file}`);
 
 /** The release settings of the config, checked: unusable values are listed in `errors` by name. */
@@ -402,8 +402,9 @@ export function planRelease(ctx, mid, { step = "prepare" } = {}) {
 }
 
 /** `task:release <M>` without a step flag: print every guard of the next step and the plan, change nothing. Returns the exit code (0 all hold · 1 one failed). */
-export function runRelease(ctx, mid, { step, out }) {
+export function runRelease(ctx, mid, { step, out: write }) {
   const at = step ?? chooseStep(ctx, mid);
+  const out = (line) => write(oneLine(line)); // every printed line: no control character from a CHANGELOG heading, a config path or a log field reaches the terminal
   out(`task:release ${mid} — dry run, nothing is written (next step: ${at === "tag" ? "--tag" : "--prepare"})`);
   const guards = releaseGuards(ctx, mid, { step: at });
   for (const g of guards) out(`${g.ok ? "✓" : "✗"} ${g.id} — ${g.reason}`);

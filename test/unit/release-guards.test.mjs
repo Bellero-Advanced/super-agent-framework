@@ -364,6 +364,31 @@ test("REL-AC-03 names printed by G-milestone have no control characters, whateve
   assert.match(g.reason, /T-M1-01 is not done \(done .*\[31m boom\)/);
 });
 
+const CONTROL = /[\u0000-\u001f\u007f]/;
+
+test("REL-AC-04 nothing the dry run prints holds a control character: a heading, a config path or a release-log field with ESC is cleaned", () => {
+  const f = fixture({ unreleased: "### Added\u001b[31m\n\n- a thing\n" });
+  assert.doesNotMatch(rel.releaseBump("0.4.0", rel.readChangelog(changelog("### Added\u001b[31m\n\n- x\n"))).reason, CONTROL, "the reason that T-M3-10 writes into the log is clean");
+  const lines = [];
+  rel.runRelease(ctxOf(f), "M1", { out: (x) => lines.push(x) });
+  assert.ok(lines.some((l) => /\(minor: Added/.test(l)), lines.join("\n"));
+  for (const l of lines) assert.doesNotMatch(l, CONTROL, JSON.stringify(l));
+  // a version file path with a control character is not accepted, and the message that names it is clean
+  const g = f.config.policies.release;
+  const badPath = { ...f, config: { ...f.config, policies: { ...f.config.policies, release: { ...g, versionFiles: ["VERSION\u001b[31m"] } } } };
+  const out = [];
+  rel.runRelease(ctxOf(badPath), "M1", { out: (x) => out.push(x) });
+  assert.match(out.join("\n"), /not a folder inside the project/);
+  for (const l of out) assert.doesNotMatch(l, CONTROL, JSON.stringify(l));
+  // the release-log entry that "--prepare already done" prints
+  const done = released(true);
+  write(done.root, "docs/plan/releases.md", `# Releases\n\n- v0.5.0 · 2026-02-03 · M1 · gate ab\u001b[1mcd · from v0.4.\u001b[0m0 · bump minor (Added\u001b[31m)\n`);
+  const tagLines = [];
+  rel.runRelease(ctxOf(done, { versions: { [NAME]: ["0.4.0"] }, gh: ghFor(done.sha, RUNS, jobs("success")) }), "M1", { out: (x) => tagLines.push(x) });
+  assert.ok(tagLines.some((l) => l.startsWith("--prepare already done: ")), tagLines.join("\n"));
+  for (const l of tagLines) assert.doesNotMatch(l, CONTROL, JSON.stringify(l));
+});
+
 test("REL-AC-04 compareVersions orders x.y.z numerically and answers null (not an exception) for anything else; a bad registry version fails closed", () => {
   assert.ok(rel.compareVersions("1.2.3", "1.2.10") < 0 && rel.compareVersions("2.0.0", "1.9.9") > 0 && rel.compareVersions("1.0.0", "1.0.0") === 0);
   for (const bad of ["x", "1.0", "1.0.0-rc.1", undefined, null]) {
