@@ -91,3 +91,14 @@ M4. the lane-label fallback stderr line embeds the TaskError text "every command
 M5. two extra tests carry the MSCOPE-AC-04 id but test the merge path and rule 2/10 selection
 M6. spec §4 says submodule cards' evidence carries `lane` — `--worktree` refuses cards outside the root repo (task.mjs:374), so submodule cards are always main-folder cards (wording)
 M7. FRICTION candidate: on Node 22 `node --test <existing file> <missing file>` exits 0 → a combined Done-when command hides a missing new test file (task:prerun caught it on T-M3-33)
+
+## T-M3-33 (review PASS at round 1) — notes for the designer
+
+R1. by-hand route incomplete: the refusal text `BY_HAND` (scripts/refresh-copies.mjs ~91) and CONTRIBUTING give two `upgrade` commands, which do not do the example re-render — a kit change to agent/CLAUDE.md templates refreshed that way leaves COPIES-AC-15 red (wording; CLAUDE.md and CONTRIBUTING sentences fixed by the main session after the merge)
+R2. both manifests are now committed, ignored by parallel overlap and by merge's post-verify check: two kit lanes in parallel will often conflict on adjacent hash lines in `.saf/manifest.json` and `examples/todo-api/.saf/manifest.json` (`task:merge` exit 4); a change to these files after verify goes unnoticed
+R3. a `create` action (missing example agent or CLAUDE.md) is neither written nor printed; AC-15 only rules out `update`
+R4. the "kept (edited)" label can mislead: a file whose manifest entry is missing or whose manifest is unparsable becomes `replace-edited` and is printed as kept although nobody edited it
+R5. the re-render is skipped silently without an example config (not even `example re-rendered: 0`); old-style fixtures AC-01..05, AC-09 never run it
+R6. `TABLE.rerender.only` and `TABLE.ownedGlobs` overlap and nothing checks the re-render paths stay inside ownedGlobs (a one-line assertion in AC-12 would lock it)
+R7. AC-10 asserts the edited agent's manifest entry only as "not equal to the edited file's hash" — assert equality with the seeded entry
+R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs does not export it); only AC-10 would catch a change of setup's hash
