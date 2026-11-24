@@ -514,6 +514,7 @@ function planStatus(root, config, writes, moved) {
   }
   for (const [rel, content] of writes) if (rel.startsWith("docs/plan/")) files.set(rel, String(content));
   const io = {
+    has: (rel) => files.has(rel),
     read: (rel) => files.get(rel) ?? readFileSync(join(root, rel), "utf8"),
     list: (dir) => {
       const seen = new Map();

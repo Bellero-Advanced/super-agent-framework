@@ -7,46 +7,46 @@
     "base": "d93b3507ffcf6e270ae84d2d55fc1b91f451cc0e",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-17",
   "worktree": ".claude/worktrees/T-M3-17",
   "verified": {
-    "at": "2026-11-24T16:44:57.554Z",
-    "head": "21ce1982fdddb57d069d5d959897a1dc649d6fee",
+    "at": "2026-11-24T16:50:31.544Z",
+    "head": "6cfbd88004bd6840279a1775c1c3caa3cf628538",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/setup-plan-read.test.mjs test/unit/setup-dry-run.test.mjs test/unit/setup-rerun.test.mjs test/unit/plan.test.mjs",
         "exit": 0,
-        "ms": 1716,
+        "ms": 1729,
         "tail": [
-          "ok 23 - RERUN-AC-02 a re-run leaves package.json byte-identical when no script is missing, and adds only the missing one otherwise",
+          "ok 24 - RERUN-AC-02 a re-run leaves package.json byte-identical when no script is missing, and adds only the missing one otherwise",
           "  ---",
-          "  duration_ms: 218.522167",
+          "  duration_ms: 270.9635",
           "  type: 'test'",
           "  ...",
           "# Subtest: RERUN-AC-02 setup still creates a missing package.json, warns on invalid JSON, and upgrade shares the one merge function",
-          "ok 24 - RERUN-AC-02 setup still creates a missing package.json, warns on invalid JSON, and upgrade shares the one merge function",
+          "ok 25 - RERUN-AC-02 setup still creates a missing package.json, warns on invalid JSON, and upgrade shares the one merge function",
           "  ---",
-          "  duration_ms: 431.701583",
+          "  duration_ms: 395.559541",
           "  type: 'test'",
           "  ...",
-          "1..24",
-          "# tests 24",
+          "1..25",
+          "# tests 25",
           "# suites 0",
-          "# pass 24",
+          "# pass 25",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1654.699125"
+          "# duration_ms 1664.315333"
         ]
       },
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 418,
+        "ms": 363,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -73,7 +73,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 1020,
+        "ms": 337,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -83,7 +83,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 725,
+        "ms": 281,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -93,28 +93,28 @@
       {
         "cmd": "node --test 'test/unit/setup-plan-read.test.mjs'",
         "exit": 0,
-        "ms": 1804,
+        "ms": 719,
         "tail": [
-          "ok 3 - RERUN-AC-18 on a re-run an edited task template is replaced (archive target named) while an edited card is kept; --keep keeps the template",
-          "  ---",
-          "  duration_ms: 225.816333",
-          "  type: 'test'",
-          "  ...",
-          "# Subtest: RERUN-AC-19 the setup skill decides a re-run by .saf/manifest.json, not by saf.config.json (guard: the skill text already says so)",
           "ok 4 - RERUN-AC-19 the setup skill decides a re-run by .saf/manifest.json, not by saf.config.json (guard: the skill text already says so)",
           "  ---",
-          "  duration_ms: 0.751542",
+          "  duration_ms: 0.369542",
           "  type: 'test'",
           "  ...",
-          "1..4",
-          "# tests 4",
+          "# Subtest: RERUN-AC-17 loadPlan with the disk io equals loadPlan without io: friction, evidence, submodules (file, link, folder, docs/plan that is a file)",
+          "ok 5 - RERUN-AC-17 loadPlan with the disk io equals loadPlan without io: friction, evidence, submodules (file, link, folder, docs/plan that is a file)",
+          "  ---",
+          "  duration_ms: 103.811166",
+          "  type: 'test'",
+          "  ...",
+          "1..5",
+          "# tests 5",
           "# suites 0",
-          "# pass 4",
+          "# pass 5",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1664.349875"
+          "# duration_ms 665.804417"
         ]
       }
     ],
@@ -127,9 +127,9 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "kit/tools-saf/lib/generate.mjs": "f809ee15802f9434a1a28b7cdb620a01c5e0dd37",
-        "kit/tools-saf/lib/plan.mjs": "3f57c282a988fc75cf8ec1cb891708c44992ad19",
-        "test/unit/setup-plan-read.test.mjs": "76a4fa5dd4c4b5beb8dfb04e27adce520ddae4b9"
+        "kit/tools-saf/lib/generate.mjs": "ec2f8c19ead4365d2f9d7155526046cd83b62b7b",
+        "kit/tools-saf/lib/plan.mjs": "6de5c954d66e214698aaf935de6b51ef188e1d3e",
+        "test/unit/setup-plan-read.test.mjs": "5c28d201b2a02cc768d08baf9de0e8c2ec7b5136"
       }
     },
     "scenarios": {
@@ -143,11 +143,11 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 74,
+        "lines": 76,
         "cap": 150
       },
       "test": {
-        "lines": 96,
+        "lines": 144,
         "cap": 250
       },
       "over": []

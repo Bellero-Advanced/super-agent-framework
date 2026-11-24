@@ -146,8 +146,9 @@ export function parseMilestone(src, file) {
   return { milestone: { id, title: str(data.title), status, file, cards: strList(data.cards), sideCards: strList(data.side_cards), legacy, gates, sections: body }, issues };
 }
 
-/** The plan as files on disk: `list(rel)` → [{ name, isDirectory }] (empty when the folder is missing; links are left out), `read(rel)` → text. */
-const diskIo = (root) => ({
+/** The plan as files on disk: `has(rel)` → does the path exist (links followed), `list(rel)` → [{ name, isDirectory }] (empty when the folder is missing; links are left out), `read(rel)` → text. */
+export const diskIo = (root) => ({
+  has: (rel) => existsSync(join(root, rel)),
   read: (rel) => readFileSync(join(root, rel), "utf8"),
   list: (rel) => (existsSync(join(root, rel)) ? readdirSync(join(root, rel), { withFileTypes: true }).filter((e) => e.isDirectory() || e.isFile()).map((e) => ({ name: e.name, isDirectory: e.isDirectory() })) : []),
 });
@@ -162,7 +163,7 @@ function listFiles(io, dir, ext, recursive) {
   return out.sort();
 }
 
-/** `io` (optional) is a read overlay `{ read(rel), list(rel) }` — setup uses it to read the plan as it will be after the apply, without writing it. */
+/** `io` (optional) is a read overlay `{ has(rel), read(rel), list(rel) }` — setup uses it to read the plan as it will be after the apply, without writing it. */
 export function loadPlan(root, config, io = diskIo(root)) {
   const issues = [];
   const read = (rel) => io.read(rel);
@@ -191,7 +192,7 @@ export function loadPlan(root, config, io = diskIo(root)) {
       issues.push(`${f}: JSON is not readable`);
     }
   }
-  const friction = io.list(PLAN_DIR).some((e) => !e.isDirectory && `${PLAN_DIR}/${e.name}` === FRICTION_FILE) ? parseFriction(read(FRICTION_FILE)) : { entries: [], issues: [], hasMarker: false };
+  const friction = io.has(FRICTION_FILE) ? parseFriction(read(FRICTION_FILE)) : { entries: [], issues: [], hasMarker: false };
   const plan = { config, milestones, cards, evidence, gateEvidence, friction, submodules: submodulePaths(root), issues };
   issues.push(...validatePlan(plan), ...friction.issues);
   return plan;
