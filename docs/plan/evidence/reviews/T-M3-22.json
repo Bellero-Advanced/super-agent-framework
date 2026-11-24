@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-22",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T16:27:38.316Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch"
+      ],
+      "note": "deploy:none text wrong; CLAUDE.md lacks 'counts as a release'",
+      "head": "64a71e782e698a3c5ea092a679ba4726f52d3646",
+      "verifyAttempts": 1,
+      "verifyAt": "2026-11-24T16:24:02.059Z"
+    }
+  ]
+}
