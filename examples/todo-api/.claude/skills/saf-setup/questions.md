@@ -28,7 +28,7 @@ Rigor sets defaults the user can still override:
 
 | Rigor | Review | Merge checks |
 |---|---|---|
-| light | spec review for M and L cards (legacy S cards together at the milestone gate) | test |
+| light | spec review for every new M and L card (legacy S cards together at the milestone gate) | test |
 | standard | spec review for every card | typecheck · lint · test |
 | strict | every card + security audit per milestone | typecheck · lint · test · build |
 

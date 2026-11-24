@@ -16,8 +16,8 @@ Status is never typed by hand — it is computed from three kinds of files:
 1. The owner says **Go** on a milestone (`status: active`; one at a time). The designer has written its cards (`/saf-plan`).
 2. `task:start <id>` — refuses when the milestone is not active (and the card is not a [side card](#side-lanes)), a dependency has not passed, or another main-folder card is
    open. Records the start commit and a hash of every already-dirty file (so pre-existing changes are not blamed on the card).
-   It prints `agent <name> · effort <effort> · size <M|L> · models.effort <mode> (<source>)` and records the same in the
-   evidence (`started.effort`); a card that says `S` (legacy) or has no size is counted as M and the line says so. The agent is the card's role, or — with `models.effort: by-size` — that role's variant file
+   It prints `agent <name> · effort <effort> · size <M|L> · models.effort <mode> (<source>)` and records the agent, effort, mode and source in the
+   evidence (`started.effort`; the size is printed, not stored); a card that says `S` (legacy) or has no size is counted as M and the line says so. The agent is the card's role, or — with `models.effort: by-size` — that role's variant file
    `<role>-<effort>` when the card's size asks for a different effort; `task:start` names it, and `task:report` compares
    review rounds by size and effort. Without the variant files (setup ran with `fixed`) it prints a warning and names the
    role's own agent.
@@ -31,7 +31,7 @@ Status is never typed by hand — it is computed from three kinds of files:
    evidence (`verified.size`): the reviewer decides, or the designer splits the card. Above twice the cap (`HARD_STOP_FACTOR`)
    the card fails and `task:verify` exits 1; when the count is already above it before the commands run, no command runs; the
    designer splits the card. A legacy `S` card counts as M.
-5. `spec-reviewer` (read only) compares the code with the card and the spec — every card at standard/strict rigor, M and L cards at light rigor (legacy S cards together at the milestone gate). With `tokenSaving.reviewerDiff` on, the main session first runs `task:diff <id>`, which writes
+5. `spec-reviewer` (read only) compares the code with the card and the spec — every card at standard/strict rigor; at light rigor every new M and L card too, and legacy S cards are reviewed together at the milestone gate — the convention the generated CLAUDE.md asks for; the engine does not enforce it. With `tokenSaving.reviewerDiff` on, the main session first runs `task:diff <id>`, which writes
    `.saf/memory/review/<id>.diff` (a git-ignored local file) holding exactly the files `task:verify` counts as the card's
    — a lane card is read and written in its worktree — and prints its path; the reviewer gets the card id, the review
    types the card needs (`text` · `data` · `security` · `refactor`) and that path (with the setting off: the id and the

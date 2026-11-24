@@ -27,7 +27,7 @@ const line = (text, start) => {
 const sentences = (text) => text.split(/\.\s+|\n|\|/).map((s) => s.trim()).filter(Boolean);
 /** What a sentence about legacy cards may say about S; nothing else may name size S. */
 const OLD_S = { en: /size S\b|\bS cards?\b|size-S|S ≤|S \/ M|<S\|M>/, th: /การ์ด(ขนาด)? S|ขนาด S|S ≤|S \/ M/ };
-const LEGACY = { en: /legacy|retired|old /i, th: /เดิม|เก่า/ };
+const LEGACY = { en: /legacy|retired|\bold\b/i, th: /การ์ด S เดิม|การ์ด S เก่า/ };
 const stray = (text, lang) => sentences(text).filter((s) => OLD_S[lang].test(s) && !LEGACY[lang].test(s));
 const noDigitCaps = (text) => assert.ok(![SIZE_CAPS.M.code, SIZE_CAPS.L.code, SIZE_CAPS.M.test, SIZE_CAPS.L.test].some((n) => new RegExp(`\\b${n}\\b`).test(text)), "no cap number copied from the table");
 
@@ -51,7 +51,7 @@ test("SIZE-AC-10 size-caps names M and L cards, the warning, the failure above t
   assert.match(e.en.cost, /same for every rigor/);
   assert.ok(!/S and M|not a failure/.test(Object.values(e.en).join(" ")), "the old S and M / not-a-failure wording is gone");
   assert.match(e.th.what, /การ์ด M และ L/);
-  assert.match(e.th.what, /เตือนเมื่อเกินเพดาน และตกเมื่อเกินสองเท่า/);
+  assert.match(e.th.what, /เตือนเมื่อเกินเพดาน และล้มเมื่อเกินสองเท่า/);
   assert.match(e.th.cost, /ทุก rigor/);
   assert.ok(!/การ์ด S และ M|ไม่ใช่การล้มเหลว/.test(Object.values(e.th).join(" ")), "th: the old wording is gone");
 });
@@ -62,8 +62,12 @@ test("SIZE-AC-10 the rigor options promise no larger or smaller cards, and the r
     assert.ok(!/larger|smaller|bigger/i.test(e.en.what), `${value} en: ${e.en.what}`);
     assert.ok(!/ใหญ่ขึ้น|เล็กลง/.test(e.th.what), `${value} th: ${e.th.what}`);
   }
-  assert.match(entry("project-rigor", "light").en.what, /spec review for M and L cards \(legacy S cards in one batch at the gate\)/);
-  assert.match(entry("project-rigor", "light").th.what, /การ์ดขนาด M และ L \(การ์ด S เดิมตรวจรวมที่ gate\)/);
+  const light = entry("project-rigor", "light");
+  assert.match(light.en.what, /spec review for every new M and L card \(legacy S cards in one batch at the gate\)/);
+  assert.match(light.th.what, /การ์ด M และ L ใหม่ทุกใบ \(การ์ด S เดิมตรวจรวมที่ gate\)/);
+  assert.equal(light.en.cost, "Fewer checks at merge, so mistakes are found later and cost more to fix.");
+  assert.equal(light.th.cost, "เช็กตอน merge น้อยลง จึงเจอข้อผิดพลาดช้าและแก้แพงกว่า");
+  for (const f of FIELDS) for (const lang of ["en", "th"]) assert.ok(light[lang][f].length <= FIELD_MAX && !/\d/.test(light[lang][f]), `light ${lang}.${f}`);
   assert.match(entry("project-rigor", "strict").en.what, /^The tightest defaults: a spec review on every card/);
 });
 
@@ -113,6 +117,7 @@ test("SIZE-AC-10 the setup skill: the rigor table has no size columns, the sizes
   const q = read("kit", "claude", "skills", "saf-setup", "questions.md");
   const tableHead = line(q, "| Rigor |");
   assert.ok(!/size|caps/i.test(tableHead), `no size columns: ${tableHead}`);
+  assert.ok(line(q, "| light |").includes("| spec review for every new M and L card (legacy S cards together at the milestone gate) |"), "the light row: every new card is reviewed");
   assert.match(flat(q), /Card size caps come from the size table .*?the same for every rigor/);
   const row = line(q, "| Override card size caps?");
   const cells = row.split("|").slice(1, -1).map((c) => c.trim());
@@ -142,6 +147,7 @@ test("SIZE-AC-11 the lifecycle loop names the size shown at start, the warning, 
   const step = (n, next) => flat(loop.slice(loop.indexOf(`\n${n}. `), loop.indexOf(`\n${next}. `)));
   const two = step(2, 3);
   assert.match(two, /· size <M\|L> · models\.effort <mode>/);
+  assert.match(two, /records the agent, effort, mode and source in the evidence \(`started\.effort`; the size is printed, not stored\)/);
   assert.match(two, /a card that says `S` \(legacy\) or has no size is counted as M/);
   const four = step(4, 5);
   assert.match(four, /caps of the card's size \(`workflow\.sizes`, `workflow\.testCaps`; `SIZE_CAPS` in `lib\/config\.mjs`, the same for every rigor\)/);
@@ -151,7 +157,7 @@ test("SIZE-AC-11 the lifecycle loop names the size shown at start, the warning, 
   assert.ok(!/never a failure/.test(four), "the old 'never a failure' is gone");
   noDigitCaps(four);
   const five = step(5, 6);
-  assert.match(five, /every card at standard\/strict rigor, M and L cards at light rigor \(legacy S cards together at the milestone gate\)/);
+  assert.match(five, /every card at standard\/strict rigor; at light rigor every new M and L card too, and legacy S cards are reviewed together at the milestone gate — the convention the generated CLAUDE\.md asks for; the engine does not enforce it/);
 });
 
 test("SIZE-AC-11 the card format example says size: M with a comment that points to SIZE_CAPS and copies no number", () => {
@@ -184,7 +190,7 @@ test("SIZE-AC-11 config-reference: rigor row without sizes, the sizes row ({ M, 
   const sizes = line(cr, "| `sizes` · `testCaps`");
   for (const t of ["`{ \"M\": <lines>, \"L\": <lines> }`", "`SIZE_CAPS` in `lib/config.mjs`", "the same for every rigor", "warns above a cap", "fails above twice it", "`{ \"S\", \"M\" }`", "ignored with a warning"]) assert.ok(sizes.includes(t), t);
   noDigitCaps(sizes);
-  assert.match(line(cr, "| `review`"), /m-cards \(M and L cards each; legacy S cards together at the milestone gate\)/);
+  assert.match(line(cr, "| `review`"), /m-cards \(every new M and L card; legacy S cards together at the milestone gate, as the generated CLAUDE\.md asks — the engine does not enforce it\)/);
   assert.match(line(cr, "| `effort`"), /the effort of size M and size L cards/);
   assert.match(line(cr, "| `effort`"), /M cards at a lower effort may bounce more in review/);
 });
