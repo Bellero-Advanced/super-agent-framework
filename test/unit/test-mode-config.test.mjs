@@ -19,7 +19,7 @@ const project = (repo = {}, local) => {
 test("tables: modes, default, local keys, full-suite keys and the schema enum agree", () => {
   assert.deepEqual(TEST_MODES, ["every-card", "targeted", "milestone"]);
   assert.equal(DEFAULT_TEST_MODE, "milestone");
-  assert.deepEqual(LOCAL_KEYS, ["workflow.testMode", "workflow.lanes.code", "workflow.sideLanes.max"]);
+  assert.deepEqual(LOCAL_KEYS, ["workflow.testMode", "workflow.lanes.code", "workflow.sideLanes.max", "models.effort"]);
   assert.deepEqual(FULL_SUITE_KEYS, ["test", "e2e"]);
   assert.equal(TEST_MODE_ENV, "SAF_TEST_MODE");
   assert.equal(LOCAL_CONFIG_FILE, "saf.config.local.json");

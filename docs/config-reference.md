@@ -40,6 +40,7 @@ See [model-presets.md](model-presets.md).
 | `planner` · `builder` | from the preset | full model ids; a non-empty value replaces the preset's model for every preset, and `custom` has no models of its own |
 | `sessionDefault` | the builder model | the model the generated CLAUDE.md tells a session opened without `--model` to start with; nothing enforces it |
 | `overrides` | {} | per role, `{ "<role>": { "model": …, "effort": … } }` — e.g. `{"qa-runner": {"effort": "low"}}`; not asked by the interview |
+| `effort` | `fixed` | `fixed` · `by-size`: with `by-size` small cards use a lower effort for the roles the effort table lists; a person can override it, see [`saf.config.local.json`](#safconfiglocaljson); not asked by the interview yet |
 
 ## roles
 
@@ -86,7 +87,7 @@ See [roles.md](roles.md).
 ## `saf.config.local.json`
 
 An optional file in the project root, **not tracked by git** (the installer adds it to `.gitignore`), for choices that belong
-to one machine. It may hold three keys: `workflow.testMode`, `workflow.lanes.code` and `workflow.sideLanes.max`:
+to one machine. It may hold four keys: `workflow.testMode`, `workflow.lanes.code`, `workflow.sideLanes.max` and `models.effort`:
 
 ```json
 { "workflow": { "testMode": "every-card", "lanes": { "code": 8 }, "sideLanes": { "max": 2 } } }

@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, posix } from "node:path";
-import { roleTable } from "./config.mjs";
+import { EFFORTS, ROLE_LIBRARY, roleTable } from "./config.mjs";
 import { globToRegExp } from "./glob.mjs";
 import { codeSpans, extractLinks, frontmatter, localTarget, proseLines, shellCommands } from "./markdown.mjs";
 import { parseYaml } from "./yaml.mjs";
@@ -15,6 +15,8 @@ import { parseYaml } from "./yaml.mjs";
  *   4. .claude/rules/*.md have a readable `paths:` list (matching no file yet = warning)
  *   5. agents: one per enabled role · name = file name · full model id equal to saf.config.json · valid effort ·
  *      read-only roles list only read tools
+ *      variant files `<role>-<effort>.md` (docs/specs/effort-by-size.md rule 9): effort = the suffix · name = file name ·
+ *      a variant of a library role that is not enabled is an error
  *   6. tracked Claude Code settings: valid JSON · no `env` block · no ANTHROPIC_ values
  *   7. CLAUDE.md shows `claude --model <id>` for every model the agents use
  */
@@ -26,8 +28,8 @@ export const LINE_LIMITS = [
   [/(^|\/)CLAUDE\.md$/, 200],
 ];
 const AGENT_DIRS = [".claude/rules/", ".claude/agents/", ".claude/commands/"];
+const VARIANT_FILE = new RegExp(`^\\.claude/agents/(.+)-(${EFFORTS.join("|")})\\.md$`);
 const READ_TOOLS = new Set(["Read", "Grep", "Glob"]);
-const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
 export const FULL_MODEL_ID = /^claude-[a-z]+(?:-\d+)+$/;
 const SETTINGS_FILE = /(^|\/)\.claude\/settings(\.[\w-]+)?\.json$/;
 const PM_BUILTINS = new Set(["install", "i", "ci", "add", "remove", "rm", "uninstall", "exec", "dlx", "create", "init", "update", "up", "upgrade", "outdated", "why", "list", "ls", "store", "publish", "pack", "link", "unlink", "rebuild", "audit", "config", "env", "help", "import", "prune", "patch", "setup", "x", "npx", "info", "view", "version", "-v", "--version", "set", "workspace", "workspaces"]);
@@ -169,6 +171,27 @@ export function runDocsCheck(input) {
       const tools = typeof data.tools === "string" ? data.tools.split(",").map((t) => t.trim()).filter(Boolean) : [];
       if (!tools.length || tools.some((t) => !READ_TOOLS.has(t))) issues.push({ file, message: `read-only role must list only ${[...READ_TOOLS].join(", ")} in tools:` });
     }
+  }
+
+  const enabledNames = new Set(roles.map((r) => r.name));
+  for (const file of input.files) {
+    const m = file.match(VARIANT_FILE);
+    if (!m || enabledNames.has(`${m[1]}-${m[2]}`)) continue;
+    const [, role, effort] = m;
+    if (!enabledNames.has(role)) {
+      if (Object.hasOwn(ROLE_LIBRARY, role)) issues.push({ file, message: `variant agent of "${role}", which is not an enabled role — remove the file or enable the role` });
+      continue;
+    }
+    let data = {};
+    try {
+      const fm = frontmatter(input.read(file));
+      data = fm ? parseYaml(fm.yaml) : {};
+    } catch (e) {
+      issues.push({ file, message: `frontmatter is not readable YAML (${e.message})` });
+      continue;
+    }
+    if (data.name !== `${role}-${effort}`) issues.push({ file, message: `name: must be "${role}-${effort}" (the file name)` });
+    if (data.effort !== effort) issues.push({ file, message: `effort: must be "${effort}" (the file name ends with it)` });
   }
 
   for (const file of input.files.filter((f) => SETTINGS_FILE.test(f))) {

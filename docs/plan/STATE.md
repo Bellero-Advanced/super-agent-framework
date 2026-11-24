@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 20/34
+## M3 SAF builds itself — cards done 21/34
 
-- In progress: **T-M3-03** models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — started 2026-11-24 17:08 · not verified yet · lane 1 · .claude/worktrees/T-M3-03
-- Next: no card can start yet — T-M3-04 waits for T-M3-03 · T-M3-05 waits for T-M3-03 · T-M3-06 waits for T-M3-04, T-M3-05 · T-M3-07 waits for T-M3-04 · T-M3-08 waits for T-M3-06, T-M3-07 · T-M3-09 waits for T-M3-08 · T-M3-10 waits for T-M3-09 · T-M3-11 waits for T-M3-09 · T-M3-12 waits for T-M3-10, T-M3-11 · T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
+- In progress: none
+- Next: T-M3-04 task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort · T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -29,7 +29,7 @@
 | [T-M3-23](tasks/M3/T-M3-23.md) | The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list | ✓ passed | [T-M3-23.json](evidence/T-M3-23.json) · passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate |
 | [T-M3-24](tasks/M3/T-M3-24.md) | Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt) | ✓ passed | [T-M3-24.json](evidence/T-M3-24.json) · passed 2026-11-24 17:06 (5 commands) · full suite deferred to gate |
 | [T-M3-25](tasks/M3/T-M3-25.md) | Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested | ✓ passed | [T-M3-25.json](evidence/T-M3-25.json) · passed 2026-11-24 17:02 (5 commands) · full suite deferred to gate |
-| [T-M3-03](tasks/M3/T-M3-03.md) | models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check | ▶ in progress | [T-M3-03.json](evidence/T-M3-03.json) · started 2026-11-24 17:08 · not verified yet |
+| [T-M3-03](tasks/M3/T-M3-03.md) | models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check | ✓ passed | [T-M3-03.json](evidence/T-M3-03.json) · passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate |
 | [T-M3-04](tasks/M3/T-M3-04.md) | task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort | · not started | – |
 | [T-M3-05](tasks/M3/T-M3-05.md) | /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code | · not started | – |
 | [T-M3-06](tasks/M3/T-M3-06.md) | SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer | · not started | – |
@@ -57,7 +57,7 @@
 
 ## Latest evidence
 
-- T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — started 2026-11-24 17:08 · not verified yet
+- T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate
 - T-M3-24 Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt) — passed 2026-11-24 17:06 (5 commands) · full suite deferred to gate
 - T-M3-25 Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested — passed 2026-11-24 17:02 (5 commands) · full suite deferred to gate
 - T-M3-19 STATE.md, the plan mirror, the report and the HTML page give every exit gate the same result word, and broken evidence never crashes them — passed 2026-11-24 16:55 (5 commands) · full suite deferred to gate

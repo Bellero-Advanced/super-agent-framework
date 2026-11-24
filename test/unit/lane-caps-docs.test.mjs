@@ -48,7 +48,7 @@ test("LCAP-AC-06 the lanes and side-lanes explanations name the worktree, the in
   for (const [q, v] of [["lanes", "on-custom"], ["side-lanes", "on"], ["side-lanes", "on-more"]]) assert.ok(words(entry(q, v), "th").includes(LOCAL_CONFIG_FILE), `${q} ${v}: th file`);
 });
 
-test("LCAP-AC-06 rule 12 file by file: the three local keys, LANE_CEILING, no environment variable for caps and why the main lane stays one", () => {
+test("LCAP-AC-06 rule 12 file by file: every LOCAL_KEYS key, LANE_CEILING, no environment variable for caps and why the main lane stays one", () => {
   for (const f of DOCS) {
     const text = read(f);
     for (const k of LOCAL_KEYS) assert.ok(text.includes(k), `${f}: names ${k}`);

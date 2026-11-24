@@ -120,7 +120,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-23 The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list — passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate
 - [x] T-M3-24 Tests pin the setup and upgrade behaviour the M2 reviews found untested (BOM, settings roots, real updates, diff properties, keep with adopt) — passed 2026-11-24 17:06 (5 commands) · full suite deferred to gate
 - [x] T-M3-25 Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested — passed 2026-11-24 17:02 (5 commands) · full suite deferred to gate
-- [ ] T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — started 2026-11-24 17:08 · not verified yet · lane 1 · .claude/worktrees/T-M3-03
+- [x] T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate
 - [ ] T-M3-04 task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort
 - [ ] T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code
 - [ ] T-M3-06 SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer

@@ -63,6 +63,7 @@
         "planner": { "$ref": "#/$defs/modelIdOrEmpty" },
         "builder": { "$ref": "#/$defs/modelIdOrEmpty" },
         "sessionDefault": { "$ref": "#/$defs/modelIdOrEmpty" },
+        "effort": { "enum": ["fixed", "by-size"] },
         "overrides": {
           "type": "object",
           "additionalProperties": {

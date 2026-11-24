@@ -1,14 +1,319 @@
 {
   "id": "T-M3-03",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T17:08:21.267Z",
     "base": "2779c314424821af72d59dbc41d19c4946b4248e",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 7,
   "lane": 1,
   "branch": "card/T-M3-03",
-  "worktree": ".claude/worktrees/T-M3-03"
+  "worktree": ".claude/worktrees/T-M3-03",
+  "verified": {
+    "at": "2026-11-24T17:23:09.382Z",
+    "head": "524d0e36c1ab7026ff214d184123d97192f3d942",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 373,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 150 · gaps 24 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/effort-by-size.test.mjs test/unit/setup-choices.test.mjs test/unit/config.test.mjs test/unit/generate.test.mjs",
+        "exit": 0,
+        "ms": 2582,
+        "tail": [
+          "ok 37 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 0.849458",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 38 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 1.087667",
+          "  type: 'test'",
+          "  ...",
+          "1..38",
+          "# tests 38",
+          "# suites 0",
+          "# pass 38",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2532.091125"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/test-mode-config.test.mjs test/unit/lane-caps-docs.test.mjs",
+        "exit": 0,
+        "ms": 248,
+        "tail": [
+          "ok 10 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "  ---",
+          "  duration_ms: 72.694167",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 11 - this repo pins targeted with a testFiles command and ignores the local file",
+          "  ---",
+          "  duration_ms: 0.2655",
+          "  type: 'test'",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 194.225125"
+        ]
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 259,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=JSON.parse(require('fs').readFileSync('kit/tools-saf/schema/saf.config.schema.json','utf8'));if(!s.properties.models.properties.effort)process.exit(1)\"",
+        "exit": 0,
+        "ms": 43,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 287,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 273 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 345,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 597 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/effort-by-size.test.mjs' 'test/unit/lane-caps-docs.test.mjs' 'test/unit/test-mode-config.test.mjs'",
+        "exit": 0,
+        "ms": 432,
+        "tail": [
+          "ok 16 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "  ---",
+          "  duration_ms: 70.718584",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 17 - this repo pins targeted with a testFiles command and ignores the local file",
+          "  ---",
+          "  duration_ms: 0.259416",
+          "  type: 'test'",
+          "  ...",
+          "1..17",
+          "# tests 17",
+          "# suites 0",
+          "# pass 17",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 380.648458"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/card-lifecycle.md",
+        "docs/config-reference.md",
+        "docs/plan/README.md",
+        "docs/specs/effort-by-size.md",
+        "kit/claude/skills/saf-setup/SKILL.md",
+        "kit/claude/skills/saf-setup/questions.md",
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/docs.mjs",
+        "kit/tools-saf/lib/effort.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/schema/saf.config.schema.json",
+        "kit/tools-saf/templates/en/docs/plan/README.md",
+        "kit/tools-saf/templates/th/docs/plan/README.md",
+        "test/unit/effort-by-size.test.mjs",
+        "test/unit/lane-caps-docs.test.mjs",
+        "test/unit/test-mode-config.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/card-lifecycle.md": "1f5b7f0f03a2ffcecd82a7d28962630e98957d9b",
+        "docs/config-reference.md": "6bc388424b3af434bfbb9fb921ce7ca1442fb074",
+        "docs/plan/README.md": "29918505162d98f568a3daa5362dec38b8817b88",
+        "docs/specs/effort-by-size.md": "e11e405232d6e47e03605b5bc12d438eaf37ba73",
+        "kit/claude/skills/saf-setup/SKILL.md": "a562e3b0ca3f9bceda6f89ff5cb1f2e2f950b825",
+        "kit/claude/skills/saf-setup/questions.md": "6063448b8db6c4959d7f7f20e7451c9f1ec6d232",
+        "kit/tools-saf/lib/choices.mjs": "7e1ef3b66fd121a12cd992840cb5962a66b28077",
+        "kit/tools-saf/lib/config.mjs": "6cd087b46a41f7389ae4f8b68f1b5bc8c431c10e",
+        "kit/tools-saf/lib/docs.mjs": "7fa3b661191a478aca24d0454ffc17e371dc2657",
+        "kit/tools-saf/lib/effort.mjs": "61f6729e79aeffa7c804ab7b52e2cdff9929083d",
+        "kit/tools-saf/lib/generate.mjs": "1a24f432e4080bba501af6a7fbf349322389ad5e",
+        "kit/tools-saf/schema/saf.config.schema.json": "1026a75eb1d31f8d094c2e8f556f0351799f339b",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "d75a3111e72cd265acfb3888f71ce6e53f63f09f",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "a457cd7f19c50aa04b051f4bc581e290b68c6a21",
+        "test/unit/effort-by-size.test.mjs": "66422fad0c1c0ae68f94b5dd3513e2c62926c6c7",
+        "test/unit/lane-caps-docs.test.mjs": "e3c4104a27b098226135bc927abf7d647894211d",
+        "test/unit/test-mode-config.test.mjs": "07dae9231efcfbaf5e7d8c38bab62319813d1527"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "EFFORT-AC-01",
+        "EFFORT-AC-02",
+        "EFFORT-AC-03",
+        "EFFORT-AC-04",
+        "EFFORT-AC-05"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 203,
+        "cap": 400
+      },
+      "test": {
+        "lines": 170,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/effort-by-size.test.mjs",
+        "test/unit/lane-caps-docs.test.mjs",
+        "test/unit/test-mode-config.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T17:14:05.034Z",
+      "head": "77fe93388e97d4264bf984d92e83de484c81f9ec",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/effort-by-size.test.mjs test/unit/setup-choices.test.mjs test/unit/config.test.mjs test/unit/generate.test.mjs",
+          "exit": 1,
+          "ms": 2624,
+          "tail": [
+            "  ---",
+            "  duration_ms: 942.138541",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: SETUP-AC-07 config-reference names every schema leaf in the section of its top-level key, and every printed anchor is a lowercase heading anchor",
+            "not ok 34 - SETUP-AC-07 config-reference names every schema leaf in the section of its top-level key, and every printed anchor is a lowercase heading anchor",
+            "  ---",
+            "  duration_ms: 6.623875",
+            "  type: 'test'",
+            "  location: '/Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M3-03/test/unit/setup-choices.test.mjs:237:1'",
+            "  failureType: 'testCodeFailure'",
+            "  error: |-",
+            "    Expected values to be strictly deep-equal:",
+            "    + actual - expected",
+            "    + [",
+            "    +   'models.effort: `effort` not named in backticks'",
+            "    + ]",
+            "    - []",
+            "  code: 'ERR_ASSERTION'",
+            "  name: 'AssertionError'",
+            "  expected:",
+            "  actual:",
+            "    0: 'models.effort: `effort` not named in backticks'",
+            "  operator: 'deepStrictEqual'",
+            "  stack: |-",
+            "    TestContext.<anonymous> (file:///Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M3-03/test/unit/setup-choices.test.mjs:248:10)",
+            "    Test.runInAsyncScope (node:async_hooks:214:14)",
+            "    Test.run (node:internal/test_runner/test:1047:25)",
+            "    Test.processPendingSubtests (node:internal/test_runner/test:744:18)",
+            "    Test.postRun (node:internal/test_runner/test:1173:19)",
+            "    Test.run (node:internal/test_runner/test:1101:12)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: SETUP-AC-07 the printed anchor of a key whose top-level part is camelCase is lowercase",
+            "ok 35 - SETUP-AC-07 the printed anchor of a key whose top-level part is camelCase is lowercase",
+            "  ---",
+            "  duration_ms: 0.425042",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+            "ok 36 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+            "  ---",
+            "  duration_ms: 0.843541",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+            "ok 37 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+            "  ---",
+            "  duration_ms: 1.094958",
+            "  type: 'test'",
+            "  ...",
+            "1..37",
+            "# tests 37",
+            "# suites 0",
+            "# pass 36",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 2567.174375"
+          ]
+        }
+      ]
+    }
+  ]
 }
