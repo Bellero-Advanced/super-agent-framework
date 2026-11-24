@@ -1,6 +1,7 @@
 # Spec — `saf upgrade` adds the engine's new package.json scripts
 
-Decision: [D-010](../DECISIONS.md) (decided). Card: T-M2-18. Found by the spec review of T-M2-09.
+Decision: [D-010](../DECISIONS.md) (decided). Cards: T-M2-18 · T-M3-16 (rules 12–13) · T-M3-21 (rule 14). Found by the spec
+review of T-M2-09.
 
 ## 1. Purpose
 
@@ -33,6 +34,14 @@ the scripts that are missing, and never changes a script the project already has
     see the project's real scripts.
 11. `examples/todo-api/package.json` (this repo's example project) has every script rule 1 wants for its config — a
     unit test guards it, so a new `ENGINE_SCRIPTS` key cannot ship without refreshing the example.
+12. A `scripts` value that is present but not a JSON object (a string, an array, a number, `null`) is never replaced:
+    `package.json` stays unchanged and setup and `upgrade` warn that `scripts` is not a JSON object and the SAF scripts
+    were not added. A missing `scripts` key is still created as an object when a script is added.
+13. The warnings of rule 9 and rule 12 say what is wrong: "is not valid JSON" only for a parse failure, "is not a JSON
+    object" for a valid root that is not an object, "`scripts` is not a JSON object" for rule 12. `mergeScriptsText`
+    returns the reason with `invalid: true`, so setup (`planPackageJson`) and `upgrade()` print the same words.
+14. A `package.json` with no indented line (minified, one line) stays minified when a script is added: no new line
+    breaks or indentation are introduced (rule 6 has no indentation to keep there).
 
 ## 3. Data
 
@@ -44,7 +53,10 @@ the scripts that are missing, and never changes a script the project already has
 
 - A project that removed a SAF script on purpose gets it back on the next upgrade — expected; a project that wants a
   different command keeps its own value under the same key (rule 3)
-- `scripts` missing or not an object in `package.json` → treated as empty and created as an object when a key is added
+- `scripts` missing in `package.json` → created as an object when a key is added; present but not an object → rule 12
+- A project that ran `init` without answers has a stub `saf.config.json` that passes validation, and `packageManager`
+  defaults to `npm`, so `upgrade` adds the SAF scripts before setup ever ran — harmless: setup later finds them present
+  and keeps them (rule 3)
 - Upgrade inside a lane worktree is not special: the same rules apply to that folder's `package.json`
 
 ## 5. Acceptance
@@ -57,6 +69,8 @@ the scripts that are missing, and never changes a script the project already has
 | UPG-AC-04 | a `package.json` indented with 4 spaces (and one with a tab) lacking `task:culprit` | `upgrade` | the added file keeps that indentation and ends with a newline | unit |
 | UPG-AC-05 | `packageManager: "none"`, or no `package.json`, or `package.json` that is not valid JSON | `upgrade` | `package.json` is unchanged or still absent; the no-file and invalid-JSON cases print a line about the scripts | unit |
 | UPG-AC-06 | this repo | the unit suite runs | `examples/todo-api/package.json` has every script rule 1 wants for `examples/todo-api/saf.config.json` | unit |
+| UPG-AC-07 | `package.json` holding `[]`; then `{ "scripts": "build.sh" }`; then `{ nope` | `upgrade`; `setup --dry-run` | every file byte-identical; the warnings say "is not a JSON object", "`scripts` is not a JSON object" and "is not valid JSON" respectively, the same words in setup and `upgrade`; `mergeScriptsText` returns `invalid: true` with the reason | unit |
+| UPG-AC-08 | a one-line minified `package.json` lacking `task:culprit` | `upgrade` | `task:culprit` is added and the file is still one line (plus its trailing newline if it had one) | unit |
 
 ## 6. Out of scope
 

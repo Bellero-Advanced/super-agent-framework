@@ -1,6 +1,6 @@
 # Spec — document languages (add one with a template folder and a text-table entry)
 
-Decision: [D-014](../DECISIONS.md) (decided). Card: T-M2-01.
+Decision: [D-014](../DECISIONS.md) (decided). Cards: T-M2-01 · T-M3-23 (rule 12).
 
 ## 1. Purpose
 
@@ -40,6 +40,9 @@ cover the new language without new text. No third language ships with this spec.
     reader review the text before it ships.
 11. The option column of the three language questions in the setup skill's `questions.md` names the source (the
     languages `choices` lists) instead of a fixed list.
+12. `docs/config-reference.md` does not list the document, chat and report languages by hand: the `docLanguage` ·
+    `chatLanguage` and `reportLanguage` rows name the source (the keys of `TEXT` in `text.mjs`, the same values as the
+    schema enums), and the "Add a document language" steps of `CONTRIBUTING.md` are linked from there.
 
 ## 3. Data
 
@@ -61,6 +64,7 @@ cover the new language without new text. No third language ships with this spec.
 | LANG-AC-03 | the same copy | `choices --group 1 --lang en` and `--group 5 --lang en` | `xx` is listed in the chat- and document-language entries and in the report-language entry for other languages | unit |
 | LANG-AC-04 | the shipped engine | setup with `en`, then `th` | no fallback warning; the session table and language names are as before; `generate.mjs` has no `LANG_NAME` and no comparison with `"th"` | unit |
 | LANG-AC-05 | `CONTRIBUTING.md` | the docs test runs | it has the "Add a document language" section with the four steps and the native-reader review | unit |
+| LANG-AC-06 | `docs/config-reference.md` | the docs test runs | the language rows contain no hand-made list such as "`en` or `th`" and name `text.mjs` as the source | unit |
 
 ## 6. Out of scope
 

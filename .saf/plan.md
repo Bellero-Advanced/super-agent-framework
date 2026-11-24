@@ -82,7 +82,11 @@ order 2026-11-24) a setup interview that explains every option and shows every s
   12/2 · 12/4); it waits for T-M2-26 (`choices.mjs`) and shares no `touch` file with T-M2-27. T-M2-29 (triage notes
   21/2 and 18/5, [spec rules 15 and 23](../../specs/setup-rerun.md#2-rules)) refuses a `--keep` the CLI cannot read
   (`--keep=<path>`, an empty list) and makes `saf upgrade` stop with one error line before writing anything when
-  `saf.config.json` is not valid JSON; it runs after T-M2-27 and T-M2-28 (`generate.mjs`, the last merged cards). The
+  `saf.config.json` is not valid JSON; it runs after T-M2-27 and T-M2-28 (`generate.mjs`, the last merged cards). T-M2-30
+  (owner order 2026-11-24, review note 27/N2, [spec rules 24–27](../../specs/setup-rerun.md#env-blocks-that-cannot-be-merged-plansettings-in-generatemjs))
+  stops `planSettings` from overwriting a local `env` value or spreading a string `env` into index keys: an `env` it
+  cannot merge is archived and nothing moves silently, a colliding key keeps the local value; it runs after T-M2-29
+  (both touch `generate.mjs`). The
   other open review notes are triaged in [M2-review-notes.md](../notes/M2-review-notes.md#triage-for-the-m2-exit-gate)
   and carried to [M3](M3.md#carried-to-m3)
 - Every new card that changes `kit/` runs `npm run saf:refresh` and the example upgrade, then restores
@@ -121,6 +125,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate
 - [x] T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units — passed 2026-11-24 06:19 (7 commands) · full suite deferred to gate
 - [ ] T-M2-29 setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything
+- [ ] T-M2-30 Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the

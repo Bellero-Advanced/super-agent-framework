@@ -1,6 +1,7 @@
 # Spec — test mode (when the full test suite runs)
 
-Decision: [D-008](../DECISIONS.md) (decided). Cards: T-M2-06 … T-M2-10, T-M2-16, T-M2-17.
+Decision: [D-008](../DECISIONS.md) (decided). Cards: T-M2-06 … T-M2-10, T-M2-16, T-M2-17 · T-M3-18 (rules 22, 24–26,
+31–33) · T-M3-20 (rule 13, fallback reason).
 
 ## 1. Purpose
 
@@ -44,8 +45,9 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 12. When a full-suite command is **deferred**, verify does not run it; the card's other criteria run as written, and
     one targeted run replaces all deferred commands.
 13. If a targeted run is impossible (no `testFiles` command, or no targeted files), nothing is deferred: the full-suite
-    commands run at verify and the evidence records why (`fallback`). A card never passes without a real test run
-    when its "Done when" names one.
+    commands run at verify and the evidence records why (`fallback`), naming the real cause: no `testFiles` command ·
+    a `testFiles` command without the `{files}` placeholder · no targeted test files. A card never passes without a
+    real test run when its "Done when" names one.
 14. A card whose "Done when" names no full-suite command runs exactly as written in every mode.
 15. Per mode:
 
@@ -89,19 +91,33 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 
 ### Finding the card that broke the suite (`task:culprit <M>`)
 
-22. The range is the first-parent commits from the oldest `started.base` of the milestone's cards (an ancestor of
-    HEAD) to HEAD. Only committed history is tested; uncommitted changes in the main folder are reported and ignored.
+22. The range is the first-parent commits from the base to HEAD. The base is, among the `started.base` commits of the
+    milestone's cards that are ancestors of HEAD, the one with the most first-parent commits up to HEAD (a base
+    reached only through a merged lane branch counts by the first-parent commits after it, so the search never starts
+    inside a lane branch). Only committed history is tested; uncommitted changes in the main folder are reported and
+    ignored.
 23. The command is the first full-suite command (`--cmd "<command>"` overrides).
 24. Every run happens in a temporary detached git worktree under `workflow.worktreeDir`; the main folder is never
     checked out or changed. `workflow.laneInstall` runs in the worktree before each run when it is set. The worktree
-    is removed when the command ends, also on error.
+    is removed when the command ends, also on error and when the person interrupts it (Ctrl-C / `SIGINT`, `SIGTERM`):
+    the running test command is stopped, the worktree is removed, and the command exits with 130 (`SIGINT`) or 143
+    (`SIGTERM`) after one line saying it was interrupted.
 25. Order: run at HEAD — passes → exit 3 ("passes at HEAD — flaky or already fixed"); run at the base — fails → exit 2
     ("already failing before the first card"); otherwise binary search for the first failing commit. At most
     2 + ⌈log2(commits)⌉ runs.
 26. The failing commit maps to a card: a card id of the milestone in the commit subject (lane merges are
     `merge(M<n>): <id> …`), else the card whose evidence `files.changed` overlaps the commit's files most, else
-    "no card". Output: card id and title, commit and subject, the tail of the failing run. Exit 0 when a commit was found.
+    "no card". Ties: a subject that names several cards of the milestone → the first of them in the milestone's card
+    order; equal file overlap → the earlier card in the milestone's card order. Output: card id and title, commit and
+    subject, the last `RUN_LIMITS.culpritTail` lines of the failing run (`run.mjs`). Exit 0 when a commit was found.
 27. `task:culprit` writes nothing in `docs/plan/`.
+31. While a run is going, its output is streamed to the terminal as it comes (secrets redacted like every captured
+    run), each run headed by its `▶ run <n>` line, so a long search never looks stuck.
+32. `task:culprit <M>` refuses a plan with problems the way `task:start` and `task:verify` do (the same error and
+    exit code) and an id that is not a milestone id of the form `M<n>` with a usage error, before any worktree is
+    made. Card ids are matched in commit subjects as literal text, never as a pattern.
+33. The output words of rule 25 are exactly: "passes at HEAD — flaky or already fixed" (exit 3) and "already failing
+    before the first card — not caused by a card" (exit 2).
 
 ## 3. Data
 
@@ -147,6 +163,10 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 | TMODE-AC-14 | `milestone` mode, `test` and `e2e` commands set, the only declared gate runs `npm test`; then gates that run both | `task:verify <M>` | an extra `full-suite` gate runs only the e2e command (`npm test` runs once); then no extra gate | unit |
 | TMODE-AC-15 | a milestone file declares a gate with id `full-suite` | `task:state --check`; `task:verify <M>` | a plan problem naming `full-suite` and the file; verify refuses before running any gate | unit |
 | TMODE-AC-16 | milestone evidence with a failed `full-suite` gate and a passed gate that is not in the milestone file, doc language en and th | STATE.md, `.saf/plan.md` and `task:report <M>` are written | each shows a `full-suite` row marked failed with the text-table text in that language, and the other row with the "not in the milestone file" text; with no milestone evidence only the declared gates show | unit |
+| TMODE-AC-17 | a culprit search whose test command sleeps; the command started as a child process | `SIGINT` is sent during a run (then `SIGTERM`) | exit 130 (143); one "interrupted" line; no `culprit-*` folder under `workflow.worktreeDir` and `git worktree list` shows only the main folder; the main folder is unchanged | unit |
+| TMODE-AC-18 | a milestone whose plan has a problem; the id `x(`; a card id with a regex character in a fixture; a commit whose subject names two cards; two cards with equal file overlap; a card that started on a lane branch merged later | `task:culprit` / `findCulprit` | plan problem → the `requireValid` error before any worktree; `x(` → usage error, exit 2; the literal id matches only itself; the first card in milestone order wins both ties; the base chosen is the one rule 22 names | unit |
+| TMODE-AC-19 | a four-commit fixture where the third breaks the suite and the failing command prints more lines than `RUN_LIMITS.culpritTail`; `onOutput` captured | `findCulprit` with an output callback; `culpritLines` for each kind | output arrives through the callback before each run ends (at least one chunk per run); the tail has exactly `RUN_LIMITS.culpritTail` lines; the exit-2 and exit-3 lines equal rule 33's words | unit |
+| TMODE-AC-20 | `milestone` mode with `stack.commands.testFiles` missing; then set without `{files}`; then set but the card changed no test file | `task:verify` | each evidence `targeted.fallback` names its own cause (no command · no `{files}` placeholder · no targeted files) and the full suite ran | unit |
 
 ## 6. Out of scope
 

@@ -1,6 +1,7 @@
 # Spec — setup choices (what each option means, and every setting the interview does not ask)
 
-Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15, T-M2-19, T-M2-28. Builds on the test-mode questions that
+Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15, T-M2-19, T-M2-28 · T-M3-20 (rules 15, 26) ·
+T-M3-22 (rule 27) · T-M3-23 (rule 16). Builds on the test-mode questions that
 T-M2-10 adds to the interview.
 
 ## 1. Purpose
@@ -71,14 +72,18 @@ the CLI and the tests all read the same words.
 14. Without `--lang` the language is `people.chatLanguage` of `saf.config.json` when the file exists and holds a valid
     value, else `en`. The command works before setup has written a full config and never writes a file.
 15. An unknown group, an unknown language, or neither `--group` nor `--not-asked` → exit 2 with a usage line that lists
-    the valid values. Success → exit 0.
+    the valid values. So does any argument the command does not define: an unknown flag (`--foo`, the `=` form
+    `--lang=th`), a stray word (`choices foo --group 2`), a flag given twice, or `--group` and `--not-asked` together.
+    Success → exit 0.
 
 ### The interview (`kit/claude/skills/saf-setup/`)
 
 16. Groups, their order and the "(recommended)" marker stay as `questions.md` defines them. Before asking a group the
     skill runs `choices --group <g> --lang <chat language>` and shows each question's options as a compact table
     (option · what it is · good for · cost · pick it when); the AskUserQuestion option descriptions carry the "pick it
-    when" line. The skill shows the text as printed — it does not rewrite or shorten it.
+    when" line. The skill shows the text as printed — it does not rewrite or shorten it. The chat-language question comes before
+    the language is known: the skill asks it first, shows its options' table with `--lang en`, and does not show that
+    table again when group 1's output is printed in the chosen language afterwards.
 17. Questions the skill skips because detection made the answer certain still show what was detected; their
     explanations are offered only when the person asks.
 18. The confirm step (Step 2) shows the summary of the answers, then the output of `choices --not-asked`, and asks once:
@@ -107,6 +112,15 @@ the CLI and the tests all read the same words.
     `owner-order` → never push without the owner's order; `allowed` → pushing is allowed. Force-push and history
     rewrite stay forbidden in both. The `push` explanations in `CHOICES` describe what the generated files say, so no
     explanation says the release-operator file forbids a push that the chosen option allows.
+26. `node tools/saf/bin/saf.mjs config --check` takes exactly that one flag; any other argument → exit 2 with its usage
+    line. A `saf.config.json` that is not valid JSON, or whose root is not an object, → one error line naming the file,
+    exit 1, no stack trace.
+27. The generated release-operator file follows `policies.deploy` as well as `policies.push` (rule 23), so it never
+    contradicts `CLAUDE.md`: with `deploy: allowed` neither its description nor its "Before anything live" steps ask for
+    an owner order (step 1 checks the change against the deploy target and exceptions instead); with `deploy:
+    owner-order` both still do. With `push: allowed` and `autoDeployBranches` set, one sentence says pushing is allowed
+    except to those branches, which deploy automatically and count as a release — the CLAUDE.md git line says the same in
+    the same order. With `push: allowed` and `protectedBranches` set, the push rule names the protected branches.
 
 ### Explanations match the code
 
@@ -141,7 +155,9 @@ the CLI and the tests all read the same words.
 - a new schema key without a home in `QUESTIONS`, `NOT_ASKED` or `INTERNAL_KEYS` → the coverage test fails and names it
 - a new enum value (a new test mode, project type, pack) without an explanation → the data test fails and names the
   question and the value
-- `saf.config.json` missing or invalid when `choices` runs → language `en`, no error (setup has not run yet)
+- `saf.config.json` missing or not valid JSON when `choices` runs → language `en`, no error (setup has not run yet).
+  Valid JSON that breaks the schema in other keys still gives its `people.chatLanguage` when that one value is a
+  language `choices` supports (rule 14 reads only that value)
 - Thai text is longer per character count than English → `FIELD_MAX` applies per language to the same limit; the
   data test reports the field that is too long
 - a re-run of `/saf-setup` → the same explanations and the same not-asked list (rule 13 prints keys and summaries,
@@ -162,6 +178,10 @@ the CLI and the tests all read the same words.
 | SETUP-AC-09 | `SKILL.md` and `questions.md` | the docs test runs | Step 1 asks the adopt question when `detect` reports an existing project; Step 3 names both `--adopt` (for "yes") and `--no-adopt` (for "no" or a skipped question); `questions.md` gives the adopt question a recommended default outside the Key-column tables | unit |
 | SETUP-AC-10 | a config with `policies.push: "owner-order"`, then `"allowed"`, with the release-operator role enabled | `generate` renders the agent files | owner-order: `.claude/agents/release-operator.md` forbids pushing without the owner's order; allowed: it says pushing is allowed and contains no "Never push"; both forbid force-push; the en and th `push: allowed` explanations no longer say the file forbids pushing | unit |
 | SETUP-AC-11 | configs rendered by `generate`: `api` with and without `i18nRequired`; `library-cli` with `i18nRequired`; preset `balanced` with `models.planner` set; a custom role with tier `planner`; `models.overrides` for one role; rigor `strict` without the security-auditor role | the facts test reads the rules, the role table and the generated CLAUDE.md, then the en and th explanations | the UI rule is present exactly when the type has one or i18n is required; the set planner id is used under `balanced`, the custom planner role gets it, the override wins; the strict CLAUDE.md names a security-auditor review; the `api`, `several`, `custom-models` and `strict` explanations (en and th) name these effects; `choices --group 2` shows the rigor review as words and the size unit | unit |
+| SETUP-AC-12 | the CLI | `choices --group 2 --foo`; `choices --lang=th --not-asked`; `choices foo --group 2`; `choices --group 2 --group 3`; `choices --group 2 --not-asked`; `config --check --foo`; `config`; `config --check` with `{ nope` then `[]` | the `choices` and bare/extra-flag `config` calls exit 2 with the usage line and print no explanation; the broken configs exit 1 with one line naming `saf.config.json` and no stack trace | unit |
+| SETUP-AC-13 | a `saf.config.json` that is valid JSON with `people.chatLanguage: "th"` but fails the schema elsewhere; then one with `chatLanguage: "fr"` | `choices --not-asked` without `--lang` | the first prints the Thai summaries, the second the English ones; both exit 0 | unit |
+| SETUP-AC-14 | configs: `deploy: allowed`; `deploy: owner-order`; `push: allowed` with `autoDeployBranches: "main"`; `push: allowed` with `protectedBranches: "main"`, each with the release-operator role | `generate` renders the agent file and `CLAUDE.md` | `deploy: allowed` → the agent file has no "owner order" / "owner's order" for live changes in its description or steps; `owner-order` → it has; auto-deploy → one sentence with "allowed" and "except" naming `main`, and the CLAUDE.md git line says the same; protected → the push rule names `main` | unit |
+| SETUP-AC-15 | `kit/claude/skills/saf-setup/SKILL.md` | the docs test runs | the chat-language question is asked first with `choices --group 1 --lang en`, and the skill says not to show that table again in the chosen language | unit |
 
 ## 6. Out of scope
 

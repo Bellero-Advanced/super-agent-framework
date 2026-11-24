@@ -1,6 +1,6 @@
 # Spec — lane caps fit the machine: higher ceilings, set per machine
 
-Decision: [D-018](../DECISIONS.md) (decided, owner order 2026-11-24). Cards: T-M2-25 (engine) · T-M2-26 (explanations and docs).
+Decision: [D-018](../DECISIONS.md) (decided, owner order 2026-11-24). Cards: T-M2-25 (engine) · T-M2-26 (explanations and docs) · T-M3-23 (rule 13).
 Builds on [test-mode.md](test-mode.md) rules 2–7 (the per-machine file `saf.config.local.json`).
 
 ## 1. Purpose
@@ -67,6 +67,9 @@ machine. The main-folder lane stays one card at a time, and the docs say why.
     and the setup skill (`SKILL.md`, `questions.md`) name the three local keys, the ceiling's home (`LANE_CEILING`), the
     absence of an env variable for caps, and why the main lane stays one. No text says the local file holds "only
     `workflow.testMode`" any more.
+13. `saf.config.local.json` is git-ignored, so it is absent inside a lane worktree: engine commands run there (a lane
+    card's `task:verify`) use the repository's test mode and caps unless `SAF_TEST_MODE` is set. `docs/card-lifecycle.md`
+    ("Per machine") and the setup skill (`SKILL.md`) say so in one sentence each.
 
 ## 3. Data
 
@@ -98,6 +101,7 @@ machine. The main-folder lane stays one card at a time, and the docs say why.
 | LCAP-AC-04 | `lanePorts.base: 65000`, `step: 200`, `lanes.code: 3` in `saf.config.json` (the highest lane port is above `MAX_PORT`); then `lanes.code: 1` in the repo and `8` in the local file | `loadConfig` | error naming `workflow.lanes.code`, `workflow.lanePorts.base`, `workflow.lanePorts.step` and `saf.config.json`; second case names `saf.config.local.json`; with `env: []` no error | unit |
 | LCAP-AC-05 | a project with and without a local file that sets both caps | `generate` | the generated files are byte-equal, and `docs/plan/README.md` shows the repo caps | unit |
 | LCAP-AC-06 | `choices.mjs`, the docs and the skill | the docs test runs | `MACHINE_SWITCHES` has en and th lines for every `LOCAL_KEYS` key; the `lanes` `on-custom` and `side-lanes` `on-more` explanations (en) name the worktree, the install step and the per-machine file, and a `lanes` explanation says why the main lane stays one; `config-reference.md`, `card-lifecycle.md`, the plan README templates, `SKILL.md` and `questions.md` name `workflow.lanes.code` and `workflow.sideLanes.max` as per-machine keys and none says the local file holds only `workflow.testMode` | unit |
+| LCAP-AC-07 | `docs/card-lifecycle.md` and `kit/claude/skills/saf-setup/SKILL.md` | the docs test runs | each says the local file is absent in a lane worktree and that lane verifies then use the repository's mode and caps unless `SAF_TEST_MODE` is set | unit |
 
 ## 6. Out of scope
 

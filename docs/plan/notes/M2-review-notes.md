@@ -273,6 +273,8 @@ of every open note is in [M3.md "Carried to M3"](../milestones/M3.md#carried-to-
 - by T-M2-29 (when it passes): 21/2 (`--keep=` and empty lists refused) · 18/5 and the `refreshKitFiles` `{}` default
   (upgrade stops before writing on a broken `saf.config.json`) · 21/8 (one synopsis) · 21/9 (caution line in
   docs/upgrade.md)
+- by T-M2-30 (when it passes): 27/N2 (a shared `env` key keeps the local value and archives `settings.json`; an `env`
+  that is not an object is archived, never spread)
 - by spec edits (designer, this pass): 25/N1 (LCAP-AC-04 row) · 25/N2 and 26/S2 (lane-caps rule 7 "names") · 26/S1
   (two-machine edge case) · 21/1 (setup-rerun rule 6) · 21/3 · 21/4 (setup-rerun §4) · 21/9 (rule 14) · 01/5
   (doc-languages rules 2 and 7) · 05/N3 (evidence-viewer §4 names the gap; the code is unchanged) · stale "(proposed)"

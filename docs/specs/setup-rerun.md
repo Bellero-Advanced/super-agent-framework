@@ -1,6 +1,8 @@
 # Spec — setup re-run: see what changes first, and never lose your edits
 
-Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22 · T-M2-27 (rules 19–22) · T-M2-29 (rules 15, 23). Builds on
+Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22 · T-M2-27 (rules 19–22) · T-M2-29 (rules 15, 23) · T-M2-30 (rules 24–27) ·
+T-M3-16 (rules 28–31) · T-M3-17 (rules 32–34) · T-M3-21 (rules 35–36) · T-M3-23 (rules 18, 38) · T-M3-26 (rule 37, waits for
+D-019). Builds on
 [upgrade-scripts.md](upgrade-scripts.md) (D-010) for the `package.json` rules.
 
 ## 1. Purpose
@@ -80,7 +82,9 @@ replacing it.
 17. Living files that will be kept are listed with one line: your edits stay; the diff shows what the new settings
     would change — port it by hand, or add a decision row when a setting changed.
 18. `docs/upgrade.md` and the skill's "Re-running" section say: living files with edits are kept, other edited files
-    are archived and replaced unless kept, and `--dry-run` / `--diff` show it first.
+    are archived and replaced unless kept, and `--dry-run` / `--diff` show it first. `docs/upgrade.md` does not promise
+    that the plan is "never reset" without the condition: an edited living file is kept, a deleted one is created again
+    from the template.
 
 ### Settings files are never lost (`planSettings` in `generate.mjs`)
 
@@ -106,6 +110,84 @@ replacing it.
     `saf.config.json` and saying nothing was changed, then exits 1. The check runs before the first write.
     `refreshKitFiles` (`generate.mjs`) never renders with default settings in place of an unreadable `saf.config.json`:
     it adds a warning naming the file and refreshes nothing. A missing `saf.config.json` keeps today's behaviour.
+
+### `env` blocks that cannot be merged (`planSettings` in `generate.mjs`)
+
+Today the moved `env` block is spread over the local one (`{ ...local.env, ...settings.env }`): a key both files hold
+takes the project value and the local value is gone, and a string or array `env` spreads into index keys (`"abc"` →
+`{ "0": "a", "1": "b", "2": "c" }`). These rules replace that.
+
+24. An `env` value is **mergeable** only when it is a plain JSON object. When `.claude/settings.json` has an `env` key
+    whose value is anything else (a string, an array, a number, `true`/`false`, `null`), setup archives
+    `settings.json` byte-identical to the first free name `archiveDest` gives under `ARCHIVE` (already git-ignored by
+    `GITIGNORE_LINES`), writes the new `settings.json` without the `env` key, and **moves nothing**:
+    `.claude/settings.local.json` is not read and stays byte-identical (or absent). The warning names both paths and
+    says the `env` value is not a JSON object and nothing was moved.
+25. When the `env` block of `settings.json` moves (it is mergeable) and `.claude/settings.local.json` is readable
+    (rule 19) but its own `env` key holds a value that is not mergeable, setup archives the local file (byte-identical,
+    the rule 20 path, git-ignored by rule 21) and writes the new local file as the old file's other keys with `env` set
+    to exactly the moved block. The warning names both paths.
+26. When both `env` blocks are mergeable, keys only one file holds are combined; for a key both files hold **with
+    different values the local value stays** (the local file is the person's machine-specific file). The project
+    value is kept by archiving `settings.json` (byte-identical, the rule 24 path) before the new one is written —
+    `settings.json` loses its `env` block in every case, so without the archive that value would exist nowhere on
+    disk. The warning names the archive path and the number of keys whose local value was kept; it never prints a key's
+    value. A key with the same value in both files is not a collision and archives nothing.
+27. `planSetup().merges.settings` carries each archive target with its reason; the dry run's settings line names each
+    target with that reason (`not valid JSON` · `env is not a JSON object` · `env values differ from
+    .claude/settings.local.json`), and the real run lists every archived settings file in `report.archived`. No output
+    line, warning or report entry holds an `env` value. `settings.json` is archived at most once per run, whatever the
+    number of reasons.
+
+### Setup keeps what it should (`planSetup` · `applySetup` · `refreshKitFiles` in `generate.mjs`)
+
+28. A `same` file (rule 4) is not written: its bytes on disk stay as they are, so a CRLF checkout stays CRLF and the
+    dry run's "same" is literally true. (The status files already follow this.)
+29. A `keep-unplanned` file keeps its manifest entry, like a `keep-edited` file (rule 7) and like `refreshKitFiles`
+    already does, so the next run still sees it as edited instead of forgetting that SAF once wrote it.
+30. `.saf/manifest.json` that exists but cannot be read — not valid JSON, a root that is not an object, or `files` that
+    is not an object — stops `setup` and `setup --dry-run` before anything is read further or written: one error line
+    names the file, says nothing was changed and that it can be restored from git; exit 1. `refreshKitFiles` (upgrade)
+    adds a warning naming the file and refreshes nothing. A missing manifest keeps the first-run behaviour (rule 1).
+31. `report.kept` holds plain paths only, in setup and in `refreshKitFiles`. Why a file was kept is said by exactly one
+    warning per kept path (setup already warns for `keep-edited`; `keep-unplanned` files and the edited files
+    `refreshKitFiles` keeps gain theirs).
+
+### Reading the plan, the task template and the skill's re-run test
+
+32. Setup computes the regenerated status files (rule 11) by calling `loadPlan` with a read overlay — the planned
+    texts of `docs/plan/` files laid over the files on disk, the files adopt moves aside left out — instead of copying
+    `docs/plan` to a temporary folder. No temporary folder is created, so setup does not depend on a writable
+    `os.tmpdir()`. `loadPlan(root, config)` without an overlay behaves exactly as today.
+33. A file whose name starts with `_` under a living folder (`docs/plan/tasks/_template.md`) is **not** a living file:
+    the engine ignores it as a card, it is a template SAF owns, and an edited copy follows rule 4 (archived and
+    replaced unless kept with `--keep`) so it receives format updates.
+34. The setup skill decides "re-run" with the engine's test (rule 1: `.saf/manifest.json` exists), not by looking at
+    `saf.config.json`, so the skill and the engine never disagree about whether the adopt question applies.
+
+### Messages that say what happened (`generate.mjs`)
+
+35. A settings file whose JSON is valid but whose root is not an object is reported as "is not a JSON object" — "not
+    valid JSON" is said only for a parse failure — in the warning and the dry-run line. The `settings.json` warning names
+    its archive path, like the local file's warning does.
+36. The dry run prints the archive target of every `replace-edited` file (`→ <dest>`, the name `archiveDest` gives,
+    with its `.1`, `.2` suffix when an older archive exists), as it already does for adopt lines.
+
+### Reinstall into a project that already has a plan (waits for D-019)
+
+37. (Applies once D-019 is decided — the card checks the row.) On a first run (no manifest) where `docs/plan` already
+    holds a plan in SAF's shape — `loadPlan` finds at least one milestone — adopt does **not** move anything under
+    `docs/plan/` aside: living files there follow rule 5 as if this were a re-run (kept when they differ), evidence and
+    other plan files stay where they are (`STATE.md` is regenerated in place as on every run), and the dry run says
+    why in one line. Adopt still archives
+    the agent folders (`.claude/agents`, `.claude/commands`, `.claude/rules`) as today.
+
+### Skill wording on a re-run (`SKILL.md`)
+
+38. The skill's re-run step says how to pass a `--keep` path that holds spaces (single quotes on macOS and Linux,
+    double quotes on Windows), that each dry-run line is action, path and reason separated by spaces (read the reason as
+    the text after the path), and names exactly which lines it leaves out when it shows the list (the per-file `same`
+    lines; the merges block is shown whole).
 
 ## 3. Data
 
@@ -142,10 +224,21 @@ replacing it.
 | RERUN-AC-09 | `settings.json` without `env` and an invalid `settings.local.json`; `settings.json` holding `[]` | `generate` | the local file is byte-identical and nothing is archived for it; the `[]` settings file is archived (target in the dry run and `report.archived`) and replaced by an object with the SAF hooks | unit |
 | RERUN-AC-10 | a re-run with an edited `CLAUDE.md` | `setup --keep=CLAUDE.md`, `--keep ","`, `--keep " , "`, `--keep ""` (each without and with `--dry-run`) | each exits 2 with the usage line; `CLAUDE.md` is byte-identical, nothing is archived and the manifest is unchanged | unit |
 | RERUN-AC-11 | a set-up project whose `saf.config.json` holds `{ nope` (then `[]`); the engine copy, a `/saf` command file and `package.json` recorded byte for byte | `saf upgrade` (`node bin/cli.mjs upgrade --dir …`) | exit 1; one error line names `saf.config.json`; no stack trace; every recorded file is byte-identical and `tools/saf/` is the old copy; `refreshKitFiles` called directly on that project warns naming the file and writes nothing | unit |
+| RERUN-AC-12 | `settings.json` `env` `{ A: "p", B: "p2" }`; `settings.local.json` `{ permissions: …, env: { A: "l", C: "l3" } }`; then the same with `A` equal in both files | `planSetup` + `setup --dry-run`; then `generate` | the new local `env` is exactly `{ A: "l", B: "p2", C: "l3" }` and `permissions` is unchanged; `settings.json` is archived byte-identical to the target the plan, the dry-run line (reason "env values differ") and `report.archived` name; the new `settings.json` has no `env`; a warning names the archive path and says one key kept its local value; no `env` value appears in any output, warning or report line; the equal-value case archives nothing | unit |
+| RERUN-AC-13 | `settings.json` `env` `"abc"` (then `["x"]`, `5`, `null`) with a valid local file; then `settings.json` `env` `{ A: "p" }` with a local file whose `env` is `"abc"` (then `[]`) and which holds `permissions` | `planSetup` + `setup --dry-run`; then `generate` | case 1: `settings.json` archived byte-identical (target and reason "env is not a JSON object" in the plan, the dry run and `report.archived`), the new `settings.json` has no `env` and holds the SAF hooks, the local file is byte-identical; case 2: the local file archived byte-identical, the new local file is `permissions` plus `env` exactly `{ A: "p" }`; no index key (`"0"`) in any written file; `git check-ignore` matches every archive path with the generated `.gitignore` | unit |
+| RERUN-AC-14 | a set-up project; one unedited rendered file converted to CRLF; one SAF-written file under `.claude/rules/` that is no longer planned and was edited (`keep-unplanned`) | setup runs again with the same answers; then a third run | the CRLF file is byte-identical and its action is `same`; the `keep-unplanned` file keeps its manifest entry after the second run and is still `keep-unplanned` (not forgotten, not removed) in the third run's plan | unit |
+| RERUN-AC-15 | a set-up project whose `.saf/manifest.json` holds `{ nope` (then `[]`, then `{ "files": [] }`) | `setup --dry-run`; `setup`; `refreshKitFiles` | setup and the dry run exit 1 with one error line naming `.saf/manifest.json`, no stack trace, every file byte-identical and nothing archived; `refreshKitFiles` returns a warning naming the file and writes nothing | unit |
+| RERUN-AC-16 | a re-run with an edited living file and a `keep-unplanned` file; an upgrade fixture with an edited `/saf` command | `generate`; `refreshKitFiles` | every entry of both `report.kept` lists is a plain path equal to a file on disk; each kept path has exactly one warning naming it | unit |
+| RERUN-AC-17 | a set-up project with cards and evidence; the entries of `os.tmpdir()` recorded | `planSetup`; `generate` | both succeed; the planned `STATE.md` equals the one `task:state` writes for the same plan; no new `saf-plan-*` entry appears in `os.tmpdir()` (listings compared before and after) and `generate.mjs` no longer imports `mkdtempSync`; `loadPlan(root, config)` without an overlay returns the same plan as before | unit |
+| RERUN-AC-18 | a re-run where `docs/plan/tasks/_template.md` and `docs/plan/tasks/M1/T-M1-01.md` are both edited | `planSetup` | `_template.md` is `replace-edited` (archive target named) and `T-M1-01.md` is `keep-edited`; with `--keep docs/plan/tasks/_template.md` the template is `keep-edited` | unit |
+| RERUN-AC-19 | `kit/claude/skills/saf-setup/SKILL.md` | the docs test runs | the skill's re-run test names `.saf/manifest.json` and no longer decides it from `saf.config.json` | unit |
+| RERUN-AC-20 | `settings.json` holding `[]`; a re-run with an edited `CLAUDE.md` while `docs/archive/pre-saf/CLAUDE.md` already exists | `setup --dry-run`; then `generate` | the settings warning and dry-run line say "is not a JSON object" (not "not valid JSON") and the warning names the archive path; the dry-run line of `CLAUDE.md` ends with `→ docs/archive/pre-saf/CLAUDE.md.1` (the name `archiveDest` gives), equal to the real run's `archived:` line | unit |
+| RERUN-AC-21 | D-019 decided; a project with `docs/plan/milestones/M1.md`, cards and `docs/plan/evidence/*.json` but no `.saf/manifest.json`, plus an unknown file in `.claude/agents/` | `setup --dry-run`; then `generate` | nothing under `docs/plan/` is archived or moved; evidence and `STATE.md` bytes before the status rewrite are where they were; edited living files are `keep-edited`; the agents file is still adopted; the dry run prints the one-line reason | unit |
+| RERUN-AC-22 | `docs/upgrade.md` and `kit/claude/skills/saf-setup/SKILL.md` | the docs test runs | `docs/upgrade.md` says a deleted living file is created again and has no unconditional "never reset"; the skill's re-run step shows the quoting for both shells, says how a dry-run line splits, and names the per-file `same` lines as the ones it leaves out | unit |
 
 ## 6. Out of scope
 
 - A three-way merge of the person's edits into the new template — the diff shows the change; porting is by hand
 - `saf upgrade` regenerating project docs (it still never touches them)
 - Changing the first-run adopt behaviour
-- `.saf/manifest.json` read with a silent default — listed in T-M2-27's Why and carried to M3 (setup hardening)
+- Merging the person's `env` values key by key across machines — rule 26 keeps the local value and archives the project file
