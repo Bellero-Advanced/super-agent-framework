@@ -1,0 +1,20 @@
+{
+  "id": "T-M3-07",
+  "milestone": "M3",
+  "status": "in_progress",
+  "started": {
+    "at": "2026-11-24T17:36:27.728Z",
+    "base": "821f93226d7468ec05ef0c6bf4060205935907cc",
+    "dirty": {},
+    "effort": {
+      "agent": "implementer",
+      "effort": "high",
+      "mode": "fixed",
+      "source": "default"
+    }
+  },
+  "attempts": 0,
+  "lane": 1,
+  "branch": "card/T-M3-07",
+  "worktree": ".claude/worktrees/T-M3-07"
+}
