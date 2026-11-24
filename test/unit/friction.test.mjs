@@ -130,11 +130,51 @@ test("FRIC-AC-02 an unknown kind, an empty field, a field with a separator or li
   assert.equal(cli(root, "task", "friction", "add", "--kind", "workaround", "--area", "a", "--evidence", "e").status, 1, "no summary");
   assert.equal(cli(root, "task", "friction", "add", "--kind", "bug", "--area", "a", "--evidence", "e", "s").status, 1);
   assert.equal(cli(root, "task", "friction", "add", "--kind", "workaround", "--area", "a", "--evidence", "e", "--card", "T-M1-02", "ok").status, 0, "a card of the plan is accepted");
-  assert.equal(cli(root, "task", "friction", "add", "--oops", "x").status, 1);
+  for (const bad of [["--oops", "x"], ["--area", "--card", "T-M1-01", "s"], ["--kind=workaround", "s"], ["--evidence"]]) {
+    const r2 = cli(root, "task", "friction", "add", ...bad);
+    assert.equal(r2.status, 2, bad.join(" "));
+    assert.match(r2.stderr, /usage: node tools\/saf\/bin\/saf\.mjs task friction add --kind/);
+  }
+  assert.equal(text(root), before.concat(text(root).slice(before.length)), "the earlier text is unchanged");
+  assert.equal(fr.parseFriction(text(root)).entries.length, 2, "only the two valid adds above were written");
   assert.equal(cli(root, "task", "friction", "frobnicate").status, 2);
   const fresh = await repo();
   assert.throws(() => add(fresh.root, { kind: "bug" }), fr.FrictionError);
   assert.equal(existsSync(join(fresh.root, FILE)), false, "a refused first add creates no file");
+});
+
+test("FRIC-AC-02 a field that starts or ends with the dot is refused (it would glue to the separator and break the command's own line); odd text round-trips", async () => {
+  const { root } = await repo();
+  add(root);
+  const before = text(root);
+  for (const over of [{ area: "a ·" }, { summary: "foo ·" }, { evidence: "e ·" }, { area: "· a" }, { summary: "·" }, { evidence: "·" }]) {
+    assert.throws(() => add(root, over), /must not contain|start|end/, JSON.stringify(over));
+  }
+  assert.throws(() => fr.appendClose(root, "F-001", "dropped", "reason ·", { today: TODAY }), fr.FrictionError);
+  assert.equal(text(root), before, "nothing written");
+  const r = cli(root, "task", "friction", "add", "--kind", "workaround", "--area", "a", "--evidence", "e", "foo", "·");
+  assert.equal(r.status, 1);
+  assert.equal(text(root), before);
+  const odd = ["tab\tinside", "\u001b[31mansi\u001b[0m", "line\u2028sep and \u2029 para", "x".repeat(5000), "ไทย 日本語 😀 é", "a·b", "a ·b", "a· b", "  padded  ", "evidence: inside", "F-009 → fixed · not"];
+  const field = ["area", "summary", "evidence"];
+  odd.forEach((v, i) => {
+    const f = field[i % 3];
+    const clean = v.trim();
+    let id;
+    try {
+      id = add(root, { [f]: v });
+    } catch (e) {
+      assert.ok(e instanceof fr.FrictionError, `${JSON.stringify(v)}: ${e.message}`);
+      return; // refused is fine; written wrongly is not
+    }
+    const parsed = fr.parseFriction(text(root));
+    assert.deepEqual(parsed.issues, [], JSON.stringify(v));
+    assert.equal(parsed.entries.find((e) => e.id === id)[f], clean, `${f} ${JSON.stringify(v)} reads back unchanged`);
+  });
+  assert.ok(fr.readFriction(root).entries.length >= 8, "most odd values are accepted");
+  assert.equal(fr.appendClose(root, "F-001", "dropped", "ansi \u001b[0m tab\t and 日本語", { today: TODAY }), "F-001");
+  assert.equal(fr.readFriction(root).entries[0].closes[0].ref, "ansi \u001b[0m tab\t and 日本語");
+  assert.deepEqual(fr.readFriction(root).issues, []);
 });
 
 test("FRIC-AC-03 carded then fixed append two closing lines and the status is fixed; closing a fixed entry is refused", async () => {
@@ -252,7 +292,7 @@ test("FRIC-AC-07 an entry appended while a card is in progress is not reported o
   const ok = await task.verifyCard(ctx, "T-M1-01");
   assert.equal(ok.status, "done");
   assert.deepEqual(ok.verified.files.outside, []);
-  assert.ok(alwaysAllowed(cfg).includes(FILE) && alwaysAllowed(cfg).filter((p) => p.includes("friction")).length === 1, "FRICTION_FILE only");
+  assert.deepEqual(alwaysAllowed(cfg).filter((p) => p.includes("friction")), [FILE, `${FILE}.lock`], "the log and its lock file only");
   task.startCard(ctx, "T-M1-01", { restart: true });
   add(root, { summary: "again" });
   write(root, "docs/plan/friction-notes.md", "x\n");
@@ -276,6 +316,8 @@ test("the engine knows the task:friction script and the cmd table, and CLAUDE.md
     assert.match(readme, /npm run task:friction -- add --kind <kind>/, `${lang}: README names add`);
     assert.match(readme, /npm run task:friction -- close <F-id>/, `${lang}: README names close`);
     assert.match(readme, /docs\/plan\/friction\.md/, `${lang}: README names the file`);
+    assert.match(readme, lang === "th" ? /Friction: ค้างอยู่ <จำนวน> · ออกการ์ดแล้ว <จำนวน>/ : /`Friction: <open> open · <carded> carded`/, `${lang}: README quotes the real session line`);
+    assert.ok(readFileSync(join(root, ".gitignore"), "utf8").split(/\r?\n/).includes(`${FILE}.lock`), `${lang}: the lock file is gitignored`);
     assert.equal(JSON.parse(readFileSync(join(root, "package.json"), "utf8")).scripts["task:friction"], "node tools/saf/bin/saf.mjs task friction");
   }
 });

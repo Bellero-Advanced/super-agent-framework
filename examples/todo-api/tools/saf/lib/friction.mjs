@@ -13,6 +13,7 @@ export const FRICTION_KINDS = ["review-bounce", "command-failed", "doc-drift", "
 export const CLOSE_STATUSES = ["carded", "fixed", "dropped"];
 
 const SEP = " · ";
+const TODAY_PLACEHOLDER = "2000-01-01";
 const ID = /^F-\d{3,}$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const CARD = /^T-M\d+-\d{2,3}$/;
@@ -91,7 +92,8 @@ export function readFriction(root) {
 export const countByStatus = (entries) => Object.fromEntries(["open", "carded", "fixed", "dropped"].map((s) => [s, entries.filter((e) => e.status === s).length]));
 
 const clean = (v) => (typeof v === "string" ? v.trim() : "");
-const badText = (v) => v.includes(SEP) || /[\r\n]/.test(v);
+/** A field must not hold the separator, a line break, or start/end with the dot (` ·` at an end would glue to the neighbouring separator). */
+const badText = (v) => v.includes(SEP) || /[\r\n]/.test(v) || v.startsWith("·") || v.endsWith("·");
 
 /** Next id: the highest number on any `- F-<n>` line (even a malformed one) + 1, at least three digits. */
 function nextId(text) {
@@ -132,9 +134,10 @@ function withLock(file, fn) {
 /**
  * Append one line: `pick(text)` returns the value (an id) that `line(value)` turns into the line — it runs under the lock,
  * on the text as it is now. A new or empty file gets `header` first. The file keeps its own line ending; a missing final
- * newline is added before the line. Nothing already in the file is rewritten.
+ * newline is added before the line. Nothing already in the file is rewritten. `verify(line, made)` runs before the write
+ * and throws when the line would not read back as the fields it was built from.
  */
-function appendLine(root, line, header, pick) {
+function appendLine(root, line, header, pick, verify) {
   const file = join(root, FRICTION_FILE);
   mkdirSync(dirname(file), { recursive: true });
   return withLock(file, () => {
@@ -143,6 +146,7 @@ function appendLine(root, line, header, pick) {
     if (!fresh && !linesOf(text).some((l) => l.trim() === FRICTION_MARKER)) throw new FrictionError(`${FRICTION_FILE} has no marker line ${FRICTION_MARKER} — nothing appended`);
     const eol = text.includes("\r\n") ? "\r\n" : "\n";
     const made = pick(fresh ? "" : text);
+    verify(line(made), made);
     let lead = "";
     if (fresh) lead = `${(header ?? `# Friction log\n\n${FRICTION_MARKER}`).replace(/\r?\n/g, eol)}${eol}`;
     else if (!text.endsWith("\n")) lead = eol;
@@ -167,7 +171,13 @@ export function appendEntry(root, fields, opts = {}) {
   if (card !== "-" && !(CARD.test(card) && (opts.cards ? opts.cards(card) : true))) throw new FrictionError(`--card ${card} is not a card of the plan`);
   const today = opts.today;
   if (!DATE.test(today ?? "")) throw new FrictionError("no date for the entry");
-  return appendLine(root, (id) => `- ${id}${SEP}${today}${SEP}${kind}${SEP}${card}${SEP}${area}${SEP}${summary}${SEP}evidence: ${evidence}`, opts.header, nextId);
+  const want = { date: today, kind, card, area, summary, evidence };
+  const verify = (l, id) => {
+    const got = parseFriction(`${FRICTION_MARKER}\n${l}`);
+    const e = got.entries[0];
+    if (got.issues.length || !e || e.id !== id || Object.entries(want).some(([k, v]) => e[k] !== v)) throw new FrictionError("the line would not read back as the same fields");
+  };
+  return appendLine(root, (id) => `- ${id}${SEP}${today}${SEP}${kind}${SEP}${card}${SEP}${area}${SEP}${summary}${SEP}evidence: ${evidence}`, opts.header, nextId, verify);
 }
 
 /**
@@ -192,6 +202,11 @@ export function appendClose(root, id, status, ref, opts = {}) {
       if (!e) throw new FrictionError(`no entry ${id} in ${FRICTION_FILE}`);
       if (e.status === "fixed" || e.status === "dropped") throw new FrictionError(`${id} is already ${e.status} — a mistake is corrected with a new entry`);
       return id;
+    },
+    (l, made) => {
+      const got = parseFriction(`${FRICTION_MARKER}\n- ${made}${SEP}${TODAY_PLACEHOLDER}${SEP}workaround${SEP}-${SEP}a${SEP}s${SEP}evidence: e\n${l}`);
+      const c = got.entries[0]?.closes[0];
+      if (got.issues.length || c?.status !== status || c.date !== today || c.ref !== what) throw new FrictionError("the line would not read back as the same fields");
     },
   );
 }

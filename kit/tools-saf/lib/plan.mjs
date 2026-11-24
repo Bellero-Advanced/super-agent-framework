@@ -38,7 +38,7 @@ const MILESTONE_STATUS = ["planned", "active", "paused", "done"];
 export const CRITERIA_HEADINGS = ["Done when", "Pass criteria", "Criteria", "เกณฑ์ผ่าน"];
 export const MILESTONE_HEADINGS = { goal: ["Goal", "เป้าหมาย"], scope: ["Scope", "ขอบเขต"], risks: ["Risks", "ความเสี่ยง"] };
 
-export const alwaysAllowed = (config) => [`${EVIDENCE_DIR}/**`, STATE_FILE, MIRROR_FILE, ".saf/memory/**", FRICTION_FILE, ...(config?.workflow?.alwaysAllowed ?? [])];
+export const alwaysAllowed = (config) => [`${EVIDENCE_DIR}/**`, STATE_FILE, MIRROR_FILE, ".saf/memory/**", FRICTION_FILE, `${FRICTION_FILE}.lock`, ...(config?.workflow?.alwaysAllowed ?? [])];
 
 const asRecord = (v) => (v && typeof v === "object" && !Array.isArray(v) ? v : {});
 const str = (v) => (typeof v === "string" ? v.trim() : "");

@@ -262,7 +262,7 @@ async function task(sub, rest) {
 
 const FRICTION_FLAGS = ["--kind", "--area", "--evidence", "--card"];
 
-/** `task friction` — the friction log (docs/specs/friction-log.md rules 7-10). Plain errors exit 1 · a wrong shape of arguments exits 2. */
+/** `task friction` — the friction log (docs/specs/friction-log.md rules 7-10). A refused value exits 1 (nothing written) · a wrong shape of arguments (unknown sub-command or option, a flag without a value, `--flag=value`) exits 2 with the usage line. */
 function friction(ctx, rest) {
   const { root, config } = ctx;
   const c = (s, a) => scriptCommand(config.stack.packageManager, s, a);
@@ -302,9 +302,12 @@ function friction(ctx, rest) {
       const fields = {};
       const words = [];
       for (let i = 0; i < args.length; i++) {
-        if (FRICTION_FLAGS.includes(args[i])) fields[args[i].slice(2)] = args[++i] ?? "";
-        else if (args[i].startsWith("--")) throw new FrictionError(`unknown option ${args[i]} — usage: ${usage.add}`);
-        else words.push(args[i]);
+        const a = args[i];
+        if (FRICTION_FLAGS.includes(a) && args[i + 1] !== undefined && !args[i + 1].startsWith("--")) fields[a.slice(2)] = args[++i];
+        else if (a.startsWith("--")) {
+          err(`✗ ${FRICTION_FLAGS.includes(a) ? `${a} needs a value (a value cannot start with --)` : `unknown option ${a} (write --option value, not --option=value)`} — usage: ${usage.add}`);
+          return 2;
+        } else words.push(a);
       }
       fields.summary = words.join(" ");
       const id = appendEntry(root, fields, opts);
