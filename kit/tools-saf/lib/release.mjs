@@ -25,7 +25,7 @@ export const RELEASE = {
   version: /^(\d+)\.(\d+)\.(\d+)$/,
   branchName: /^[A-Za-z0-9][A-Za-z0-9._/-]*$/,
   hexHead: /^[0-9a-f]{7,64}$/i,
-  packageName: /^(@[a-z0-9-~][a-z0-9-._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/,
+  packageName: /^(@[a-z0-9~][a-z0-9-._~]*\/)?[a-z0-9~][a-z0-9-._~]*$/, // no leading "-" (it would read as an npm option) and no shell characters
   shortHead: 7,
   maxBuffer: 64 * 1024 * 1024,
   registryMissing: /E404/,
@@ -45,9 +45,10 @@ const oneLine = (s) => String(s ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").tr
 const why = (r) => oneLine(String(r.err || r.out || "").split(/\r?\n/).find((l) => l.trim()) ?? `exit ${r.code}`).replace(/\/\/[^/@\s]+@/g, "//***@");
 const noCr = (text) => String(text ?? "").replace(/\r\n/g, "\n");
 
-/** Compare two `x.y.z` versions: negative, 0 or positive. */
+/** Compare two `x.y.z` versions: negative, 0 or positive; `null` when either is not `x.y.z` (callers fail closed). */
 export function compareVersions(a, b) {
   const [x, y] = [num(a), num(b)];
+  if (!x || !y) return null;
   const i = x.findIndex((n, k) => n !== y[k]);
   return i < 0 ? 0 : x[i] - y[i];
 }
@@ -62,7 +63,7 @@ export function commandRunner(cwd, { timeoutMs } = {}) {
       timeout: timeoutMs,
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
-      shell: process.platform === "win32" && cmd === "npm", // npm is a .cmd file on Windows; its arguments were checked as names
+      shell: process.platform === "win32" && cmd === "npm", // npm is a .cmd file on Windows and needs a shell; its only variable argument is a package name that passed RELEASE.packageName
       env: { ...process.env, GIT_TERMINAL_PROMPT: "0", GH_PROMPT_DISABLED: "1" },
     });
     return { code: r.error ? 127 : (r.status ?? 1), out: r.stdout ?? "", err: r.error ? r.error.message : (r.stderr ?? "") };
@@ -198,27 +199,27 @@ const verdict = (id, problems, okText) => ({ id, ok: problems.length === 0, reas
 // ── the guards ───────────────────────────────────────────────────────────────
 
 /** `auto` of saf.config.json as git shows it at `rev`: `{ auto }` or `{ error }`. */
-function switchAt(ctx, rev) {
+function switchAt(ctx, rev, label = rev) {
   const r = git(ctx, "show", `${rev}:${CONFIG_FILE}`);
-  if (r.code !== 0) return { error: `cannot read ${CONFIG_FILE} at ${rev} (${why(r)})` };
+  if (r.code !== 0) return { error: `cannot read ${CONFIG_FILE} at ${label} (${why(r)})` };
   try {
     return { auto: JSON.parse(r.out)?.policies?.release?.auto ?? "off" };
   } catch {
-    return { error: `${CONFIG_FILE} at ${rev} is not valid JSON` };
+    return { error: `${CONFIG_FILE} at ${label} is not valid JSON` };
   }
 }
 
 function guardSwitch(ctx, s, fetched) {
   const problems = [];
-  const at = (rev) => {
-    const v = switchAt(ctx, rev);
+  const at = (rev, label = rev) => {
+    const v = switchAt(ctx, rev, label);
     if (v.error) problems.push(v.error);
-    else if (v.auto !== "on") problems.push(`policies.release.auto is "${oneLine(v.auto)}" at ${rev}`);
+    else if (v.auto !== "on") problems.push(`policies.release.auto is "${oneLine(v.auto)}" at ${label}`);
   };
   at("HEAD");
   if (s.errors.branch) problems.push(s.errors.branch);
   else if (fetched.error) problems.push(`${RELEASE.remote}/${s.branch} not read: ${fetched.error}`);
-  else at(`${RELEASE.remote}/${s.branch}`);
+  else at(`refs/remotes/${RELEASE.remote}/${s.branch}`, `${RELEASE.remote}/${s.branch}`);
   return verdict("G-switch", problems, `policies.release.auto is on at HEAD and on ${RELEASE.remote}/${s.branch}`);
 }
 
@@ -231,7 +232,7 @@ function guardBranch(ctx, s, fetched, plan, step, d, mid) {
   if (status.code !== 0) problems.push(`git status failed (${why(status)})`);
   else if (status.out.trim()) problems.push("the worktree is not clean");
   if (plan.error) problems.push(`the plan cannot be read (${plan.error})`);
-  else for (const c of activeCards(plan.plan)) problems.push(`card ${c.id} is in progress`);
+  else for (const c of activeCards(plan.plan)) problems.push(`card ${oneLine(c.id)} is in progress`);
   if (fetched.error) problems.push(`fetch failed (${fetched.error})`);
   else if (!s.errors.branch) {
     const head = git(ctx, "rev-parse", "HEAD");
@@ -252,8 +253,8 @@ function guardMilestone(ctx, s, plan, mid, d) {
   const m = p.milestones.find((x) => x.id === mid);
   if (!m) return verdict("G-milestone", [`${mid} is not a milestone of this plan`]);
   const problems = [];
-  if (m.status !== "done") problems.push(`milestone ${mid} is ${m.status}, not done`);
-  for (const id of m.cards) if (!isDone(cardStatus(p, id))) problems.push(`card ${id} is not done (${cardStatus(p, id)})`);
+  if (m.status !== "done") problems.push(`milestone ${mid} is ${oneLine(m.status)}, not done`);
+  for (const id of m.cards) if (!isDone(cardStatus(p, id))) problems.push(`card ${oneLine(id)} is not done (${oneLine(cardStatus(p, id))})`);
   const gate = p.gateEvidence.get(mid);
   if (!gate) problems.push(`no gate evidence for ${mid} — run task:verify ${mid}`);
   else {
@@ -266,7 +267,7 @@ function guardMilestone(ctx, s, plan, mid, d) {
       else {
         const allowed = new Set([RELEASE.changelog, RELEASE.mirror, ...d.packages.map((x) => x.file), ...s.versionFiles.filter(safeDir).map((f) => asPath(".", f))]);
         const other = diff.out.split("\0").filter((f) => f && !allowed.has(f) && !f.startsWith(RELEASE.planDir));
-        if (other.length) problems.push(`${other.join(", ")} changed since the gate evidence (${head.slice(0, RELEASE.shortHead)}) — run task:verify ${mid} again`);
+        if (other.length) problems.push(`${other.map(oneLine).join(", ")} changed since the gate evidence (${head.slice(0, RELEASE.shortHead)}) — run task:verify ${mid} again`);
       }
     }
   }
@@ -295,7 +296,7 @@ function guardVersion(ctx, d, step) {
       const r = registryVersions(ctx, p.name);
       if (r.error) problems.push(r.error);
       else {
-        const newer = r.versions.filter((v) => compareVersions(v, d.next) >= 0);
+        const newer = r.versions.filter((v) => (compareVersions(v, d.next) ?? 1) >= 0);
         if (newer.length) problems.push(`${p.name} ${newer.at(-1)} is on the registry (the new version must be above it)`);
       }
     }
@@ -376,7 +377,7 @@ export function releaseGuards(ctx, mid, { step = "prepare" } = {}) {
 
 // ── the plan ─────────────────────────────────────────────────────────────────
 
-/** The version and what each step would do, as text; `null` when there is no version to plan. */
+/** The version and what each step would do, as text; `null` when there is no version to plan. At the tag step `prepare` is empty and `done` says what --prepare already did. */
 export function planRelease(ctx, mid, { step = "prepare" } = {}) {
   const d = describe(ctx, step);
   if (!d.next) return null;
@@ -385,7 +386,9 @@ export function planRelease(ctx, mid, { step = "prepare" } = {}) {
   const gate = readJson(ctx, `${RELEASE.evidenceDir}${mid}.json`)?.verified?.head;
   const bump = d.bump ?? { bump: "none", reason: "the version in package.json" };
   const line = releaseLogLine({ version: d.next, date, mid, head: typeof gate === "string" ? gate : "", from: d.current, bump: bump.bump, reason: bump.reason });
-  const prepare = [
+  const entry = readReleaseLog(readText(ctx, RELEASE_LOG) ?? "").find((e) => e.version === d.next && e.mid === mid);
+  const done = step === "tag" ? (entry ? releaseLogLine(entry) : `${RELEASE.subject(d.next, mid)} (no entry in ${RELEASE_LOG})`) : null;
+  const prepare = step === "tag" ? [] : [
     ...d.packages.map((p) => `set version ${d.next} in ${p.file}`),
     ...d.packages.flatMap((p) => names.filter((n) => n !== p.name && RELEASE.dependencyKeys.some((k) => p.json?.[k]?.[n] !== undefined)).map((n) => `set ${n} to ${d.next} in ${p.file}`)),
     ...d.s.versionFiles.map((f) => `set version ${d.next} in ${f}`),
@@ -395,7 +398,7 @@ export function planRelease(ctx, mid, { step = "prepare" } = {}) {
     "git push",
   ];
   const tag = [`git tag -a v${d.next} on HEAD (message: the ${RELEASE.changelog} section of ${d.next})`, `git push ${RELEASE.remote} refs/tags/v${d.next}`];
-  return { version: d.next, previous: d.current, bump: bump.bump, reason: bump.reason, step, prepare, tag };
+  return { version: d.next, previous: d.current, bump: bump.bump, reason: bump.reason, step, prepare, done, tag };
 }
 
 /** `task:release <M>` without a step flag: print every guard of the next step and the plan, change nothing. Returns the exit code (0 all hold · 1 one failed). */
@@ -407,11 +410,14 @@ export function runRelease(ctx, mid, { step, out }) {
   const plan = planRelease(ctx, mid, { step: at });
   if (plan) {
     out(at === "tag" ? `version: v${plan.version} (the release commit)` : `version: v${plan.previous} → v${plan.version} (${plan.bump}: ${plan.reason})`);
-    out("--prepare would:");
-    plan.prepare.forEach((a) => out(`  - ${a}`));
+    if (at === "tag") out(`--prepare already done: ${plan.done}`);
+    else {
+      out("--prepare would:");
+      plan.prepare.forEach((a) => out(`  - ${a}`));
+    }
     out("--tag would (after the CI run of the release commit is green):");
     plan.tag.forEach((a) => out(`  - ${a}`));
-  } else out("no next version: there is nothing under Unreleased to release");
+  }
   const failed = guards.filter((g) => !g.ok);
   out(failed.length ? `✗ ${failed.length} guard(s) failed — nothing was changed` : "✓ every guard holds — nothing was changed");
   return failed.length ? 1 : 0;
