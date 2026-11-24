@@ -109,7 +109,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path — passed 2026-11-24 09:35 (7 commands) · full suite deferred to gate
 - [x] T-M3-32 spec:matrix --check counts a started card only in the folder where it is built, so two parallel lane cards with scenarios no longer block each other — passed 2026-11-24 09:57 (8 commands) · full suite deferred to gate
 - [x] T-M3-33 This repository's /saf commands and CLAUDE.md commands block stay equal to the templates (a test fails when they drift), and saf:refresh keeps the example's commands, skills, agents and CLAUDE.md current — passed 2026-11-24 10:03 (9 commands) · full suite deferred to gate
-- [ ] T-M3-34 task:merge accepts a lane card that adds an always-allowed glob: the post-verify check uses the main folder's list and the branch's
+- [ ] T-M3-34 task:merge accepts a lane card that adds an always-allowed glob: the post-verify check uses the main folder's list and the branch's — started 2026-11-24 16:18 · not verified yet · lane 1 · .claude/worktrees/T-M3-34
 - [ ] T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read
 - [ ] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
 - [ ] T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names
