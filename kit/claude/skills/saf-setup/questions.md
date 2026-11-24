@@ -9,8 +9,8 @@ What each option means (what it is · good for · cost · pick it when) is not h
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
-| Which language should we chat in? | `people.chatLanguage` | th · en | the language the user wrote in |
-| Which language for project documents? | `people.docLanguage` | th · en | same as chat |
+| Which language should we chat in? | `people.chatLanguage` | the languages `choices --group 1` lists | the language the user wrote in |
+| Which language for project documents? | `people.docLanguage` | the languages `choices --group 1` lists | same as chat |
 | What should agents call you? | `people.ownerTitle` | owner · founder · lead · free text | owner (Thai documents: a Thai title the user prefers) |
 | Which languages does the product UI use? | `people.uiLanguages` · `people.i18nRequired` | one language · several (i18n required) · no UI | detected / chat language; i18n on when more than one |
 | Your time zone (for timestamps in status files)? | `people.timeZone` | IANA name | the system time zone |
@@ -69,7 +69,7 @@ Core roles are always on: `designer` · `spec-reviewer` (read only) · `implemen
 |---|---|---|---|
 | Extra roles? (multi-select) | `roles.enabled` | art-producer · db-guardian · release-operator · security-auditor · data-engineer · content-writer | by type: game → art-producer · database → db-guardian · deploys → release-operator · strict rigor → security-auditor · data-ai → data-engineer · several UI languages → content-writer |
 | A custom role? (name · what it does · planner or builder · focus) | `roles.custom` | — | none |
-| Language of agent reports? | `roles.reportLanguage` | en · th | en (fewer tokens) |
+| Language of agent reports? | `roles.reportLanguage` | the languages `choices --group 5` lists | en (fewer tokens) |
 | Optional skill packs? (multi-select) | `skills.packs` | ui-frontend · db-migrations · performance · i18n · mobile · game | by answers: web-app/mobile/game/erp → ui-frontend · a database → db-migrations · game → performance + game · several UI languages → i18n · mobile → mobile |
 
 Core skills are always installed and load by themselves when the work matches: `debug-protocol` · `tdd` · `code-review` ·

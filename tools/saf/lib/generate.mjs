@@ -9,6 +9,7 @@ import { scriptOf } from "./docs.mjs";
 import { loadPlan } from "./plan.mjs";
 import { generatedFiles } from "./task.mjs";
 import { render } from "./template.mjs";
+import { languageName, textFor } from "./text.mjs";
 
 /**
  * Generator — turns setup answers into the full project system:
@@ -38,7 +39,6 @@ const isLiving = (rel) => LIVING_FILES.some((p) => (p.endsWith("/") ? rel.starts
 const OWNED_DIRS = [".claude/commands/", ".claude/skills/", ".claude/agents/", ".claude/rules/"];
 /** Skills shipped in this project: core + chosen packs (one skill per pack). */
 export const skillsFor = (config) => [...CORE_SKILLS, ...config.skills.packs];
-const LANG_NAME = { th: { th: "ภาษาไทย", en: "Thai" }, en: { th: "ภาษาอังกฤษ", en: "English" } };
 const TYPE_LABEL = { "web-app": "web app / SaaS", mobile: "mobile app", game: "game", api: "API / backend", erp: "ERP / business system", "data-ai": "data / AI", "library-cli": "library / CLI", other: "other" };
 
 function readJson(p, fallback) {
@@ -86,11 +86,11 @@ function sessionRows(roles, docLang) {
     row.tiers.add(r.tier);
     by.set(r.model, row);
   }
+  const labels = textFor(docLang).sessionWork;
   const work = (tiers) => {
     const planner = tiers.has("planner");
     const builder = tiers.has("builder");
-    if (docLang === "th") return planner && builder ? "ออกแบบ · ตรวจ · ลงมือ" : planner ? "ออกแบบ · เขียนการ์ด/สเปก · ตรวจงานกับสเปก" : "ลงมือทำการ์ด · ทดสอบ · งานเฉพาะทาง";
-    return planner && builder ? "design · review · build" : planner ? "design · write cards/specs · review against specs" : "build cards · test · specialist work";
+    return planner && builder ? labels.both : planner ? labels.planner : labels.builder;
   };
   return [...by.values()].map((r) => ({ model: r.model, roles: r.roles.map((n) => `\`${n}\``).join(" · "), work: work(r.tiers) }));
 }
@@ -120,7 +120,6 @@ export function templateData(config, detected, opts = {}) {
     .filter((x) => x.cmd)
     .map((x) => ({ ...x, ready: ready(x.cmd) }));
   const projectChecks = projectCommands.filter((x) => x.ready && x.key !== "e2e").map((x) => x.cmd);
-  const isTh = config.people.docLanguage === "th";
   const dl = config.people.docLanguage;
   const goal = config.firstMilestone.goal.trim();
   // first sentence: a line break, "。", or a dot followed by a space or the end ("v0.1.0" stays whole)
@@ -132,14 +131,12 @@ export function templateData(config, detected, opts = {}) {
   return {
     ...config,
     saf: { version: opts.version ?? "" },
-    isTh,
-    chatTh: config.people.chatLanguage === "th",
     owner: config.people.ownerTitle,
     today,
     typeLabel: TYPE_LABEL[config.project.type],
-    docLanguageName: LANG_NAME[dl][dl],
-    chatLanguageName: LANG_NAME[config.people.chatLanguage][dl],
-    reportLanguageName: LANG_NAME[config.roles.reportLanguage][dl],
+    docLanguageName: languageName(dl, dl),
+    chatLanguageName: languageName(config.people.chatLanguage, dl),
+    reportLanguageName: languageName(config.roles.reportLanguage, dl),
     uiLanguagesText: config.people.uiLanguages.join(", "),
     presetName,
     presetIsStandard: !!MODEL_PRESETS[config.models.preset],
@@ -201,9 +198,19 @@ export function templateData(config, detected, opts = {}) {
   };
 }
 
+/** A document is read from templates/<lang>/, or from templates/en/ when that folder lacks it (`fallback` then names the missing path). */
+function docTemplate(lang, p) {
+  const own = join(TEMPLATES, lang, p);
+  if (existsSync(own)) return { src: own };
+  return { src: join(TEMPLATES, "en", p), fallback: `templates/${lang}/${p}` };
+}
+
+/** The warning of a document that fell back to English (setup report and dry run). */
+const fallbackWarning = (f, lang) => `${f.fallback} is missing — the English template is used for document language "${lang}"`;
+
 function plannedFiles(config, data, detected) {
   const lang = config.people.docLanguage;
-  const L = (p) => join(TEMPLATES, lang, p);
+  const L = (p) => docTemplate(lang, p);
   const files = [
     [L("CLAUDE.template.md"), "CLAUDE.md"],
     [L("docs/INDEX.md"), "docs/INDEX.md"],
@@ -216,7 +223,7 @@ function plannedFiles(config, data, detected) {
   ];
   if (data.m1) files.push([L("docs/plan/milestones/M1.md"), "docs/plan/milestones/M1.md"]);
   for (const name of COMMANDS) files.push([L(`commands/${name}.md`), `.claude/commands/${name}.md`]);
-  const out = files.map(([src, dest]) => ({ dest, content: alignShellComments(render(readTemplate(src), data)) }));
+  const out = files.map(([tpl, dest]) => ({ dest, content: alignShellComments(render(readTemplate(tpl.src), data)), ...(tpl.fallback && { fallback: tpl.fallback }) }));
   for (const role of data.roles) {
     const src = role.custom ? join(TEMPLATES, "agents", "_custom.md") : join(TEMPLATES, "agents", `${role.name}.md`);
     out.push({ dest: `.claude/agents/${role.name}.md`, content: render(readTemplate(src), { ...data, role: { ...role, summaryYaml: JSON.stringify(role.summary || role.name) } }) });
@@ -539,6 +546,7 @@ export function planSetup(root, answers, opts = {}) {
   // 3. rendered files: one action each
   const data = templateData(config, detected, { now: opts.now, scripts, version: SAF_VERSION() });
   const files = plannedFiles(config, data, detected);
+  for (const f of files) if (f.fallback) report.warnings.push(fallbackWarning(f, config.people.docLanguage));
   const asked = resolveKeep(root, keepAsked, files);
   const next = { version: SAF_VERSION(), files: {} };
   const actions = [];
@@ -710,6 +718,7 @@ export function refreshKitFiles(root) {
   const kitDirs = [".claude/commands/", ".claude/skills/"];
   const planned = plannedFiles(config, data, detected);
   for (const f of planned.filter((x) => kitDirs.some((d) => x.dest.startsWith(d)))) {
+    if (f.fallback) report.warnings.push(fallbackWarning(f, config.people.docLanguage));
     const abs = join(root, f.dest);
     if (existsSync(abs)) {
       const cur = readText(abs);

@@ -101,7 +101,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-02 saf setup --dry-run lists, per file, what a setup run would do — and writes nothing — passed 2026-11-24 05:05 (5 commands) · full suite deferred to gate
 - [x] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it — passed 2026-11-24 05:09 (5 commands) · full suite deferred to gate
 - [x] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — passed 2026-11-24 05:17 (5 commands) · full suite deferred to gate
-- [ ] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning — started 2026-11-24 05:18 · not verified yet · lane 1 · .claude/worktrees/T-M2-01
+- [x] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning — passed 2026-11-24 05:27 (5 commands) · full suite deferred to gate
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the
