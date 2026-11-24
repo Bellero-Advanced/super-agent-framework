@@ -96,7 +96,7 @@ tools/saf/   workflow engine (vendored, no dependencies) · saf.config.json = it
 - Change the engine in `kit/`, never in `tools/saf/` — then refresh the installed copy (a unit test fails while they differ). A unit test also keeps `.claude/commands`, `.claude/skills` and the Commands block above equal to the templates, so a kit card that changes the commands block lists `CLAUDE.md` in `touch`:
 
 ```bash
-npm run saf:refresh                    # needs a card in progress: refreshes this repo AND examples/todo-api, puts back example files outside the card's touch
+npm run saf:refresh                    # needs a card in progress: refreshes this repo AND examples/todo-api, re-renders the example's unedited CLAUDE.md and agents, puts back the other example files the card does not own
 npm run saf:refresh -- --check         # read only: do the copies equal kit/? (kit cards list it in "Done when")
 npm run test:unit                      # unit tests only (npm test = unit + e2e + package)
 node scripts/demo.mjs                  # rebuild docs/assets/demo.svg from a real run

@@ -53,8 +53,8 @@ language can ship in parts. Agent, rule and skill templates stay English.
 3. **Schema.** Add the code to the three enums in `kit/tools-saf/schema/saf.config.schema.json`: `people.docLanguage`,
    `people.chatLanguage` and `roles.reportLanguage`.
 4. **Refresh, then test.** With a card in progress in your folder run `npm run saf:refresh`: it
-   refreshes this repository and runs `node bin/cli.mjs upgrade --dir examples/todo-api`, then puts back the example files
-   outside the card's `touch`. Without a card it refuses: run `node bin/cli.mjs upgrade --dir .` and
+   refreshes this repository and runs `node bin/cli.mjs upgrade --dir examples/todo-api`, re-renders the example's unedited
+   `CLAUDE.md` and agents, then puts back the other example files the card does not own. Without a card it refuses: run `node bin/cli.mjs upgrade --dir .` and
    `node bin/cli.mjs upgrade --dir examples/todo-api` by hand (`npm run saf:refresh -- --check` tells in a second).
    Then `npm test`. The language test names any enum that differs from the languages in `TEXT` and any table without
    `langName`; the setup-choices tests list the new language automatically (the explanations of the three questions
