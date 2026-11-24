@@ -3,8 +3,8 @@ import { join } from "node:path";
 import { scriptCommand } from "./config.mjs";
 import { changedSince, commitSubject, diffNames, gitWrite, isAncestor, resolveCommit, revList } from "./git.mjs";
 import { loadPlan } from "./plan.mjs";
-import { taskRunner } from "./run.mjs";
-import { TaskError, refuseInLane } from "./task.mjs";
+import { RUN_LIMITS, taskRunner } from "./run.mjs";
+import { TaskError, refuseInLane, requireValid } from "./task.mjs";
 import { fullSuiteCommands } from "./testmode.mjs";
 
 /**
@@ -15,8 +15,9 @@ import { fullSuiteCommands } from "./testmode.mjs";
 
 /** Result kinds → CLI exit codes (1 = error is thrown as TaskError). */
 export const CULPRIT_EXIT = { found: 0, "base-fails": 2, "passes-at-head": 3 };
+/** Signals that stop the search → the exit code of the interrupted command (128 + the signal number). */
+const INTERRUPT_EXIT = { SIGINT: 130, SIGTERM: 143 };
 
-const FAIL_TAIL = 20;
 /** Oldest `started.base` of the milestone's cards that is an ancestor of HEAD (the one with the most commits up to HEAD). */
 function oldestBase(ctx, m, plan) {
   const bases = m.cards.map((id) => plan.evidence.get(id)?.started?.base).filter(Boolean);
@@ -27,10 +28,15 @@ function oldestBase(ctx, m, plan) {
   return reachable.sort((a, b) => count(b) - count(a))[0];
 }
 
-/** Card of the milestone that owns a commit: id in the subject, else the most overlap with evidence `files.changed`, else null. */
-function cardOf(ctx, m, plan, sha) {
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Card of the milestone that owns a commit: id in the subject (matched as literal text; several → the first in
+ * milestone order), else the most overlap with evidence `files.changed` (equal → the earlier card), else null.
+ */
+export function cardOf(ctx, m, plan, sha) {
   const subject = commitSubject(ctx.root, sha) ?? "";
-  const named = m.cards.find((id) => new RegExp(`(^|[^\\w-])${id}(?![\\w-])`).test(subject));
+  const named = m.cards.find((id) => new RegExp(`(^|[^\\w-])${escapeRegExp(id)}(?![\\w-])`).test(subject));
   if (named) return { id: named, by: "subject" };
   const files = diffNames(ctx.root, `${sha}^`, sha); // a commit of the range always has a parent (the range starts after the base)
   let best = null;
@@ -41,6 +47,12 @@ function cardOf(ctx, m, plan, sha) {
   }
   return best;
 }
+
+/** Let the event loop deliver a signal that arrived while a synchronous step (git, the install command) was blocking it. */
+const settle = () => new Promise((resolve) => setImmediate(resolve));
+
+/** Thrown inside the search when a signal asked it to stop. */
+class Interrupted extends Error {}
 
 /** Remove the temporary worktree; never throws (the caller may already be handling an error). */
 function removeWorktree(ctx, dir) {
@@ -60,6 +72,7 @@ function removeWorktree(ctx, dir) {
 export async function findCulprit(ctx, mid, opts = {}) {
   refuseInLane(ctx, `task:culprit ${mid}`);
   const plan = loadPlan(ctx.root, ctx.config);
+  requireValid(plan);
   const m = plan.milestones.find((x) => x.id === mid);
   if (!m) throw new TaskError(`no milestone ${mid}`);
   const command = (opts.cmd ?? "").trim() || fullSuiteCommands(ctx.config)[0];
@@ -71,27 +84,39 @@ export async function findCulprit(ctx, mid, opts = {}) {
   if (dirty) ctx.log?.(`  ! ${dirty} uncommitted file(s) in the main folder are not tested — only committed history is searched`);
 
   const dir = join(ctx.root, ctx.config.workflow.worktreeDir, `culprit-${process.pid}-${Date.now().toString(36)}`);
-  const run = taskRunner(dir, { timeoutMs: ctx.config.workflow.commandTimeoutMs });
+  const run = taskRunner(dir, { onOutput: ctx.onOutput, timeoutMs: ctx.config.workflow.commandTimeoutMs });
   const install = ctx.install === undefined ? ctx.config.workflow.laneInstall : ctx.install;
   let runs = 0;
+  let interrupted = null; // the signal that stopped the search, if any
+  const stopRun = new AbortController();
+  const onSignal = (name) => () => {
+    interrupted ??= name;
+    stopRun.abort(); // the runner stops the test command and everything it started
+  };
+  const handlers = Object.keys(INTERRUPT_EXIT).map((name) => [name, onSignal(name)]);
   let tail = []; // the tail of the latest failing run is the tail of the first failing commit (the search only moves down)
   /** One real run of the command at one commit; true = the suite passes. */
   const passesAt = async (sha) => {
+    if (interrupted) throw new Interrupted();
     gitWrite(dir, ["checkout", "--detach", "--quiet", sha]);
     if (install) {
       const code = ctx.runSync ? ctx.runSync(install, dir) : 0;
       if (code !== 0) throw new TaskError(`${install} exited ${code} at ${sha.slice(0, 7)} — cannot judge this commit`);
     }
+    await settle(); // a signal during checkout or install must stop the search before a run starts
+    if (interrupted) throw new Interrupted();
     runs += 1;
     ctx.log?.(`▶ run ${runs}: ${command} @ ${sha.slice(0, 7)}`);
-    const r = await run(command);
+    const r = await run(command, { signal: stopRun.signal });
+    if (interrupted) throw new Interrupted();
     ctx.log?.(r.exit === 0 ? "  ✓ passes" : `  ✗ fails (exit ${r.exit})`);
-    if (r.exit !== 0) tail = r.tail.slice(-FAIL_TAIL);
+    if (r.exit !== 0) tail = r.tail.slice(-RUN_LIMITS.culpritTail);
     return r.exit === 0;
   };
   const result = (kind, extra = {}) => ({ kind, exit: CULPRIT_EXIT[kind], milestone: mid, command, runs, commits: commits.length, ...extra });
 
   try {
+    for (const [name, h] of handlers) process.on(name, h);
     gitWrite(ctx.root, ["worktree", "add", "--detach", dir, head]);
     if (await passesAt(head)) return result("passes-at-head");
     // no commit between base and HEAD means HEAD is the base, which just failed
@@ -106,16 +131,22 @@ export async function findCulprit(ctx, mid, opts = {}) {
     const sha = commits[bad];
     const owner = cardOf(ctx, m, plan, sha);
     return result("found", { sha, subject: commitSubject(ctx.root, sha) ?? "", card: owner?.id ?? null, cardTitle: plan.cards.get(owner?.id)?.title ?? "", by: owner?.by ?? null, tail });
+  } catch (e) {
+    await settle(); // Ctrl-C during install also kills it: the install error must not hide the signal
+    if (e instanceof Interrupted || interrupted) return result("interrupted", { exit: INTERRUPT_EXIT[interrupted], signal: interrupted });
+    throw e;
   } finally {
+    for (const [name, h] of handlers) process.off(name, h);
     removeWorktree(ctx, dir);
   }
 }
 
 /** Plain lines for the CLI. */
 export function culpritLines(r) {
+  if (r.kind === "interrupted") return [`✗ ${r.milestone}: interrupted by ${r.signal} — the running command was stopped and the temporary worktree removed`];
   const used = `${r.runs} run(s) of \`${r.command}\` over ${r.commits} commit(s)`;
   if (r.kind === "passes-at-head") return [`✓ ${r.milestone}: the suite passes at HEAD — flaky or already fixed · no culprit to find (${used})`];
-  if (r.kind === "base-fails") return [`✗ ${r.milestone}: the suite already fails before the first card — not caused by a card (${used})`];
+  if (r.kind === "base-fails") return [`✗ ${r.milestone}: the suite is already failing before the first card — not caused by a card (${used})`];
   return [
     `✗ ${r.milestone}: the suite first fails at commit ${r.sha.slice(0, 7)} ${r.subject}`,
     r.card ? `  card: ${r.card} ${r.cardTitle} (found by ${r.by === "subject" ? "the commit subject" : "the files it changed"})` : "  card: no card of this milestone matches this commit",

@@ -117,7 +117,7 @@ test("TMODE-AC-12 the suite already fails before the first card: exit 2 after tw
   assert.equal(r.kind, "base-fails");
   assert.equal(r.exit, 2);
   assert.equal(r.runs, 2);
-  assert.match(culprit.culpritLines(r)[0], /already fails before the first card/);
+  assert.match(culprit.culpritLines(r)[0], /already failing before the first card/);
   assert.equal(worktrees(made.root), 1);
 });
 

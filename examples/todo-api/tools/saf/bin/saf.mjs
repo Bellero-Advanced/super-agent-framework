@@ -12,7 +12,7 @@ import { listRepoFiles } from "../lib/git.mjs";
 import { blockingGaps, buildMatrix, completeGaps, countsHere, renderMatrix, summarize } from "../lib/matrix.mjs";
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
-import { CARD_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
+import { CARD_ID, MILESTONE_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { prerunCard } from "../lib/prerun.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
 import { writeReviewDiff } from "../lib/reviewdiff.mjs";
@@ -284,7 +284,12 @@ async function task(sub, rest) {
       return 0;
     }
     case "culprit": {
-      const r = await findCulprit(ctx, requireId(), { cmd: option("--cmd") });
+      const mid = requireId();
+      if (!MILESTONE_ID.test(mid)) {
+        err(`✗ "${mid}" is not a milestone id — usage: ${c("task:culprit", '<M> [--cmd "<command>"]')} (for example ${c("task:culprit", "M1")})`);
+        return 2;
+      }
+      const r = await findCulprit({ ...ctx, onOutput: (s) => process.stdout.write(s) }, mid, { cmd: option("--cmd") });
       culpritLines(r).forEach(out);
       return r.exit;
     }

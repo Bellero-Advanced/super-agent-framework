@@ -1,14 +1,173 @@
 {
   "id": "T-M3-18",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:29:48.672Z",
     "base": "a70ec47c868243fc9c2fe8af2b8d06313348cd3e",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 5,
   "lane": 1,
   "branch": "card/T-M3-18",
-  "worktree": ".claude/worktrees/T-M3-18"
+  "worktree": ".claude/worktrees/T-M3-18",
+  "verified": {
+    "at": "2026-11-24T16:39:42.201Z",
+    "head": "0c6571d7c0e69535a29181e6a42f9d4c3498743e",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/culprit-robust.test.mjs test/unit/culprit.test.mjs test/unit/task.test.mjs",
+        "exit": 0,
+        "ms": 12142,
+        "tail": [
+          "ok 35 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.078917",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 36 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 270.825042",
+          "  type: 'test'",
+          "  ...",
+          "1..36",
+          "# tests 36",
+          "# suites 0",
+          "# pass 35",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 12077.449"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 438,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "174 scenario(s) in 19 spec(s) · with test 130 · gaps 44 · gaps of started cards 0 · started in another folder 1"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 385,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 571 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 301,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 264 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/culprit-robust.test.mjs' 'test/unit/culprit.test.mjs'",
+        "exit": 0,
+        "ms": 10240,
+        "tail": [
+          "ok 21 - TMODE-AC-13 no hint when no card deferred the suite, or when the failed gate is not a full-suite command",
+          "  ---",
+          "  duration_ms: 184.393917",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: the engine script and the cmd table know task:culprit",
+          "ok 22 - the engine script and the cmd table know task:culprit",
+          "  ---",
+          "  duration_ms: 0.187792",
+          "  type: 'test'",
+          "  ...",
+          "1..22",
+          "# tests 22",
+          "# suites 0",
+          "# pass 22",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 10185.25075"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/culprit.mjs",
+        "kit/tools-saf/lib/run.mjs",
+        "test/unit/culprit-robust.test.mjs",
+        "test/unit/culprit.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/bin/saf.mjs": "630bd4e0b2a2469060bf6e0613b3b1163a6a25b8",
+        "kit/tools-saf/lib/culprit.mjs": "b70bf684ec257439f9f6ae798300b14f1d6fe213",
+        "kit/tools-saf/lib/run.mjs": "677dc3cd5e49a5154fae3cc2693546428794a52c",
+        "test/unit/culprit-robust.test.mjs": "638fff994b17fa2403fe548bd7b9566f3ba1e3db",
+        "test/unit/culprit.test.mjs": "7123ab1393c753ddc050840c8b2eb60295ab9272"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "TMODE-AC-17",
+        "TMODE-AC-18",
+        "TMODE-AC-19"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 62,
+        "cap": 150
+      },
+      "test": {
+        "lines": 207,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/culprit-robust.test.mjs",
+        "test/unit/culprit.test.mjs"
+      ]
+    }
+  }
 }

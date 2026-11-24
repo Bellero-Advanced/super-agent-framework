@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 13/34
+## M3 SAF builds itself — cards done 14/34
 
-- In progress: **T-M3-18** task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — started 2026-11-24 16:29 · not verified yet · lane 1 · .claude/worktrees/T-M3-18
-- Next: T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
+- In progress: none
+- Next: T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates · T-M3-20 saf choices and config --check refuse arguments they do not know, and a verify fallback names its real cause
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -21,7 +21,7 @@
 | [T-M3-34](tasks/M3/T-M3-34.md) | task:merge accepts a lane card that adds an always-allowed glob: the post-verify check uses the main folder's list and the branch's | ✓ passed | [T-M3-34.json](evidence/T-M3-34.json) · passed 2026-11-24 16:19 (8 commands) · full suite deferred to gate |
 | [T-M3-16](tasks/M3/T-M3-16.md) | Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read | ✓ passed | [T-M3-16.json](evidence/T-M3-16.json) · passed 2026-11-24 16:26 (5 commands) · full suite deferred to gate |
 | [T-M3-17](tasks/M3/T-M3-17.md) | Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates | · not started | – |
-| [T-M3-18](tasks/M3/T-M3-18.md) | task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names | ▶ in progress | [T-M3-18.json](evidence/T-M3-18.json) · started 2026-11-24 16:29 · not verified yet |
+| [T-M3-18](tasks/M3/T-M3-18.md) | task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names | ✓ passed | [T-M3-18.json](evidence/T-M3-18.json) · passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate |
 | [T-M3-19](tasks/M3/T-M3-19.md) | STATE.md, the plan mirror, the report and the HTML page give every exit gate the same result word, and broken evidence never crashes them | · not started | – |
 | [T-M3-20](tasks/M3/T-M3-20.md) | saf choices and config --check refuse arguments they do not know, and a verify fallback names its real cause | · not started | – |
 | [T-M3-21](tasks/M3/T-M3-21.md) | Setup messages say what happened: "not a JSON object" for a valid non-object file, the archive path in every settings warning and dry-run line, and a minified package.json stays minified | · not started | – |
@@ -57,8 +57,8 @@
 
 ## Latest evidence
 
+- T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate
 - T-M3-23 The setup skill and the user docs say exactly what the code does: keep paths with spaces, the chat-language question, lanes without the local file, upgrade's plan promise, the language list — passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate
-- T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — started 2026-11-24 16:29 · not verified yet
 - T-M3-22 The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception — passed 2026-11-24 16:28 (5 commands) · full suite deferred to gate
 - T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read — passed 2026-11-24 16:26 (5 commands) · full suite deferred to gate
 - T-M3-34 task:merge accepts a lane card that adds an always-allowed glob: the post-verify check uses the main folder's list and the branch's — passed 2026-11-24 16:19 (8 commands) · full suite deferred to gate
