@@ -6,7 +6,7 @@ import { detectProject } from "./detect.mjs";
 import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
 import { variantAgents } from "./effort.mjs";
-import { FRICTION_FILE } from "./friction.mjs";
+import { FRICTION_FILE, SELF_FIX_KINDS, SELF_FIX_LIMITS } from "./friction.mjs";
 import { loadPlan } from "./plan.mjs";
 import { generatedFiles } from "./task.mjs";
 import { render } from "./template.mjs";
@@ -120,6 +120,9 @@ export function alignShellComments(md) {
   });
 }
 
+/** The word that joins two alternatives in generated text, per document language. */
+const OR_WORD = { en: "or", th: "หรือ" };
+
 export function templateData(config, detected, opts = {}) {
   const pm = config.stack.packageManager;
   const c = (s, a) => scriptCommand(pm, s, a);
@@ -174,6 +177,9 @@ export function templateData(config, detected, opts = {}) {
     dontTouchYaml: JSON.stringify([...new Set([...config.policies.forbiddenPaths, ...config.policies.ownerOnlyPaths])]),
     reviewEvery: config.workflow.review !== "m-cards",
     reviewSecurity: config.workflow.review === "every-card+security",
+    selfFixOn: config.workflow.selfFix === "on",
+    selfFixCap: SELF_FIX_LIMITS.perMilestone,
+    selfFixKinds: SELF_FIX_KINDS.map((k) => `\`${k}\``).join(` ${OR_WORD[dl] ?? OR_WORD.en} `),
     lanesOn: config.workflow.worktrees && config.workflow.lanes.code > 0,
     sideOn: config.workflow.sideLanes.enabled,
     measureOn: config.workflow.measure.enabled,
@@ -208,6 +214,8 @@ export function templateData(config, detected, opts = {}) {
       taskFriction: c("task:friction"),
       taskFrictionAdd: c("task:friction", "add --kind <kind> --area <area> --evidence <text> <summary>"),
       taskFrictionClose: c("task:friction", "close <F-id> carded|fixed|dropped <card id or reason>"),
+      taskFrictionDraft: c("task:friction", "draft"),
+      taskFrictionCarded: c("task:friction", "close <F-id> carded <card id>"),
       docsCheck: c("docs:check"),
       specMatrix: c("spec:matrix"),
       specMatrixCheck: c("spec:matrix", "--check"),

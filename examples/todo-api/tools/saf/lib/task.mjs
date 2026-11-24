@@ -28,6 +28,7 @@ import {
   submoduleReady,
   topLevel,
 } from "./git.mjs";
+import { FRICTION_FILE, appendClose, readFriction } from "./friction.mjs";
 import { globToRegExp, toGlob } from "./glob.mjs";
 import { laneOf, pickParallel } from "./parallel.mjs";
 import {
@@ -46,6 +47,7 @@ import {
   alwaysAllowed,
   cardStatus,
   doneCount,
+  formatTime,
   isDone,
   laneSessionContext,
   loadPlan,
@@ -548,6 +550,24 @@ function planVerifyRun(ctx, card, ev, filesBase, inLane) {
   return { run: [...card.criteria.filter((c) => !full.includes(c)), command], deferred: full, targeted: { files } };
 }
 
+/**
+ * Rule 21: a passed self-fix card closes its friction entry as fixed in the main folder's log. Never throws, whatever the log
+ * does (refuses the line, cannot be read or written) — the evidence and the merge are already done, so the failure is
+ * reported and the card result stands. An entry already fixed by this card (verify again after a failed review) is left alone.
+ */
+function closeSelfFix(ctx, plan, card) {
+  if (!card.selfFix) return;
+  try {
+    const entry = readFriction(ctx.root).entries.find((e) => e.id === card.selfFix);
+    if (entry?.status === "fixed" && entry.closes[entry.closes.length - 1]?.ref === card.id) return;
+    const today = formatTime(nowIso(ctx), ctx.config.people.timeZone).slice(0, 10);
+    appendClose(ctx.root, card.selfFix, "fixed", card.id, { today, cards: (x) => plan.cards.has(x) });
+    ctx.log?.(`  ${card.selfFix} → fixed (${card.id}) in ${FRICTION_FILE} — not committed`);
+  } catch (e) {
+    ctx.log?.(`  ! ${card.selfFix} was not closed as fixed: ${errText(e)}`);
+  }
+}
+
 export async function verifyCard(ctx, id) {
   const plan = loadPlan(ctx.root, ctx.config);
   const lane = laneFolder(ctx.root, plan);
@@ -581,6 +601,7 @@ export async function verifyCard(ctx, id) {
   }
   if (size.over.length) ctx.log?.(sizeWarning(id, size));
   writeJson(ctx.root, evidencePath(id), next);
+  if (pass && !lane) closeSelfFix(ctx, plan, card);
   if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
   return next;
 }
@@ -769,6 +790,7 @@ export async function mergeCard(ctx, id, opts = {}) {
     await fail(`error after merging (before commit): ${errText(e)}`, 5);
   }
   const commit = resolveCommit(root, "HEAD") ?? "";
+  closeSelfFix(ctx, plan, card);
   const warnings = [];
   for (const args of [["worktree", "remove", worktree], ["branch", "-d", branch]]) {
     try {

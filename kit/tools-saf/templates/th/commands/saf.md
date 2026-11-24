@@ -74,3 +74,21 @@ commit ไฟล์รอบรีวิว `docs/plan/evidence/reviews/<id>.jso
 - **คำสั่งการ์ด:** `{{cmd.taskStart}}` → ทำงาน → `{{cmd.taskVerify}}` → ตรวจ → commit · สถานะ `docs/plan/STATE.md` ·
   วิธีทำงาน `docs/plan/README.md`
 - **ลองพิมพ์:** `/saf การ์ดถัดไปคืออะไร` · `/saf หน้า login ล่มตอนกดส่ง` · `/saf รัน test ให้หน่อย`
+{{#if selfFixOn}}
+
+## 5. แก้ตัวเอง (SAF แก้บั๊กของตัวเองที่พิสูจน์แล้ว)
+
+`workflow.selfFix` เป็น `on`: รายการ friction ชนิด {{selfFixKinds}} ที่การ์ดขนาด S ใบเดียวพร้อม test แก้ได้ กลายเป็นการ์ด
+ใน milestone ที่ **active** ได้โดยไม่ต้องรอ Go ของ{{owner}} — ไม่เกิน {{selfFixCap}} ใบต่อ milestone
+(`SELF_FIX_LIMITS.perMilestone` ใน `tools/saf/lib/friction.mjs`) engine ตรวจทุกเงื่อนไข (`{{cmd.taskStateCheck}}`)
+
+1. `{{cmd.taskFrictionDraft}}` พิมพ์ร่างที่มี `self_fix: <F-id>` แทน `T-M<n>-??` ด้วยรหัสการ์ดถัดไปที่ว่าง เติม `touch`
+   (มีไฟล์ test) และ "Done when" (คำสั่งที่รันไฟล์ test นั้น) แล้วบันทึกเป็นไฟล์การ์ด
+2. เพิ่มรหัสการ์ดต่อท้าย `cards:` ของ milestone ที่ active — แก้แค่บรรทัดเดียวนั้นในไฟล์ milestone
+3. รัน `{{cmd.taskFrictionCarded}}`
+4. ทำตาม card loop ปกติ โดยเขียน test ก่อนและต้องล้มก่อนแก้ (skill `tdd`) `spec-reviewer` ตรวจว่า test ครอบหลักฐานของ friction
+   เมื่อการ์ดผ่าน `{{cmd.taskVerify}}`{{#if lanesOn}} (การ์ด lane: `{{cmd.taskMerge}}`){{/if}} engine ปิดรายการเป็น fixed ให้ใน
+   `docs/plan/friction.md` ให้ commit ไฟล์นั้นลำพังทันที (โฟลเดอร์หลักที่ยังไม่ commit จะทำให้ merge ครั้งถัดไปถูกปฏิเสธ)
+
+อย่างอื่น — ชนิดอื่น ขนาด M ไม่มี test เกินเพดาน — รอ `designer` และ Go ของ{{owner}} (`/saf-plan`)
+{{/if}}

@@ -76,3 +76,20 @@ Show the owner, in Thai:
 - **Card commands:** `npm run task:start -- <id>` → work → `npm run task:verify -- <id>` → review → commit · status `docs/plan/STATE.md` ·
   how it works `docs/plan/README.md`
 - **Try:** `/saf what is the next card?` · `/saf the login page crashes on submit` · `/saf run the tests`
+
+## 5. Self-fix (SAF fixes its own proven bugs)
+
+`workflow.selfFix` is `on`: a friction entry of kind `command-failed` or `doc-drift` that one size S card with a test can fix becomes a card
+in the **active** milestone without waiting for the owner's Go — at most 3 such cards per milestone
+(`SELF_FIX_LIMITS.perMilestone` in `tools/saf/lib/friction.mjs`). The engine checks every condition (`npm run task:state -- --check`).
+
+1. `npm run task:friction -- draft` prints a draft with `self_fix: <F-id>`. Replace `T-M<n>-??` with the next free card id, fill
+   `touch` (a test file included) and "Done when" (a command that runs that test file), and save it as the card file.
+2. Append the card id to `cards:` of the active milestone — only that one line of the milestone file.
+3. Run `npm run task:friction -- close <F-id> carded <card id>`.
+4. Run the normal card loop with the test written first and failing before the fix (the `tdd` skill); the `spec-reviewer`
+   checks that the test exercises the friction's evidence. When the card passes `npm run task:verify -- <id>` (a lane card: `npm run task:merge -- <id>`),
+   the engine closes the entry as fixed in `docs/plan/friction.md`: commit that file alone right after (an uncommitted main
+   folder refuses the next merge).
+
+Anything else — another kind, size M, no test, the cap reached — waits for `designer` and the owner's Go (`/saf-plan`).

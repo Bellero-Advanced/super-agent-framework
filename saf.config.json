@@ -68,6 +68,7 @@
       "M": 600
     },
     "review": "every-card",
+    "selfFix": "on",
     "lanes": {
       "code": 3,
       "main": 1

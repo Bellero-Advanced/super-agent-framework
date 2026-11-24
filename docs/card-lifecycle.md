@@ -211,6 +211,28 @@ thing, a document contradicts the code, or the work needs a step the workflow do
   quotes the evidence under "Why" and leaves `touch` and "Done when" as `TODO`. The engine never adds a card to a plan file: the
   designer writes the cards, or closes the entry `dropped` with a reason
 
+## Self-fix cards
+
+With `workflow.selfFix: "on"` ([config-reference.md](config-reference.md#workflow)) a small, proven framework bug becomes a card
+in the active milestone without waiting for the owner's Go. The card carries `self_fix: F-<nnn>` in its frontmatter, and the
+engine reports the card as a plan problem (`task:state --check` fails, and `task:start` or `task:verify` refuse) unless all of
+these hold:
+
+- the entry `F-<nnn>` exists and is open, or carded to this card; its kind is `command-failed` or `doc-drift`
+- the card is size S, its milestone is the active one, its `touch` lists a test file and a "Done when" command names that file
+- the milestone holds at most `SELF_FIX_LIMITS.perMilestone` (`tools/saf/lib/friction.mjs`) self-fix cards
+
+A card that has already passed keeps its history: its entry may be fixed by it (also while the card is reopened after a
+failed review) and its milestone may be closed, without the card becoming a plan problem.
+
+The steps: `task:friction draft` → write the card file → append its id to `cards:` of the active milestone (only that line) →
+`task:friction close <F-id> carded <card id>` → the normal loop, with the test written first and failing before the fix; the
+spec review checks that the test exercises the friction's evidence. When the card passes `task:verify` in the main folder,
+or `task:merge` merges a lane card, the engine appends `F-<nnn> → fixed · <date> · <card id>` to the main folder's log (not
+committed — commit it alone right away: the next `task:merge` refuses a main folder with uncommitted changes). A failed verify, a verify inside a lane or a refused merge appends
+nothing. Everything that does not qualify (another kind, size M, the cap reached, `selfFix` off) waits for the designer and
+the owner's Go.
+
 ## Hooks
 
 - **SessionStart** prints the milestone, cards done, the card in progress with its criteria and `touch`, the next cards and
