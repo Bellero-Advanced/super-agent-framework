@@ -26,11 +26,13 @@ What each option means (what it is · good for · cost · pick it when) is not h
 
 Rigor sets defaults the user can still override:
 
-| Rigor | Card size S / M (code lines) | Test caps S / M | Review | Merge checks |
-|---|---|---|---|---|
-| light | 200 / 500 | 300 / 800 | spec review for size-M cards | test |
-| standard | 150 / 400 | 250 / 600 | spec review for every card | typecheck · lint · test |
-| strict | 100 / 300 | 200 / 500 | every card + security audit per milestone | typecheck · lint · test · build |
+| Rigor | Review | Merge checks |
+|---|---|---|
+| light | spec review for M and L cards (legacy S cards together at the milestone gate) | test |
+| standard | spec review for every card | typecheck · lint · test |
+| strict | every card + security audit per milestone | typecheck · lint · test · build |
+
+Card size caps come from the size table (`SIZE_CAPS` in `config.mjs`), the same for every rigor: `task:verify` warns above a cap and fails above twice it.
 
 ## 3. Stack
 
@@ -51,7 +53,7 @@ npm needs `--` before arguments (`npm run task:verify -- T-M1-01`); the generate
 | Model preset? | `models.preset` | Max · Balanced · Economy · Custom | Balanced |
 | Custom only: planner model · builder model | `models.planner` · `models.builder` | full model ids | — |
 | Model for sessions opened without `--model`? | `models.sessionDefault` | builder model · planner model | builder model |
-| Effort for every card, or lower for small ones? | `models.effort` | fixed · by-size | fixed |
+| Effort for every card, or lower for M cards? | `models.effort` | fixed · by-size | fixed |
 
 | Preset | Planner roles (designer · spec-reviewer · security-auditor) | Builder roles (implementer · qa-runner · others) |
 |---|---|---|
@@ -63,8 +65,8 @@ A preset changes the models only; a role's own effort is the same in every prese
 implementer high · qa-runner medium · …). `models.effort` decides how that effort is used: `fixed` keeps one effort per
 role for every card and the agent files as they are; `by-size` lowers it only for the roles and card sizes in the effort
 table (`EFFORT_BY_SIZE` in `config.mjs`, SAF's decision D-016) and setup then writes one extra agent file
-`.claude/agents/<role>-<effort>.md` per role and lowered effort, which `task:start` names for the card. Cards of size S at
-a lower effort may bounce more in review; `task:report` shows review rounds by size and effort. Per-role changes go in
+`.claude/agents/<role>-<effort>.md` per role and lowered effort, which `task:start` names for the card. M cards at a
+lower effort may bounce more in review; `task:report` shows review rounds by size and effort. Per-role changes go in
 `models.overrides` (`{"qa-runner": {"effort": "low"}}`) and win over both modes; a role with an effort override gets no
 extra file.
 
@@ -95,7 +97,7 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 | Test database name per lane? | `workflow.laneDb` | pattern with `{n}` | empty; with a database: `<name>_lane{n}_test` |
 | Measure lock (heavy commands one at a time on this machine)? | `workflow.measure.enabled` | on · off | on |
 | Performance budget file? | `workflow.perfBudgets` | path · none | none |
-| Override card size caps? | `workflow.sizes` · `workflow.testCaps` | numbers | from rigor |
+| Override card size caps? | `workflow.sizes` · `workflow.testCaps` | `{ M, L }` numbers | the size table (the same for every rigor) |
 | Override merge checks? | `workflow.mergeChecks` | list of commands | from rigor (only commands whose scripts exist) |
 | How often should the full test suite run? | `workflow.testMode` | every-card · targeted · milestone | milestone (the fastest; each person can override it on their own machine — see below) |
 | Command that runs only some test files? | `stack.commands.testFiles` | command with `{files}` · empty | from the test runner: `node --test {files}` · `vitest run {files}` · `jest {files}` · `pytest {files}`; empty = cards fall back to the full suite |

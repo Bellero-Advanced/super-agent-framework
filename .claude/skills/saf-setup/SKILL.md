@@ -63,7 +63,7 @@ pick it when (the rigor and preset options also carry the values they derive). T
   (`- pnpm · npm · yarn · bun`): give each of them a row. A question with no options (a typed value) gets its one
   explanation as four short lines instead of a table. Identity questions (names, pitch, owner title, time zone, goal) print
   nothing: ask them without an explanation.
-- When an option prints derived values under its four lines (card sizes, test caps, review and merge checks for a rigor;
+- When an option prints derived values under its four lines (the M / L card and test caps, review and merge checks for a rigor;
   planner and builder models for a preset), add them as one line under that option's row, as printed.
 - Put the "pick it when" line of each option in its AskUserQuestion option description, as printed.
 - A question you skip because detection made the answer certain: say what was detected. Offer its explanation only when the

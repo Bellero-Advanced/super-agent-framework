@@ -109,7 +109,7 @@ npm ส่งอาร์กิวเมนต์หลัง `--`: `npm run tas
 {{#if reviewEvery}}
 - `spec-reviewer` เทียบงานกับสเปกแล้ว (ทุกการ์ด){{#if reviewSecurity}} · `security-auditor` ตรวจ milestone ก่อนประตูออก{{/if}}
 {{else}}
-- `spec-reviewer` เทียบการ์ดขนาด M กับสเปก · การ์ด S ตรวจรวมที่ประตูออก milestone
+- `spec-reviewer` เทียบการ์ดขนาด M และ L กับสเปก · การ์ด S เดิมตรวจรวมที่ประตูออก milestone
 {{/if}}
 - ขนาดการ์ด: M ≤ {{sizeM}} · L ≤ {{sizeL}} บรรทัดโค้ดที่เปลี่ยน (test: M ≤ {{testM}} · L ≤ {{testL}}) — `task:verify` เตือนเมื่อเกินเพดานและล้มเมื่อเกิน {{hardStop}} เท่าของเพดาน → designer แตกการ์ด
 

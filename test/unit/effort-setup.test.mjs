@@ -60,7 +60,7 @@ test("EFFORT-AC-08 each effort sentence names the fact the code makes true: tabl
   for (const lang of ["en", "th"]) for (const t of ["task:report", "saf.config.local.json", "models.overrides"]) assert.ok(joined(bySize, lang).includes(t), `${lang}: ${t}`);
   assert.match(bySize.en.what, /only for the roles and card sizes[^.]*table/);
   assert.match(bySize.en.what, /one extra agent file per role and lowered effort/);
-  assert.match(bySize.en.cost, /small cards[^.]*bounce more in review/i);
+  assert.match(bySize.en.cost, /M cards[^.]*bounce more in review/);
   assert.match(bySize.en.cost, /review rounds by size and effort/);
   assert.match(bySize.en.when, /per machine/);
   assert.match(bySize.en.when, /models\.overrides still wins for one role/);

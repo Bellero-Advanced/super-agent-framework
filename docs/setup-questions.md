@@ -9,13 +9,13 @@ The interview `/saf-setup` runs, grouped in this order — each question shows a
 3. **Stack** — package manager (pnpm · npm · yarn · bun · none) · the real typecheck/lint/test/e2e/build commands · database ·
    monorepo · submodules
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model ([model-presets.md](model-presets.md)) · effort
-   (`fixed` · `by-size`, recommended `fixed`: `by-size` gives small cards a lower effort and adds agent files — [roles.md](roles.md#variant-agent-files))
+   (`fixed` · `by-size`, recommended `fixed`: `by-size` gives M cards a lower effort and adds agent files — [roles.md](roles.md#variant-agent-files))
 5. **Roles and skills** — optional library roles · a custom role · report language ([roles.md](roles.md)) · optional skill
    packs (ui-frontend · db-migrations · performance · i18n · mobile · game — [skills.md](skills.md))
 6. **Workflow** — parallel lanes and caps · side lanes (on/off, how many at a time) · moving a role to the other lane
    (only with lanes on) · solo paths · ports and test database per lane · test mode (how often the full suite runs —
    `every-card` · `targeted` · `milestone`, recommended `milestone`) and the command that runs only some test files ·
-   measure lock · performance budgets · card size caps · merge checks
+   measure lock · performance budgets · card size caps (M / L, one table for every rigor) · merge checks
 7. **Policies** — push · deploy (target, exceptions) · protected and auto-deploy branches · no force-push · env files ·
    forbidden and owner-only paths · external services
 8. **Token saving and the first milestone** — token-saving mode · the goal of M1

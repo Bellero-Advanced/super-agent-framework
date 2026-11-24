@@ -34,7 +34,7 @@ Unclear between two routes → ask one short question with a recommendation.
 | start | main session | `{{cmd.taskStart}}`{{#if lanesOn}} (code-lane role → `{{cmd.taskStartLane}}`){{/if}} |
 | build | the agent `{{cmd.taskStart}}` named | touch only files in `touch` |
 | verify | same agent | `{{cmd.taskVerify}}` until it passes |
-| review | `spec-reviewer` (read only){{#unless reviewEvery}} — size M cards; S cards at the milestone gate{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}`, then {{/if}}the card id · the review types{{#if tokenSaving.reviewerDiff}} · the diff path{{/if}} |
+| review | `spec-reviewer` (read only){{#unless reviewEvery}} — M and L cards; legacy S cards at the milestone gate{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}`, then {{/if}}the card id · the review types{{#if tokenSaving.reviewerDiff}} · the diff path{{/if}} |
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
 | land | main session | commit{{#if lanesOn}} · lane card → `{{cmd.taskMerge}}`{{/if}} |
 
@@ -79,7 +79,7 @@ Show the {{owner}}, in {{chatLanguageName}}:
 
 ## 5. Self-fix (SAF fixes its own proven bugs)
 
-`workflow.selfFix` is `on`: a friction entry of kind {{selfFixKinds}} that one size S card with a test can fix becomes a card
+`workflow.selfFix` is `on`: a friction entry of kind {{selfFixKinds}} that one size M card with a test can fix becomes a card
 in the **active** milestone without waiting for the {{owner}}'s Go — at most {{selfFixCap}} such cards per milestone
 (`SELF_FIX_LIMITS.perMilestone` in `tools/saf/lib/friction.mjs`). The engine checks every condition (`{{cmd.taskStateCheck}}`).
 
@@ -92,5 +92,5 @@ in the **active** milestone without waiting for the {{owner}}'s Go — at most {
    the engine closes the entry as fixed in `docs/plan/friction.md`: commit that file alone right after (an uncommitted main
    folder refuses the next merge).
 
-Anything else — another kind, size M, no test, the cap reached — waits for `designer` and the {{owner}}'s Go (`/saf-plan`).
+Anything else — another kind, size L (a self-fix card is size M), no test, the cap reached — waits for `designer` and the {{owner}}'s Go (`/saf-plan`).
 {{/if}}

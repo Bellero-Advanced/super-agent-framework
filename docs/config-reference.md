@@ -10,7 +10,7 @@ validates; every engine command validates on load. Missing keys get the defaults
 | `name` · `pitch` · `domain` · `users` | detected / "" | shown at the top of CLAUDE.md |
 | `type` | `web-app` | web-app · mobile · game · api · erp · data-ai · library-cli · other — selects rule templates |
 | `stage` | `prototype` | idea · prototype · mvp · production |
-| `rigor` | `standard` | light · standard · strict — derives sizes, test caps, review and merge checks |
+| `rigor` | `standard` | light · standard · strict — derives review and merge checks (the card size caps are one table for every rigor) |
 
 ## people
 
@@ -40,7 +40,7 @@ See [model-presets.md](model-presets.md).
 | `planner` · `builder` | from the preset | full model ids; a non-empty value replaces the preset's model for every preset, and `custom` has no models of its own |
 | `sessionDefault` | the builder model | the model the generated CLAUDE.md tells a session opened without `--model` to start with; nothing enforces it |
 | `overrides` | {} | per role, `{ "<role>": { "model": …, "effort": … } }` — e.g. `{"qa-runner": {"effort": "low"}}`; not asked by the interview |
-| `effort` | `fixed` | `fixed` · `by-size`. `fixed`: one effort per role and the agent files as they are. `by-size`: only the roles and card sizes in the effort table (`EFFORT_BY_SIZE` in `lib/config.mjs`, SAF's decision [D-016](DECISIONS.md): per role, the effort of size S and size M cards) get a lower effort, and setup writes one extra agent file `.claude/agents/<role>-<effort>.md` per role and lowered effort ([roles.md](roles.md#variant-agent-files)); `models.overrides` still wins for a single role. Small cards at a lower effort may bounce more in review; `task:report` shows review rounds by size and effort. A person can override the mode, see [`saf.config.local.json`](#safconfiglocaljson); asked by the interview in group 4 |
+| `effort` | `fixed` | `fixed` · `by-size`. `fixed`: one effort per role and the agent files as they are. `by-size`: only the roles and card sizes in the effort table (`EFFORT_BY_SIZE` in `lib/config.mjs`, SAF's decision [D-016](DECISIONS.md): per role, the effort of size M and size L cards) get a lower effort, and setup writes one extra agent file `.claude/agents/<role>-<effort>.md` per role and lowered effort ([roles.md](roles.md#variant-agent-files)); `models.overrides` still wins for a single role. M cards at a lower effort may bounce more in review; `task:report` shows review rounds by size and effort. A person can override the mode, see [`saf.config.local.json`](#safconfiglocaljson); asked by the interview in group 4 |
 
 ## roles
 
@@ -63,9 +63,9 @@ See [roles.md](roles.md).
 
 | Key | Default | Notes |
 |---|---|---|
-| `sizes` · `testCaps` | from rigor | `{ "S": 150, "M": 400 }` changed code lines |
-| `review` | from rigor | m-cards · every-card · every-card+security |
-| `selfFix` | `off` | `on` lets the main session add a card with `self_fix: F-<nnn>` to the **active** milestone without the owner's Go when the friction entry is open (or carded to that card), of kind `command-failed` or `doc-drift`, and the card is size S, lists a test file in `touch` that a "Done when" command names, and the milestone holds at most `SELF_FIX_LIMITS.perMilestone` (`lib/friction.mjs`) self-fix cards; the engine reports any other `self_fix` card as a plan problem (a card that already passed keeps its history: its entry may be fixed by it, also while it is reopened after a failed review, and its milestone may be closed). With `off` every `self_fix` card is a plan problem and the generated `/saf` command has no Self-fix section — [card-lifecycle.md](card-lifecycle.md#self-fix-cards) |
+| `sizes` · `testCaps` | the size table | `{ "M": <lines>, "L": <lines> }` changed code lines · changed test lines. The default is `SIZE_CAPS` in `lib/config.mjs`, the same for every rigor; `task:verify` warns above a cap and fails above twice it. The retired shape `{ "S", "M" }` is ignored with a warning |
+| `review` | from rigor | m-cards (M and L cards each; legacy S cards together at the milestone gate) · every-card · every-card+security |
+| `selfFix` | `off` | `on` lets the main session add a card with `self_fix: F-<nnn>` to the **active** milestone without the owner's Go when the friction entry is open (or carded to that card), of kind `command-failed` or `doc-drift`, and the card is size M, lists a test file in `touch` that a "Done when" command names, and the milestone holds at most `SELF_FIX_LIMITS.perMilestone` (`lib/friction.mjs`) self-fix cards; the engine reports any other `self_fix` card as a plan problem (a card that already passed keeps its history: its entry may be fixed by it, also while it is reopened after a failed review, and its milestone may be closed). With `off` every `self_fix` card is a plan problem and the generated `/saf` command has no Self-fix section — [card-lifecycle.md](card-lifecycle.md#self-fix-cards) |
 | `worktrees` | true | parallel lanes; with worktrees off all cards run in the main folder |
 | `lanes`: `code` · `main` | 3 · 1 | how many cards may run at once in the code lane (0 to `LANE_CEILING` in `lib/config.mjs`, now 32) and in the main lane. `main` is fixed at 1 because that lane works in one folder and `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder could not be told apart (`task:start` also refuses a second main-folder card: "one folder works one card at a time"). Each code lane is a worktree plus the `laneInstall` step and uses CPU, memory and disk while it builds and tests; `code: 0` runs every card in the main folder. A machine may set its own `code` in [`saf.config.local.json`](#safconfiglocaljson) |
 | `sideLanes`: `enabled` · `max` | true · 1 | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` (1 to `LANE_CEILING`) in progress at once; side cards only use lane slots the active milestone leaves free, so `max` never adds slots; a machine may set its own `max` in [`saf.config.local.json`](#safconfiglocaljson) — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
