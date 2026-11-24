@@ -1,14 +1,217 @@
 {
   "id": "T-M3-32",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T09:50:10.704Z",
     "base": "4878a5434d635b13e82b61b824346ca203b0edbc",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M3-32",
-  "worktree": ".claude/worktrees/T-M3-32"
+  "worktree": ".claude/worktrees/T-M3-32",
+  "verified": {
+    "at": "2026-11-24T09:52:01.874Z",
+    "head": "29ef566df6ea053fa128c4b9e50fc4a31eaf3eaa",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/matrix-scope.test.mjs",
+        "exit": 0,
+        "ms": 5196,
+        "tail": [
+          "ok 9 - MSCOPE-AC-04 a lane card counts once done on main (merge checks run there)",
+          "  ---",
+          "  duration_ms: 1049.383667",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
+          "ok 10 - MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
+          "  ---",
+          "  duration_ms: 1.597375",
+          "  type: 'test'",
+          "  ...",
+          "1..10",
+          "# tests 10",
+          "# suites 0",
+          "# pass 10",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 5134.36825"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/checks.test.mjs",
+        "exit": 0,
+        "ms": 1174,
+        "tail": [
+          "ok 5 - measure lock: second holder waits then exits 75; lock is released",
+          "  ---",
+          "  duration_ms: 67.192084",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: probe: passes when hooks answer and the hook-less control does not",
+          "ok 6 - probe: passes when hooks answer and the hook-less control does not",
+          "  ---",
+          "  duration_ms: 867.095",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
+          "# suites 0",
+          "# pass 6",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1119.796541"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('docs/card-lifecycle.md','utf8');if(!s.includes('another folder'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 45,
+        "tail": []
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 313,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 349,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "171 scenario(s) in 18 spec(s) · with test 113 · gaps 58 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 331,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 557 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 285,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 273 markdown file(s) · 256 local link(s) · 82 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/matrix-scope.test.mjs'",
+        "exit": 0,
+        "ms": 5347,
+        "tail": [
+          "ok 9 - MSCOPE-AC-04 a lane card counts once done on main (merge checks run there)",
+          "  ---",
+          "  duration_ms: 1120.513375",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
+          "ok 10 - MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
+          "  ---",
+          "  duration_ms: 1.393834",
+          "  type: 'test'",
+          "  ...",
+          "1..10",
+          "# tests 10",
+          "# suites 0",
+          "# pass 10",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 5296.416625"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/card-lifecycle.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/matrix.mjs",
+        "test/unit/matrix-scope.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/card-lifecycle.md": "9d39c31013c3ac87bdf7eff50cc7e600a580a434",
+        "kit/tools-saf/bin/saf.mjs": "8a74afa06b641ba7fe8c592181d7b81256f24957",
+        "kit/tools-saf/lib/matrix.mjs": "397d716e9d545267969958b6d0b3fea28f7d79b7",
+        "test/unit/matrix-scope.test.mjs": "8eeded0e6c6abf2dc570fd83e2d690a0324b9a2d"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "MSCOPE-AC-01",
+        "MSCOPE-AC-02",
+        "MSCOPE-AC-03",
+        "MSCOPE-AC-04",
+        "MSCOPE-AC-05",
+        "MSCOPE-AC-06",
+        "MSCOPE-AC-07"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 55,
+        "cap": 150
+      },
+      "test": {
+        "lines": 175,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/matrix-scope.test.mjs"
+      ]
+    }
+  }
 }

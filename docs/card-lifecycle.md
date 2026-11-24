@@ -76,7 +76,9 @@ Each list item is one command — a leading backticked command or the whole line
 Specs live in `docs/specs/<system>.md`. The "Acceptance" (or "ฉากยอมรับ") section is a table whose first cell is a
 scenario id `<AREA>-AC-<nn>`. `spec:matrix` maps ids to tests (JS/TS: the test name contains the id; other languages: the
 id appears in a test file). `spec:matrix --check` fails when a started card has a scenario without a test;
-`--complete=auth,billing` demands every scenario of those specs.
+`--complete=auth,billing` demands every scenario of those specs. A card still being built counts only in the folder
+where it is built (its lane, or the main folder for a card without a lane) — other folders list its gaps as "started in
+another folder"; a finished card counts everywhere.
 
 ## Parallel lanes
 
