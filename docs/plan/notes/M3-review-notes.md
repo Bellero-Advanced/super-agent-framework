@@ -131,3 +131,6 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 ## T-M3-17 (setup reads plan, no temp copy) — non-blocking from round 1
 - setup-rerun.test.mjs:73-74 (RERUN-AC-01) copies the old isLiving and asserts _template.md is living (contradicts rule 33; outside touch → later card). readFriction in friction.mjs now used only by its test. setup-plan-read.test.mjs:85 missing semicolon.
 - T-M3-17 round 2 (pass): parity helper in setup-plan-read test compares default io with itself (real proof = fixed expected values); setup now skips a friction.md that is a folder (old threw EISDIR; outside rule 32); on Windows os.tmpdir() ignores TMPDIR so the tmpdir check may flake.
+
+## T-M3-21 (setup messages) — non-blocking
+- adopt-moved replace-edited lines have no `→` (target only on the adopt line); set `to` from adoptMoves. Multi-line package.json with no indentation collapses to one line when a script is added (spec edge). readJson catch reports EACCES/dir as "not valid JSON" (pre-existing). setup-messages test:136-137 weak check ("is not valid JSON" vs "not valid JSON"). Designer checklist: run the card's Done-when test files against the new rules and list any that must change in `touch` (happened for T-M3-18 and T-M3-21).
