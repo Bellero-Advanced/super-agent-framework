@@ -137,3 +137,16 @@ N3. no test shows the `saf-plan-*` scratch folder is removed after success or er
 N4. test tidy-up: `const bad = cli(empty, "--dry-run")` expects 0 (misleading name); `assert.deepEqual(x.length > 5, true)` → `assert.ok`
 N5. `report.kept` still mixes plain paths and decorated strings — T-M2-21/22 should read `plan.actions`
 N6. evidence defers `npm test` (targeted mode); the milestone gate must cover the full suite
+
+## T-M2-21 (review PASS) — notes for the designer
+
+1. spec: a `--keep` path planned but MISSING on disk exits 2 ("nothing to keep"); rule 6 says "whatever its state" — make the spec say so (rule 6 or §4 edge cases); the branch has no test
+2. `--keep=CLAUDE.md` (the `=` form this CLI uses for `--complete=a,b`) is silently ignored and a real run would then archive and replace CLAUDE.md (recoverable from docs/archive/pre-saf); `--keep ","` keeps nothing silently — refuse `--keep=` and empty lists with the usage line
+3. a path containing a comma cannot be kept (no planned file has one) — a spec note
+4. an absolute path in Windows 8.3 form, or macOS `/var/…` when cwd is `/private/var/…`, becomes a `../` relative path and exits 2 (safe, confusing)
+5. the adopt skip compares paths ignoring case — `--keep docs/plan/README.md` also stops an unplanned `docs/plan/readme.md` being moved aside on a case-sensitive FS (safe direction)
+6. property test weak: (a) does not assert `-`/context lines match the old text, (b) never checks `newStart/newLines`, (c) all 200 pairs end with a newline and have no CRLF — add pairs without final newline and a running new-side counter
+7. untested: `--keep` on a first run with adopt; `--keep` of a file already equal to the new version ("no differences")
+8. cosmetic: JSDoc of `generate()` (~generate.mjs:654) omits `keep`; the saf.mjs header says `[--dry-run [--diff]]`, the error message `[--dry-run] [--diff]`
+9. `--diff` prints whatever the person wrote in CLAUDE.md etc. to the terminal and through the T-M2-22 skill into the chat (rule 14, by design) — spec: one-line caution not to keep secrets in those files
+10. evidence defers `npm test` (targeted); the milestone gate runs the full suite
