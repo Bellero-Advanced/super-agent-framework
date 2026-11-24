@@ -113,3 +113,13 @@ N4. `report.kept` mixes plain paths (living files) with decorated strings from `
 N5. a non-object `scripts` value is replaced with `{}` when scripts are added (also upgrade's old behaviour); undocumented
 N6. evidence records `npm test` as deferred (targeted mode) — the milestone exit gate must run the full suite (137 tests ran by hand)
 N7. docs/upgrade.md "your working plan is never reset" is accurate for edited files only (a deleted living file is recreated)
+
+## T-M2-05 (review PASS + hardening S1-S3 done) — notes for the designer
+
+N1. `viewer.mjs:65` `mark(res.pass ?? null)` shows "manual check" when a gate result has no `pass`; `report.mjs:37` shows "failed" — only with broken evidence, make the two agree
+N2. `viewer.mjs:69` the `gatesNot` text carries markdown backticks that appear literally in the HTML (cosmetic)
+N3. `secrets.mjs:24` the "Claude Code env value" pattern needs a literal `"`; in HTML it becomes `&quot;` so the HTML scan cannot match it (the JSON form `\"` also slips past; run.mjs redacts at capture) — spec §4 treats the HTML scan as a safety net, for this pattern it is not
+N4. `viewer.mjs:64` milestone evidence `gates` that is an object, not an array, throws a TypeError (same weakness in `report.mjs` and `undeclaredGates`)
+N5. the milestone status is shown raw ("active") on a Thai page
+N6. the card Done-when grep for `<script|https?://` in viewer.mjs fails on any harmless future comment — use a narrower check
+N7. an evidence tail is never truncated by the viewer (spec §4): a hand-crafted 10 MB tail makes a 10 MB page — tails are capped at capture time (20 pass / 60 fail lines)
