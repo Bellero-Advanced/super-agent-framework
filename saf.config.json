@@ -117,7 +117,7 @@
       }
     },
     "perfBudgets": "",
-    "alwaysAllowed": ["tools/saf/**", ".claude/skills/saf-setup/**", "examples/todo-api/tools/saf/**"],
+    "alwaysAllowed": ["tools/saf/**", ".claude/skills/saf-setup/**", "examples/todo-api/tools/saf/**", "docs/plan/friction.md", "docs/plan/friction.md.lock"],
     "commandTimeoutMs": 1800000,
     "testMode": "targeted"
   },
