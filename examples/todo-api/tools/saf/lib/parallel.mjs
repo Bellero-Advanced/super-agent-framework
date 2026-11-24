@@ -1,4 +1,4 @@
-import { roleTable } from "./config.mjs";
+import { LOCAL_CONFIG_FILE, roleTable } from "./config.mjs";
 import { globToRegExp, preparePattern, touchOverlaps } from "./glob.mjs";
 import { activeCards, activeSideCards, alwaysAllowed, cardStatus, isSideCard, nextCards, sideLaneMax, sideTracks, unmetDepends } from "./plan.mjs";
 
@@ -60,6 +60,8 @@ export function pickParallel(plan, m) {
   const solo = (plan.config.workflow.solo ?? []).join(", ");
   let sideUsed = activeSideCards(plan).length;
   const sideMax = sideLaneMax(plan);
+  const local = plan.config.workflow.localKeys ?? [];
+  const here = (key) => (local.includes(key) ? ` (this machine: ${LOCAL_CONFIG_FILE})` : "");
 
   for (const id of walkOrder(plan, m)) {
     const card = plan.cards.get(id);
@@ -93,12 +95,12 @@ export function pickParallel(plan, m) {
       continue;
     }
     if (used[lane] >= caps[lane]) {
-      skipped.push({ id, reason: `${LANE_NAME[lane]} is full (${caps[lane]} card(s), counting cards in progress)` });
+      skipped.push({ id, reason: `${LANE_NAME[lane]} is full (${caps[lane]} card(s), counting cards in progress)${lane === "code" ? here("workflow.lanes.code") : ""}` });
       continue;
     }
     const side = isSideCard(plan, id);
     if (side && sideUsed >= sideMax) {
-      skipped.push({ id, reason: `side lanes are full (${sideMax} side card(s) at a time, counting cards in progress)` });
+      skipped.push({ id, reason: `side lanes are full (${sideMax} side card(s) at a time, counting cards in progress)${here("workflow.sideLanes.max")}` });
       continue;
     }
     if (side) sideUsed++;
