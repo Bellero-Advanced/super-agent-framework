@@ -122,7 +122,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-25 Tests pin the setup-choices, gate-coverage and lane-cap behaviour the M2 reviews found weakly tested — passed 2026-11-24 17:02 (5 commands) · full suite deferred to gate
 - [x] T-M3-03 models.effort: by-size gives a role a second agent file at a lower effort for small cards, checked by docs:check — passed 2026-11-24 17:23 (8 commands) · full suite deferred to gate
 - [x] T-M3-04 task:start names the agent and effort for each card, the evidence keeps them, and the report compares review rounds by size and effort — passed 2026-11-24 17:32 (5 commands) · full suite deferred to gate
-- [ ] T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code — started 2026-11-24 17:26 · not verified yet · lane 2 · .claude/worktrees/T-M3-05
+- [x] T-M3-05 /saf-setup asks fixed or by-size effort and explains the trade-off in English and Thai, true to the code — passed 2026-11-24 17:38 (5 commands) · full suite deferred to gate
 - [ ] T-M3-06 SAF's own repository builds S cards with a medium-effort implementer and writes plans with a medium-effort designer
 - [ ] T-M3-07 At milestone end task:report lists open friction with a brief for the designer, and task:friction draft prints card drafts for recurring friction — started 2026-11-24 17:36 · not verified yet · lane 1 · .claude/worktrees/T-M3-07
 - [ ] T-M3-08 With workflow.selfFix on, a small proven framework bug becomes a self-fix card in the active milestone without waiting, inside a cap the engine enforces

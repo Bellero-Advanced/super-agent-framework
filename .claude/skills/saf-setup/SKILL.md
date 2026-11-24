@@ -31,7 +31,7 @@ detection (say what you detected instead):
 1. **Language and people** — chat language · document language · owner title · UI languages / i18n
 2. **Project** — name + one-line pitch + users/market (one free-text message) · type · stage · rigor
 3. **Stack** — package manager · confirm the detected commands · database · monorepo / submodules
-4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model
+4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model · effort (fixed · by-size)
 5. **Roles and skills** — optional roles (multi-select) · custom role? · report language · optional skill packs (multi-select)
 6. **Workflow** — parallel lanes on/off and caps · side lanes on/off and how many at a time · **test mode** (how often the full suite runs — explain the modes from the `choices --group 6` output, shown as printed (see below), recommend `milestone`) and the command that runs only some test files · measure lock · performance budgets file
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
@@ -39,7 +39,7 @@ detection (say what you detected instead):
 
 Test mode and the two lane caps are per-machine choices, and so is the effort mode. The untracked `saf.config.local.json` may hold `workflow.testMode`,
 `workflow.lanes.code`, `workflow.sideLanes.max` and `models.effort` and nothing else (the engine refuses anything outside `LOCAL_KEYS`,
-`$schema` and `workflow.lanes.main` included). When the person says their machine is slow (or fast), offer to write the
+`$schema` and `workflow.lanes.main` included). `by-size` there lowers effort only when the project's `saf.config.json` also says `by-size` (setup then wrote the extra agent files), otherwise the role's own agent is used, and `fixed` there always turns it off. When the person says their machine is slow (or fast), offer to write the
 test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
 code-lane cap (`workflow.lanes.code`, at most `LANE_CEILING` in `config.mjs`) or a side-card cap (`workflow.sideLanes.max`)
 there. The installer git-ignores that file, so it is absent inside a lane worktree: engine commands run there, such as a

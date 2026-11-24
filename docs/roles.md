@@ -1,7 +1,8 @@
 # Roles
 
 Each enabled role becomes `.claude/agents/<role>.md` with a full model id, an effort level and (for restricted roles) a
-tool list. `docs:check` fails when an agent's model differs from `saf.config.json`.
+tool list; with `models.effort: by-size` some roles also get a second file, see [Variant agent files](#variant-agent-files).
+`docs:check` fails when an agent's model differs from `saf.config.json`.
 
 | Role | Tier | Lane | Effort | Tools | Does |
 |---|---|---|---|---|---|
@@ -49,6 +50,28 @@ its cards then queue in the main folder.
   off or `workflow.lanes.code` 0 every card works in the main folder, whatever `roles.lanes` says. A key for a role that
   is not enabled has no effect. A card already in progress keeps its folder; the setting applies to the next start.
   There is no per-machine override.
+
+## Variant agent files
+
+Claude Code fixes a subagent's effort in its agent file, so a card that should run at another effort needs a second file.
+With `models.effort: by-size` ([config-reference.md](config-reference.md#models)) setup writes, besides `<role>.md`, one
+file `.claude/agents/<role>-<effort>.md` for every enabled role whose effort in the effort table (`EFFORT_BY_SIZE` in
+`lib/config.mjs`, SAF's decision [D-016](DECISIONS.md)) differs from its effort in the table above, and for every such effort.
+With today's table those are `implementer-medium` and `designer-medium`.
+
+- **What is in it.** The same agent at another effort: the same model, tools and instructions as `<role>.md`, `name:
+  <role>-<effort>`, and a description that starts with "Same as <role> at <effort> effort — use it only when task:start
+  names it."
+- **Who uses it.** `task:start` names the agent for each card: the variant when the card's size gets a lower effort in
+  the table, otherwise the role's own agent; the main session starts that agent. When a designer variant exists,
+  `/saf-plan` hands plan work to `designer-medium` and keeps `designer` for large design work (a plan that adds a new
+  spec file, or a decision row that affects more than one card).
+- **No file.** `models.effort: fixed` (the default) writes none. A role with an effort in `models.overrides` gets none
+  either: every card of that role uses the override, which `<role>.md` already carries.
+- **Upgrade and checks.** `saf upgrade` writes missing variant files and removes unedited ones that are no longer
+  planned (a role disabled, the mode back to `fixed`); an edited one is kept and listed. The base files `<role>.md`
+  change only when setup runs again. `docs:check` accepts `<role>-<effort>.md` of an enabled role when `effort` in its
+  frontmatter equals the suffix and `name` equals the file name. A custom role may not be named like a variant.
 
 ## Custom roles
 

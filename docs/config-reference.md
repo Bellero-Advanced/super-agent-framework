@@ -40,7 +40,7 @@ See [model-presets.md](model-presets.md).
 | `planner` · `builder` | from the preset | full model ids; a non-empty value replaces the preset's model for every preset, and `custom` has no models of its own |
 | `sessionDefault` | the builder model | the model the generated CLAUDE.md tells a session opened without `--model` to start with; nothing enforces it |
 | `overrides` | {} | per role, `{ "<role>": { "model": …, "effort": … } }` — e.g. `{"qa-runner": {"effort": "low"}}`; not asked by the interview |
-| `effort` | `fixed` | `fixed` · `by-size`: with `by-size` small cards use a lower effort for the roles the effort table lists; a person can override it, see [`saf.config.local.json`](#safconfiglocaljson); not asked by the interview yet |
+| `effort` | `fixed` | `fixed` · `by-size`. `fixed`: one effort per role and the agent files as they are. `by-size`: only the roles and card sizes in the effort table (`EFFORT_BY_SIZE` in `lib/config.mjs`, SAF's decision [D-016](DECISIONS.md): per role, the effort of size S and size M cards) get a lower effort, and setup writes one extra agent file `.claude/agents/<role>-<effort>.md` per role and lowered effort ([roles.md](roles.md#variant-agent-files)); `models.overrides` still wins for a single role. Small cards at a lower effort may bounce more in review; `task:report` shows review rounds by size and effort. A person can override the mode, see [`saf.config.local.json`](#safconfiglocaljson); asked by the interview in group 4 |
 
 ## roles
 
@@ -96,7 +96,7 @@ to one machine. It may hold four keys: `workflow.testMode`, `workflow.lanes.code
 Any other key is an error that names the key — including `$schema` and `workflow.lanes.main`, so leave them out. The file is
 checked with the same schema as `saf.config.json`, so a cap above `LANE_CEILING` (32, in `lib/config.mjs`) is an error. Each key
 takes the first source that sets it: the test mode from environment variable `SAF_TEST_MODE` → this file → `saf.config.json` →
-the default; each lane cap from this file → `saf.config.json` → the default. There is no environment variable for lane caps:
+the default; each lane cap and `models.effort` from this file → `saf.config.json` → the default. A `by-size` set here lowers effort only when `saf.config.json` also says `by-size` (setup wrote the extra agent files then); otherwise the role's own agent is used. `fixed` here always turns it off. There is no environment variable for lane caps:
 `task:next --parallel`, `task:start` and `task:merge` run in different shells and sessions, and every one of them must count
 the same caps. The right cap is the machine's CPU, memory and disk; the ceiling is only a guard against typing mistakes.
 When a cap from this file stops a card, the reason names `this machine: saf.config.local.json`: `task:next --parallel` and the code-cap check of `task:start` end with `(this machine: saf.config.local.json)`, and `task:start`'s side-cap refusal has it inside the text. The error "no free lane number" does not name the file.
