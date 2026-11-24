@@ -34,29 +34,29 @@ test("LCAP-AC-06 the lanes and side-lanes explanations name the worktree, the in
   assert.match(custom, /worktree/);
   assert.match(custom, /install step/);
   assert.ok(custom.includes(LOCAL_CONFIG_FILE));
-  const lanesAll = ["on", "on-custom"].map((v) => words(entry("lanes", v), "en")).join(" ");
-  assert.match(lanesAll, /main-folder lane stays one card/);
-  assert.match(lanesAll, /share one folder/);
-  assert.match(lanesAll, /start commit/);
-  const more = words(entry("side-lanes", "on-more"), "en");
-  assert.ok(more.includes(LOCAL_CONFIG_FILE));
-  assert.match(more, /free lane slots/);
-  for (const [q, v] of [["lanes", "on"], ["lanes", "on-custom"], ["side-lanes", "on"], ["side-lanes", "on-more"]]) {
-    assert.ok(words(entry(q, v), "th").includes(LOCAL_CONFIG_FILE) || q === "lanes" && v === "on", `${q} ${v}: th names the file`);
+  assert.match(custom, /main-folder lane stays one card/);
+  assert.match(custom, /two cards cannot be told apart/);
+  assert.match(custom, /since the start commit/);
+  for (const [q, v] of [["lanes", "on"], ["side-lanes", "on"], ["side-lanes", "on-more"]]) {
+    const en = words(entry(q, v), "en");
+    assert.match(en, /worktree/, `${q} ${v}: worktree`);
+    assert.match(en, /install step/, `${q} ${v}: install step`);
+    assert.match(en, /CPU, memory and disk/, `${q} ${v}: cost`);
+    assert.match(words(entry(q, v), "th"), /worktree/, `${q} ${v}: th worktree`);
   }
+  for (const v of ["on", "on-more"]) assert.ok(words(entry("side-lanes", v), "en").includes(LOCAL_CONFIG_FILE), `side-lanes ${v}: file`);
+  for (const [q, v] of [["lanes", "on-custom"], ["side-lanes", "on"], ["side-lanes", "on-more"]]) assert.ok(words(entry(q, v), "th").includes(LOCAL_CONFIG_FILE), `${q} ${v}: th file`);
 });
 
-test("LCAP-AC-06 the docs, templates and skill name both lane caps as per-machine keys and none says the local file holds only workflow.testMode", () => {
+test("LCAP-AC-06 rule 12 file by file: the three local keys, LANE_CEILING, no environment variable for caps and why the main lane stays one", () => {
   for (const f of DOCS) {
     const text = read(f);
-    assert.ok(text.includes("workflow.lanes.code") && text.includes("workflow.sideLanes.max"), `${f}: names both per-machine caps`);
-    assert.ok(text.includes("saf.config.local.json"), `${f}: names the local file`);
-    assert.ok(!/only `workflow\.testMode`|holds only `workflow\.testMode`|เฉพาะ `workflow\.testMode`/.test(text), `${f}: still says only testMode`);
+    for (const k of LOCAL_KEYS) assert.ok(text.includes(k), `${f}: names ${k}`);
+    assert.ok(text.includes("LANE_CEILING"), `${f}: names LANE_CEILING`);
+    assert.ok(/no environment variable|ไม่มีตัวแปรสภาพแวดล้อม/i.test(text), `${f}: no env variable for caps`);
+    assert.ok(/cannot be told apart|could not be told apart|แยกการ์ดสองใบไม่ได้/.test(text), `${f}: why the main lane stays one`);
+    assert.ok(!/only \`workflow\.testMode\`|เฉพาะ \`workflow\.testMode\`/.test(text), `${f}: still says only testMode`);
   }
   const ref = read("docs/config-reference.md");
-  assert.ok(ref.includes("LANE_CEILING") && ref.includes(`(${LANE_CEILING}, in`), "config-reference names LANE_CEILING and its value");
-  assert.match(ref, /no environment variable for lane caps/i);
-  assert.match(ref, /start commit/);
-  assert.match(read("docs/card-lifecycle.md"), /no environment variable/);
-  assert.match(read("kit/claude/skills/saf-setup/SKILL.md"), /no environment variable/);
+  assert.ok(ref.includes(`(${LANE_CEILING}, in`), "config-reference names the ceiling value");
 });

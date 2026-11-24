@@ -7,19 +7,19 @@
     "base": "aaac81cbaaf55b04bf499e8e4952a3218b71d20e",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-26",
   "worktree": ".claude/worktrees/T-M2-26",
   "verified": {
-    "at": "2026-11-24T06:00:47.150Z",
-    "head": "5fc226242237743228bd7393f55e1a9026f55a6e",
+    "at": "2026-11-24T06:07:12.230Z",
+    "head": "1cc53c9065e1a91c7a5fb3a2bababaccac14a38d",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 227,
+        "ms": 249,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,17 +46,17 @@
       {
         "cmd": "node --test test/unit/lane-caps-docs.test.mjs test/unit/setup-choices.test.mjs test/unit/lane-caps.test.mjs",
         "exit": 0,
-        "ms": 1777,
+        "ms": 1551,
         "tail": [
           "ok 20 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.669042",
+          "  duration_ms: 0.513417",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "ok 21 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.591333",
+          "  duration_ms: 0.586459",
           "  type: 'test'",
           "  ...",
           "1..21",
@@ -67,13 +67,13 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1742.278958"
+          "# duration_ms 1515.752792"
         ]
       },
       {
         "cmd": "node tools/saf/bin/saf.mjs choices --group 6 --lang th",
         "exit": 0,
-        "ms": 45,
+        "ms": 47,
         "tail": [
           "- every-card",
           "    คืออะไร: ชุดทดสอบเต็มรันตอน verify ของทุกการ์ด และรันอีกครั้งตอน merge การ์ดจาก lane ถ้าเช็กตอน merge มีมัน",
@@ -100,7 +100,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 295,
+        "ms": 241,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -110,7 +110,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 185,
+        "ms": 182,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -120,17 +120,17 @@
       {
         "cmd": "node --test 'test/unit/lane-caps-docs.test.mjs'",
         "exit": 0,
-        "ms": 87,
+        "ms": 85,
         "tail": [
           "ok 2 - LCAP-AC-06 the lanes and side-lanes explanations name the worktree, the install step, the per-machine file and why the main lane stays one",
           "  ---",
-          "  duration_ms: 0.184792",
+          "  duration_ms: 0.235917",
           "  type: 'test'",
           "  ...",
-          "# Subtest: LCAP-AC-06 the docs, templates and skill name both lane caps as per-machine keys and none says the local file holds only workflow.testMode",
-          "ok 3 - LCAP-AC-06 the docs, templates and skill name both lane caps as per-machine keys and none says the local file holds only workflow.testMode",
+          "# Subtest: LCAP-AC-06 rule 12 file by file: the three local keys, LANE_CEILING, no environment variable for caps and why the main lane stays one",
+          "ok 3 - LCAP-AC-06 rule 12 file by file: the three local keys, LANE_CEILING, no environment variable for caps and why the main lane stays one",
           "  ---",
-          "  duration_ms: 0.800792",
+          "  duration_ms: 0.819291",
           "  type: 'test'",
           "  ...",
           "1..3",
@@ -141,7 +141,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 52.900125"
+          "# duration_ms 52.514917"
         ]
       }
     ],
@@ -159,14 +159,14 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/card-lifecycle.md": "2482b701ac202d63141ce9053c141528541e1251",
-        "docs/config-reference.md": "1b95887ca0cb037cef117986fbac3a666dd33f11",
-        "kit/claude/skills/saf-setup/SKILL.md": "6f06f3c6289ead46e15e1e221b297314c93371d7",
-        "kit/claude/skills/saf-setup/questions.md": "fe51d6e6ec78994fb34f60837776c5743e8b1e88",
-        "kit/tools-saf/lib/choices.mjs": "6db520280e96f834d722ef539acc17f651991061",
-        "kit/tools-saf/templates/en/docs/plan/README.md": "5e5eb06e2e4980047af7f112bb8e8407289c28c5",
-        "kit/tools-saf/templates/th/docs/plan/README.md": "dd6b915a61a1734bb8b2f74c983a4cdcfcb61de1",
-        "test/unit/lane-caps-docs.test.mjs": "4a64e4602e0b3ec8bf7005d94db83ddb6998fb76"
+        "docs/card-lifecycle.md": "de0032128fed90ece00dc23ce6c2d73bf7f08dd8",
+        "docs/config-reference.md": "731a09196f3fe2c8cea458c50c901522667b9ca6",
+        "kit/claude/skills/saf-setup/SKILL.md": "ef3143ea713b80d301dc220f500b87b7d0160455",
+        "kit/claude/skills/saf-setup/questions.md": "1da2896db74832edc2c694e9ff502f84227d24d0",
+        "kit/tools-saf/lib/choices.mjs": "454e8660b8d21ef80baf6477b4f42cf7238baf58",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "c4e07010afe83c057a2c95c9e584928db5c4d09f",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "ff8de7e20f9632a7000c52e712f3a25bd7786100",
+        "test/unit/lane-caps-docs.test.mjs": "f7d123e9a27a305d365d3bf7c8eeccdfc0be3cb2"
       }
     },
     "scenarios": {
@@ -178,7 +178,7 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 99,
+        "lines": 102,
         "cap": 150
       },
       "test": {

@@ -43,7 +43,7 @@ Test mode and the two lane caps are per-machine choices. The untracked `saf.conf
 test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
 code-lane cap (`workflow.lanes.code`, at most `LANE_CEILING` in `config.mjs`) or a side-card cap (`workflow.sideLanes.max`)
 there. The installer already git-ignores that file, so it is also absent inside a lane worktree. `SAF_TEST_MODE` sets the
-test mode for one shell; lane caps have no environment variable. None of this changes generated files.
+test mode for one shell; lane caps have no environment variable (sessions in different shells must count the same caps). The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart. None of this changes generated files.
 
 **Before each group**, run `node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>` (`<g>` is `1` to `8`;
 `<chat language>` is `en` or `th`, the language the person picked). Group 1 starts with the bilingual chat-language

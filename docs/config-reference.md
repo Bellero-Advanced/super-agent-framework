@@ -64,7 +64,7 @@ See [roles.md](roles.md).
 | `sizes` · `testCaps` | from rigor | `{ "S": 150, "M": 400 }` changed code lines |
 | `review` | from rigor | m-cards · every-card · every-card+security |
 | `worktrees` | true | parallel lanes; with worktrees off all cards run in the main folder |
-| `lanes`: `code` · `main` | 3 · 1 | how many cards may run at once in the code lane (0 to `LANE_CEILING` in `lib/config.mjs`, now 32) and in the main lane. `main` is fixed at 1: that lane works in one folder and `task:verify` tells cards apart by comparing the folder with each card's start commit, so two cards there could not be told apart. Each code lane is a worktree plus the `laneInstall` step and uses CPU, memory and disk while it builds and tests; `code: 0` runs every card in the main folder. A machine may set its own `code` in [`saf.config.local.json`](#safconfiglocaljson) |
+| `lanes`: `code` · `main` | 3 · 1 | how many cards may run at once in the code lane (0 to `LANE_CEILING` in `lib/config.mjs`, now 32) and in the main lane. `main` is fixed at 1 because that lane works in one folder and `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder could not be told apart (`task:start` also refuses a second main-folder card: "one folder works one card at a time"). Each code lane is a worktree plus the `laneInstall` step and uses CPU, memory and disk while it builds and tests; `code: 0` runs every card in the main folder. A machine may set its own `code` in [`saf.config.local.json`](#safconfiglocaljson) |
 | `sideLanes`: `enabled` · `max` | true · 1 | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` (1 to `LANE_CEILING`) in progress at once; side cards only use lane slots the active milestone leaves free, so `max` never adds slots; a machine may set its own `max` in [`saf.config.local.json`](#safconfiglocaljson) — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
 | `worktreeDir` · `branchPrefix` | `.claude/worktrees` · `card/` | |
 | `solo` | [] | globs whose cards run alone in the code lane (e.g. migrations) |
@@ -97,7 +97,7 @@ takes the first source that sets it: the test mode from environment variable `SA
 the default; each lane cap from this file → `saf.config.json` → the default. There is no environment variable for lane caps:
 `task:next --parallel`, `task:start` and `task:merge` run in different shells and sessions, and every one of them must count
 the same caps. The right cap is the machine's CPU, memory and disk; the ceiling is only a guard against typing mistakes.
-When a cap from this file stops a card, the reason ends with `(this machine: saf.config.local.json)`.
+When a cap from this file stops a card, the reason names `this machine: saf.config.local.json`: `task:next --parallel` and the code-cap check of `task:start` end with `(this machine: saf.config.local.json)`, and `task:start`'s side-cap refusal has it inside the text. The error "no free lane number" does not name the file.
 
 With `lanes.code` 0 in this file, every card on this machine runs in the main folder. After the file is applied the port check
 runs on the result: with worktrees on, `lanePorts.env` not empty and `lanes.code` ≥ 1, `lanePorts.base + lanePorts.step ×
