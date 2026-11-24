@@ -1,0 +1,291 @@
+{
+  "id": "T-M3-11",
+  "milestone": "M3",
+  "status": "done",
+  "started": {
+    "at": "2026-11-24T19:57:13.202Z",
+    "base": "77844c85cd77d17155be4b739995fc16dbe98ac9",
+    "dirty": {},
+    "effort": {
+      "agent": "implementer-medium",
+      "effort": "medium",
+      "mode": "by-size",
+      "source": "repo"
+    }
+  },
+  "attempts": 6,
+  "lane": 2,
+  "branch": "card/T-M3-11",
+  "worktree": ".claude/worktrees/T-M3-11",
+  "verified": {
+    "at": "2026-11-24T20:30:33.988Z",
+    "head": "64e3594cd9c95bec8f5c448cfa69822fe359aa9f",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 455,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "190 scenario(s) in 20 spec(s) · with test 179 · gaps 11 · gaps of started cards 0 · started in another folder 3"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/release-check.test.mjs",
+        "exit": 0,
+        "ms": 13735,
+        "tail": [
+          "ok 71 - REL-AC-09 this repository's own saf.config.json passes the same check (two packages, one version file)",
+          "  ---",
+          "  duration_ms: 0.976916",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: REL-AC-09 the command line: notes for a tag with no CHANGELOG section fails, the tag is validated, unknown arguments are a usage error",
+          "ok 72 - REL-AC-09 the command line: notes for a tag with no CHANGELOG section fails, the tag is validated, unknown arguments are a usage error",
+          "  ---",
+          "  duration_ms: 248.983791",
+          "  type: 'test'",
+          "  ...",
+          "1..72",
+          "# tests 72",
+          "# suites 0",
+          "# pass 72",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 13677.540709"
+        ]
+      },
+      {
+        "cmd": "node scripts/release-check.mjs workflow",
+        "exit": 0,
+        "ms": 70,
+        "tail": [
+          "✓ runs only when a v* tag is pushed",
+          "✓ top-level permissions are contents: read only",
+          "✓ one job `publish` on a GitHub-hosted runner, in the environment `npm`",
+          "✓ no step or job has a condition (`if`): every step runs, none can be skipped",
+          "✓ the job has a time limit",
+          "✓ the job asks for contents: write, id-token: <redacted> and actions: read, nothing more",
+          "✓ no npm token, secrets, force flags, unpublish, deprecate or pull_request_target",
+          "✓ event values reach scripts only through environment variables",
+          "✓ the GitHub token goes only to the steps that call gh",
+          "✓ the tag name is validated first",
+          "✓ actions are first-party and pinned (full commit id or major version tag)",
+          "✓ checkout has full history and keeps no git credentials",
+          "✓ Node >= 22.14.0 and npm >= 11.5.1, with a link to npm's trusted-publishing docs",
+          "✓ the guards step comes before every publish and release step, and no step is optional",
+          "✓ each package is published with provenance, in order, the kill switch checked right before",
+          "✓ the GitHub release comes after the last publish, then the npm and release checks"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('.github/workflows/release.yml','utf8');if(/NPM_TOKEN|NODE_AUTH_TOKEN|secrets\\.[A-Z_]*NPM/i.test(s)||!/id-token:\\s*write/.test(s))process.exit(1)\"",
+        "exit": 0,
+        "ms": 43,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 377,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 282 markdown file(s) · 313 local link(s) · 104 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 422,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 638 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/release-check.test.mjs'",
+        "exit": 0,
+        "ms": 13866,
+        "tail": [
+          "ok 71 - REL-AC-09 this repository's own saf.config.json passes the same check (two packages, one version file)",
+          "  ---",
+          "  duration_ms: 1.131417",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: REL-AC-09 the command line: notes for a tag with no CHANGELOG section fails, the tag is validated, unknown arguments are a usage error",
+          "ok 72 - REL-AC-09 the command line: notes for a tag with no CHANGELOG section fails, the tag is validated, unknown arguments are a usage error",
+          "  ---",
+          "  duration_ms: 262.708042",
+          "  type: 'test'",
+          "  ...",
+          "1..72",
+          "# tests 72",
+          "# suites 0",
+          "# pass 72",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 13812.448875"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".github/workflows/release.yml",
+        "docs/INDEX.md",
+        "docs/releasing.md",
+        "docs/specs/auto-release.md",
+        "saf.config.json",
+        "scripts/release-check.mjs",
+        "test/unit/release-check.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".github/workflows/release.yml": "b4cd4c6bdb03b593bac388a2a871b06d25742f50",
+        "docs/INDEX.md": "19941d80702516d8671e711ade0fb3389e6dfda4",
+        "docs/releasing.md": "2d095adcce773dc9834820ade8b3705f9accc9cf",
+        "docs/specs/auto-release.md": "15d26e8108977a3934389bf174237d6a2e86abbf",
+        "saf.config.json": "2e5e6614fa526f552d06b07215748ed22f00c9c5",
+        "scripts/release-check.mjs": "1b68ee41faec1c112dca983b8ca0c19e6cb4ae8d",
+        "test/unit/release-check.test.mjs": "bd943211d2a64de361d69baa39cd86825e5ed73e"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "REL-AC-08",
+        "REL-AC-09",
+        "REL-AC-10",
+        "REL-AC-11"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 738,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 383,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/release-check.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T20:19:55.224Z",
+      "head": "e2a48ebec7aebedb7ad98ec9268d3ad83d32635b",
+      "attempts": 3,
+      "commands": [
+        {
+          "cmd": "npm run spec:matrix -- --check",
+          "exit": 1,
+          "ms": 624,
+          "tail": [
+            "| RERUN-AC-01 | setup-rerun:216 | T-M2-20 (done) · T-M3-24 (done) | test/unit/setup-rerun.test.mjs +3 | ✓ 4 test(s) |",
+            "| RERUN-AC-02 | setup-rerun:217 | T-M2-20 (done) | test/unit/setup-rerun.test.mjs +1 | ✓ 2 test(s) |",
+            "| RERUN-AC-03 | setup-rerun:218 | T-M2-02 (done) | test/unit/setup-dry-run.test.mjs +6 | ✓ 7 test(s) |",
+            "| RERUN-AC-04 | setup-rerun:219 | T-M2-02 (done) | test/unit/setup-dry-run.test.mjs +3 | ✓ 4 test(s) |",
+            "| RERUN-AC-05 | setup-rerun:220 | T-M2-21 (done) · T-M3-24 (done) | test/unit/setup-diff.test.mjs +9 | ✓ 10 test(s) |",
+            "| RERUN-AC-06 | setup-rerun:221 | T-M2-21 (done) · T-M3-24 (done) | test/unit/setup-diff.test.mjs +5 | ✓ 6 test(s) |",
+            "| RERUN-AC-07 | setup-rerun:222 | T-M2-22 (done) | test/unit/setup-rerun-docs.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-08 | setup-rerun:223 | T-M2-27 (done) · T-M3-24 (done) | test/unit/settings-archive.test.mjs +2 | ✓ 3 test(s) |",
+            "| RERUN-AC-09 | setup-rerun:224 | T-M2-27 (done) · T-M3-24 (done) | test/unit/settings-archive.test.mjs +3 | ✓ 4 test(s) |",
+            "| RERUN-AC-10 | setup-rerun:225 | T-M2-29 (done) | test/unit/setup-guards.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-11 | setup-rerun:226 | T-M2-29 (done) | test/unit/setup-guards.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-12 | setup-rerun:227 | T-M2-30 (done) | test/unit/settings-env-merge.test.mjs +1 | ✓ 2 test(s) |",
+            "| RERUN-AC-13 | setup-rerun:228 | T-M2-30 (done) | test/unit/settings-env-merge.test.mjs +2 | ✓ 3 test(s) |",
+            "| RERUN-AC-14 | setup-rerun:229 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-15 | setup-rerun:230 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-16 | setup-rerun:231 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-17 | setup-rerun:232 | T-M3-17 (done) | test/unit/setup-plan-read.test.mjs +2 | ✓ 3 test(s) |",
+            "| RERUN-AC-18 | setup-rerun:233 | T-M3-17 (done) | test/unit/setup-plan-read.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-19 | setup-rerun:234 | T-M3-17 (done) | test/unit/setup-plan-read.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-20 | setup-rerun:235 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+            "| RERUN-AC-21 | setup-rerun:236 | T-M3-26 (not started) | — | ✗ gap |",
+            "| RERUN-AC-22 | setup-rerun:237 | T-M3-23 (done) | test/unit/docs-wording.test.mjs +3 | ✓ 4 test(s) |",
+            "| PACK-AC-01 | skill-packs:91 | T-M3-13 (not started) | — | ✗ gap |",
+            "| PACK-AC-02 | skill-packs:92 | T-M3-13 (not started) | — | ✗ gap |",
+            "| PACK-AC-03 | skill-packs:93 | T-M3-13 (not started) | — | ✗ gap |",
+            "| PACK-AC-04 | skill-packs:94 | T-M3-14 (not started) | — | ✗ gap |",
+            "| PACK-AC-05 | skill-packs:95 | T-M3-14 (not started) | — | ✗ gap |",
+            "| PACK-AC-06 | skill-packs:96 | T-M3-14 (not started) | — | ✗ gap |",
+            "| PACK-AC-07 | skill-packs:97 | T-M3-15 (not started) | — | ✗ gap |",
+            "| TMODE-AC-01 | test-mode:150 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-02 | test-mode:151 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-03 | test-mode:152 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-04 | test-mode:153 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-05 | test-mode:154 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-06 | test-mode:155 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+            "| TMODE-AC-07 | test-mode:156 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-08 | test-mode:157 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-09 | test-mode:158 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+            "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+            "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+            "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+            "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+            "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+            "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+            "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+            "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+            "190 scenario(s) in 20 spec(s) · with test 177 · gaps 13 · gaps of started cards 2 · started in another folder 3",
+            "✗ REL-AC-10 (docs/specs/auto-release.md:145) has no test — card T-M3-11 has started",
+            "✗ REL-AC-11 (docs/specs/auto-release.md:146) has no test — card T-M3-11 has started"
+          ]
+        }
+      ]
+    }
+  ]
+}

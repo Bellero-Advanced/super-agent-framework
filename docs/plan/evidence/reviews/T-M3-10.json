@@ -1,0 +1,41 @@
+{
+  "id": "T-M3-10",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T20:17:14.863Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "tag push lacks --no-follow-tags; --prepare has no HEAD-moved check; fetch uses bare branch name; push-rejected advice wrong",
+      "head": "293b351167201cebe38d2d214e4b92bf9c15343d",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T20:11:54.474Z"
+    },
+    {
+      "round": 2,
+      "at": "2026-11-24T20:37:20.282Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "dangling symlink at docs/plan/releases.md is written through (existsSync follows links)",
+      "head": "c37a2f4f0ce5149b65a096fecf2f590f5605579f",
+      "verifyAttempts": 5,
+      "verifyAt": "2026-11-24T20:35:19.948Z"
+    },
+    {
+      "round": 3,
+      "at": "2026-11-24T20:43:59.653Z",
+      "result": "pass",
+      "kinds": [],
+      "note": "",
+      "head": "5bd63b15483bb7d6d6d5bf5492645c3df2d41975",
+      "verifyAttempts": 6,
+      "verifyAt": "2026-11-24T20:42:53.288Z"
+    }
+  ]
+}

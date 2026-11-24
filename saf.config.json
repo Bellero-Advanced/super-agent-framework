@@ -152,7 +152,17 @@
     "ownerOnlyPaths": [],
     "externalServices": [],
     "noTimeEstimates": true,
-    "evidenceRequired": true
+    "evidenceRequired": true,
+    "release": {
+      "auto": "on",
+      "packages": [
+        ".",
+        "packages/create-saf"
+      ],
+      "versionFiles": [
+        "kit/tools-saf/VERSION"
+      ]
+    }
   },
   "tokenSaving": {
     "enabled": true,
