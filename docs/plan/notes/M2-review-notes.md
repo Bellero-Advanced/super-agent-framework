@@ -305,3 +305,11 @@ an existing M3 card where one fits, otherwise a proposed M3 card that needs the 
 6. upgrade with a config that is a valid object but fails `validateConfig` still copies the kit then exits 1 — related half-upgrade path, not covered by rule 23
 7. SCANNER FALSE POSITIVE (hit T-M2-29's verify): the OpenAI rule in secrets.mjs:13 `/sk-(?:proj-)?[A-Za-z0-9_-]{32,}/` matched inside "ta**sk-**template-and-the-skills-re-run-test" (a spec heading slug). Any slug ending in `…sk-` + a long hyphenated tail (task-, risk-, desk-) trips it again. Refine: lookbehind `(?<![A-Za-z0-9])sk-…` and/or require a digit in the tail; needs its own card + a slug-shaped near-miss test and a real-shaped key built at runtime (no real-looking key in the repo)
 8. AC-11 asserts a line names the file, not that there is exactly ONE error line as the spec says
+
+## T-M2-30 (review PASS) — notes for the designer
+
+1. generate.mjs:365 types the reason "env values differ from .claude/settings.local.json" instead of building it from `SETTINGS_LOCAL`
+2. generate.mjs:362 compares clashing values by `JSON.stringify` — reordered keys in nested object values count as a clash (safe: archives too often, never loses a value) — a sentence in rule 26 or a stable stringify
+3. untested but read-correct edges: settings.json `env` false/0/""; local `env: null`; `env: {}`; a `"__proto__"` key in env; nested object/array values in a clash; an idempotent second run after a clash; `git check-ignore` on a `.1` archive
+4. the test checks settings.json unchanged after the dry run but not the local file (RERUN-AC-03 covers dry-run purity); it never spawns the real (non-dry) CLI (checks generate's report JSON, which is what the CLI prints)
+5. evidence defers `npm test` (targeted); the gate attaches the full run
