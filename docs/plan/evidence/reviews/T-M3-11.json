@@ -13,6 +13,19 @@
       "head": "e2a48ebec7aebedb7ad98ec9268d3ad83d32635b",
       "verifyAttempts": 2,
       "verifyAt": "2026-11-24T20:07:23.626Z"
+    },
+    {
+      "round": 2,
+      "at": "2026-11-24T20:26:19.873Z",
+      "result": "fail",
+      "kinds": [
+        "docs",
+        "spec-mismatch"
+      ],
+      "note": "docs/spec do not state that the tagged commit's own workflow/scripts run; tag ruleset must also restrict creations",
+      "head": "64e3594cd9c95bec8f5c448cfa69822fe359aa9f",
+      "verifyAttempts": 5,
+      "verifyAt": "2026-11-24T20:23:03.179Z"
     }
   ]
 }
