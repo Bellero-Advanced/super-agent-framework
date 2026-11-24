@@ -1,7 +1,7 @@
 {
   "id": "T-M3-09",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T19:29:03.104Z",
     "base": "76ba43c9047aabb7817168377e387b974f93ef88",
@@ -13,8 +13,260 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-09",
-  "worktree": ".claude/worktrees/T-M3-09"
+  "worktree": ".claude/worktrees/T-M3-09",
+  "verified": {
+    "at": "2026-11-24T19:39:47.984Z",
+    "head": "03e05947718b4560d151631d1a5f3a5a63caf197",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 409,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "188 scenario(s) in 20 spec(s) · with test 175 · gaps 13 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/release-guards.test.mjs test/unit/setup-choices.test.mjs",
+        "exit": 0,
+        "ms": 11454,
+        "tail": [
+          "ok 27 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 1.060459",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 28 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 1.074834",
+          "  type: 'test'",
+          "  ...",
+          "1..28",
+          "# tests 28",
+          "# suites 0",
+          "# pass 28",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 11402.363666"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/release.mjs','utf8');if(/unpublish|deprecate|--force|push\\s+-f|tag\\s+-d|--delete/.test(s))process.exit(1)\"",
+        "exit": 0,
+        "ms": 48,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 394,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 281 markdown file(s) · 309 local link(s) · 104 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 385,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 632 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/release-guards.test.mjs'",
+        "exit": 0,
+        "ms": 11286,
+        "tail": [
+          "ok 12 - REL-AC-04 the tag step: with a green run, the log entry and the release commit every guard passes; another commit on top does not",
+          "  ---",
+          "  duration_ms: 860.457458",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: REL-AC-04 usage: no milestone, an unknown option or a bad id exit 2; --prepare and --tag say they are not built yet and exit 2",
+          "ok 13 - REL-AC-04 usage: no milestone, an unknown option or a bad id exit 2; --prepare and --tag say they are not built yet and exit 2",
+          "  ---",
+          "  duration_ms: 685.038833",
+          "  type: 'test'",
+          "  ...",
+          "1..13",
+          "# tests 13",
+          "# suites 0",
+          "# pass 13",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 11233.451459"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/config-reference.md",
+        "examples/todo-api/package.json",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/release.mjs",
+        "kit/tools-saf/schema/saf.config.schema.json",
+        "package.json",
+        "test/unit/release-guards.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/config-reference.md": "fd096a64cfe0cb4b643f741d9ad70d61519c75bb",
+        "examples/todo-api/package.json": "37debdbb2c9109efde5f9e2af85fafadc741c95d",
+        "kit/tools-saf/bin/saf.mjs": "f525e73a93cec8d0485ed31d54c2164bb1135613",
+        "kit/tools-saf/lib/choices.mjs": "6f31776851f7b4176c19b88602e4e2ca5d6a2abf",
+        "kit/tools-saf/lib/config.mjs": "63a7e223187dff1c30f758f5490dac8e85cb56a4",
+        "kit/tools-saf/lib/release.mjs": "be7728c068ee6308c6097ebd52f362643ec95510",
+        "kit/tools-saf/schema/saf.config.schema.json": "a91058a5d88f2854410afea23f9be91a38871d10",
+        "package.json": "f5afb9f75ec3848b12f9d0f1249d9400cb3b0498",
+        "test/unit/release-guards.test.mjs": "f37d42968f31fe4be5554a183e9f9d0e185de40c"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "REL-AC-01",
+        "REL-AC-02",
+        "REL-AC-03",
+        "REL-AC-04"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 467,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 297,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/release-guards.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T19:37:34.092Z",
+      "head": "03e05947718b4560d151631d1a5f3a5a63caf197",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/release-guards.test.mjs test/unit/setup-choices.test.mjs",
+          "exit": 1,
+          "ms": 11541,
+          "tail": [
+            "  ---",
+            "  duration_ms: 8.517833",
+            "  type: 'test'",
+            "  location: '/Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M3-09/test/unit/setup-choices.test.mjs:237:1'",
+            "  failureType: 'testCodeFailure'",
+            "  error: |-",
+            "    Expected values to be strictly deep-equal:",
+            "    + actual - expected",
+            "    + [",
+            "    +   'policies.release.auto: `auto` not named in backticks',",
+            "    +   'policies.release.packages: `packages` not named in backticks',",
+            "    +   'policies.release.versionFiles: `versionFiles` not named in backticks',",
+            "    +   'policies.release.ciWorkflow: `ciWorkflow` not named in backticks'",
+            "    + ]",
+            "    - []",
+            "  code: 'ERR_ASSERTION'",
+            "  name: 'AssertionError'",
+            "  expected:",
+            "  actual:",
+            "    0: 'policies.release.auto: `auto` not named in backticks'",
+            "    1: 'policies.release.packages: `packages` not named in backticks'",
+            "    2: 'policies.release.versionFiles: `versionFiles` not named in backticks'",
+            "    3: 'policies.release.ciWorkflow: `ciWorkflow` not named in backticks'",
+            "  operator: 'deepStrictEqual'",
+            "  stack: |-",
+            "    TestContext.<anonymous> (file:///Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M3-09/test/unit/setup-choices.test.mjs:248:10)",
+            "    Test.runInAsyncScope (node:async_hooks:214:14)",
+            "    Test.run (node:internal/test_runner/test:1047:25)",
+            "    Test.processPendingSubtests (node:internal/test_runner/test:744:18)",
+            "    Test.postRun (node:internal/test_runner/test:1173:19)",
+            "    Test.run (node:internal/test_runner/test:1101:12)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: SETUP-AC-07 the printed anchor of a key whose top-level part is camelCase is lowercase",
+            "ok 26 - SETUP-AC-07 the printed anchor of a key whose top-level part is camelCase is lowercase",
+            "  ---",
+            "  duration_ms: 0.656833",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+            "ok 27 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+            "  ---",
+            "  duration_ms: 1.2535",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+            "ok 28 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+            "  ---",
+            "  duration_ms: 2.075083",
+            "  type: 'test'",
+            "  ...",
+            "1..28",
+            "# tests 28",
+            "# suites 0",
+            "# pass 27",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 11489.608291"
+          ]
+        }
+      ]
+    }
+  ]
 }
