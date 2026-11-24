@@ -7,7 +7,7 @@ import { REPO, cleanup, commitAll, card, fakeCtx, git, gitRepo, lib, planRepo, w
 
 /** L cards in steps (docs/specs/card-sizes.md rules 19-22: SIZE-AC-12, SIZE-AC-13, SIZE-AC-14). */
 const task = await lib("task.mjs");
-const { generate } = await lib("generate.mjs");
+const { generate, planSetup } = await lib("generate.mjs");
 const { parseCard, loadPlan, STEPS_HEADINGS, L_MIN_STEPS } = await lib("plan.mjs");
 after(cleanup);
 
@@ -30,6 +30,13 @@ test("SIZE-AC-12 card.steps holds the numbered items in order for L, M and Thai-
   assert.deepEqual(parse(withSteps("M", null)).card.steps, []);
   assert.deepEqual(parse(withSteps("L", "```\n1. in a fence\n2. also\n```")).card.steps, []);
   assert.deepEqual(STEPS_HEADINGS, ["Steps", "ขั้นตอน"]);
+});
+
+test("SIZE-AC-12 a nested numbered list and indented code lines are not steps; CRLF files read the same steps", () => {
+  const parse = (src) => parseCard(src, FILE, null).card.steps;
+  assert.deepEqual(parse(withSteps("L", "1. Data\n    1. migration\n    2. model\n2. Server\n   1. routes\n3. Screens")), ["Data", "Server", "Screens"]);
+  assert.deepEqual(parse(withSteps("L", "    1. code, not a step\n1. real\n2. also real")), ["real", "also real"]);
+  assert.deepEqual(parse(withSteps("L", "1. one\n2. two").replace(/\n/g, "\r\n")), ["one", "two"]);
 });
 
 test("SIZE-AC-12 an L card with fewer than L_MIN_STEPS steps (one step, no section, only a fenced list) is the rule-19 plan issue; the others are valid", async () => {
@@ -160,8 +167,13 @@ test("SIZE-AC-14 the card template has the Steps section (en: Steps, th: ขั�
   }
 });
 
-test("SIZE-AC-14 the plan README (en, th) says what an L card's steps are, how they are committed, resumed and reviewed — with no number from the data table", () => {
+test("SIZE-AC-14 the plan README (en, th) says what an L card's steps are, how they are committed, resumed and reviewed — with no number from the data table; the reviewer half only when the reviewer gets a diff file", () => {
   for (const lang of ["en", "th"]) {
+    const off = rendered(lang, false).readme.replace(/\s+/g, " ");
+    assert.match(off, /task:diff/, `${lang}: the command is still named without a reviewer diff`);
+    assert.ok(!/section by section|อ่านทีละส่วน/.test(off), `${lang}: no reviewer reading when reviewerDiff is off`);
+    assert.match(rendered(lang, true).readme.replace(/\s+/g, " "), /section by section|อ่านทีละส่วน/, `${lang}: reviewer reading when it is on`);
+    for (const t of [off, rendered(lang, true).readme]) assert.doesNotMatch(t, /\{\{|\}\}/);
     const text = rendered(lang, true).readme.replace(/\s+/g, " ");
     for (const re of [/## Steps/, /## ขั้นตอน/, /step <k>\/<n>/, /git log --oneline <(start commit|commit เริ่มต้น)>\.\.HEAD/, /task:diff/, /task:verify/]) assert.match(text, re, `${lang}: ${re}`);
     assert.ok(!/at least \d|อย่างน้อย \d/.test(text), `${lang}: no minimum copied from L_MIN_STEPS`);
@@ -187,4 +199,15 @@ test("SIZE-AC-14 docs/card-lifecycle.md has the part 'L cards in steps' with the
   const text = doc.slice(from, doc.indexOf("## Specs and scenarios")).replace(/\s+/g, " ");
   for (const re of [/`## Steps`/, /L_MIN_STEPS/, /step <k>\/<n>/, /git log --oneline <start commit>\.\.HEAD/, /# after the last step commit/, /# step <k>\/<n> <text> · commit <short sha>/, /no step commits — whole diff/, /step commits out of order — whole diff/]) assert.match(text, re, String(re));
   assert.ok(doc.indexOf("## Card format") < doc.indexOf("### L cards in steps") && doc.indexOf("### L cards in steps") < doc.indexOf("## Specs and scenarios"), "under Card format");
+});
+
+test("SIZE-AC-14 the example's plan README and card template equal the rendering of the templates (so they cannot miss a step text again)", () => {
+  const ex = join(REPO, "examples", "todo-api");
+  const plan = planSetup(ex, JSON.parse(readFileSync(join(ex, "saf.config.json"), "utf8")));
+  for (const rel of ["docs/plan/README.md", "docs/plan/tasks/_template.md"]) {
+    const action = plan.actions.find((a) => a.path === rel);
+    assert.ok(action, `${rel} is planned`);
+    assert.equal(readFileSync(join(ex, rel), "utf8").replace(/\r\n/g, "\n"), action.content.replace(/\r\n/g, "\n"), `${rel} equals its rendering`);
+  }
+  assert.match(readFileSync(join(ex, "docs/plan/tasks/_template.md"), "utf8"), /^## Steps$/m);
 });

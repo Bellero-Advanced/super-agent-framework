@@ -63,10 +63,15 @@ export function criteriaCommands(lines) {
 /** Steps: the numbered items (`1. text`) of the steps section, outside code fences, in order · no section → []. */
 export function cardSteps(sectionLines) {
   const out = [];
+  let indent = null;
   for (const l of sectionLines ?? []) {
     if (l.inFence) continue;
-    const text = l.text.match(/^\s*\d+[.)]\s+(.+?)\s*$/)?.[1];
-    if (text) out.push(text);
+    const m = l.text.match(/^( *)\d+[.)]\s+(.+?)\s*$/);
+    if (!m) continue;
+    // top level = the indent of the first numbered item, at most 3 spaces (4 or more is code); a nested list is indented deeper
+    if (m[1].length > 3) continue;
+    indent ??= m[1].length;
+    if (m[1].length === indent) out.push(m[2]);
   }
   return out;
 }
