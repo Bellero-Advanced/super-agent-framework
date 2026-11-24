@@ -1,14 +1,16 @@
 # SAF setup questions
 
 Every question, the `saf.config.json` key it sets, the options, and the recommended default.
+What each option means (what it is · good for · cost · pick it when) is not here: it comes from
+`node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>` (SKILL.md, Step 1).
 "detected" = from `node tools/saf/bin/saf.mjs detect`.
 
 ## 1. Language and people
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
-| Which language should we chat in? | `people.chatLanguage` | th · en | the language the user wrote in |
-| Which language for project documents? | `people.docLanguage` | th · en | same as chat |
+| Which language should we chat in? | `people.chatLanguage` | the languages `choices --group 1` lists | the language the user wrote in |
+| Which language for project documents? | `people.docLanguage` | the languages `choices --group 1` lists | same as chat |
 | What should agents call you? | `people.ownerTitle` | owner · founder · lead · free text | owner (Thai documents: a Thai title the user prefers) |
 | Which languages does the product UI use? | `people.uiLanguages` · `people.i18nRequired` | one language · several (i18n required) · no UI | detected / chat language; i18n on when more than one |
 | Your time zone (for timestamps in status files)? | `people.timeZone` | IANA name | the system time zone |
@@ -35,7 +37,7 @@ Rigor sets defaults the user can still override:
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Package manager? | `stack.packageManager` | pnpm · npm · yarn · bun · none (no Node tooling — SAF commands run as `node tools/saf/bin/saf.mjs …`) | detected from the lock file |
-| Are these the real commands? (typecheck · lint · test · e2e · build) | `stack.commands.*` | confirm · edit | detected scripts; empty when none |
+| Are these the real commands? (typecheck · lint · test · e2e · build) | `stack.commands.typecheck` · `stack.commands.lint` · `stack.commands.test` · `stack.commands.e2e` · `stack.commands.build` | confirm · edit | detected scripts; empty when none |
 | Database? | `stack.database` | none · PostgreSQL · MySQL · SQLite · MongoDB · Supabase · other | detected |
 | Monorepo? Git submodules? | `stack.monorepo` · `stack.submodules` | yes · no | detected |
 | Stack in one line (free text, optional) | `stack.summary` | — | frameworks detected |
@@ -66,8 +68,8 @@ Core roles are always on: `designer` · `spec-reviewer` (read only) · `implemen
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Extra roles? (multi-select) | `roles.enabled` | art-producer · db-guardian · release-operator · security-auditor · data-engineer · content-writer | by type: game → art-producer · database → db-guardian · deploys → release-operator · strict rigor → security-auditor · data-ai → data-engineer · several UI languages → content-writer |
-| A custom role? (name · what it does · planner or builder · focus) | `roles.custom[]` | — | none |
-| Language of agent reports? | `roles.reportLanguage` | en · th | en (fewer tokens) |
+| A custom role? (name · what it does · planner or builder · focus) | `roles.custom` | — | none |
+| Language of agent reports? | `roles.reportLanguage` | the languages `choices --group 5` lists | en (fewer tokens) |
 | Optional skill packs? (multi-select) | `skills.packs` | ui-frontend · db-migrations · performance · i18n · mobile · game | by answers: web-app/mobile/game/erp → ui-frontend · a database → db-migrations · game → performance + game · several UI languages → i18n · mobile → mobile |
 
 Core skills are always installed and load by themselves when the work matches: `debug-protocol` · `tdd` · `code-review` ·
@@ -78,22 +80,37 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
-| Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom caps) · off | on for standard/strict, off for light |
-| Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time) · off | on, 1 at a time |
+| Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom code cap; the main lane stays 1) · off | on for standard/strict, off for light |
+| Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time; never more than the lane caps leave free) · off | on, 1 at a time |
+| Move a role to the other lane — e.g. image or copy cards into a worktree beside other cards? Ask only when worktree lanes are on (not `off`, code cap above 0) | `roles.lanes` | role → `code` or `main` for any library role except designer · spec-reviewer · release-operator (their lane is fixed); a custom role sets its own `lane` in `roles.custom`; none | leave empty (every role keeps its default lane) |
 | Paths that only one card may touch at a time? | `workflow.solo` | globs | none (lock files are handled automatically) |
-| Ports per lane for dev servers? | `workflow.lanePorts` | base · step · env names | base 3000 · step 10 · `PORT` |
+| Ports per lane for dev servers? | `workflow.lanePorts.base` · `workflow.lanePorts.step` · `workflow.lanePorts.env` | base · step · env names | base 3000 · step 10 · `PORT` |
 | Test database name per lane? | `workflow.laneDb` | pattern with `{n}` | empty; with a database: `<name>_lane{n}_test` |
 | Measure lock (heavy commands one at a time on this machine)? | `workflow.measure.enabled` | on · off | on |
 | Performance budget file? | `workflow.perfBudgets` | path · none | none |
 | Override card size caps? | `workflow.sizes` · `workflow.testCaps` | numbers | from rigor |
 | Override merge checks? | `workflow.mergeChecks` | list of commands | from rigor (only commands whose scripts exist) |
+| How often should the full test suite run? | `workflow.testMode` | every-card · targeted · milestone | milestone (the fastest; each person can override it on their own machine — see below) |
+| Command that runs only some test files? | `stack.commands.testFiles` | command with `{files}` · empty | from the test runner: `node --test {files}` · `vitest run {files}` · `jest {files}` · `pytest {files}`; empty = cards fall back to the full suite |
+
+### Test mode — explain each choice before asking
+
+The four lines for each mode (what it is · good for · cost · pick it when) come from `node tools/saf/bin/saf.mjs choices --group 6 --lang <chat language>`, shown as printed — this file keeps no copy. Recommended: `milestone`. How each mode behaves (deferred evidence, the exit gate, the per-machine override) is in the SAF repository's docs/card-lifecycle.md, section Test mode.
+
+Each person can override the repo's choice on their own machine, without changing a tracked file. The test mode: the environment
+variable `SAF_TEST_MODE`, or an untracked `saf.config.local.json`; order: env, then local file, then `saf.config.json`, then the
+default (`milestone`). The two caps (`workflow.lanes.code`, `workflow.sideLanes.max`): the local file, then `saf.config.json`, then
+the default — there is no environment variable for lane caps, so every session on a machine counts the same caps. The local file
+may hold only those three keys (any other key is refused, including `$schema` and `workflow.lanes.main`). When the person says
+the machine is weak or strong, offer to write the caps there. The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart; the code cap is at most
+`LANE_CEILING` (`config.mjs`).
 
 ## 7. Policies
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
 | Push | `policies.push` | only on your order · allowed | only on your order |
-| Deploy | `policies.deploy.mode` · `.target` · `.exceptions` | only on your order · allowed · this project does not deploy | only on your order |
+| Deploy | `policies.deploy.mode` · `policies.deploy.target` · `policies.deploy.exceptions` | only on your order · allowed · this project does not deploy | only on your order |
 | Protected branches · branches that deploy on push | `policies.protectedBranches` · `policies.autoDeployBranches` | names | `main` · none |
 | Never force-push or rewrite history | `policies.noForcePush` | yes · no | yes |
 | Env files that hold secrets (never committed, never printed, keys counted only) | `policies.secrets.envFiles` | names | `.env` · `.env.local` · `.env.*.local` |
@@ -106,11 +123,18 @@ Always on (not asked): no time estimates — gates, not dates · "done" needs re
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
-| Token-saving mode | `tokenSaving.*` | on (all) · choose · off | on: silent on interim agent notifications · reviewer notes batched to the designer at milestone end · reviewer reads a diff file · fix flaky tests first |
+| Token-saving mode | `tokenSaving.enabled` · `tokenSaving.silentInterim` · `tokenSaving.batchReviewerNotes` · `tokenSaving.reviewerDiff` · `tokenSaving.fixFlakyFirst` | on (all) · choose · off | on: silent on interim agent notifications · reviewer notes batched to the designer at milestone end · reviewer reads a diff file · fix flaky tests first |
 | What should work at the end of the first milestone? (free text) | `firstMilestone.goal` | — | — (empty = no M1 draft yet) |
 
 M0 (the setup gate) is always created and active. M1 is created as `planned` from the goal; the designer fills its cards;
 work starts when the user says Go.
+
+## Setup flow
+
+Not config keys (no Key column): these change what `setup` and the first commit do.
+
+- Keep the old docs as history (`adopt`) — asked only for an existing project (`detect` reports `adopt: true`) that is not a re-run. Options: yes · no. Recommended: yes. Step 3 passes `--adopt` for yes and `--no-adopt` for no or a skipped question.
+- Commit the setup locally now (`commit`) — Options: yes · no. Recommended: yes. Never push.
 
 ## Example answers file
 

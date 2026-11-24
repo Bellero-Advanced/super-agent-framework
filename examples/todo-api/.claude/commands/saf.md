@@ -34,9 +34,16 @@ Unclear between two routes → ask one short question with a recommendation.
 | start | main session | `npm run task:start -- <id>` |
 | build | the card's `role` agent | touch only files in `touch` |
 | verify | same agent | `npm run task:verify -- <id>` until it passes |
-| review | `spec-reviewer` (read only) | the card id and a diff file |
+| review | `spec-reviewer` (read only) | `npm run task:diff -- <id>`, then the card id · the review types · the diff path |
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
 | land | main session | commit |
+
+Give the `spec-reviewer` the card id, the review types the card needs (a comma list of `text` · `data` · `security` · `refactor`, as its agent file defines them; none fits → none) and the path `npm run task:diff -- <id>` prints: the file holds exactly the files `npm run task:verify -- <id>` counted as the card's — never build a diff by hand.
+
+After every spec review the main session records the result with `npm run task:review -- <id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]` (`pass`, or `fail` with the kinds that
+apply). On `fail` the card is open again: the builder fixes it and runs `npm run task:verify -- <id>` again, no restart. The command
+does not commit: commit the round file `docs/plan/evidence/reviews/<id>.json` alone
+with `git commit -m "chore(plan): review <id> round <n>" -- docs/plan/evidence/reviews/<id>.json`.
 
 Independent cards may run in parallel.
 
