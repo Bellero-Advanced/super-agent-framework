@@ -71,7 +71,7 @@ npm passes arguments after `--`: `npm run task:verify -- T-M1-01`.
 - Project checks pass with the run attached: `npm test`
 - `npm run check-secrets` · `npm run docs:check` pass
 - `spec-reviewer` compared the work with the spec (every card)
-- Card size: S ≤ 150 · M ≤ 400 changed code lines (tests: S ≤ 250 · M ≤ 600) — bigger → the designer splits the card
+- Card size: M ≤ 800 · L ≤ 1600 changed code lines (tests: M ≤ 600 · L ≤ 1200) — `task:verify` warns above a cap and fails above 2 × the cap → the designer splits the card
 
 ## Repo layout
 

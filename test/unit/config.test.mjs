@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { lib } from "../helpers.mjs";
 
-const { resolveConfig, roleTable, validateConfig, scriptCommand, MODEL_PRESETS, MODELS, CORE_ROLES } = await lib("config.mjs");
+const { resolveConfig, roleTable, validateConfig, scriptCommand, MODEL_PRESETS, MODELS, CORE_ROLES, SIZE_CAPS } = await lib("config.mjs");
 
 test("presets map planner and builder tiers; effort is per role, not per preset", () => {
   const efforts = {};
@@ -29,13 +29,13 @@ test("core roles always come first; custom roles are added; overrides win", () =
 
 test("rigor sets sizes, review and merge checks", () => {
   const light = resolveConfig({ project: { rigor: "light" }, stack: { packageManager: "pnpm", commands: { test: "pnpm test", lint: "pnpm lint" } } });
-  assert.deepEqual(light.workflow.sizes, { S: 200, M: 500 });
+  assert.deepEqual(light.workflow.sizes, { M: SIZE_CAPS.M.code, L: SIZE_CAPS.L.code });
   assert.equal(light.workflow.review, "m-cards");
   assert.deepEqual(light.workflow.mergeChecks, ["pnpm test", "pnpm check-secrets", "pnpm docs:check"]);
   const strict = resolveConfig({ project: { rigor: "strict" } });
-  assert.deepEqual(strict.workflow.sizes, { S: 100, M: 300 });
+  assert.deepEqual(strict.workflow.sizes, light.workflow.sizes); // one table for every rigor
   assert.equal(strict.workflow.review, "every-card+security");
-  assert.deepEqual(resolveConfig({ workflow: { sizes: { S: 10, M: 20 } } }).workflow.sizes, { S: 10, M: 20 });
+  assert.deepEqual(resolveConfig({ workflow: { sizes: { M: 10, L: 20 } } }).workflow.sizes, { M: 10, L: 20 });
 });
 
 test("scriptCommand follows the package manager (npm needs --)", () => {

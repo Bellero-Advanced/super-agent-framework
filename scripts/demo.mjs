@@ -76,7 +76,7 @@ try {
   // the owner closes M0 and says Go on M1: one card, written the way the designer writes them
   write("docs/plan/milestones/M0.md", (await import("node:fs")).readFileSync(join(root, "docs/plan/milestones/M0.md"), "utf8").replace("status: active", "status: done"));
   write("docs/plan/milestones/M1.md", "---\nid: M1\ntitle: Add and list todos\nstatus: active\ncards:\n  - T-M1-01\ngates:\n  - id: project-checks\n    text: the project's own checks pass\n    run: [\"npm test\"]\n---\n\n# M1 — add and list todos\n");
-  write("docs/plan/tasks/M1/T-M1-01.md", "---\nid: T-M1-01\nmilestone: M1\ntitle: Add a todo\nsize: S\nrole: implementer\ntouch:\n  - src/todos.mjs\n  - test/todos.test.mjs\ndepends: []\nscenarios: []\n---\n\n# T-M1-01 — Add a todo\n\n## Done when\n\n- `npm test`\n");
+  write("docs/plan/tasks/M1/T-M1-01.md", "---\nid: T-M1-01\nmilestone: M1\ntitle: Add a todo\nsize: M\nrole: implementer\ntouch:\n  - src/todos.mjs\n  - test/todos.test.mjs\ndepends: []\nscenarios: []\n---\n\n# T-M1-01 — Add a todo\n\n## Done when\n\n- `npm test`\n");
   run({ steps: [] }, "", "npm run -s task:state");
   git("add", "-A");
   git("commit", "-qm", "docs(plan): M1 — one card (owner: Go)");

@@ -110,7 +110,7 @@ test("profile 2 — English · Max · game · no package manager", () => {
   assert.match(read(root, ".claude/agents/level-designer.md"), /description: "Designs levels: layout, pacing and encounters."/);
   assert.match(read(root, "docs/plan/tasks/M0/T-M0-01.md"), /dont_touch: \["art\/approved\/\*\*"\]/);
   assert.match(read(root, "CLAUDE.md"), /node tools\/saf\/bin\/saf\.mjs task verify <id>/);
-  assert.match(read(root, "CLAUDE.md"), /S ≤ 100 · M ≤ 300/);
+  assert.match(read(root, "CLAUDE.md"), /M ≤ 800 · L ≤ 1600/);
   assert.ok(!existsSync(join(root, "docs/plan/milestones/M1.md")));
   selfChecks(root, (s, a = "") => {
     const sub = { "task:state": "task state", "task:start": "task start", "task:verify": "task verify", "docs:check": "docs-check", "check-secrets": "check-secrets" }[s];

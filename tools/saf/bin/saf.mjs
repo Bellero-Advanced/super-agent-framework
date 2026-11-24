@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { GROUPS, LANGS, groupText, languageFor, notAskedText } from "../lib/choices.mjs";
-import { CONFIG_FILE, ConfigError, findRoot, loadConfig, scriptCommand, validateConfig } from "../lib/config.mjs";
+import { CONFIG_FILE, ConfigError, findRoot, legacySizeLine, loadConfig, resolveConfig, scriptCommand, validateConfig } from "../lib/config.mjs";
 import { culpritLines, findCulprit } from "../lib/culprit.mjs";
 import { detectProject } from "../lib/detect.mjs";
 import { docsInputFor, runDocsCheck } from "../lib/docs.mjs";
@@ -28,6 +28,7 @@ import {
   abandonCard,
   checkStop,
   effortLines,
+  sizeStopLine,
   evidencePath,
   laneEnvLines,
   laneFolder,
@@ -110,6 +111,7 @@ function cardReport(ev, inLane) {
   if (failed.length) lines.push(`  failed commands: ${failed.map((c) => `${c.cmd} (exit ${c.exit})`).join(" · ")}`);
   if (v.files.outside.length) lines.push(`  files outside touch: ${v.files.outside.join(" · ")}`);
   if (v.files.forbidden.length) lines.push(`  files in dont_touch: ${v.files.forbidden.join(" · ")}`);
+  if (v.size?.stopped?.length) lines.push(sizeStopLine(ev.id, v.size, v.commands.length > 0));
   if (v.scenarios.missing.length) lines.push(`  scenarios without a test that has the id in its name: ${v.scenarios.missing.join(", ")}`);
   lines.push(`  evidence: ${evidencePath(ev.id)} · ${inLane ? "written on the lane branch only (STATE.md + .saf/plan.md are rebuilt in the main folder)" : "STATE.md + .saf/plan.md updated"}`);
   return lines;
@@ -612,6 +614,7 @@ async function main() {
       }
       const errors = validateConfig(raw);
       for (const e of errors) err(`✗ ${e}`);
+      if (!errors.length) for (const key of resolveConfig(raw).workflow.sizesLegacy) out(legacySizeLine(key));
       if (!errors.length) out(`✓ ${CONFIG_FILE} is valid`);
       return errors.length ? 1 : 0;
     }

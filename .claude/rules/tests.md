@@ -18,4 +18,4 @@ paths:
 - Databases in tests: a local database whose name ends in `_test`, or an in-memory one — never shared or production data
 - Fake secrets in fixtures are built at runtime (string concatenation) so secret scanners never match a real-looking value
 - A flaky test is a bug: fix the cause; never add retries or widen timeouts just to get green
-- Never delete or weaken an assertion to make a card pass — the card's size caps include tests (S ≤ 250 · M ≤ 600 lines)
+- Never delete or weaken an assertion to make a card pass — the card's size caps include tests (M ≤ 600 · L ≤ 1200 lines)

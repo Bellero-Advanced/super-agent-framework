@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, posix, relative } from "node:path";
-import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, ROLE_LIBRARY, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig, variantNames } from "./config.mjs";
+import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, HARD_STOP_FACTOR, LOCAL_CONFIG_FILE, MODEL_PRESETS, ROLE_LIBRARY, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig, variantNames } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
@@ -187,10 +187,11 @@ export function templateData(config, detected, opts = {}) {
     deployNone: config.policies.deploy.mode === "none",
     pushOwner: config.policies.push === "owner-order",
     m1: goal ? { goal, titleYaml: JSON.stringify(m1Title) } : null,
-    sizeS: config.workflow.sizes.S,
     sizeM: config.workflow.sizes.M,
-    testS: config.workflow.testCaps.S,
+    sizeL: config.workflow.sizes.L,
     testM: config.workflow.testCaps.M,
+    testL: config.workflow.testCaps.L,
+    hardStop: HARD_STOP_FACTOR,
     pmNpm: pm === "npm",
     pmNone: pm === "none",
     detected,
@@ -654,6 +655,8 @@ export function planSetup(root, answers, opts = {}) {
   }
   const stored = JSON.parse(JSON.stringify(config));
   stored.$schema = "tools/saf/schema/saf.config.schema.json";
+  delete stored.workflow.sizesLegacy; // resolved-only: the size table applies unless the answers override it (docs/specs/card-sizes.md rule 2)
+  for (const key of ["sizes", "testCaps"]) stored.workflow[key] = answers.workflow?.[key] ?? null;
   const ordered = { $schema: stored.$schema, ...stored };
   const configText = `${JSON.stringify(ordered, null, 2)}\n`;
   config = resolveConfig(ordered);

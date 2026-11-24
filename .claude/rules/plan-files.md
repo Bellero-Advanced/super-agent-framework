@@ -8,7 +8,7 @@ paths:
 
 - Format and loop: `docs/plan/README.md` — read the relevant section before editing
 - Cards: file name = id · folder = milestone · `touch` required · every "Done when" item is a command
-- Sizes: S ≤ 150 / M ≤ 400 changed code lines — bigger → split into more cards
+- Sizes: M ≤ 800 / L ≤ 1600 changed code lines — bigger → split into more cards
 - `role` must be one of: designer, spec-reviewer, implementer, qa-runner, release-operator
 - Never edit `docs/plan/STATE.md`, `.saf/plan.md` or `docs/plan/evidence/` by hand — the engine writes them
 - Only the owner sets a milestone to `active` or `done`

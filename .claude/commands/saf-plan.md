@@ -11,8 +11,8 @@ Target: $ARGUMENTS
    `docs/plan/README.md`, the existing milestone file if any, and the specs in `docs/specs/` it touches.
 2. The designer writes or updates:
    - `docs/plan/milestones/M<n>.md` — goal · scope · risks · exit gates · ordered `cards:` · `status: planned`
-   - one card per step in `docs/plan/tasks/M<n>/` (copy `docs/plan/tasks/_template.md`) — size S ≤ 150 / M ≤ 400
-     code lines, explicit `touch`, a "Done when" list of commands, `scenarios` from the spec
+   - one card per step in `docs/plan/tasks/M<n>/` (copy `docs/plan/tasks/_template.md`) — size M ≤ 800 / L ≤ 1600
+     code lines (`task:verify` fails above 2 × the cap — split the card), explicit `touch`, a "Done when" list of commands, `scenarios` from the spec
    - specs with acceptance scenarios in `docs/specs/` when a system is new
 3. Run `npm run task:state -- --check` and `npm run docs:check`; fix every issue they report. Then run `npm run task:prerun -- <id>` for each new
    card: every proving "Done when" command must fail now, or carry `— passes by design: <reason>`.

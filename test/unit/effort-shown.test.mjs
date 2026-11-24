@@ -33,7 +33,7 @@ test("EFFORT-AC-06 task:start stores started.effort and prints the agent line of
   const { root, config } = await project({ effort: "by-size" });
   const out = cli(root, "task", "start", "T-M1-01");
   assert.equal(out.status, 0, out.stderr);
-  assert.match(out.stdout, /^ {2}agent implementer-medium · effort medium · size S · models\.effort by-size \(repo\)$/m);
+  assert.match(out.stdout, /^ {2}agent implementer-medium · effort medium · size M \(legacy S counted as M\) · models\.effort by-size \(repo\)$/m);
   assert.doesNotMatch(out.stdout, /warning/);
   const want = cardEffort(config, { role: "implementer", size: "S" });
   assert.deepEqual(evidence(root, "T-M1-01").started.effort, { agent: want.agent, effort: want.effort, mode: "by-size", source: "repo" });
@@ -61,14 +61,14 @@ test("EFFORT-AC-06 the missing-variants warning is printed after the line, and a
   commitAll(root, "local mode");
   const out = cli(root, "task", "start", "T-M1-01");
   assert.equal(out.status, 0, out.stderr);
-  assert.match(out.stdout, /^ {2}agent implementer · effort high · size S · models\.effort by-size \(local\)$/m);
+  assert.match(out.stdout, /^ {2}agent implementer · effort high · size M \(legacy S counted as M\) · models\.effort by-size \(local\)$/m);
   assert.match(out.stdout, /^ {2}warning: models\.effort is by-size here, but setup ran with fixed/m);
   const legacy = await planRepo({ cards: [{ id: "T-M1-01", size: "" }] });
   const text = readFileSync(join(legacy.root, "docs/plan/tasks/M1/T-M1-01.md"), "utf8").replace(/^size: *\n/m, "");
   write(legacy.root, "docs/plan/tasks/M1/T-M1-01.md", text);
   commitAll(legacy.root, "no size");
   const run = cli(legacy.root, "task", "start", "T-M1-01");
-  assert.match(run.stdout, /size M \(the card has no size — counted as M\)/);
+  assert.match(run.stdout, /size M \(no size — counted as M\)/);
 });
 
 test("EFFORT-AC-07 the report table has one row per size and effort and a row for cards started before this change", async () => {
@@ -81,7 +81,7 @@ test("EFFORT-AC-07 the report table has one row per size and effort and a row fo
   };
   await pass("T-M1-01", "src/a.ts"); // S implementer-medium: pass first time
   rv.recordReview(ctx, "T-M1-01", "pass");
-  await pass("T-M1-02", "lib/b.ts"); // M implementer: fail then pass
+  await pass("T-M1-02", "lib/b.ts"); // M implementer-medium: fail then pass
   rv.recordReview(ctx, "T-M1-02", "fail", { kinds: ["missing-test"], note: "x" });
   await task.verifyCard(ctx, "T-M1-02");
   rv.recordReview(ctx, "T-M1-02", "pass");
@@ -96,7 +96,7 @@ test("EFFORT-AC-07 the report table has one row per size and effort and a row fo
   assert.match(text, /## Effort and review rounds/);
   assert.match(text, /\| Size \| Effort \| Cards \| Reviewed \| Passed review first time \| Review rounds \| Verify attempts \|/);
   assert.ok(row(text, "S", "medium", "2", "1", "1", "1", "2"), text);
-  assert.ok(row(text, "M", "high", "1", "1", "0", "2", "2"), text);
+  assert.ok(row(text, "M", "medium", "1", "1", "0", "2", "2"), text);
   assert.ok(row(text, "—", "—", "1", "0", "0", "0", "0"), text);
   assert.equal(text.split("\n").filter((l) => /^\| (S|M|—) \|/.test(l)).length, 3, "no other rows");
 });

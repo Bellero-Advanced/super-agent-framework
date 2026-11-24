@@ -6,6 +6,7 @@ import { after, test } from "node:test";
 import { cleanup, commitAll, fakeCtx, git, lib, planRepo, tmp, write } from "../helpers.mjs";
 
 const task = await lib("task.mjs");
+const { HARD_STOP_FACTOR } = await lib("config.mjs");
 const { samePath, topLevel } = await lib("git.mjs");
 const { loadPlan, cardStatus } = await lib("plan.mjs");
 after(cleanup);
@@ -160,7 +161,7 @@ test("hooks: session-start text, stop guidance, probe judging", async () => {
 const lines = (n) => `${Array.from({ length: n }, (_, i) => `line ${i}`).join("\n")}\n`;
 
 test("size: a card under the cap reports counts and no warning", async () => {
-  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "S", touch: ["src/**", "test/**"] }] });
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "M", touch: ["src/**", "test/**"] }] });
   const ctx = fakeCtx(root, config, { logged: [] });
   ctx.log = (s) => ctx.logged.push(s);
   task.startCard(ctx, "T-M1-01");
@@ -168,13 +169,14 @@ test("size: a card under the cap reports counts and no warning", async () => {
   write(root, "test/a.test.js", lines(4));
   const r = await task.verifyCard(ctx, "T-M1-01");
   assert.equal(r.status, "done");
-  assert.deepEqual(r.verified.size, { size: "S", code: { lines: 10, cap: config.workflow.sizes.S }, test: { lines: 4, cap: config.workflow.testCaps.S }, over: [] });
+  const [codeCap, testCap] = [config.workflow.sizes.M, config.workflow.testCaps.M];
+  assert.deepEqual(r.verified.size, { size: "M", code: { lines: 10, cap: codeCap, stop: codeCap * HARD_STOP_FACTOR }, test: { lines: 4, cap: testCap, stop: testCap * HARD_STOP_FACTOR }, over: [], stopped: [] });
   assert.ok(!ctx.logged.some((l) => /over the size cap/.test(l)));
 });
 
 test("size: over the cap warns in the output and the evidence but still passes", async () => {
-  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "S", touch: ["src/**", "test/**"] }] });
-  config.workflow.sizes.S = 5; // caps come from the config
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "M", touch: ["src/**", "test/**"] }] });
+  config.workflow.sizes.M = 5; // caps come from the config
   const ctx = fakeCtx(root, config, { logged: [] });
   ctx.log = (s) => ctx.logged.push(s);
   task.startCard(ctx, "T-M1-01");
@@ -188,8 +190,8 @@ test("size: over the cap warns in the output and the evidence but still passes",
 });
 
 test("size: test lines are counted apart from code lines (added + removed, modified files too)", async () => {
-  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "S", touch: ["src/**", "test/**"] }] });
-  config.workflow.testCaps.S = 3;
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", size: "M", touch: ["src/**", "test/**"] }] });
+  config.workflow.testCaps.M = 3;
   write(root, "src/old.js", lines(5));
   write(root, "test/old.test.js", lines(2));
   commitAll(root, "seed");
@@ -203,7 +205,7 @@ test("size: test lines are counted apart from code lines (added + removed, modif
   assert.equal(r.verified.size.code.lines, 3);
   assert.equal(r.verified.size.test.lines, 4);
   assert.deepEqual(r.verified.size.over, ["test"]);
-  assert.ok(ctx.logged.some((l) => /test 4 > 3/.test(l)));
+  assert.ok(ctx.logged.some((l) => /test 4 > 3/.test(l) && l.includes(`not a failure up to ${HARD_STOP_FACTOR} × the cap`)));
   assert.equal(r.status, "done");
 });
 

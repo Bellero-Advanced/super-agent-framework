@@ -8,7 +8,7 @@ import { REPO, cleanup, gitRepo, lib } from "../helpers.mjs";
 const { generate, refreshKitFiles } = await lib("generate.mjs");
 const { CHOICES, NOT_ASKED, LABELS } = await lib("choices.mjs");
 const { EXIT_BUSY } = await lib("measure.mjs");
-const { RIGOR, ROLE_LIBRARY, resolveConfig, roleTable } = await lib("config.mjs");
+const { RIGOR, ROLE_LIBRARY, SIZE_CAPS, resolveConfig, roleTable } = await lib("config.mjs");
 after(cleanup);
 
 /** Renders a project from answers and returns its folder; the code facts below are read from what it wrote. */
@@ -125,9 +125,9 @@ test("SETUP-AC-11 choices --group 2 names the unit of card sizes and test caps a
     const out = group2(lang);
     const L = LABELS[lang];
     for (const [name, v] of Object.entries(RIGOR)) {
-      const line = out.split("\n").find((l) => l.includes(`${L.sizes}: ${v.sizes.S} / ${v.sizes.M}`));
+      const line = out.split("\n").find((l) => l.includes(`${L.sizes}: ${SIZE_CAPS.M.code} / ${SIZE_CAPS.L.code}`) && l.includes(`${L.review}: ${L.reviewWords[v.review]}`));
       assert.ok(line, `${lang} ${name}: the rigor line`);
-      assert.ok(line.includes(`${L.caps}: ${v.testCaps.S} / ${v.testCaps.M}`) && line.includes(`${L.review}: ${L.reviewWords[v.review]}`), `${lang} ${name}: caps and review words`);
+      assert.ok(line.includes(`${L.caps}: ${SIZE_CAPS.M.test} / ${SIZE_CAPS.L.test}`) && line.includes(`${L.review}: ${L.reviewWords[v.review]}`), `${lang} ${name}: caps and review words`);
       assert.ok(!line.includes(v.review), `${lang} ${name}: no raw review id`);
     }
   }

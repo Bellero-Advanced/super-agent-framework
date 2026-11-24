@@ -1,7 +1,7 @@
 {
   "id": "T-M3-35",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T18:30:52.771Z",
     "base": "30175e526255ffec328dedaa4b76ea2d900a5172",
@@ -13,8 +13,349 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-35",
-  "worktree": ".claude/worktrees/T-M3-35"
+  "worktree": ".claude/worktrees/T-M3-35",
+  "verified": {
+    "at": "2026-11-24T18:45:06.808Z",
+    "head": "2be46c88ef816366f2567f9c5ecab314460b1931",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 383,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "188 scenario(s) in 20 spec(s) · with test 166 · gaps 22 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/card-sizes.test.mjs",
+        "exit": 0,
+        "ms": 2886,
+        "tail": [
+          "ok 8 - SIZE-AC-08 generate in en and th shows the M and L caps in every line of rule 14, the stop lines also the factor, and says size: M in the card template and T-M0-01",
+          "  ---",
+          "  duration_ms: 128.197417",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SIZE-AC-09 saf choices --group 2 follows every rigor option with the M / L code caps and test caps in the labels of en and th",
+          "ok 9 - SIZE-AC-09 saf choices --group 2 follows every rigor option with the M / L code caps and test caps in the labels of en and th",
+          "  ---",
+          "  duration_ms: 176.595875",
+          "  type: 'test'",
+          "  ...",
+          "1..9",
+          "# tests 9",
+          "# suites 0",
+          "# pass 9",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2835.697583"
+        ]
+      },
+      {
+        "cmd": "node --input-type=module -e \"const m=await import('./kit/tools-saf/lib/config.mjs');if(!m.SIZE_CAPS||!m.HARD_STOP_FACTOR||m.RIGOR.standard.sizes||!m.EFFORT_BY_SIZE.implementer.L)process.exit(1)\"",
+        "exit": 0,
+        "ms": 49,
+        "tail": []
+      },
+      {
+        "cmd": "node -e \"const fs=require('fs'),p=require('path');const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(p.join(d,e.name)):[p.join(d,e.name)]);const bad=walk('kit/tools-saf/templates').filter(f=>/S ≤|sizeS|testS/.test(fs.readFileSync(f,'utf8')));if(bad.length){console.error(bad.join('\\n'));process.exit(1)}\"",
+        "exit": 0,
+        "ms": 50,
+        "tail": []
+      },
+      {
+        "cmd": "node --test test/unit/config.test.mjs test/unit/task.test.mjs test/unit/plan.test.mjs test/unit/effort-by-size.test.mjs test/unit/effort-setup.test.mjs test/unit/effort-shown.test.mjs test/unit/self-fix.test.mjs test/unit/friction-triage.test.mjs test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs test/unit/review-diff.test.mjs test/unit/agent-instructions.test.mjs test/unit/repo-sync.test.mjs",
+        "exit": 0,
+        "ms": 9307,
+        "tail": [
+          "ok 104 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.080792",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 105 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 288.482417",
+          "  type: 'test'",
+          "  ...",
+          "1..105",
+          "# tests 105",
+          "# suites 0",
+          "# pass 104",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 9247.321958"
+        ]
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 312,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run task:state -- --check",
+        "exit": 0,
+        "ms": 293,
+        "tail": [
+          "> super-agent-framework@0.1.0 task:state",
+          "> node tools/saf/bin/saf.mjs task state --check",
+          "✓ plan is valid (lane worktree — state files are not compared here)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 295,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 281 markdown file(s) · 306 local link(s) · 102 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 349,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 620 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/e2e/init.test.mjs' 'test/unit/card-sizes.test.mjs' 'test/unit/config.test.mjs' 'test/unit/effort-by-size.test.mjs' 'test/unit/effort-setup.test.mjs' 'test/unit/effort-shown.test.mjs' 'test/unit/friction-triage.test.mjs' 'test/unit/review-diff.test.mjs' 'test/unit/self-fix.test.mjs' 'test/unit/setup-choices-facts.test.mjs' 'test/unit/setup-choices.test.mjs' 'test/unit/task.test.mjs'",
+        "exit": 0,
+        "ms": 16676,
+        "tail": [
+          "ok 106 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.057125",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 107 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 249.935625",
+          "  type: 'test'",
+          "  ...",
+          "1..107",
+          "# tests 107",
+          "# suites 0",
+          "# pass 106",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 16615.909042"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/agents/designer-medium.md",
+        ".claude/agents/designer.md",
+        ".claude/agents/implementer-medium.md",
+        ".claude/agents/implementer.md",
+        ".claude/agents/spec-reviewer.md",
+        ".claude/commands/saf-plan.md",
+        ".claude/rules/plan-files.md",
+        ".claude/rules/tests.md",
+        "CLAUDE.md",
+        "docs/plan/README.md",
+        "docs/plan/tasks/_template.md",
+        "examples/todo-api/.claude/rules/plan-files.md",
+        "examples/todo-api/.claude/rules/tests.md",
+        "examples/todo-api/docs/plan/README.md",
+        "examples/todo-api/docs/plan/tasks/_template.md",
+        "examples/todo-api/saf.config.json",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/effort.mjs",
+        "kit/tools-saf/lib/friction.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/schema/saf.config.schema.json",
+        "kit/tools-saf/templates/agents/designer.md",
+        "kit/tools-saf/templates/agents/implementer.md",
+        "kit/tools-saf/templates/agents/spec-reviewer.md",
+        "kit/tools-saf/templates/en/CLAUDE.template.md",
+        "kit/tools-saf/templates/en/commands/saf-plan.md",
+        "kit/tools-saf/templates/en/docs/DECISIONS.md",
+        "kit/tools-saf/templates/en/docs/plan/README.md",
+        "kit/tools-saf/templates/en/docs/plan/tasks/T-M0-01.md",
+        "kit/tools-saf/templates/en/docs/plan/tasks/_template.md",
+        "kit/tools-saf/templates/rules/plan-files.md",
+        "kit/tools-saf/templates/rules/tests.md",
+        "kit/tools-saf/templates/th/CLAUDE.template.md",
+        "kit/tools-saf/templates/th/commands/saf-plan.md",
+        "kit/tools-saf/templates/th/docs/DECISIONS.md",
+        "kit/tools-saf/templates/th/docs/plan/README.md",
+        "kit/tools-saf/templates/th/docs/plan/tasks/T-M0-01.md",
+        "kit/tools-saf/templates/th/docs/plan/tasks/_template.md",
+        "saf.config.json",
+        "scripts/demo.mjs",
+        "test/e2e/init.test.mjs",
+        "test/helpers.mjs",
+        "test/unit/card-sizes.test.mjs",
+        "test/unit/config.test.mjs",
+        "test/unit/effort-by-size.test.mjs",
+        "test/unit/effort-setup.test.mjs",
+        "test/unit/effort-shown.test.mjs",
+        "test/unit/friction-triage.test.mjs",
+        "test/unit/review-diff.test.mjs",
+        "test/unit/self-fix.test.mjs",
+        "test/unit/setup-choices-facts.test.mjs",
+        "test/unit/setup-choices.test.mjs",
+        "test/unit/task.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/agents/designer-medium.md": "ebe1b53d4139427f2a6963bacddcfb44f9a44fd1",
+        ".claude/agents/designer.md": "cb184e070b35bfe516165e5af0df0f03798b8450",
+        ".claude/agents/implementer-medium.md": "add5c99cca6fb94a96cc7a177b8c5bb6b9706452",
+        ".claude/agents/implementer.md": "0943c0440d57499cd82b3c48319e70057948ec0d",
+        ".claude/agents/spec-reviewer.md": "45191ce272556f7577f8e6b30f29d7be128d2f9f",
+        ".claude/commands/saf-plan.md": "fb197b6fef8bd6ede7552025cc93d2b68042e4e9",
+        ".claude/rules/plan-files.md": "7a8c9fd654bc7ffb726db0629201434d868e7175",
+        ".claude/rules/tests.md": "ab3450b01f511e68a1e586f26aff117e61290fce",
+        "CLAUDE.md": "6ba3572201aad24ab62e6d8c8fe3cb79322061a3",
+        "docs/plan/README.md": "0eee2a524ccbc2be3b36a7739900a605ea50bb7e",
+        "docs/plan/tasks/_template.md": "a8127542155169aa2fe926424a9ced6f3349c480",
+        "examples/todo-api/.claude/rules/plan-files.md": "448fb405dc36906c836bdae2adacd08cbc00162c",
+        "examples/todo-api/.claude/rules/tests.md": "ab3450b01f511e68a1e586f26aff117e61290fce",
+        "examples/todo-api/docs/plan/README.md": "82d08d5fe0fb6824f215ce59ce9a0bcc8ddf00f0",
+        "examples/todo-api/docs/plan/tasks/_template.md": "7e49bd40775de1854680f9c5cd6d0c3b99ca2006",
+        "examples/todo-api/saf.config.json": "2324099123a15053d9da11131d409dea471def94",
+        "kit/tools-saf/bin/saf.mjs": "359c785c23619fea276f55a2cf5170b1e2b04543",
+        "kit/tools-saf/lib/choices.mjs": "fde16b0335e7cb3799ee7b61d618ed963426332d",
+        "kit/tools-saf/lib/config.mjs": "d3a89a175929e448348aca83c65a15096325913f",
+        "kit/tools-saf/lib/effort.mjs": "2d850a8cc94c2bd3ae7233f793eb592f20887f80",
+        "kit/tools-saf/lib/friction.mjs": "9058842f78314bdb94b81d5d93a62c8949f47aa5",
+        "kit/tools-saf/lib/generate.mjs": "cfbbcdab137ffffaaafc6cad7c37aa0012d8dba9",
+        "kit/tools-saf/lib/plan.mjs": "59e4cc397ea20d7669a89c4d85bd96670406bfa3",
+        "kit/tools-saf/lib/task.mjs": "43ea9fecae6b00b56f99fbad92b4736f2c65f778",
+        "kit/tools-saf/schema/saf.config.schema.json": "93340ec9a4955a07d07eadf80a159a3b0b9fcb87",
+        "kit/tools-saf/templates/agents/designer.md": "4da8125be65968107915f7a75517d970d11b5183",
+        "kit/tools-saf/templates/agents/implementer.md": "3426f0eece7dd9bcbd8ecb575daefe22b3f8d8c0",
+        "kit/tools-saf/templates/agents/spec-reviewer.md": "0d03fe81eb9628913d217e0fd1ac46cc279f6f44",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "eb8375a6bfdf94d39cdb46606ad7d7bf9f802738",
+        "kit/tools-saf/templates/en/commands/saf-plan.md": "2c1c7520bff9882a5841136b7496e382a605c735",
+        "kit/tools-saf/templates/en/docs/DECISIONS.md": "1b1b88c78b1b76ca22d395e75b396779371a0cf0",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "e71f30db57f5eda9f4036ad4de27b188051bef23",
+        "kit/tools-saf/templates/en/docs/plan/tasks/T-M0-01.md": "a21d5c66f07925644b50759fe6d502dc83d40687",
+        "kit/tools-saf/templates/en/docs/plan/tasks/_template.md": "27e13af737005bab111051ddcd153fdb6bee7fd0",
+        "kit/tools-saf/templates/rules/plan-files.md": "672cf8aaca648b8edd4c942b81e50f47eda8ab03",
+        "kit/tools-saf/templates/rules/tests.md": "fac546437c5ab2f89085093c1779bc78c72b737b",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "d9c0fa1d933662bcce88fd0ed6ea4fdcc267abb8",
+        "kit/tools-saf/templates/th/commands/saf-plan.md": "edfbf960ddbad22f05759cb0dc3027df3fce9895",
+        "kit/tools-saf/templates/th/docs/DECISIONS.md": "03d112d8f3c72c627be47ea3ce61a504ef4d0b74",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "549a9a09d2b49953924af3b5798a5f4574125ce5",
+        "kit/tools-saf/templates/th/docs/plan/tasks/T-M0-01.md": "2bead8f7394cceedc9b43c67c4a22d6153033f4d",
+        "kit/tools-saf/templates/th/docs/plan/tasks/_template.md": "b7b9d0b2f91426721dd2155e89075c9578513a3c",
+        "saf.config.json": "b833e4b614aa32fb1aff4788c551e42060d7da7d",
+        "scripts/demo.mjs": "5ed51541df1cda79d6946be3cc593bb59b2d1a2c",
+        "test/e2e/init.test.mjs": "3f83494459857fd3b897351bbf8a0fdd6f4d5d00",
+        "test/helpers.mjs": "a80c8249f6245d0902143ea7981a5e58409f6b79",
+        "test/unit/card-sizes.test.mjs": "176561a2543ef120fa567666086069f09ab7dc12",
+        "test/unit/config.test.mjs": "f8ce37f31b96646d72a5e4920942fad859a5df13",
+        "test/unit/effort-by-size.test.mjs": "4cbdee6d14a455edcfa78421fe78d4bacf155a43",
+        "test/unit/effort-setup.test.mjs": "1de18f683739c22c93bc6f1a30a821480852cfbb",
+        "test/unit/effort-shown.test.mjs": "e990912279426cbb84dd15a146c6081b308b7290",
+        "test/unit/friction-triage.test.mjs": "39c6227d134a8cdba72fd2926c7bfc2570075b13",
+        "test/unit/review-diff.test.mjs": "e3da7ddb7198a5e7f1ec9ed77272f09ac7701dfd",
+        "test/unit/self-fix.test.mjs": "2c925e7fd502c29f4fb80486f82b41259a7616cd",
+        "test/unit/setup-choices-facts.test.mjs": "3ad8f210c53b9c7fb7e4f596e62749c490e38b2e",
+        "test/unit/setup-choices.test.mjs": "c65d38e2357c6f5dc460603d1c049d0d140e2a71",
+        "test/unit/task.test.mjs": "4aa2de66daa4e8ef2ca825aa4283076cd990d814"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SIZE-AC-01",
+        "SIZE-AC-02",
+        "SIZE-AC-03",
+        "SIZE-AC-04",
+        "SIZE-AC-05",
+        "SIZE-AC-06",
+        "SIZE-AC-07",
+        "SIZE-AC-08",
+        "SIZE-AC-09"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 259,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 310,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/e2e/init.test.mjs",
+        "test/unit/card-sizes.test.mjs",
+        "test/unit/config.test.mjs",
+        "test/unit/effort-by-size.test.mjs",
+        "test/unit/effort-setup.test.mjs",
+        "test/unit/effort-shown.test.mjs",
+        "test/unit/friction-triage.test.mjs",
+        "test/unit/review-diff.test.mjs",
+        "test/unit/self-fix.test.mjs",
+        "test/unit/setup-choices-facts.test.mjs",
+        "test/unit/setup-choices.test.mjs",
+        "test/unit/task.test.mjs"
+      ]
+    }
+  }
 }

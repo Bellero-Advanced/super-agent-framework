@@ -1,5 +1,6 @@
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { countedSize } from "./config.mjs";
 import { isTestFile } from "./scenarios.mjs";
 import { textFor } from "./text.mjs";
 
@@ -261,7 +262,7 @@ export function renderDrafts(plan) {
       `title: ${JSON.stringify(title)}`,
       "spec: []",
       "depends: []",
-      "size: S",
+      "size: M",
       "role: implementer",
       "touch:",
       "  - TODO",
@@ -321,7 +322,7 @@ export function selfFixIssues(plan) {
       if (!ok) bad(`${c.selfFix} is ${e.status}${last ? { carded: ` to ${last}`, fixed: ` by ${last}` }[e.status] ?? ` (${last})` : ""} — it must be open, or carded to this card`);
       if (!SELF_FIX_KINDS.includes(e.kind)) bad(`${c.selfFix} has kind ${e.kind} — a self-fix card needs ${SELF_FIX_KINDS.join(" or ")}`);
     }
-    if (c.size !== "S") bad(`size ${c.size ?? "-"} — a self-fix card is size S`);
+    if (countedSize(c).size !== "M") bad(`size ${c.size} — a self-fix card is size M`);
     const m = plan.milestones.find((x) => x.id === c.milestone);
     if (!done && m?.status !== "active") bad(`milestone ${c.milestone} is ${m?.status ?? "unknown"} — a self-fix card belongs to the active milestone`);
     const tests = c.touch.filter(isTestFile);

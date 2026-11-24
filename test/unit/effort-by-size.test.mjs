@@ -34,25 +34,26 @@ const agentIssues = (root, config) => runDocsCheck(docsInputFor(root, listFiles(
 
 test("EFFORT-AC-01 cardEffort follows rules 3 and 4 in both modes, with and without an override", () => {
   const fixed = cfg({ effort: "fixed" });
-  for (const role of Object.keys(EFFORT_BY_SIZE).filter((r) => ROLE_LIBRARY[r].core)) for (const size of ["S", "M"]) {
+  for (const role of Object.keys(EFFORT_BY_SIZE).filter((r) => ROLE_LIBRARY[r].core)) for (const size of ["M", "L"]) {
     const r = cardEffort(fixed, { role, size });
     assert.deepEqual([r.effort, r.agent, r.mode], [ROLE_LIBRARY[role].effort, role, "fixed"], `fixed ${role} ${size}`);
   }
   const bySize = cfg();
-  for (const role of Object.keys(EFFORT_BY_SIZE).filter((r) => ROLE_LIBRARY[r].core)) for (const size of ["S", "M"]) {
+  for (const role of Object.keys(EFFORT_BY_SIZE).filter((r) => ROLE_LIBRARY[r].core)) for (const size of ["M", "L"]) {
     const want = EFFORT_BY_SIZE[role][size];
     const r = cardEffort(bySize, { role, size });
     assert.equal(r.effort, want, `${role} ${size}`);
     assert.equal(r.agent, want === ROLE_LIBRARY[role].effort ? role : `${role}-${want}`, `${role} ${size} agent`);
   }
-  assert.deepEqual(cardEffort(bySize, { role: "implementer", size: "S" }).agent, "implementer-medium");
-  assert.deepEqual(cardEffort(bySize, { role: "implementer", size: "M" }).agent, "implementer");
-  assert.equal(cardEffort(bySize, { role: "implementer" }).effort, "high", "a card without size counts as M");
+  assert.deepEqual(cardEffort(bySize, { role: "implementer", size: "M" }).agent, "implementer-medium");
+  assert.deepEqual(cardEffort(bySize, { role: "implementer", size: "L" }).agent, "implementer");
+  assert.equal(cardEffort(bySize, { role: "implementer" }).effort, "medium", "a card without size counts as M");
+  assert.equal(cardEffort(bySize, { role: "implementer", size: "S" }).effort, "medium", "a legacy S card counts as M");
   const over = cfg({ overrides: { implementer: { effort: "low" } } });
-  for (const size of ["S", "M"]) assert.deepEqual([cardEffort(over, { role: "implementer", size }).effort, cardEffort(over, { role: "implementer", size }).agent], ["low", "implementer"], "the override wins in every size");
+  for (const size of ["M", "L"]) assert.deepEqual([cardEffort(over, { role: "implementer", size }).effort, cardEffort(over, { role: "implementer", size }).agent], ["low", "implementer"], "the override wins in every size");
   const outside = cfg({}, { roles: { enabled: ["art-producer"] } });
   assert.ok(!("art-producer" in EFFORT_BY_SIZE));
-  assert.deepEqual([cardEffort(outside, { role: "art-producer", size: "S" }).effort, cardEffort(outside, { role: "art-producer", size: "S" }).agent], [ROLE_LIBRARY["art-producer"].effort, "art-producer"]);
+  assert.deepEqual([cardEffort(outside, { role: "art-producer", size: "M" }).effort, cardEffort(outside, { role: "art-producer", size: "M" }).agent], [ROLE_LIBRARY["art-producer"].effort, "art-producer"]);
 });
 
 test("EFFORT-AC-02 by-size planning writes one variant file per differing effort with the name, effort, model, tools, description and base body of rule 7; fixed writes none", () => {
@@ -147,16 +148,16 @@ test("EFFORT-AC-05 a local by-size over a tracked fixed gives mode by-size, sour
   write(root, LOCAL_CONFIG_FILE, { models: { effort: "by-size" } });
   const c = loadConfig(root, {});
   assert.deepEqual([c.models.effort, c.models.effortSource, c.models.effortTracked], ["by-size", "local", "fixed"]);
-  const r = cardEffort(c, { role: "implementer", size: "S" });
+  const r = cardEffort(c, { role: "implementer", size: "M" });
   assert.deepEqual([r.agent, r.effort, r.mode, r.source], ["implementer", "high", "by-size", "local"]);
   assert.match(r.warning, /setup/);
   assert.match(r.warning, /by-size/);
-  assert.equal(cardEffort(c, { role: "implementer", size: "M" }).warning, undefined, "warns only when the wanted effort differs from the base agent's");
+  assert.equal(cardEffort(c, { role: "implementer", size: "L" }).warning, undefined, "warns only when the wanted effort differs from the base agent's");
   const tracked = tmp();
   write(tracked, "saf.config.json", { version: 1, ...BASE, models: { effort: "by-size" } });
   const t = loadConfig(tracked, {});
   assert.deepEqual([t.models.effortSource, t.models.effortTracked], ["repo", "by-size"]);
-  assert.deepEqual([cardEffort(t, { role: "implementer", size: "S" }).agent, cardEffort(t, { role: "implementer", size: "S" }).warning], ["implementer-medium", undefined]);
+  assert.deepEqual([cardEffort(t, { role: "implementer", size: "M" }).agent, cardEffort(t, { role: "implementer", size: "M" }).warning], ["implementer-medium", undefined]);
   const none = loadConfig((() => { const d = tmp(); write(d, "saf.config.json", { version: 1, ...BASE }); return d; })(), {});
   assert.deepEqual([none.models.effort, none.models.effortSource], ["fixed", "default"]);
   const bad = tmp();

@@ -6,7 +6,7 @@ import { after, test } from "node:test";
 import { REPO, cleanup, lib, tmp, write } from "../helpers.mjs";
 
 const { QUESTIONS, CHOICES, FIELD_MAX, GROUPS, LABELS, NOT_ASKED, INTERNAL_KEYS, MACHINE_SWITCHES, DOCS_URL, schemaLeaves, notAskedText } = await lib("choices.mjs");
-const { LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SKILL_PACKS, loadSchema } = await lib("config.mjs");
+const { LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SIZE_CAPS, SKILL_PACKS, loadSchema } = await lib("config.mjs");
 
 after(cleanup);
 
@@ -130,7 +130,7 @@ test("SETUP-AC-04 choices --group 2 --lang th prints every option with four Thai
   const count = (text) => r.stdout.split(text).length - 1;
   for (const label of LABELS.th.fields) assert.equal(count(`    ${label}: `), CHOICES.filter((e) => QUESTIONS.find((q) => q.id === e.question).group === 2).length, label);
   for (const [name, v] of Object.entries(RIGOR)) {
-    const line = r.stdout.split("\n").find((l) => l.includes(`${LABELS.th.sizes}: ${v.sizes.S} / ${v.sizes.M}`) && l.includes(`${v.testCaps.S} / ${v.testCaps.M}`) && l.includes(`${LABELS.th.review}: ${LABELS.th.reviewWords[v.review]}`) && !l.includes(v.review));
+    const line = r.stdout.split("\n").find((l) => l.includes(`${LABELS.th.sizes}: ${SIZE_CAPS.M.code} / ${SIZE_CAPS.L.code}`) && l.includes(`${SIZE_CAPS.M.test} / ${SIZE_CAPS.L.test}`) && l.includes(`${LABELS.th.review}: ${LABELS.th.reviewWords[v.review]}`) && !l.includes(v.review));
     assert.ok(line && line.includes(v.merge.join(" · ")), name);
   }
   assert.ok(!r.stdout.includes(LABELS.en.fields[0]), "no English labels");

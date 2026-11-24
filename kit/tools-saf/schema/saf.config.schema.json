@@ -231,10 +231,20 @@
     "effort": { "enum": ["low", "medium", "high", "xhigh", "max"] },
     "roleName": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "sizeCaps": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["S", "M"],
-      "properties": { "S": { "type": "integer", "minimum": 1 }, "M": { "type": "integer", "minimum": 1 } }
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["M", "L"],
+          "properties": { "M": { "type": "integer", "minimum": 1 }, "L": { "type": "integer", "minimum": 1 } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["S", "M"],
+          "properties": { "S": { "type": "integer", "minimum": 1 }, "M": { "type": "integer", "minimum": 1 } }
+        }
+      ]
     }
   }
 }

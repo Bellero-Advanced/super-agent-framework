@@ -11,8 +11,8 @@ argument-hint: <รหัส milestone หรือเป้าหมาย>
    สเปกใน `docs/specs/` ที่เกี่ยวข้อง
 2. designer เขียนหรือแก้:
    - `docs/plan/milestones/M<n>.md` — เป้าหมาย · ขอบเขต · ความเสี่ยง · ประตูออก · ลำดับ `cards:` · `status: planned`
-   - การ์ดทีละขั้นใน `docs/plan/tasks/M<n>/` (คัดลอก `docs/plan/tasks/_template.md`) — ขนาด S ≤ {{sizeS}} / M ≤ {{sizeM}}
-     บรรทัดโค้ด · `touch` ชัด · "เกณฑ์ผ่าน" เป็นคำสั่ง · `scenarios` จากสเปก
+   - การ์ดทีละขั้นใน `docs/plan/tasks/M<n>/` (คัดลอก `docs/plan/tasks/_template.md`) — ขนาด M ≤ {{sizeM}} / L ≤ {{sizeL}}
+     บรรทัดโค้ด (`task:verify` ล้มเมื่อเกิน {{hardStop}} เท่าของเพดาน — แตกการ์ด) · `touch` ชัด · "เกณฑ์ผ่าน" เป็นคำสั่ง · `scenarios` จากสเปก
    - สเปกพร้อมฉากยอมรับใน `docs/specs/` เมื่อเป็นระบบใหม่
 3. รัน `{{cmd.taskStateCheck}}` และ `{{cmd.docsCheck}}` แก้ทุกข้อที่รายงาน แล้วรัน `{{cmd.taskPrerun}}` กับทุกการ์ดใหม่:
    คำสั่ง "เกณฑ์ผ่าน" ที่พิสูจน์การ์ดต้องล้มตอนนี้ หรือมี `— passes by design: <reason>`

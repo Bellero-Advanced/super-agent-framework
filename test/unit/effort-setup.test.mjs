@@ -71,10 +71,10 @@ test("EFFORT-AC-08 each effort sentence names the fact the code makes true: tabl
   // The code behind the sentences.
   assert.ok(LOCAL_KEYS.includes("models.effort"), "the local file may override it");
   const by = (models, role, size) => cardEffort(resolveConfig({ stack: { packageManager: "none" }, models: { effort: "by-size", effortTracked: "by-size", ...models }, roles: { custom: [{ name: "helper", description: "Helps" }] } }), { role, size });
-  const fixedEffort = (role) => cardEffort(resolveConfig({ stack: { packageManager: "none" }, roles: { custom: [{ name: "helper", description: "Helps" }] } }), { role, size: "S" }).effort;
-  assert.equal(by({}, "helper", "S").effort, fixedEffort("helper"), "a role outside the table keeps its effort");
-  assert.notEqual(by({}, "implementer", "S").effort, fixedEffort("implementer"), "a table role is lowered");
-  assert.equal(by({ overrides: { implementer: { effort: "max" } } }, "implementer", "S").effort, "max", "models.overrides wins for one role");
+  const fixedEffort = (role) => cardEffort(resolveConfig({ stack: { packageManager: "none" }, roles: { custom: [{ name: "helper", description: "Helps" }] } }), { role, size: "M" }).effort;
+  assert.equal(by({}, "helper", "M").effort, fixedEffort("helper"), "a role outside the table keeps its effort");
+  assert.notEqual(by({}, "implementer", "M").effort, fixedEffort("implementer"), "a table role is lowered");
+  assert.equal(by({ overrides: { implementer: { effort: "max" } } }, "implementer", "M").effort, "max", "models.overrides wins for one role");
   assert.equal(variantAgents(resolveConfig({ stack: { packageManager: "none" } })).length, 0, "fixed: no extra agent file");
   const planned = variantAgents(resolveConfig({ stack: { packageManager: "none" }, models: { effort: "by-size" } }));
   assert.ok(planned.length > 0 && planned.every((v) => Object.hasOwn(EFFORT_BY_SIZE, v.role)), "by-size: one extra file per table role and lowered effort");
