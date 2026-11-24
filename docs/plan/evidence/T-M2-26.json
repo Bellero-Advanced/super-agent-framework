@@ -1,14 +1,203 @@
 {
   "id": "T-M2-26",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T05:58:30.757Z",
     "base": "aaac81cbaaf55b04bf499e8e4952a3218b71d20e",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-26",
-  "worktree": ".claude/worktrees/T-M2-26"
+  "worktree": ".claude/worktrees/T-M2-26",
+  "verified": {
+    "at": "2026-11-24T06:00:47.150Z",
+    "head": "5fc226242237743228bd7393f55e1a9026f55a6e",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 227,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "99 scenario(s) in 12 spec(s) · with test 56 · gaps 43 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/lane-caps-docs.test.mjs test/unit/setup-choices.test.mjs test/unit/lane-caps.test.mjs",
+        "exit": 0,
+        "ms": 1777,
+        "tail": [
+          "ok 20 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 0.669042",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 21 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 0.591333",
+          "  type: 'test'",
+          "  ...",
+          "1..21",
+          "# tests 21",
+          "# suites 0",
+          "# pass 21",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1742.278958"
+        ]
+      },
+      {
+        "cmd": "node tools/saf/bin/saf.mjs choices --group 6 --lang th",
+        "exit": 0,
+        "ms": 45,
+        "tail": [
+          "- every-card",
+          "    คืออะไร: ชุดทดสอบเต็มรันตอน verify ของทุกการ์ด และรันอีกครั้งตอน merge การ์ดจาก lane ถ้าเช็กตอน merge มีมัน",
+          "    เหมาะกับ: จับความเสียได้ที่การ์ดที่ทำให้เกิด ก่อนอะไรจะเข้า main",
+          "    ข้อเสีย: โหมดที่ช้าที่สุด: ชุดทดสอบเดิมถูกรันซ้ำทุกการ์ด",
+          "    เลือกเมื่อ: ชุดทดสอบเร็วหรือความเสียมีราคาแพง เครื่องที่ช้ายังตั้งทับได้เอง (SAF_TEST_MODE, saf.config.local.json)",
+          "- targeted",
+          "    คืออะไร: การ์ดจาก lane verify ด้วยเทสต์ที่ตัวเองแก้และเทสต์ของ scenario ส่วนชุดเต็มรันครั้งเดียวตอน merge เข้า main การ์ดในโฟลเดอร์หลักยังรันชุดเต็มตอน verify",
+          "    เหมาะกับ: รันเต็มหนึ่งครั้งต่อการ์ดโดยไม่ซ้ำ และทุก merge ได้รับการพิสูจน์",
+          "    ข้อเสีย: ความเสียในโค้ดที่ไม่ได้แตะจะโผล่ตอน merge ไม่ใช่ตอน verify และต้องมีคำสั่ง test-files ไม่งั้น verify รันชุดเต็ม",
+          "    เลือกเมื่อ: ชุดทดสอบใช้เวลาหลายนาทีและอยากให้ทุก merge ได้รับการพิสูจน์",
+          "- milestone",
+          "    คืออะไร: การ์ด verify ด้วยเทสต์ของตัวเอง และ merge ข้ามชุดเต็ม ชุดเต็มรันครั้งเดียวที่ exit gate ของ milestone และ task:culprit หาการ์ดที่ทำให้พัง",
+          "    เหมาะกับ: วงรอบที่เร็วที่สุด: ไม่รันชุดเต็มต่อการ์ด เหมาะกับเครื่องอ่อนและชุดทดสอบใหญ่",
+          "    ข้อเสีย: ความเสียที่อื่นโผล่เฉพาะตอน gate จากนั้น task:culprit รันชุดทดสอบซ้ำบน commit เก่ากว่าเพื่อหาการ์ด ซึ่งต้องรันเพิ่ม",
+          "    เลือกเมื่อ: ชุดทดสอบช้าหรือเครื่องอ่อน แต่ละเครื่องตั้งโหมดของตัวเองได้ (SAF_TEST_MODE, saf.config.local.json)",
+          "## stack.commands.testFiles",
+          "    คืออะไร: คำสั่งที่รันเฉพาะบางไฟล์เทสต์ ตัวแทนรายชื่อไฟล์จะถูกแทนด้วยพาธที่ใส่เครื่องหมายคำพูดแล้ว โหมด targeted และ milestone ใช้ตอน verify",
+          "    เหมาะกับ: verify ของการ์ดรันเฉพาะเทสต์ที่การ์ดแก้หรือที่ระบุตาม scenario ไม่ใช่ทั้งชุด",
+          "    ข้อเสีย: ถ้าไม่มี {files} เว้นว่าง หรือไม่พบไฟล์เทสต์ verify จะถอยไปรันชุดเต็ม และคำสั่งที่รับชื่อไฟล์ไม่ได้ทำให้การ์ดไม่ผ่าน",
+          "    เลือกเมื่อ: ใช้โหมด targeted หรือ milestone และตัวรันเทสต์รับชื่อไฟล์ได้"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 295,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 493 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 185,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 245 markdown file(s) · 189 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/lane-caps-docs.test.mjs'",
+        "exit": 0,
+        "ms": 87,
+        "tail": [
+          "ok 2 - LCAP-AC-06 the lanes and side-lanes explanations name the worktree, the install step, the per-machine file and why the main lane stays one",
+          "  ---",
+          "  duration_ms: 0.184792",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: LCAP-AC-06 the docs, templates and skill name both lane caps as per-machine keys and none says the local file holds only workflow.testMode",
+          "ok 3 - LCAP-AC-06 the docs, templates and skill name both lane caps as per-machine keys and none says the local file holds only workflow.testMode",
+          "  ---",
+          "  duration_ms: 0.800792",
+          "  type: 'test'",
+          "  ...",
+          "1..3",
+          "# tests 3",
+          "# suites 0",
+          "# pass 3",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 52.900125"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/card-lifecycle.md",
+        "docs/config-reference.md",
+        "kit/claude/skills/saf-setup/SKILL.md",
+        "kit/claude/skills/saf-setup/questions.md",
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/templates/en/docs/plan/README.md",
+        "kit/tools-saf/templates/th/docs/plan/README.md",
+        "test/unit/lane-caps-docs.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/card-lifecycle.md": "2482b701ac202d63141ce9053c141528541e1251",
+        "docs/config-reference.md": "1b95887ca0cb037cef117986fbac3a666dd33f11",
+        "kit/claude/skills/saf-setup/SKILL.md": "6f06f3c6289ead46e15e1e221b297314c93371d7",
+        "kit/claude/skills/saf-setup/questions.md": "fe51d6e6ec78994fb34f60837776c5743e8b1e88",
+        "kit/tools-saf/lib/choices.mjs": "6db520280e96f834d722ef539acc17f651991061",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "5e5eb06e2e4980047af7f112bb8e8407289c28c5",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "dd6b915a61a1734bb8b2f74c983a4cdcfcb61de1",
+        "test/unit/lane-caps-docs.test.mjs": "4a64e4602e0b3ec8bf7005d94db83ddb6998fb76"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "LCAP-AC-06"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 99,
+        "cap": 150
+      },
+      "test": {
+        "lines": 62,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/lane-caps-docs.test.mjs"
+      ]
+    }
+  }
 }
