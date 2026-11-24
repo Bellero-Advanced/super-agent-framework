@@ -25,7 +25,11 @@ Status is never typed by hand — it is computed from three kinds of files:
    `workflow.testCaps`). Over a cap = a warning in the output and in the evidence (`verified.size`), never a failure:
    the reviewer decides, or the designer splits the card.
 5. `spec-reviewer` (read only) compares the code with the card and the spec — every card at standard/strict rigor, size-M
-   cards at light rigor. The main session records each result with `task:review <id> pass` or
+   cards at light rigor. With `tokenSaving.reviewerDiff` on, the main session first runs `task:diff <id>`, which writes
+   `.saf/memory/review/<id>.diff` (a git-ignored local file) holding exactly the files `task:verify` counts as the card's
+   — a lane card is read and written in its worktree — and prints its path; the reviewer gets the card id, the review
+   types the card needs (`text` · `data` · `security` · `refactor`) and that path (with the setting off: the id and the
+   types only). The main session records each result with `task:review <id> pass` or
    `task:review <id> fail --kind <k>[,<k>…] [--note <text>]` (kinds: `spec-mismatch` · `missing-test` · `out-of-scope` · `docs` ·
    `framework`) in `docs/plan/evidence/reviews/<id>.json`; the command only works in the main folder, only after the card's
    last verify passed (for a lane card: the evidence committed on its branch), and never commits — commit that file alone

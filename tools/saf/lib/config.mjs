@@ -180,6 +180,7 @@ export const ENGINE_SCRIPTS = {
   "task:culprit": "task culprit",
   "task:friction": "task friction",
   "task:prerun": "task prerun",
+  "task:diff": "task diff",
   "docs:check": "docs-check",
   "spec:matrix": "spec-matrix",
   "check-secrets": "check-secrets",

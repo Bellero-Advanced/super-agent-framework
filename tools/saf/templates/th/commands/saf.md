@@ -34,9 +34,11 @@ argument-hint: <สิ่งที่คุณต้องการ เป็น
 | เริ่ม | session หลัก | `{{cmd.taskStart}}`{{#if lanesOn}} (บทบาทสายโค้ด → `{{cmd.taskStartLane}}`){{/if}} |
 | ลงมือ | agent ตาม `role` ของการ์ด | แตะเฉพาะไฟล์ใน `touch` |
 | ตรวจ | agent เดิม | `{{cmd.taskVerify}}` จนผ่าน |
-| เทียบสเปก | `spec-reviewer` (อ่านอย่างเดียว){{#unless reviewEvery}} — การ์ดขนาด M · การ์ด S ตรวจรวมที่ประตูออก{{/unless}} | รหัสการ์ด{{#if tokenSaving.reviewerDiff}}และไฟล์ diff{{/if}} |
+| เทียบสเปก | `spec-reviewer` (อ่านอย่างเดียว){{#unless reviewEvery}} — การ์ดขนาด M · การ์ด S ตรวจรวมที่ประตูออก{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}` แล้วให้ {{/if}}รหัสการ์ด · ประเภทการรีวิว{{#if tokenSaving.reviewerDiff}} · path ของไฟล์ diff{{/if}} |
 | ทดสอบจริง | `qa-runner` | เมื่อการ์ดแตะ UI · multiplayer · ประสิทธิภาพ |
 | ลงงาน | session หลัก | commit{{#if lanesOn}} · การ์ดสาย → `{{cmd.taskMerge}}`{{/if}} |
+
+ส่งให้ `spec-reviewer` รหัสการ์ด · ประเภทการรีวิวที่การ์ดต้องใช้ (รายการคั่นจุลภาคจาก `text` · `data` · `security` · `refactor` ตามที่ไฟล์ agent ของมันนิยาม · ไม่มีข้อไหนตรง → ไม่ระบุ){{#if tokenSaving.reviewerDiff}} และ path ที่ `{{cmd.taskDiff}}` พิมพ์ออกมา: ไฟล์นั้นมีเฉพาะไฟล์ที่ `{{cmd.taskVerify}}` นับเป็นของการ์ด — ห้ามทำ diff เอง{{/if}}
 
 หลังเทียบสเปกทุกครั้ง session หลักบันทึกผลด้วย `{{cmd.taskReview}}` (`pass` หรือ `fail` พร้อม kind ที่ตรง) ถ้า `fail` การ์ดจะเปิดอีกครั้ง:
 ผู้ลงมือแก้แล้วรัน `{{cmd.taskVerify}}` ใหม่ ไม่ต้อง restart · คำสั่งนี้ไม่ commit ให้

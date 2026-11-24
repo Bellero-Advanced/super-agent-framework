@@ -15,6 +15,7 @@ import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib
 import { CARD_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { prerunCard } from "../lib/prerun.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
+import { writeReviewDiff } from "../lib/reviewdiff.mjs";
 import { REVIEW_KINDS, listRounds, recordReview, reviewsPath } from "../lib/reviews.mjs";
 import { htmlPath, renderEvidencePage } from "../lib/viewer.mjs";
 import { taskRunner } from "../lib/run.mjs";
@@ -56,6 +57,8 @@ import {
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
  *   task prerun <id>   which "Done when" commands of a card that has not started already pass (exit 0 none unmarked · 1 some do · 2 usage or refused)
  *     (runs those commands like task:verify does — same runner, folder and time limit, guards are not run — and writes no evidence, STATE.md or mirror (the commands themselves may write, as at task:verify) · main folder or lane)
+ *   task diff <id>   write the reviewer's diff of a started card to .saf/memory/review/<id>.diff (exit 0 written · 1 git failed · 2 usage or refused)
+ *     (exactly the files task:verify counts as the card's · a lane card is read and written in its worktree · prints the absolute path)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -268,13 +271,25 @@ async function task(sub, rest) {
       if (r.refused) err(`✗ ${r.refused}`);
       return r.exit;
     }
+    case "diff": {
+      const bad = rest.filter((a) => a.startsWith("-"));
+      const words = rest.filter((a) => !a.startsWith("-"));
+      if (bad.length || words.length !== 1) {
+        err(`✗ ${bad.length ? `unknown option ${bad[0]}` : words.length ? `unexpected argument "${words[1]}"` : "give a card id"} — usage: ${c("task:diff", "<id>")}`);
+        return 2;
+      }
+      const r = writeReviewDiff(ctx, words[0]);
+      out(`wrote ${r.path}`);
+      out(`  ${r.files} file(s) · ${r.lines} line(s) · code ${r.size.code.lines} · test ${r.size.test.lines} changed lines${r.lane ? " · lane worktree" : ""}`);
+      return 0;
+    }
     case "culprit": {
       const r = await findCulprit(ctx, requireId(), { cmd: option("--cmd") });
       culpritLines(r).forEach(out);
       return r.exit;
     }
     default:
-      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction|prerun — see docs/plan/README.md");
+      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction|prerun|diff — see docs/plan/README.md");
       return 2;
   }
 }
@@ -560,7 +575,7 @@ async function main() {
   }
 }
 
-const isPrerun = argv[0] === "task" && argv[1] === "prerun";
+const refusesWith2 = argv[0] === "task" && ["prerun", "diff"].includes(argv[1]); // prerun: exit 1 means "some command passes" · diff: exit 1 means a git call failed
 
 main().then(
   (code) => {
@@ -569,6 +584,6 @@ main().then(
   (e) => {
     err(`✗ ${e instanceof Error ? e.message : String(e)}`);
     if (!(e instanceof TaskError) && !(e instanceof ConfigError) && e instanceof Error && e.stack) err(e.stack.split("\n").slice(1, 4).join("\n"));
-    process.exitCode = e instanceof StartIncomplete || e instanceof MergeStop ? e.exitCode : isPrerun && (e instanceof TaskError || e instanceof ConfigError) ? 2 : 1; // prerun: exit 1 means "some command passes"
+    process.exitCode = e instanceof StartIncomplete || e instanceof MergeStop ? e.exitCode : refusesWith2 && (e instanceof TaskError || e instanceof ConfigError) ? 2 : 1;
   },
 );
