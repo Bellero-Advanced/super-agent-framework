@@ -122,3 +122,4 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-23 (docs wording) — non-blocking
 - SKILL.md:46,105,119 lines over ~120 cols; docs/plan/README.md:34 rendered 127 cols (wrap via template). Stray comma "saf.config.local.json, (at most" in en/th plan README templates (+docs/plan/README.md:97). SKILL.md:51-52 "ask that question first … show its table" order unclear. "use the repository's test mode and lane caps unless SAF_TEST_MODE is set" can read as env overriding caps. SKILL.md:50 hand-made language list (en/th).
+- T-M3-23 round 2: SKILL.md:217 still ~165 cols; docs/plan/README.md:98 127 cols (rendered cmd); th plan README:98 stray "·" before "(ไม่เกิน" (Thai reader pass).
