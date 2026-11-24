@@ -19,10 +19,13 @@ async function setup(lang, gates) {
   return { plan, state: planMod.renderState(plan), mirror: planMod.renderMirror(plan), report: reportMod.renderReport({ plan, files: [], read: () => "" }, "M1") };
 }
 
+// Rule 10 (T-M3-19): an evidence gate that recorded no commands reads "manual check", whatever its pass — so the undeclared gates
+// here record the command they ran, and "full-suite failed" / "old passed" keep their words. (g1 is declared with `run`: no commands needed.)
+const RAN = [{ cmd: "npm test", exit: 0, ms: 1, tail: [] }];
 const EVIDENCE = [
   { id: "g1", pass: true, commands: [] },
-  { id: "full-suite", pass: false, commands: [] },
-  { id: "old", pass: true, commands: [] },
+  { id: "full-suite", pass: false, commands: RAN },
+  { id: "old", pass: true, commands: RAN },
 ];
 
 for (const lang of ["en", "th"]) {
@@ -44,11 +47,14 @@ for (const lang of ["en", "th"]) {
   });
 
   test(`TMODE-AC-16 (${lang}) with no milestone evidence only the declared gates show`, async () => {
+    const t = textMod.textFor(lang);
     const { plan, state, mirror, report } = await setup(lang, null);
-    for (const view of [state, mirror, report]) {
-      assert.ok(!view.includes("full-suite") && !view.includes("old"));
-      assert.ok(view.includes("g1"));
-    }
+    const gateRows = (view) => view.split("\n").filter((l) => /^\| (g1|full-suite|old) \|/.test(l));
+    for (const view of [state, report]) assert.deepEqual(gateRows(view), [`| g1 | declared gate | ${t.gateNotRun} |`]);
+    const lines = mirror.split("\n");
+    const from = lines.indexOf("## Done When") + 1;
+    const end = lines.findIndex((l, i) => i >= from && l.startsWith("## "));
+    assert.deepEqual(lines.slice(from, end < 0 ? undefined : end).filter(Boolean), ["- [ ] g1 declared gate"]);
     assert.deepEqual(planMod.undeclaredGates(plan, plan.milestones[0]), []);
   });
 }

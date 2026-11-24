@@ -1,5 +1,6 @@
 import { scriptCommand } from "./config.mjs";
-import { PLAN_DIR, cardStatus, doneCount, formatTime, titleOf, undeclaredGates } from "./plan.mjs";
+import { PLAN_DIR, cardStatus, doneCount, formatTime, gateResults, gateWord, titleOf, undeclaredGates } from "./plan.mjs";
+import { RUN_LIMITS } from "./run.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -18,6 +19,9 @@ const visible = (c) => {
   return n < 256 ? `\\x${n.toString(16).padStart(2, "0")}` : `\\u${n.toString(16).padStart(4, "0")}`;
 };
 export const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ENTITY[c]).replace(HIDDEN, visible);
+
+/** Text-table strings carry markdown: escape first, then a backticked part becomes `<code>` (rule 12). */
+const md = (v) => esc(v).replace(/`([^`]*)`/g, (_, x) => `<code>${x}</code>`);
 
 const el = (tag, cls, inner) => `<${tag}${cls ? ` class="${cls}"` : ""}>${inner}</${tag}>`;
 const STATUS_CLASS = new Set(["legacy", "done", "failed", "in_progress", "todo"]);
@@ -52,19 +56,21 @@ export function renderEvidencePage(plan, mid) {
   const newest = stamps.sort((a, b) => b[1] - a[1])[0]?.[0];
 
   const label = (st) => (Object.hasOwn(t.status, st) ? t.status[st] : st);
+  /** Rule 14: the last `RUN_LIMITS.tailFail` lines, and one line saying how many earlier ones were left out. */
+  const shownTail = (lines) => (lines.length > RUN_LIMITS.tailFail ? [v.tailOmitted(lines.length - RUN_LIMITS.tailFail), ...lines.slice(-RUN_LIMITS.tailFail)] : lines).join("\n");
   const block = (c) =>
     el("div", "", `${el("code", "", esc(c.cmd))} ${el("span", c.exit === 0 ? "ok" : "bad", esc(v.exit(c.exit)))} · ${esc(v.duration(c.ms))}`) +
-    el("pre", "", esc(arr(c.tail).join("\n")) || esc(v.noOutput));
+    el("pre", "", esc(shownTail(arr(c.tail))) || esc(v.noOutput));
   const field = (label, items) => el("p", "", `${el("strong", "", esc(label))}`) + (items.length ? list(items) : el("p", "muted", esc(v.none)));
 
   // ── exit gates ──
-  const mark = (pass) => (pass === null ? t.gateManual : pass ? "✓" : t.gateFail);
+  const results = gateResults(plan.gateEvidence.get(m.id));
   const rows = [
     ...m.gates.map((g) => {
-      const res = gateEv?.gates?.find((x) => x.id === g.id);
-      return { id: g.id, text: g.text, mark: !res ? t.gateNotRun : mark(res.pass ?? null), run: g.run, res };
+      const res = results.find((x) => x.id === g.id);
+      return { id: g.id, text: g.text, mark: gateWord(t, g, res), run: g.run, res };
     }),
-    ...undeclaredGates(plan, m).map((g) => ({ id: g.id, text: g.text, mark: mark(g.pass), run: [], res: gateEv?.gates?.find((x) => x.id === g.id) })),
+    ...undeclaredGates(plan, m).map((g) => ({ id: g.id, text: g.text, mark: gateWord(t, g, g.result), run: [], res: g.result })),
   ];
   const gateHead = gateEv ? t.report.gatesChecked(when(gateEv.at), String(gateEv.head ?? "").slice(0, 7)) : t.report.gatesNot(scriptCommand(plan.config.stack.packageManager, "task:verify", m.id));
   const gateFolds = rows
@@ -74,7 +80,7 @@ export function renderEvidencePage(plan, mid) {
       return el("details", "gate", el("summary", "", `${esc(g.id)} — ${esc(g.mark)}`) + body);
     });
   const gates = [
-    el("p", "", esc(gateHead)),
+    el("p", "", md(gateHead)),
     el("table", "", el("thead", "", el("tr", "", [v.gate, v.criterion, v.result].map((x) => el("th", "", esc(x))).join(""))) + el("tbody", "", rows.map((g) => el("tr", "", [g.id, g.text, g.mark].map((x) => el("td", "", esc(x))).join(""))).join(""))),
     ...gateFolds,
   ];
@@ -120,10 +126,10 @@ export function renderEvidencePage(plan, mid) {
   });
 
   const body = [
-    el("header", "", el("h1", "", esc(v.title(m.id, m.title))) + el("p", "", esc(v.milestone(m.status))) + el("p", "", esc(v.cardsDone(doneCount(plan, m), m.cards.length))) + el("p", "muted", esc(newest ? v.newest(when(newest)) : v.noEvidence))),
+    el("header", "", el("h1", "", esc(v.title(m.id, m.title))) + el("p", "", esc(v.milestone(Object.hasOwn(t.milestoneStatus, m.status) ? t.milestoneStatus[m.status] : m.status))) + el("p", "", esc(v.cardsDone(doneCount(plan, m), m.cards.length))) + el("p", "muted", esc(newest ? v.newest(when(newest)) : v.noEvidence))),
     el("section", "", el("h2", "", esc(v.gates)) + gates.join("")),
     el("section", "", el("h2", "", esc(v.cards)) + cardTable + (folds.length ? el("h2", "", esc(v.details)) + folds.join("") : "")),
-    el("p", "muted", esc(v.note(scriptCommand(plan.config.stack.packageManager, "task:report", `${m.id} --html`)))),
+    el("p", "muted", md(v.note(scriptCommand(plan.config.stack.packageManager, "task:report", `${m.id} --html`)))),
   ].join("\n");
   return `<!DOCTYPE html>\n<html lang="${v.htmlLang}"><head><meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'unsafe-inline'">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(v.title(m.id, m.title))}</title>\n<style>${CSS}</style></head>\n<body><main>\n${body}\n</main></body></html>\n`;
 }
