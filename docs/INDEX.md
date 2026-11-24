@@ -18,8 +18,8 @@ Each topic has exactly one home. Other files link to it instead of copying it. W
 |---|---|
 | What we build and for whom | [CLAUDE.md](../CLAUDE.md) (pitch) — move to its own doc when it grows |
 | System specs with acceptance scenarios | `docs/specs/` (template [specs/_template.md](specs/_template.md)) |
-| User-facing docs (shipped on GitHub, not in the npm package) | [../README.md](../README.md) · `docs/*.md` (install · card-lifecycle · setup-questions · config-reference · skills · roles · upgrade · faq) |
-| Release, roadmap, contributing | [../CHANGELOG.md](../CHANGELOG.md) · [../ROADMAP.md](../ROADMAP.md) · [../CONTRIBUTING.md](../CONTRIBUTING.md) · release checks `scripts/release-check.mjs` |
+| User-facing docs (shipped on GitHub, not in the npm package) | [../README.md](../README.md) · `docs/*.md` (install · card-lifecycle · setup-questions · config-reference · skills · roles · upgrade · releasing · faq) |
+| Release (automatic release, kill switch, tag workflow, npm trusted publishing), roadmap, contributing | [releasing.md](releasing.md) · [../CHANGELOG.md](../CHANGELOG.md) · [../ROADMAP.md](../ROADMAP.md) · [../CONTRIBUTING.md](../CONTRIBUTING.md) · `.github/workflows/release.yml` · release checks `scripts/release-check.mjs` |
 | A real project taken through two milestones | `examples/todo-api/` |
 
 ## 3. How the AI team works
