@@ -97,6 +97,7 @@ data-engineer, builder custom roles; `roles.lanes` can move a role, see [roles.m
 - In the main folder: `task:merge <id>` merges one card with `--no-ff`, installs dependencies if lock files changed, runs
   the merge checks and refreshes status. Exit **3** refused (not passed, dirty folder, changed after verification) · **4**
   conflict · **5** a merge check failed — 4 and 5 are rolled back completely.
+  The "changed after verification" check skips files allowed by the main folder's `workflow.alwaysAllowed` or the branch's, so a card that adds a glob merges in one step.
 
 By default the roles of the main-folder lane (designer, spec-reviewer, art-producer, release-operator, …) run in the main
 folder, one at a time, and so do submodule cards, which cannot move; `roles.lanes` can move a library role other than designer, spec-reviewer and release-operator to the code lane ([roles.md](roles.md#moving-a-role-to-the-other-lane)). With lanes off, every card runs in the main folder, one at a time. The main lane is fixed at one card

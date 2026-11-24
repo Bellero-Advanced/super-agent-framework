@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, normalize, sep } from "node:path";
-import { LOCAL_CONFIG_FILE, scriptCommand } from "./config.mjs";
+import { CONFIG_FILE, LOCAL_CONFIG_FILE, scriptCommand } from "./config.mjs";
 import {
   changedSince,
   commitSubject,
@@ -614,6 +614,16 @@ export async function verifyMilestone(ctx, mid) {
 
 // ── merge (lane → main branch, one at a time) ──────────────────────────────
 
+/** workflow.alwaysAllowed of the saf.config.json committed on a branch; unreadable or malformed → none. */
+function branchAllowed(root, branch) {
+  try {
+    const globs = JSON.parse(showFile(root, `refs/heads/${branch}`, CONFIG_FILE) ?? "null")?.workflow?.alwaysAllowed;
+    return Array.isArray(globs) && globs.every((g) => typeof g === "string") ? globs : [];
+  } catch {
+    return [];
+  }
+}
+
 function precheck(ctx, id) {
   const root = ctx.root;
   const refuse = (why) => {
@@ -642,7 +652,11 @@ function precheck(ctx, id) {
   if (laneDirty.length) refuse(`worktree ${worktree} has uncommitted files — commit work + evidence on ${branch} first: ${list(laneDirty)}`);
   const skip = [...alwaysAllowed(ctx.config), card.file].map((g) => globToRegExp(g));
   const base = mergeBase(root, "HEAD", `refs/heads/${branch}`) ?? refuse(`${branch} shares no history with HEAD`);
-  const files = diffNames(root, base, `refs/heads/${branch}`).filter((f) => !skip.some((re) => re.test(f)));
+  const changedOnBranch = diffNames(root, base, `refs/heads/${branch}`);
+  // the lane verified with its own always-allowed list: count the branch's globs only when its config is the verified one
+  const verifiedConfig = !changedOnBranch.includes(CONFIG_FILE) || (v.files.changed.includes(CONFIG_FILE) && v.files.hashes[CONFIG_FILE] === fileHash(dir, CONFIG_FILE));
+  const branchSkip = (verifiedConfig ? branchAllowed(root, branch) : []).map((g) => globToRegExp(g));
+  const files = changedOnBranch.filter((f) => !skip.some((re) => re.test(f)) && (f === CONFIG_FILE || !branchSkip.some((re) => re.test(f))));
   const verified = [...v.files.changed].sort();
   const off = [...files.filter((f) => !verified.includes(f) || v.files.hashes[f] !== fileHash(dir, f)), ...verified.filter((f) => !files.includes(f))];
   if (off.length) refuse(`changed after verification (does not match verified.files): ${list([...new Set(off)])} — run ${cmd(ctx.config, "task:verify", id)} again in the lane, then commit`);

@@ -1,14 +1,211 @@
 {
   "id": "T-M3-34",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:18:42.754Z",
     "base": "b9b29766e4c1f9b896b8065459ceee60e306ced6",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M3-34",
-  "worktree": ".claude/worktrees/T-M3-34"
+  "worktree": ".claude/worktrees/T-M3-34",
+  "verified": {
+    "at": "2026-11-24T16:19:33.610Z",
+    "head": "10fed68376d8d82c11a43681cb1e2ed878a1cdf7",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/merge-allowed.test.mjs",
+        "exit": 0,
+        "ms": 2484,
+        "tail": [
+          "ok 2 - MALLOW-AC-02 a file neither list allows still refuses the merge and the allowed one is not named",
+          "  ---",
+          "  duration_ms: 622.801542",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: MALLOW-AC-03 guard: a config edited after verification cannot widen the check",
+          "ok 3 - MALLOW-AC-03 guard: a config edited after verification cannot widen the check",
+          "  ---",
+          "  duration_ms: 570.9595",
+          "  type: 'test'",
+          "  ...",
+          "1..3",
+          "# tests 3",
+          "# suites 0",
+          "# pass 3",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2423.683959"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/task.test.mjs",
+        "exit": 0,
+        "ms": 4355,
+        "tail": [
+          "ok 13 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.059291",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 14 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 215.22425",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 13",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 4296.524625"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('docs/card-lifecycle.md','utf8');if(!s.includes('branch\\'s'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 47,
+        "tail": []
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 284,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 353,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "174 scenario(s) in 19 spec(s) · with test 123 · gaps 51 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 371,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 563 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 286,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 261 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/merge-allowed.test.mjs'",
+        "exit": 0,
+        "ms": 2150,
+        "tail": [
+          "ok 2 - MALLOW-AC-02 a file neither list allows still refuses the merge and the allowed one is not named",
+          "  ---",
+          "  duration_ms: 620.724667",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: MALLOW-AC-03 guard: a config edited after verification cannot widen the check",
+          "ok 3 - MALLOW-AC-03 guard: a config edited after verification cannot widen the check",
+          "  ---",
+          "  duration_ms: 588.048958",
+          "  type: 'test'",
+          "  ...",
+          "1..3",
+          "# tests 3",
+          "# suites 0",
+          "# pass 3",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2099.918333"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/card-lifecycle.md",
+        "kit/tools-saf/lib/task.mjs",
+        "test/unit/merge-allowed.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/card-lifecycle.md": "d45cc9d4412f1521d1b241e7b7ea711c815328fd",
+        "kit/tools-saf/lib/task.mjs": "4eb13a441e0e5875f6662f921d4a62e31dde71bf",
+        "test/unit/merge-allowed.test.mjs": "10baf6af6c9f2902a372bd6af6bf076dbdd09d17"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "MALLOW-AC-01",
+        "MALLOW-AC-02",
+        "MALLOW-AC-03"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 19,
+        "cap": 150
+      },
+      "test": {
+        "lines": 72,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/merge-allowed.test.mjs"
+      ]
+    }
+  }
 }
