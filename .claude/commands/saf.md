@@ -38,6 +38,11 @@ Unclear between two routes → ask one short question with a recommendation.
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
 | land | main session | commit · lane card → `npm run task:merge -- <id>` |
 
+After every spec review the main session records the result with `npm run task:review -- <id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]` (`pass`, or `fail` with the kinds that
+apply). On `fail` the card is open again: the builder fixes it and runs `npm run task:verify -- <id>` again, no restart. The command
+does not commit: commit the round file `docs/plan/evidence/reviews/<id>.json` alone (before `npm run task:merge -- <id>`)
+with `git commit -m "chore(plan): review <id> round <n>" -- docs/plan/evidence/reviews/<id>.json`.
+
 Independent cards may run in parallel — `npm run task:next -- --parallel` lists the safe set.
 
 ## 3. Report

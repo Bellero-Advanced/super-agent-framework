@@ -51,6 +51,7 @@
     "task:verify": "node tools/saf/bin/saf.mjs task verify",
     "task:abandon": "node tools/saf/bin/saf.mjs task abandon",
     "task:merge": "node tools/saf/bin/saf.mjs task merge",
+    "task:review": "node tools/saf/bin/saf.mjs task review",
     "task:state": "node tools/saf/bin/saf.mjs task state",
     "task:next": "node tools/saf/bin/saf.mjs task next",
     "task:probe": "node tools/saf/bin/saf.mjs task probe",

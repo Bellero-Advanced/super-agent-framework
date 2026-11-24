@@ -179,6 +179,7 @@ export function templateData(config, detected, opts = {}) {
       taskVerifyM: c("task:verify", "<M>"),
       taskAbandon: c("task:abandon", "<id>"),
       taskMerge: c("task:merge", "<id>"),
+      taskReview: c("task:review", "<id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]"),
       taskState: c("task:state"),
       taskStateCheck: c("task:state", "--check"),
       taskNext: c("task:next", "--parallel"),
