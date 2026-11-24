@@ -137,3 +137,6 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-19 (gate words in every view) — non-blocking
 - Spec evidence-viewer §4 "no evidence → every gate not checked" contradicts rule 10 (declared gate without run reads manual); fix the §4 line. "Passed" word differs by view (STATE shows time) — decide if literal. bin/saf.mjs:161 task:verify <M> summary decides gate marks itself (outside touch). Still crash on: gate commands entry null (page block()), invalid verified.at (formatTime RangeError in STATE/report) — card title "never crashes" is broader than rules 10–14 → small card. Rule 12 covers only text table (card titles with backticks show literally). Test gaps: undeclared gate commands [] pass false; STATE passed check uses startsWith.
+
+## T-M3-25 (pin choices/gate-coverage/lane caps) — non-blocking
+- Card labels: snapshot/walk-up tests are SETUP-AC-03 (card lists AC-01; add AC-03 to scenarios). Spec setup-choices rule 14 lacks "found by walking up from a subfolder". TMODE-AC-15 test: `task state --check` child ignores `mode` (pass SAF_TEST_MODE in env). LCAP-AC-02: repo cap and local cap both 1 — use repo 3 / local 1 to prove local value is read. TMODE-AC-14 test name "runs once" checks only gate list.
