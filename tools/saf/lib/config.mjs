@@ -134,6 +134,7 @@ const DEFAULTS = {
     perfBudgets: "",
     alwaysAllowed: [],
     commandTimeoutMs: 30 * 60 * 1000,
+    selfFix: "off",
   },
   policies: {
     push: "owner-order",

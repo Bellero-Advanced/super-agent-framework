@@ -1,7 +1,7 @@
 {
   "id": "T-M3-08",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T17:49:44.934Z",
     "base": "ae3d982b62df4c76ea954d4f438c340a6589aad3",
@@ -13,8 +13,199 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M3-08",
-  "worktree": ".claude/worktrees/T-M3-08"
+  "worktree": ".claude/worktrees/T-M3-08",
+  "verified": {
+    "at": "2026-11-24T17:56:39.766Z",
+    "head": "191ffdec840cc44fcab6721d64a6eef76d304a7d",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 376,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 157 · gaps 17 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/self-fix.test.mjs test/unit/friction.test.mjs test/unit/friction-triage.test.mjs test/unit/setup-choices.test.mjs test/unit/plan.test.mjs",
+        "exit": 0,
+        "ms": 6920,
+        "tail": [
+          "ok 51 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "  ---",
+          "  duration_ms: 1.620666",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 52 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 1.914791",
+          "  type: 'test'",
+          "  ...",
+          "1..52",
+          "# tests 52",
+          "# suites 0",
+          "# pass 52",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 6866.215459"
+        ]
+      },
+      {
+        "cmd": "node -e \"const c=JSON.parse(require('fs').readFileSync('saf.config.json','utf8'));if(c.workflow.selfFix!=='on')process.exit(1)\"",
+        "exit": 0,
+        "ms": 49,
+        "tail": []
+      },
+      {
+        "cmd": "npm run task:state -- --check",
+        "exit": 0,
+        "ms": 294,
+        "tail": [
+          "> super-agent-framework@0.1.0 task:state",
+          "> node tools/saf/bin/saf.mjs task state --check",
+          "✓ plan is valid (lane worktree — state files are not compared here)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 293,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 277 markdown file(s) · 285 local link(s) · 102 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 363,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 613 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/self-fix.test.mjs'",
+        "exit": 0,
+        "ms": 2941,
+        "tail": [
+          "ok 10 - FRIC-AC-11 a lane card refused before merging (changed after verification) appends nothing",
+          "  ---",
+          "  duration_ms: 584.894542",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: the generated /saf command has the Self-fix section only when workflow.selfFix is on, in en and th, with the steps and the limit",
+          "ok 11 - the generated /saf command has the Self-fix section only when workflow.selfFix is on, in en and th, with the steps and the limit",
+          "  ---",
+          "  duration_ms: 125.479291",
+          "  type: 'test'",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2886.603792"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/commands/saf.md",
+        "docs/card-lifecycle.md",
+        "docs/config-reference.md",
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/friction.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/schema/saf.config.schema.json",
+        "kit/tools-saf/templates/en/commands/saf.md",
+        "kit/tools-saf/templates/th/commands/saf.md",
+        "saf.config.json",
+        "test/unit/self-fix.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/commands/saf.md": "cd17510f64227bca55e0c2acb9179f1b7345fcf6",
+        "docs/card-lifecycle.md": "858a3490e0f39f033e9de53710bbbda19a323fe1",
+        "docs/config-reference.md": "9396f243fede267d2d895cd156708bfa3a2962c0",
+        "kit/tools-saf/lib/choices.mjs": "8d4bfd21eda2b8c63f58171481929fed06561602",
+        "kit/tools-saf/lib/config.mjs": "5bfd46d80885d7bd433051de86daec602cd4d385",
+        "kit/tools-saf/lib/friction.mjs": "aa53903ab266eac0a99e89d76be0cb824c76f569",
+        "kit/tools-saf/lib/generate.mjs": "2ccde718da809e70a4a23362c7120791eacd07e5",
+        "kit/tools-saf/lib/plan.mjs": "e5df9be8a9e16a0692071d00df6abdfcb1c626b2",
+        "kit/tools-saf/lib/task.mjs": "8de3a5815369e22e34ab41da0f2d28939747634e",
+        "kit/tools-saf/schema/saf.config.schema.json": "e66b8c53813e25f1124925f3921806eb9d9456a2",
+        "kit/tools-saf/templates/en/commands/saf.md": "4f09232108b6f0347aab85112207666c0c996d47",
+        "kit/tools-saf/templates/th/commands/saf.md": "e8a4985cf6e9c9192357f67dddc0013875fa3a20",
+        "saf.config.json": "5e7f672d6fe06ed1514873e6698347e0af185b99",
+        "test/unit/self-fix.test.mjs": "4c84bc5233b3dbab3b6c528707873ee077db22f4"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "FRIC-AC-10",
+        "FRIC-AC-11"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 146,
+        "cap": 400
+      },
+      "test": {
+        "lines": 212,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/self-fix.test.mjs"
+      ]
+    }
+  }
 }

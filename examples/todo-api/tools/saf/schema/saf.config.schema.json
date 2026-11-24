@@ -172,6 +172,7 @@
         "perfBudgets": { "type": "string" },
         "alwaysAllowed": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "commandTimeoutMs": { "type": "integer", "minimum": 1000 },
+        "selfFix": { "enum": ["off", "on"] },
         "testMode": { "enum": ["every-card", "targeted", "milestone"] }
       }
     },

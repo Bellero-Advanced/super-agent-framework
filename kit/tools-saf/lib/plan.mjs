@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { roleTable, scriptCommand } from "./config.mjs";
-import { FRICTION_FILE, countByStatus, parseFriction } from "./friction.mjs";
+import { FRICTION_FILE, countByStatus, parseFriction, selfFixIssues } from "./friction.mjs";
 import { submodulePaths } from "./git.mjs";
 import { codeSpans, findSection, frontmatter, scanLines, sections } from "./markdown.mjs";
 import { stripComment } from "./yaml.mjs";
@@ -108,6 +108,7 @@ export function parseCard(src, file, roles) {
       touch,
       dontTouch: strList(data.dont_touch),
       scenarios: strList(data.scenarios),
+      selfFix: str(data.self_fix) || undefined,
       criteria,
     },
     issues,
@@ -250,6 +251,7 @@ export function validatePlan(plan) {
       if (never.length) issues.push(`${m.file}: side card ${cid} depends on ${never.join(", ")}, which cannot start (its milestone is not active and it is not a side card)`);
     }
   }
+  issues.push(...selfFixIssues(plan));
   for (const id of plan.evidence.keys()) if (!plan.cards.has(id)) issues.push(`${EVIDENCE_DIR}/${id}.json: card ${id} does not exist`);
   for (const id of plan.gateEvidence.keys()) if (!ids.has(id)) issues.push(`${EVIDENCE_DIR}/${id}.json: milestone ${id} does not exist`);
   return issues;

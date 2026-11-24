@@ -1,5 +1,6 @@
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { isTestFile } from "./scenarios.mjs";
 import { textFor } from "./text.mjs";
 
 /**
@@ -16,6 +17,8 @@ export const CLOSE_STATUSES = ["carded", "fixed", "dropped"];
 export const FRICTION_LIMITS = { recurring: 2 };
 /** Kinds a self-fix card may carry (rule 19, D-017). */
 export const SELF_FIX_KINDS = ["command-failed", "doc-drift"];
+/** Self-fix cap (rule 19): self-fix cards one milestone may hold. */
+export const SELF_FIX_LIMITS = { perMilestone: 3 };
 
 const SEP = " · ";
 const TODAY_PLACEHOLDER = "2000-01-01";
@@ -291,4 +294,42 @@ export function renderDrafts(plan) {
     for (const e of entries.filter((x) => SELF_FIX_KINDS.includes(x.kind))) out.push(draft({ title: e.summary, why: [e], fix: e.id }));
   }
   return out;
+}
+
+/**
+ * Rule 19: one issue per broken condition of every card with `self_fix` (a card the plan already finished keeps its history:
+ * its entry may be fixed by it and its milestone closed). Reads plan.config, cards, milestones, evidence and friction.
+ */
+export function selfFixIssues(plan) {
+  const issues = [];
+  const cards = [...plan.cards.values()].filter((c) => c.selfFix).sort((a, b) => a.id.localeCompare(b.id));
+  const entries = new Map((plan.friction?.entries ?? []).map((e) => [e.id, e]));
+  const perMilestone = new Map();
+  for (const c of cards) {
+    const bad = (why) => issues.push(`${c.file}: self_fix ${c.selfFix} — ${why}`);
+    if (plan.config?.workflow?.selfFix !== "on") {
+      bad('workflow.selfFix is "off" (a self-fix card needs "on")');
+      continue;
+    }
+    const done = plan.evidence?.get(c.id)?.status === "done";
+    const e = entries.get(c.selfFix);
+    if (!ID.test(c.selfFix)) bad(`self_fix "${c.selfFix}" is not an F-<nnn> id`);
+    else if (!e) bad(`${c.selfFix} has no entry in ${FRICTION_FILE}`);
+    else {
+      const last = e.closes[e.closes.length - 1]?.ref;
+      const ok = e.status === "open" || ((e.status === "carded" || e.status === "fixed") && last === c.id);
+      if (!ok) bad(`${c.selfFix} is ${e.status}${last ? { carded: ` to ${last}`, fixed: ` by ${last}` }[e.status] ?? ` (${last})` : ""} — it must be open, or carded to this card`);
+      if (!SELF_FIX_KINDS.includes(e.kind)) bad(`${c.selfFix} has kind ${e.kind} — a self-fix card needs ${SELF_FIX_KINDS.join(" or ")}`);
+    }
+    if (c.size !== "S") bad(`size ${c.size ?? "-"} — a self-fix card is size S`);
+    const m = plan.milestones.find((x) => x.id === c.milestone);
+    if (!done && m?.status !== "active") bad(`milestone ${c.milestone} is ${m?.status ?? "unknown"} — a self-fix card belongs to the active milestone`);
+    const tests = c.touch.filter(isTestFile);
+    if (!tests.length) bad("touch holds no test file");
+    else if (!tests.some((t) => c.criteria.some((cmd) => cmd.includes(t)))) bad('no "Done when" command names a test file of touch');
+    const n = (perMilestone.get(c.milestone) ?? 0) + 1;
+    perMilestone.set(c.milestone, n);
+    if (n > SELF_FIX_LIMITS.perMilestone) bad(`${c.milestone} holds more than ${SELF_FIX_LIMITS.perMilestone} self-fix cards`);
+  }
+  return issues;
 }
