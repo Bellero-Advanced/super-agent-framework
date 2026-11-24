@@ -13,6 +13,7 @@ import { blockingGaps, buildMatrix, completeGaps, renderMatrix, summarize } from
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
+import { prerunCard } from "../lib/prerun.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
 import { REVIEW_KINDS, listRounds, recordReview, reviewsPath } from "../lib/reviews.mjs";
 import { htmlPath, renderEvidencePage } from "../lib/viewer.mjs";
@@ -53,6 +54,8 @@ import {
  *   task review <id> [pass|fail] [--kind <k>[,<k>…]] [--note <text>] [--area <area>]   record one spec review round (no result lists the rounds)
  *     (docs/plan/evidence/reviews/<id>.json · fail reopens the card for verify · main folder only · exit 0 recorded · 1 refused · 2 usage)
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
+ *   task prerun <id>   which "Done when" commands of a card that has not started already pass (exit 0 none unmarked · 1 some do · 2 usage or refused)
+ *     (runs those commands like task:verify does — same runner, folder and time limit, guards are not run — and writes nothing · main folder or lane)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -254,13 +257,24 @@ async function task(sub, rest) {
       return friction(ctx, rest);
     case "review":
       return review(ctx, rest);
+    case "prerun": {
+      const bad = rest.filter((a) => a.startsWith("-"));
+      const words = rest.filter((a) => !a.startsWith("-"));
+      if (bad.length || words.length !== 1) {
+        err(`✗ ${bad.length ? `unknown option ${bad[0]}` : words.length ? `unexpected argument "${words[1]}"` : "give a card id"} — usage: ${c("task:prerun", "<id>")}`);
+        return 2;
+      }
+      const r = await prerunCard(ctx, words[0], out);
+      if (r.refused) err(`✗ ${r.refused}`);
+      return r.exit;
+    }
     case "culprit": {
       const r = await findCulprit(ctx, requireId(), { cmd: option("--cmd") });
       culpritLines(r).forEach(out);
       return r.exit;
     }
     default:
-      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction — see docs/plan/README.md");
+      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction|prerun — see docs/plan/README.md");
       return 2;
   }
 }

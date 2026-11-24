@@ -34,6 +34,8 @@ scenarios:
 
 ## เกณฑ์ผ่าน
 
+แต่ละคำสั่งต้องล้มก่อนทำการ์ด (ตรวจด้วย `{{cmd.taskPrerun}}`) หรือมี `— passes by design: <reason>` ต่อท้าย · คำสั่งยามเฝ้า (ชุดทดสอบเต็ม · ตัวตรวจของเครื่องมือ) ไม่ต้องมีเครื่องหมาย
+
 - `{{cmd.specMatrixCheck}}`
 {{#each projectChecks}}
 - `{{this}}`

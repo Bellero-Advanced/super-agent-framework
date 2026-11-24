@@ -22,7 +22,8 @@
     "check-secrets": "node tools/saf/bin/saf.mjs check-secrets",
     "task:culprit": "node tools/saf/bin/saf.mjs task culprit",
     "task:friction": "node tools/saf/bin/saf.mjs task friction",
-    "task:review": "node tools/saf/bin/saf.mjs task review"
+    "task:review": "node tools/saf/bin/saf.mjs task review",
+    "task:prerun": "node tools/saf/bin/saf.mjs task prerun"
   },
   "engines": {
     "node": ">=20"

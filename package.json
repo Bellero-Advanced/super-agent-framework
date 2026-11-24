@@ -59,6 +59,7 @@
     "task:report": "node tools/saf/bin/saf.mjs task report",
     "task:culprit": "node tools/saf/bin/saf.mjs task culprit",
     "task:friction": "node tools/saf/bin/saf.mjs task friction",
+    "task:prerun": "node tools/saf/bin/saf.mjs task prerun",
     "docs:check": "node tools/saf/bin/saf.mjs docs-check",
     "spec:matrix": "node tools/saf/bin/saf.mjs spec-matrix",
     "check-secrets": "node tools/saf/bin/saf.mjs check-secrets",
