@@ -1,14 +1,168 @@
 {
   "id": "T-M3-22",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:22:54.305Z",
     "base": "1e67f5e937c68d316915e43d5cefbe3eb4e8fb30",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 2,
   "branch": "card/T-M3-22",
-  "worktree": ".claude/worktrees/T-M3-22"
+  "worktree": ".claude/worktrees/T-M3-22",
+  "verified": {
+    "at": "2026-11-24T16:28:01.416Z",
+    "head": "64a71e782e698a3c5ea092a679ba4726f52d3646",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/release-operator-text.test.mjs test/unit/generate.test.mjs",
+        "exit": 0,
+        "ms": 975,
+        "tail": [
+          "ok 17 - SETUP-AC-14 push: allowed with protectedBranches - the push rule names main",
+          "  ---",
+          "  duration_ms: 35.962833",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
+          "ok 18 - SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
+          "  ---",
+          "  duration_ms: 74.446375",
+          "  type: 'test'",
+          "  ...",
+          "1..18",
+          "# tests 18",
+          "# suites 0",
+          "# pass 18",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 914.177875"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 367,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (in progress) | — | ✗ gap (started in another folder) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "174 scenario(s) in 19 spec(s) · with test 124 · gaps 50 · gaps of started cards 0 · started in another folder 4"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 357,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 567 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 285,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 263 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/release-operator-text.test.mjs'",
+        "exit": 0,
+        "ms": 463,
+        "tail": [
+          "ok 5 - SETUP-AC-14 push: allowed with protectedBranches - the push rule names main",
+          "  ---",
+          "  duration_ms: 34.395333",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
+          "ok 6 - SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
+          "  ---",
+          "  duration_ms: 67.771542",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
+          "# suites 0",
+          "# pass 6",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 412.37"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/templates/agents/release-operator.md",
+        "kit/tools-saf/templates/en/CLAUDE.template.md",
+        "kit/tools-saf/templates/th/CLAUDE.template.md",
+        "test/unit/release-operator-text.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/templates/agents/release-operator.md": "55483ee0b7058179178b106cb5df2e4446266775",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "9e9068b0472e8c721559979e7b0d2c0b09810825",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "3d5efd544c2f71895c9b328de7a2cdcb0abcfc41",
+        "test/unit/release-operator-text.test.mjs": "eca696fa3a4b25c5cd1a0e4b84f567c6d9c2b08e"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-14"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 13,
+        "cap": 150
+      },
+      "test": {
+        "lines": 72,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/release-operator-text.test.mjs"
+      ]
+    }
+  }
 }
