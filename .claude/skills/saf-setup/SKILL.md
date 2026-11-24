@@ -18,8 +18,9 @@ Everything you generate comes from templates + the user's answers — never hand
 
 Run `node tools/saf/bin/saf.mjs detect` and keep the JSON: name, description, package manager, monorepo, submodules,
 languages, frameworks, database, the real commands (typecheck · lint · test · e2e · build), existing Claude files, and
-whether this is an existing project (`adopt`). Use these as the recommended defaults below. If `saf.config.json` already
-holds a full config (a re-run), use its values as the defaults instead and say so.
+whether this is an existing project (`adopt`). Use these as the recommended defaults below. Then check whether `.saf/manifest.json` exists
+(the engine's own test for a re-run — not the shape of `saf.config.json`). If it exists this is a **re-run**: read
+`saf.config.json`, use its values as the defaults instead and say so.
 
 ## Step 1 — interview (AskUserQuestion, grouped, ≤ 4 questions per call)
 
@@ -87,7 +88,28 @@ already know, instead of forcing them into options.
 2. Run `node tools/saf/bin/saf.mjs setup --answers .saf/setup-answers.json` with exactly one adopt flag: `--adopt` when the
    person said yes to keeping the old docs as history, `--no-adopt` when they said no or the question was skipped. Say why
    in one line: without a flag `setup` falls back to detection and would archive an existing project's files even after a "no".
+   **On a re-run** (`.saf/manifest.json` exists) do the "Before generating on a re-run" steps below first, and add one
+   `--keep <path>` per file the person chose to keep to this command.
 3. Read the output: list archived files (they moved to `docs/archive/pre-saf/`, nothing was deleted) and warnings.
+
+**Before generating on a re-run** (only when `.saf/manifest.json` exists; skip for a new setup):
+
+1. Write `.saf/setup-answers.json` (step 1 above), then run
+   `node tools/saf/bin/saf.mjs setup --answers .saf/setup-answers.json <adopt flag> --dry-run` with the same adopt flag as
+   the real run. It writes nothing. Show the list as printed, without the `same` lines.
+2. For each `replace-edited` line (a file someone edited, or SAF did not write) ask once with AskUserQuestion:
+   - **Take the new version — yours is archived to `docs/archive/pre-saf/` (recommended)**
+   - **Keep mine**
+   - **Show the diff first** — run the same command with `--dry-run --diff` added, show only that file's part (from its
+     `--- a/<path>` line to the next `---` line), then ask the same question again with the first two options.
+3. Every file answered "Keep mine" goes to the real run as `--keep <path>`, written exactly like that: a space, then the
+   path as the list printed it. Never `--keep=<path>` — the CLI silently ignores that form and the file would be
+   archived and replaced. Repeat `--keep` per file (or give one comma-separated list). A path must be a file the dry run
+   planned and that exists; anything else exits 2. `--diff` works only together with `--dry-run`.
+4. List every `keep-edited` file (living files: decision log, index, milestone and card files) with one line: your edits
+   stay; the diff shows what the new settings would change — port it by hand, or add a decision row when a setting changed.
+   Do not ask about these.
+5. Run the dry run again with the `--keep` flags to confirm: each kept file shows `keep-edited`. Then generate.
 
 ## Step 4 — self-checks (real runs, report real results)
 
@@ -115,5 +137,9 @@ Show the user the card list and **stop**. Work starts only when the user says Go
 
 ## Re-running
 
-`/saf-setup` can run again at any time to change settings. Files SAF wrote and nobody edited are replaced; edited ones are
-archived to `docs/archive/pre-saf/` first, except your edited decision log, index, milestone and card files, which a re-run keeps as they are (it lists them as kept). Plan cards, specs and evidence are never deleted.
+`/saf-setup` can run again at any time to change settings. It detects a re-run by `.saf/manifest.json`. Files SAF wrote
+and nobody edited are replaced. Your edited decision log, index, milestone and card files (living files) are kept as they
+are, and the run lists them as kept. Any other edited file is archived to `docs/archive/pre-saf/` and replaced, unless you
+keep it. Before anything is written, `setup --dry-run` lists every change, and `--dry-run --diff` shows each one as a
+diff; you decide per edited file (take the new version · keep mine · show the diff first). Plan cards, specs and evidence
+are never deleted.
