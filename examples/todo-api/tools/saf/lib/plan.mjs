@@ -186,7 +186,10 @@ export function loadPlan(root, config, io = diskIo(root)) {
   for (const f of listFiles(io, EVIDENCE_DIR, ".json", false)) {
     try {
       const data = JSON.parse(read(f));
-      if (data.kind === "milestone") gateEvidence.set(data.id, data);
+      if (data.kind === "milestone") {
+        gateEvidence.set(data.id, data);
+        if (!Array.isArray(data.verified?.gates)) issues.push(`${f}: gates is not a list — read as no gate results`);
+      }
       else evidence.set(data.id, data);
     } catch {
       issues.push(`${f}: JSON is not readable`);
@@ -352,22 +355,27 @@ export function laneTag(plan, id) {
 
 const cell = (s) => s.replace(/\|/g, "\\|").replace(/\n/g, " ");
 
-function gateMark(plan, m, g) {
-  const t = T(plan);
-  const ev = plan.gateEvidence.get(m.id);
-  const r = ev?.verified.gates.find((x) => x.id === g.id);
-  if (!g.run.length) return t.gateManual;
-  if (!r || r.pass === null) return t.gateNotRun;
-  return r.pass ? t.gatePass(timeOf(plan, ev.verified.at)) : t.gateFail;
+/** The gate results of milestone evidence — a list, `[]` for anything else (hand-made or broken evidence never throws). */
+export const gateResults = (gateEvidence) => (Array.isArray(gateEvidence?.verified?.gates) ? gateEvidence.verified.gates.filter((x) => x !== null && typeof x === "object") : []);
+
+/**
+ * The ONE place that decides a gate's result word (spec evidence-viewer rule 10) — STATE.md, the mirror, the report and the page use it.
+ * `gate.run` = the commands of the gate (declared: its `run`; undeclared: the commands the evidence recorded). `at` (optional) adds the time to "passed".
+ */
+export function gateWord(t, gate, result, at) {
+  if (!Array.isArray(gate?.run) || !gate.run.length) return t.gateManual;
+  if (!result || result.pass === null) return t.gateNotRun;
+  if (result.pass === true) return at === undefined ? "✓" : t.gatePass(at);
+  return t.gateFail;
 }
 
 /** Rules 29-30: the gates of the milestone evidence that the milestone file does not declare, in evidence order (no evidence = none). */
 export function undeclaredGates(plan, m) {
   const t = T(plan);
   const declared = new Set(m.gates.map((g) => g.id));
-  return (plan.gateEvidence.get(m.id)?.verified?.gates ?? [])
+  return gateResults(plan.gateEvidence.get(m.id))
     .filter((g) => !declared.has(g.id))
-    .map((g) => ({ id: g.id, text: g.id === FULL_SUITE_GATE.id ? t.fullSuiteGate : t.undeclaredGate, pass: g.pass ?? null }));
+    .map((g) => ({ id: g.id, text: g.id === FULL_SUITE_GATE.id ? t.fullSuiteGate : t.undeclaredGate, pass: g.pass, run: Array.isArray(g.commands) ? g.commands : [], result: g }));
 }
 
 /** Heading · in progress · next · card table for `m.cards` (the active milestone, or one milestone's side cards). */
@@ -405,9 +413,10 @@ export function renderState(plan) {
     const extra = undeclaredGates(plan, m);
     if (m.gates.length || extra.length) {
       out.push("", t.gatesTitle(m.id, c("task:verify", m.id)), "", t.gatesTable, "|---|---|---|");
-      for (const g of m.gates) out.push(`| ${g.id} | ${cell(g.text)} | ${gateMark(plan, m, g)} |`);
-      const at = plan.gateEvidence.get(m.id)?.verified?.at;
-      for (const g of extra) out.push(`| ${g.id} | ${cell(g.text)} | ${g.pass === null ? t.gateManual : g.pass ? t.gatePass(timeOf(plan, at)) : t.gateFail} |`);
+      const results = gateResults(plan.gateEvidence.get(m.id));
+      const word = (g, r) => gateWord(t, g, r, r?.pass === true ? timeOf(plan, plan.gateEvidence.get(m.id).verified.at) : undefined);
+      for (const g of m.gates) out.push(`| ${g.id} | ${cell(g.text)} | ${word(g, results.find((x) => x.id === g.id))} |`);
+      for (const g of extra) out.push(`| ${g.id} | ${cell(g.text)} | ${word(g, g.result)} |`);
     }
     out.push("");
   }
@@ -442,11 +451,10 @@ export function renderMirror(plan) {
   sec("Goal", "goal");
   sec("Scope", "scope");
   out.push("## Done When");
-  for (const g of m.gates) {
-    const r = plan.gateEvidence.get(m.id)?.verified.gates.find((x) => x.id === g.id);
-    out.push(`- [${r?.pass ? "x" : " "}] ${g.id} ${g.text}${g.run.length ? "" : t.manualSuffix}`);
-  }
-  for (const g of undeclaredGates(plan, m)) out.push(`- [${g.pass ? "x" : " "}] ${g.id} ${g.text}`);
+  const results = gateResults(plan.gateEvidence.get(m.id));
+  const line = (g, r) => `- [${gateWord(t, g, r) === "✓" ? "x" : " "}] ${g.id} ${g.text}${g.run.length ? "" : t.manualSuffix}`;
+  for (const g of m.gates) out.push(line(g, results.find((x) => x.id === g.id)));
+  for (const g of undeclaredGates(plan, m)) out.push(line(g, g.result));
   const tasks = (x, ids) => {
     for (const id of ids) {
       const s = cardStatus(plan, id);
