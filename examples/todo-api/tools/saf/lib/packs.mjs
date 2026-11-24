@@ -22,7 +22,8 @@ export const PACK_LIMITS = {
   depth: 8, // folder levels below the pack folder
   skills: 50,
   text: 300, // longest pack-supplied text printed (description, version)
-  tools: 50, // asked tools listed per skill
+  tools: 50, // asked tools per skill: more is a problem, never a silent cut
+  toolChars: 100, // one asked tool: longer is a problem, never a silent cut
 };
 
 export const PACK = {
@@ -39,7 +40,7 @@ export const PACK = {
   /** frontmatter keys a pack skill may use; the rest (hooks, shell, model, context, agent …) can run or redirect things */
   frontmatterKeys: ["name", "description", "when_to_use", "argument-hint", "disable-model-invocation", "user-invocable", "allowed-tools", "license", "metadata", "version"],
   reserved: ["saf-setup"],
-  unprintable: /[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2066-\u2069\ufeff]/g,
+  unprintable: /[\u0000-\u001f\u007f-\u009f\u061c\u200b-\u200f\u2028-\u202e\u2060-\u2064\u2066-\u2069\ufeff\u{e0000}-\u{e007f}]/gu,
 };
 
 const M = {
@@ -58,6 +59,9 @@ const M = {
   nameMismatch: (p, folder) => `${p} frontmatter name is not "${folder}" (the folder name)`,
   noDescription: (p) => `${p} frontmatter has no description`,
   keyNotAllowed: (p, k) => `${p} frontmatter key "${k}" is not allowed in a pack skill`,
+  badTools: (p) => `${p} frontmatter "allowed-tools" must be text or a list of text`,
+  tooManyTools: (p, n) => `${p} asks for more than ${n} tools`,
+  longTool: (p, n) => `${p} asks for a tool whose name is longer than ${n} characters`,
   clash: (name, with_) => `skill "${name}" clashes with ${with_}`,
   packTaken: (n) => `pack name "${n}" is already used by another pack`,
   caseClash: (p) => `${p} differs from another file only by upper and lower case`,
@@ -79,10 +83,18 @@ const noCr = (s) => s.replace(/\r\n/g, "\n");
 const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 const goodSegments = (rel) => rel.split("/").every((s) => PACK.segmentPattern.test(s) && !PACK.windowsReserved.test(s) && !s.includes(".."));
 
-/** Asked tools: a list, or text separated by commas or spaces outside parentheses (`Bash(git add:*)` stays one tool). */
-function toolsOf(value) {
-  const items = Array.isArray(value) ? value.map(String) : typeof value === "string" ? splitTools(value) : [];
-  return items.map((t) => safe(t, 100)).filter(Boolean).slice(0, PACK_LIMITS.tools);
+/**
+ * Asked tools: a list of text, or text separated by commas or spaces outside parentheses (`Bash(git add:*)` stays one tool).
+ * Every tool is listed as written: any other shape, too many tools or a too long tool is a problem, never a silent cut.
+ */
+function toolsOf(value, file) {
+  if (value === undefined) return { tools: [], problems: [] };
+  const items = Array.isArray(value) ? value : typeof value === "string" ? splitTools(value) : null;
+  if (!items || items.some((t) => typeof t !== "string")) return { tools: [], problems: [M.badTools(file)] };
+  const tools = items.map((t) => t.trim()).filter(Boolean);
+  if (tools.length > PACK_LIMITS.tools) return { tools: [], problems: [M.tooManyTools(file, PACK_LIMITS.tools)] };
+  if (tools.some((t) => t.length > PACK_LIMITS.toolChars)) return { tools: [], problems: [M.longTool(file, PACK_LIMITS.toolChars)] };
+  return { tools: tools.map((t) => safe(t, PACK_LIMITS.toolChars)), problems: [] };
 }
 function splitTools(text) {
   const out = [];
@@ -114,7 +126,7 @@ function walk(root, problems) {
         names.push(e.name);
       }
     } catch {
-      problems.push(`${rel || "the pack folder"} cannot be read`);
+      problems.push(`${safe(rel) || "the pack folder"} cannot be read`);
     } finally {
       handle?.closeSync();
     }
@@ -172,9 +184,9 @@ function readManifest(root, problems) {
   }
   let raw;
   try {
-    raw = JSON.parse(readFileSync(path, "utf8"));
+    raw = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(readFileSync(path)));
   } catch {
-    problems.push(M.badManifest("is not valid JSON"));
+    problems.push(M.badManifest("is not valid JSON in plain UTF-8 text"));
     return null;
   }
   if (!isObject(raw)) {
@@ -310,7 +322,9 @@ export function readPack(dir, { taken = [] } = {}) {
     if (typeof meta.description !== "string" || !meta.description.trim()) problems.push(M.noDescription(file));
     for (const key of Object.keys(meta)) if (!PACK.frontmatterKeys.includes(key)) problems.push(M.keyNotAllowed(file, safe(key, 60)));
     info.description = safe(meta.description);
-    info.tools = toolsOf(meta["allowed-tools"]);
+    const asked = toolsOf(meta["allowed-tools"], file);
+    problems.push(...asked.problems);
+    info.tools = asked.tools;
   }
   // an installed file must be plain text too (it is copied into the project); the SKILL.md files were checked above
   for (const f of result.files) {
@@ -351,7 +365,7 @@ export function packShowLines(pack, given) {
   const lines = [`Pack ${safe(pack.name)} ${safe(pack.version)}`, safe(pack.description), "", `Skills (${pack.skills.length}):`];
   for (const s of pack.skills) {
     lines.push(`  ${safe(s.name)} — ${safe(s.description)}`);
-    lines.push(`    asks for tools: ${s.tools.length ? s.tools.map((t) => safe(t)).join(", ") : "none"}`);
+    lines.push(`    asks for tools: ${s.tools.length ? s.tools.map((t) => safe(t, PACK_LIMITS.toolChars)).join(", ") : "none"}`);
   }
   lines.push("", `Files that would be installed (${pack.files.length}, ${bytes} bytes):`);
   for (const f of pack.files) lines.push(`  ${safe(f.path)}  (${f.size} bytes)`);

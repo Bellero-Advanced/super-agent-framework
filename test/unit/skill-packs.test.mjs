@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, lib, tmp, write } from "../helpers.mjs";
 
-const { PACK_LIMITS, packHash, packShowLines, readPack } = await lib("packs.mjs");
+const { PACK, PACK_LIMITS, packHash, packShowLines, readPack } = await lib("packs.mjs");
 const SAF = join(REPO, "kit", "tools-saf", "bin", "saf.mjs");
 after(cleanup);
 
@@ -74,8 +74,9 @@ test("PACK-AC-01 pack show runs nothing from the pack and the engine file has no
 test("PACK-AC-01 pack show cleans control characters from every text the pack supplies and needs exactly one folder argument", () => {
   const esc = String.fromCharCode(27);
   const bidi = String.fromCharCode(0x202e);
+  const hidden = [0x61c, 0x2060, 0x2064, 0xe0041].map((c) => String.fromCodePoint(c)).join("");
   const pack = fixture((root) => {
-    write(root, "saf-pack.json", { name: "team-pack", version: `1.0${esc}[2J`, description: `Hi${esc}]0;owned\nsecond line${bidi}`, skills: ["alpha"] });
+    write(root, "saf-pack.json", { name: "team-pack", version: `1.0${esc}[2J`, description: `Hi${esc}]0;owned\nsecond line${bidi}${hidden}`, skills: ["alpha"] });
     write(root, "skills/alpha/SKILL.md", `---\nname: alpha\ndescription: Nice${esc}[31m red\nallowed-tools: Read${esc}[0m\n---\nbody\n`);
     try {
       write(root, `evil${esc}[31m.txt`, "x");
@@ -85,7 +86,7 @@ test("PACK-AC-01 pack show cleans control characters from every text the pack su
   });
   const r = show(tmp("saf-cwd-"), pack);
   assert.equal(r.status, 0, r.stderr);
-  assert.equal(/[\u0000-\u0009\u000b-\u001f\u007f‮]/.test(r.stdout), false, "no control character reaches the screen");
+  assert.equal(/[\u0000-\u0009\u000b-\u001f\u007f\u061c\u2060-\u2064\u202e\u{e0000}-\u{e007f}]/u.test(r.stdout), false, "no control or hidden character reaches the screen");
   assert.match(r.stdout, /Pack team-pack 1\.0\?\[2J/);
   for (const args of [[], [pack, pack], ["--help"], ["-x"]]) {
     const u = show(tmp("saf-cwd-"), ...args);
@@ -117,6 +118,11 @@ test("PACK-AC-02 each broken pack exits 1 and names its problem", () => {
     ["more bytes than PACK_LIMITS", () => fixture((x) => { for (let i = 0; i < 5; i++) write(x, `skills/alpha/f${i}.md`, "x".repeat(PACK_LIMITS.fileBytes - 1)); }), /more than 1048576 bytes/],
     ["more entries than PACK_LIMITS", () => fixture((x) => { for (let i = 0; i <= PACK_LIMITS.entries; i++) write(x, `docs/${i}.txt`, ""); }), /more than 2000 files and folders/],
     ["a text file with a zero byte", () => fixture((x) => writeFileSync(at(x, "skills/alpha/zero.md"), Buffer.from("fine\0text"))), /skills\/alpha\/zero\.md is not plain UTF-8 text/],
+    ["51 asked tools (the 51st would be hidden by a cut)", () => fixture((x) => write(x, "skills/beta/SKILL.md", skillText("beta", `allowed-tools: [${Array.from({ length: PACK_LIMITS.tools }, (_, i) => `T${i}`).join(", ")}, "Bash(*)"]\n`))), /skills\/beta\/SKILL\.md asks for more than 50 tools/],
+    ["allowed-tools written as a mapping", () => fixture((x) => write(x, "skills/beta/SKILL.md", skillText("beta", "allowed-tools:\n  Bash: all\n"))), /skills\/beta\/SKILL\.md frontmatter "allowed-tools" must be text or a list of text/],
+    ["allowed-tools as a list holding a mapping", () => fixture((x) => write(x, "skills/beta/SKILL.md", skillText("beta", "allowed-tools:\n  - Read\n  - Bash: all\n"))), /"allowed-tools" must be text or a list of text/],
+    ["a tool longer than PACK_LIMITS", () => fixture((x) => write(x, "skills/beta/SKILL.md", skillText("beta", `allowed-tools: Bash(${"a".repeat(PACK_LIMITS.toolChars)}:*)\n`))), /asks for a tool whose name is longer than 100 characters/],
+    ["a saf-pack.json that is not UTF-8", () => fixture((x) => writeFileSync(at(x, "saf-pack.json"), Buffer.concat([Buffer.from('{"name":"team-pack","version":"1","description":"d","skills":["alpha"],"x":"'), Buffer.from([0xff]), Buffer.from('"}')]))), /saf-pack\.json is not valid JSON in plain UTF-8 text/],
     ["a binary file named .md", () => fixture((x) => writeFileSync(at(x, "skills/alpha/bin.md"), Buffer.from([0x89, 0, 0xff, 0xfe]))), /skills\/alpha\/bin\.md is not plain UTF-8 text/],
   ];
   for (const [label, build, want] of cases) {
@@ -229,4 +235,74 @@ test("PACK-AC-01 packShowLines lists the tools of a list-form allowed-tools and 
   const lines = packShowLines(pack, 'my "pack"\\dir');
   assert.ok(lines.includes("    asks for tools: Read, Bash(npm test:*)"));
   assert.ok(lines.some((l) => l.trim() === JSON.stringify({ path: 'my "pack"\\dir', sha256: pack.hash })));
+});
+
+test("PACK-AC-02 more entries than PACK_LIMITS stop the walk, and a pack over the file or byte limit lists no skills", () => {
+  const many = readPack(fixture((x) => { for (let i = 0; i <= PACK_LIMITS.entries; i++) write(x, `docs/${i}.txt`, ""); }));
+  assert.equal(many.ok, false);
+  assert.ok(many.refused.length <= PACK_LIMITS.entries, `${many.refused.length} refused files listed`);
+  const files = readPack(fixture((x) => { for (let i = 0; i <= PACK_LIMITS.files; i++) write(x, `skills/alpha/n/${i}.md`, "x"); }));
+  assert.equal(files.ok, false);
+  assert.deepEqual(files.skills, [], "a pack over the file limit is not read further");
+  const bytes = readPack(fixture((x) => { for (let i = 0; i < 5; i++) write(x, `skills/alpha/f${i}.md`, "x".repeat(PACK_LIMITS.fileBytes - 1)); }));
+  assert.deepEqual(bytes.skills, [], "a pack over the byte limit is not read further");
+});
+
+test("PACK-AC-02 two files that differ only by upper and lower case make the pack invalid", (t) => {
+  const pack = fixture((x) => write(x, "skills/alpha/Notes.md", "a"));
+  write(pack, "skills/alpha/notes.md", "b");
+  const names = readdirSync(join(pack, "skills", "alpha")).filter((n) => n.toLowerCase() === "notes.md");
+  if (names.length < 2) {
+    t.skip("this file system treats Notes.md and notes.md as one file, so the clash cannot be built here");
+    return;
+  }
+  assert.match(readPack(pack).problems.join("\n"), /skills\/alpha\/notes\.md differs from another file only by upper and lower case/);
+});
+
+test("PACK-AC-02 a folder that cannot be read is reported with a name cleaned of control characters", (t) => {
+  const esc = String.fromCharCode(27);
+  const pack = fixture();
+  const dir = join(pack, "skills", "alpha", `bad${esc}[31m`);
+  try {
+    mkdirSync(dir);
+    chmodSync(dir, 0o000);
+    try {
+      readdirSync(dir);
+      t.skip("this system lets the test read a folder with mode 000 (for example it runs as the super-user)");
+      return;
+    } catch {
+      /* unreadable, as wanted */
+    }
+  } catch (e) {
+    t.skip(`this system cannot make that folder (${e.code})`);
+    return;
+  }
+  try {
+    const text = readPack(pack).problems.join("\n");
+    assert.match(text, /cannot be read/);
+    assert.equal(text.includes(esc), false, "the folder name is cleaned");
+    assert.match(text, /skills\/alpha\/bad\?\[31m cannot be read/);
+  } finally {
+    chmodSync(dir, 0o700);
+  }
+});
+
+test("PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs", () => {
+  const doc = readFileSync(join(REPO, "docs", "skills.md"), "utf8").replace(/\r\n/g, "\n");
+  const rows = Object.fromEntries([...doc.matchAll(/^\| (.+?) \| (\d+) \|$/gm)].map((m) => [m[1], Number(m[2])]));
+  const labels = {
+    files: "Files to install",
+    bytes: "Bytes of all files to install",
+    fileBytes: "Bytes of one installed file",
+    manifestBytes: "Bytes of `saf-pack.json`",
+    entries: "Files and folders looked at",
+    depth: "Folder levels",
+    skills: "Skills",
+    tools: "Asked tools per skill",
+    toolChars: "Characters of one asked tool",
+  };
+  assert.deepEqual(Object.keys(labels).sort(), Object.keys(PACK_LIMITS).filter((k) => k !== "text").sort(), "every limit that makes a pack invalid has a row");
+  for (const [key, label] of Object.entries(labels)) assert.equal(rows[label], PACK_LIMITS[key], label);
+  const keys = doc.match(/Allowed keys:\n(.+)\n/)?.[1].match(/`[^`]+`/g)?.map((k) => k.slice(1, -1));
+  assert.deepEqual(keys, PACK.frontmatterKeys);
 });

@@ -68,14 +68,27 @@ my-pack/
 - `version` and `description`: non-empty text
 - `skills`: a non-empty list of different names; each needs `skills/<name>/SKILL.md`
 
-Each `SKILL.md` starts with frontmatter: `name` (the same as its folder) and a non-empty `description`. It may also use
-`allowed-tools`, `when_to_use`, `argument-hint`, `disable-model-invocation`, `user-invocable`, `license`, `metadata` and
-`version`. Any other key (for example `hooks`, `model` or `context`) makes the pack invalid.
+Each `SKILL.md` starts with frontmatter: `name` (the same as its folder) and a non-empty `description`. Allowed keys:
+`name`, `description`, `when_to_use`, `argument-hint`, `disable-model-invocation`, `user-invocable`, `allowed-tools`, `license`, `metadata`, `version`.
+Any other key (for example `hooks`, `model` or `context`) makes the pack invalid. `allowed-tools` is text or a list of text;
+any other shape, or a tool name longer than the limit below, makes the pack invalid, so `saf pack show` always lists every tool a
+skill asks for.
 
 Only regular `.md` files inside a listed skill folder are ever copied. Everything else — a README, a script, a file in an
 unlisted folder, a name with odd characters — is **refused**: never copied, and listed by `saf pack show`. A symbolic link
-anywhere, a file that is not plain UTF-8 text, or a pack bigger than the limits (200 files · 1 MiB in total · 256 KiB per file · 2000
-files and folders looked at) makes the pack invalid.
+anywhere, an installed file or `saf-pack.json` that is not plain UTF-8 text, or a pack over a limit makes the pack invalid.
+
+| Limit | Value |
+|---|---|
+| Files to install | 200 |
+| Bytes of all files to install | 1048576 |
+| Bytes of one installed file | 262144 |
+| Bytes of `saf-pack.json` | 65536 |
+| Files and folders looked at | 2000 |
+| Folder levels | 8 |
+| Skills | 50 |
+| Asked tools per skill | 50 |
+| Characters of one asked tool | 100 |
 
 ### Look before you trust: `saf pack show`
 
@@ -83,7 +96,8 @@ files and folders looked at) makes the pack invalid.
 node tools/saf/bin/saf.mjs pack show path/to/my-pack
 ```
 
-It only reads. It prints the name, version and description, each skill with its description and the tools its
+Run it from the project root: the `path` in the entry it prints is the path you typed, and `skills.external` reads a relative
+path from the project root. It only reads. It prints the name, version and description, each skill with its description and the tools its
 `allowed-tools` asks for, every file that would be installed with its size, every refused file, the content hash and the exact
 `skills.external` entry to add. Nothing from the pack is run, nothing is written and nothing is fetched. Exit code 0: the pack
 is valid · 1: it is invalid and the problems are listed · 2: wrong arguments.

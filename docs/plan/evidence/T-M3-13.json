@@ -13,19 +13,19 @@
       "source": "repo"
     }
   },
-  "attempts": 2,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M3-13",
   "worktree": ".claude/worktrees/T-M3-13",
   "verified": {
-    "at": "2026-11-24T21:13:49.546Z",
-    "head": "e4410504548fa792cf66f42489d9ae45c27bc5ad",
+    "at": "2026-11-24T21:22:04.379Z",
+    "head": "13a4f86ff9e80c2fec8d6d284db23656390fb45c",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 417,
+        "ms": 574,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -52,40 +52,40 @@
       {
         "cmd": "node --test test/unit/skill-packs.test.mjs",
         "exit": 0,
-        "ms": 2869,
+        "ms": 4569,
         "tail": [
-          "ok 9 - PACK-AC-03 the hash is path, zero byte, LF text, zero byte for each file sorted by POSIX path",
+          "ok 13 - PACK-AC-02 a folder that cannot be read is reported with a name cleaned of control characters",
           "  ---",
-          "  duration_ms: 1.846125",
+          "  duration_ms: 2.448",
           "  type: 'test'",
           "  ...",
-          "# Subtest: PACK-AC-01 packShowLines lists the tools of a list-form allowed-tools and prints an entry whose path stays one JSON string",
-          "ok 10 - PACK-AC-01 packShowLines lists the tools of a list-form allowed-tools and prints an entry whose path stays one JSON string",
+          "# Subtest: PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
+          "ok 14 - PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
           "  ---",
-          "  duration_ms: 3.475875",
+          "  duration_ms: 0.46125",
           "  type: 'test'",
           "  ...",
-          "1..10",
-          "# tests 10",
+          "1..14",
+          "# tests 14",
           "# suites 0",
-          "# pass 10",
+          "# pass 13",
           "# fail 0",
           "# cancelled 0",
-          "# skipped 0",
+          "# skipped 1",
           "# todo 0",
-          "# duration_ms 2816.203125"
+          "# duration_ms 4516.305875"
         ]
       },
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/packs.mjs','utf8');if(/child_process|import\\(|fetch\\(|https?:/.test(s))process.exit(1)\"",
         "exit": 0,
-        "ms": 47,
+        "ms": 57,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 309,
+        "ms": 475,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -95,7 +95,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 352,
+        "ms": 546,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -105,28 +105,28 @@
       {
         "cmd": "node --test 'test/unit/skill-packs.test.mjs'",
         "exit": 0,
-        "ms": 2834,
+        "ms": 4280,
         "tail": [
-          "ok 9 - PACK-AC-03 the hash is path, zero byte, LF text, zero byte for each file sorted by POSIX path",
+          "ok 13 - PACK-AC-02 a folder that cannot be read is reported with a name cleaned of control characters",
           "  ---",
-          "  duration_ms: 1.733791",
+          "  duration_ms: 3.186875",
           "  type: 'test'",
           "  ...",
-          "# Subtest: PACK-AC-01 packShowLines lists the tools of a list-form allowed-tools and prints an entry whose path stays one JSON string",
-          "ok 10 - PACK-AC-01 packShowLines lists the tools of a list-form allowed-tools and prints an entry whose path stays one JSON string",
+          "# Subtest: PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
+          "ok 14 - PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
           "  ---",
-          "  duration_ms: 3.272792",
+          "  duration_ms: 0.596",
           "  type: 'test'",
           "  ...",
-          "1..10",
-          "# tests 10",
+          "1..14",
+          "# tests 14",
           "# suites 0",
-          "# pass 10",
+          "# pass 13",
           "# fail 0",
           "# cancelled 0",
-          "# skipped 0",
+          "# skipped 1",
           "# todo 0",
-          "# duration_ms 2782.977208"
+          "# duration_ms 4223.332875"
         ]
       }
     ],
@@ -142,10 +142,10 @@
       "forbidden": [],
       "hashes": {
         "CHANGELOG.md": "9686cfd8d21890b26f340ad92942d3ed18cd9286",
-        "docs/skills.md": "9c6d984d516092781339f0039cdaf408f906d7f8",
+        "docs/skills.md": "7cc957c84a276b3659a62c55d83965a3a6022f29",
         "kit/tools-saf/bin/saf.mjs": "753527ab3e07a43148b8e770502c0ef35fd0f48b",
-        "kit/tools-saf/lib/packs.mjs": "e8d114766b0c0a6accdf29551961821099a3d729",
-        "test/unit/skill-packs.test.mjs": "b86027f9bb4327424305017bc6465131f724895b"
+        "kit/tools-saf/lib/packs.mjs": "3942ec789d2aee95aca7ff2a0b65f20f121ada4e",
+        "test/unit/skill-packs.test.mjs": "b12ed7ea04937d96e4b73fdc65cfbc1302ac310f"
       }
     },
     "scenarios": {
@@ -159,12 +159,12 @@
     "size": {
       "size": "M",
       "code": {
-        "lines": 443,
+        "lines": 471,
         "cap": 800,
         "stop": 1600
       },
       "test": {
-        "lines": 232,
+        "lines": 308,
         "cap": 600,
         "stop": 1200
       },
