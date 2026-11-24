@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, posix, relative } from "node:path";
-import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
+import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
@@ -32,11 +32,11 @@ const readText = (abs) => readFileSync(abs, "utf8").replace(/\r\n/g, "\n");
 /** Templates are stored with LF; a checkout with CRLF line endings must render the same bytes. */
 const readTemplate = (p) => readFileSync(p, "utf8").replace(/\r\n/g, "\n");
 export const COMMANDS = ["saf", "saf-plan"];
-/** Agent-facing folders SAF owns files in — a file SAF wrote there that is no longer planned is removed when unedited. */
 /** Files the team keeps writing in after setup: a re-run keeps them when edited (a trailing "/" = everything under that folder). */
 export const LIVING_FILES = ["docs/DECISIONS.md", "docs/INDEX.md", "docs/plan/milestones/", "docs/plan/tasks/"];
 const isLiving = (rel) => LIVING_FILES.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
 
+/** Agent-facing folders SAF owns files in — a file SAF wrote there that is no longer planned is removed when unedited. */
 const OWNED_DIRS = [".claude/commands/", ".claude/skills/", ".claude/agents/", ".claude/rules/"];
 /** Skills shipped in this project: core + chosen packs (one skill per pack). */
 export const skillsFor = (config) => [...CORE_SKILLS, ...config.skills.packs];
@@ -48,6 +48,20 @@ function readJson(p, fallback) {
   } catch {
     return fallback;
   }
+}
+
+const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+const MANIFEST_UNREADABLE = `${MANIFEST} is not readable`;
+
+/** The manifest: missing → `{ files: {} }` (a first run); present but broken (not JSON, not an object, `files` not an object) → null. */
+function readManifest(root) {
+  const file = join(root, MANIFEST);
+  if (!existsSync(file)) return { files: {} };
+  let m = null;
+  try {
+    m = JSON.parse(readFileSync(file, "utf8"));
+  } catch {}
+  return isObject(m) && isObject(m.files) ? m : null;
 }
 
 function walk(dir) {
@@ -302,7 +316,8 @@ function planRetire(root, files, plannedDests) {
 function applyRetire(root, entries, files, report) {
   for (const e of entries) {
     if (e.action === "keep-unplanned") {
-      report.kept.push(keptLine(e));
+      report.kept.push(e.path);
+      report.warnings.push(keptWarning(e));
       continue;
     }
     delete files[e.path];
@@ -315,8 +330,8 @@ function applyRetire(root, entries, files, report) {
   }
 }
 
-/** One shape for the plan (plain path + reason); the real report keeps its text: the reason in brackets after a no-longer-shipped file. */
-const keptLine = (e) => (e.action === "keep-unplanned" ? `${e.path} (${e.reason})` : e.path);
+/** The one warning a kept no-longer-shipped file gets (`report.kept` holds the plain path). */
+const keptWarning = (e) => `${e.path}: ${REASONS["keep-unplanned"]}`;
 
 const SETTINGS_HOOKS = {
   SessionStart: 'cd "$CLAUDE_PROJECT_DIR" && node tools/saf/bin/saf.mjs hook session-start',
@@ -427,21 +442,32 @@ export function engineScripts(config) {
   return want;
 }
 
+/** What is wrong with a package.json the scripts merge cannot use, by `mergeScriptsText` reason (setup and upgrade print these words). */
+export const PACKAGE_INVALID = {
+  json: "package.json is not valid JSON",
+  root: "package.json is not a JSON object",
+  scripts: "package.json: `scripts` is not a JSON object",
+};
+
 /**
  * The one package.json script merge — setup and `saf upgrade` both call it. Adds the scripts in `want` that are missing,
  * never changes an existing one, and returns the new text only when something was added (`text: null` otherwise, so the
  * caller leaves the file byte-identical). Keeps the byte-order mark, indentation, line endings and trailing newline.
- * @returns {{text:string|null, added:string[], kept:string[], scripts:object|null, invalid:boolean}}
+ * @returns {{text:string|null, added:string[], kept:string[], scripts:object|null, invalid:boolean, reason?:"json"|"root"|"scripts"}} `reason` only when invalid: the key of PACKAGE_INVALID
  */
 export function mergeScriptsText(text, want) {
   const bom = text.startsWith("\uFEFF") ? "\uFEFF" : "";
   const body = text.slice(bom.length);
-  let pkg = null;
+  let pkg;
   try {
     pkg = JSON.parse(body);
-  } catch {}
-  if (!pkg || typeof pkg !== "object" || Array.isArray(pkg)) return { text: null, added: [], kept: [], scripts: null, invalid: true };
-  if (!pkg.scripts || typeof pkg.scripts !== "object" || Array.isArray(pkg.scripts)) pkg.scripts = {};
+  } catch {
+    return { text: null, added: [], kept: [], scripts: null, invalid: true, reason: "json" };
+  }
+  const invalid = (reason) => ({ text: null, added: [], kept: [], scripts: null, invalid: true, reason });
+  if (!isObject(pkg)) return invalid("root");
+  if (pkg.scripts === undefined) pkg.scripts = {};
+  else if (!isObject(pkg.scripts)) return invalid("scripts");
   const added = [];
   const kept = [];
   for (const [name, value] of Object.entries(want)) {
@@ -468,7 +494,7 @@ function planPackageJson(root, config, report) {
   const want = engineScripts(config);
   const res = mergeScriptsText(text, want);
   if (res.invalid) {
-    report.warnings.push("package.json is not valid JSON — scripts were not added (see docs/plan/README.md for the commands)");
+    report.warnings.push(`${PACKAGE_INVALID[res.reason]} — scripts were not added (see docs/plan/README.md for the commands)`);
     return { ...none, state: "invalid" };
   }
   for (const k of res.kept) report.warnings.push(`package.json already has a different "${k}" script — kept yours; SAF docs assume "${want[k]}"`);
@@ -537,7 +563,8 @@ export function planSetup(root, answers, opts = {}) {
   if (errors.length) throw new Error(["setup answers are invalid:", ...errors.map((e) => `  ✗ ${e}`)].join("\n"));
   const detected = detectProject(root);
   const report = { written: [], archived: [], kept: [], removed: [], warnings: [] };
-  const manifest = readJson(join(root, MANIFEST), { files: {} });
+  const manifest = readManifest(root);
+  if (!manifest) throw new ConfigError(`${MANIFEST_UNREADABLE} — nothing was changed; restore it from git (git checkout -- ${MANIFEST})`);
   const ownedUnchanged = (rel) => {
     const abs = join(root, rel);
     return manifest.files[rel] && existsSync(abs) && sha(readText(abs)) === manifest.files[rel];
@@ -626,7 +653,12 @@ export function planSetup(root, answers, opts = {}) {
   }
   const retire = planRetire(root, manifest.files, new Set(files.map((f) => f.dest))).filter((e) => e.action !== "forget");
   actions.push(...retire);
-  for (const e of retire) if (e.action === "keep-unplanned") report.kept.push(keptLine(e));
+  for (const e of retire) {
+    if (e.action !== "keep-unplanned") continue;
+    next.files[e.path] = manifest.files[e.path]; // like a kept living file: the next run still sees it as edited
+    report.kept.push(e.path);
+    report.warnings.push(keptWarning(e));
+  }
   for (const e of retire) if (e.action === "remove") report.removed.push(e.path);
   const settings = planSettings(root, taken, report);
   if (settings.archivedTo) report.archived.push(archiveLine(SETTINGS, settings.archivedTo));
@@ -684,11 +716,11 @@ export function applySetup(root, plan) {
   if (m.packageJson.text !== null) writeFileSync(join(root, "package.json"), m.packageJson.text);
   writeFileSync(join(root, CONFIG_FILE), m.config.text);
   for (const a of plan.actions) {
-    if (a.content === undefined || a.action === "keep-edited") continue;
+    if (a.content === undefined || a.action === "keep-edited" || a.action === "same") continue;
     if (a.to) moveAside(root, a.path, a.to);
     writeAt(root, a.path, a.content);
   }
-  applyRetire(root, plan.actions.filter((a) => a.content === undefined), {}, { kept: [], removed: [] });
+  applyRetire(root, plan.actions.filter((a) => a.content === undefined), {}, { kept: [], removed: [], warnings: [] });
   const s = m.settings;
   if (s.localArchivedTo) moveAside(root, SETTINGS_LOCAL, s.localArchivedTo);
   if (s.localText !== null) writeAt(root, SETTINGS_LOCAL, s.localText);
@@ -747,7 +779,11 @@ export function planDiffs(plan) {
  */
 export function refreshKitFiles(root) {
   const report = { written: [], archived: [], kept: [], removed: [], warnings: [] };
-  const manifest = readJson(join(root, MANIFEST), { files: {} });
+  const manifest = readManifest(root);
+  if (!manifest) {
+    report.warnings.push(`${MANIFEST_UNREADABLE} — commands and skills were not refreshed; restore it from git (git checkout -- ${MANIFEST})`);
+    return report;
+  }
   const raw = readJson(join(root, CONFIG_FILE), existsSync(join(root, CONFIG_FILE)) ? null : {});
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
     report.warnings.push(`${CONFIG_FILE} is not valid JSON — commands and skills were not refreshed`);
@@ -774,7 +810,8 @@ export function refreshKitFiles(root) {
         continue;
       }
       if (!manifest.files[f.dest] || sha(cur) !== manifest.files[f.dest]) {
-        report.kept.push(`${f.dest} (edited in this project — kept)`);
+        report.kept.push(f.dest);
+        report.warnings.push(`${f.dest} edited in this project — kept`);
         continue;
       }
     }

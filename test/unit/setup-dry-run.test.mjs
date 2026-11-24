@@ -197,7 +197,7 @@ test("RERUN-AC-04 one fixture with every action: the plan's actions match the re
   assert.ok(report.written.includes(".claude/commands/saf-plan.md") && report.written.includes("docs/plan/README.md"));
   assert.deepEqual(report.removed, [".claude/rules/gone.md"]);
   assert.ok(report.kept.includes("docs/DECISIONS.md"));
-  assert.ok(report.kept.some((k) => k.startsWith(".claude/rules/mine.md (")), "the real report keeps its decorated text");
+  assert.ok(report.kept.includes(".claude/rules/mine.md"), "the real report keeps the plain path (RERUN-AC-16 rule 31)");
   assert.deepEqual(plan.actions.filter((a) => a.action === "keep-unplanned").map((a) => a.path), [".claude/rules/mine.md"], "the plan's kept entry is a plain path");
   assert.ok(!existsSync(join(root, ".claude/rules/gone.md")));
   assert.equal(read(root, ".claude/rules/mine.md"), "shipped once, then edited\n");
