@@ -1,14 +1,179 @@
 {
   "id": "T-M3-27",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T08:45:16.069Z",
     "base": "8b11597c906f932133c67e9406fec4ad98a8836f",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 6,
   "lane": 1,
   "branch": "card/T-M3-27",
-  "worktree": ".claude/worktrees/T-M3-27"
+  "worktree": ".claude/worktrees/T-M3-27",
+  "verified": {
+    "at": "2026-11-24T08:55:47.940Z",
+    "head": "ec799c08696d7a7d78bf305e082b837973abe4d4",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/refresh-copies.test.mjs test/unit/doc-languages.test.mjs",
+        "exit": 0,
+        "ms": 2360,
+        "tail": [
+          "ok 15 - COPIES-AC-03 refusals without a usable card print the by-hand fallback",
+          "  ---",
+          "  duration_ms: 350.091458",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
+          "ok 16 - COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
+          "  ---",
+          "  duration_ms: 0.770208",
+          "  type: 'test'",
+          "  ...",
+          "1..16",
+          "# tests 16",
+          "# suites 0",
+          "# pass 16",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2303.347041"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 332,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "157 scenario(s) in 17 spec(s) · with test 83 · gaps 74 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 348,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 538 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 284,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 270 markdown file(s) · 241 local link(s) · 72 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/refresh-copies.test.mjs'",
+        "exit": 0,
+        "ms": 2356,
+        "tail": [
+          "ok 9 - COPIES-AC-03 refusals without a usable card print the by-hand fallback",
+          "  ---",
+          "  duration_ms: 364.918042",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
+          "ok 10 - COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
+          "  ---",
+          "  duration_ms: 0.796334",
+          "  type: 'test'",
+          "  ...",
+          "1..10",
+          "# tests 10",
+          "# suites 0",
+          "# pass 10",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2306.361667"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "CLAUDE.md",
+        "CONTRIBUTING.md",
+        "package.json",
+        "saf.config.json",
+        "scripts/refresh-copies.mjs",
+        "test/unit/refresh-copies.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "CLAUDE.md": "51970205789ffb18444ac74d00ac9ee36ea6c10e",
+        "CONTRIBUTING.md": "f76f14c2c2ad339455afdbc5563d6caa6714d5fa",
+        "package.json": "980db51de43d9eafdc460a88b4c6b9998a187fb9",
+        "saf.config.json": "27a6187c3168c36ec514e7e546fa8e9447b333a2",
+        "scripts/refresh-copies.mjs": "9b5909e60bb80f392c8c477caa092e8d51eeb15c",
+        "test/unit/refresh-copies.test.mjs": "04ffc24ed485f7dd5ae1e6e086bacdf408b4b49e"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "COPIES-AC-01",
+        "COPIES-AC-02",
+        "COPIES-AC-03",
+        "COPIES-AC-04",
+        "COPIES-AC-05",
+        "COPIES-AC-06",
+        "COPIES-AC-07",
+        "COPIES-AC-08"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 150,
+        "cap": 150
+      },
+      "test": {
+        "lines": 189,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/refresh-copies.test.mjs"
+      ]
+    }
+  }
 }

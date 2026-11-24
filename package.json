@@ -62,6 +62,6 @@
     "docs:check": "node tools/saf/bin/saf.mjs docs-check",
     "spec:matrix": "node tools/saf/bin/saf.mjs spec-matrix",
     "check-secrets": "node tools/saf/bin/saf.mjs check-secrets",
-    "saf:refresh": "node bin/cli.mjs upgrade --dir ."
+    "saf:refresh": "node scripts/refresh-copies.mjs"
   }
 }
