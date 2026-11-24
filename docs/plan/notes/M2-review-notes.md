@@ -294,3 +294,14 @@ of every open note is in [M3.md "Carried to M3"](../milestones/M3.md#carried-to-
 
 Every other note in this file. Grouped in [M3.md "Carried to M3"](../milestones/M3.md#carried-to-m3) by destination:
 an existing M3 card where one fits, otherwise a proposed M3 card that needs the owner's Go, or an owner decision.
+
+## T-M2-29 (review PASS) — notes for the designer
+
+1. the card asked for the synopsis form `[--dry-run [--diff]]`; two pinned tests outside `touch` (setup-dry-run.test.mjs:137, setup-diff.test.mjs:224) make that impossible, so `[--dry-run] [--diff]` is used in header and usage line — fix the card text or accept
+2. evidence lists `npm test` as deferred (targeted mode); the gate must provide the full run and name the skipped test
+3. `refreshKitFiles` says "is not valid JSON" for `[]`/`null` roots (valid JSON); upgrade and rule 35 use "is not a JSON object" — align
+4. upgrade reports an unreadable file (EACCES, a folder named saf.config.json) as "is not valid JSON" — "cannot be read" would be accurate
+5. unknown `--keep…` tokens (`--keep-all`) are still ignored silently (carried: "other unknown setup flags"); `--keep a,,b` drops the empty element silently (spec allows; say so)
+6. upgrade with a config that is a valid object but fails `validateConfig` still copies the kit then exits 1 — related half-upgrade path, not covered by rule 23
+7. SCANNER FALSE POSITIVE (hit T-M2-29's verify): the OpenAI rule in secrets.mjs:13 `/sk-(?:proj-)?[A-Za-z0-9_-]{32,}/` matched inside "ta**sk-**template-and-the-skills-re-run-test" (a spec heading slug). Any slug ending in `…sk-` + a long hyphenated tail (task-, risk-, desk-) trips it again. Refine: lookbehind `(?<![A-Za-z0-9])sk-…` and/or require a digit in the tail; needs its own card + a slug-shaped near-miss test and a real-shaped key built at runtime (no real-looking key in the repo)
+8. AC-11 asserts a line names the file, not that there is exactly ONE error line as the spec says
