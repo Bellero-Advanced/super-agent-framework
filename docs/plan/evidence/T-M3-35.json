@@ -1,0 +1,20 @@
+{
+  "id": "T-M3-35",
+  "milestone": "M3",
+  "status": "in_progress",
+  "started": {
+    "at": "2026-11-24T18:30:52.771Z",
+    "base": "30175e526255ffec328dedaa4b76ea2d900a5172",
+    "dirty": {},
+    "effort": {
+      "agent": "implementer",
+      "effort": "high",
+      "mode": "by-size",
+      "source": "repo"
+    }
+  },
+  "attempts": 0,
+  "lane": 1,
+  "branch": "card/T-M3-35",
+  "worktree": ".claude/worktrees/T-M3-35"
+}
