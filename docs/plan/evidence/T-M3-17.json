@@ -1,14 +1,168 @@
 {
   "id": "T-M3-17",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:43:01.566Z",
     "base": "d93b3507ffcf6e270ae84d2d55fc1b91f451cc0e",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M3-17",
-  "worktree": ".claude/worktrees/T-M3-17"
+  "worktree": ".claude/worktrees/T-M3-17",
+  "verified": {
+    "at": "2026-11-24T16:44:57.554Z",
+    "head": "21ce1982fdddb57d069d5d959897a1dc649d6fee",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/setup-plan-read.test.mjs test/unit/setup-dry-run.test.mjs test/unit/setup-rerun.test.mjs test/unit/plan.test.mjs",
+        "exit": 0,
+        "ms": 1716,
+        "tail": [
+          "ok 23 - RERUN-AC-02 a re-run leaves package.json byte-identical when no script is missing, and adds only the missing one otherwise",
+          "  ---",
+          "  duration_ms: 218.522167",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-02 setup still creates a missing package.json, warns on invalid JSON, and upgrade shares the one merge function",
+          "ok 24 - RERUN-AC-02 setup still creates a missing package.json, warns on invalid JSON, and upgrade shares the one merge function",
+          "  ---",
+          "  duration_ms: 431.701583",
+          "  type: 'test'",
+          "  ...",
+          "1..24",
+          "# tests 24",
+          "# suites 0",
+          "# pass 24",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1654.699125"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 418,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "174 scenario(s) in 19 spec(s) · with test 138 · gaps 36 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 1020,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 578 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 725,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 267 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-plan-read.test.mjs'",
+        "exit": 0,
+        "ms": 1804,
+        "tail": [
+          "ok 3 - RERUN-AC-18 on a re-run an edited task template is replaced (archive target named) while an edited card is kept; --keep keeps the template",
+          "  ---",
+          "  duration_ms: 225.816333",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-19 the setup skill decides a re-run by .saf/manifest.json, not by saf.config.json (guard: the skill text already says so)",
+          "ok 4 - RERUN-AC-19 the setup skill decides a re-run by .saf/manifest.json, not by saf.config.json (guard: the skill text already says so)",
+          "  ---",
+          "  duration_ms: 0.751542",
+          "  type: 'test'",
+          "  ...",
+          "1..4",
+          "# tests 4",
+          "# suites 0",
+          "# pass 4",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1664.349875"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/plan.mjs",
+        "test/unit/setup-plan-read.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/generate.mjs": "f809ee15802f9434a1a28b7cdb620a01c5e0dd37",
+        "kit/tools-saf/lib/plan.mjs": "3f57c282a988fc75cf8ec1cb891708c44992ad19",
+        "test/unit/setup-plan-read.test.mjs": "76a4fa5dd4c4b5beb8dfb04e27adce520ddae4b9"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RERUN-AC-17",
+        "RERUN-AC-18",
+        "RERUN-AC-19"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 74,
+        "cap": 150
+      },
+      "test": {
+        "lines": 96,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-plan-read.test.mjs"
+      ]
+    }
+  }
 }
