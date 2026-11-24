@@ -49,9 +49,9 @@
 | Gate | Criterion | Result |
 |---|---|---|
 | cards | every card of M3 passed task:verify and the spec review (a pass round recorded with task:review from T-M3-02 on) | manual check |
-| matrix | every acceptance scenario of the M3 specs has a passing test | not checked |
-| release-workflow | the release workflow publishes only through npm trusted publishing on a v* tag, after the guards step | not checked |
-| project-checks | the project's own checks pass on Linux, macOS and Windows (CI matrix green) | not checked |
+| matrix | every acceptance scenario of the M3 specs has a passing test | ✓ passed 2026-11-24 23:23 |
+| release-workflow | the release workflow publishes only through npm trusted publishing on a v* tag, after the guards step | ✓ passed 2026-11-24 23:23 |
+| project-checks | the project's own checks pass on Linux, macOS and Windows (CI matrix green) | ✓ passed 2026-11-24 23:23 |
 | owner-setup | the owner finished the one-time trusted-publishing setup listed under 'Owner setup' below (npmjs.com for both packages, GitHub environment npm, tag ruleset, gh login on the releasing machine) | manual check |
 | owner | the owner tried the friction log, review rounds, effort by size, a self-fix card and a release dry run (task:release M3) in this repository and accepts them | manual check |
 
