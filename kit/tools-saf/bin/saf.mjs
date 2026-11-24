@@ -74,6 +74,18 @@ const argv = rawArgv.filter((a) => a !== "--");
 const out = (s) => process.stdout.write(`${s}\n`);
 const err = (s) => process.stderr.write(`${s}\n`);
 
+/** `choices` arguments: only `--group <g>`, `--not-asked`, `--lang <l>`, each at most once; `ok` is false for anything else. */
+function parseChoicesArgs(args) {
+  const found = { ok: true, notAsked: false };
+  for (let i = 0; i < args.length; i++) {
+    const key = { "--group": "group", "--lang": "lang" }[args[i]];
+    if (key && found[key] === undefined && i + 1 < args.length) found[key] = args[++i];
+    else if (args[i] === "--not-asked" && !found.notAsked) found.notAsked = true;
+    else found.ok = false;
+  }
+  return found;
+}
+
 function ctxFor(root, config, verbose = false) {
   return {
     root,
@@ -555,10 +567,9 @@ async function main() {
       }
     }
     case "choices": {
-      const rest = [sub, ...more];
-      const value = (flag) => (rest.includes(flag) ? (rest[rest.indexOf(flag) + 1] ?? "") : undefined);
-      const [lang, group] = [value("--lang"), value("--group")];
-      const bad = (lang !== undefined && !LANGS.includes(lang)) || rest.includes("--group") === rest.includes("--not-asked") || (group !== undefined && !GROUPS.map(String).includes(group));
+      const given = parseChoicesArgs(argv.slice(1));
+      const { lang, group } = given;
+      const bad = !given.ok || (lang !== undefined && !LANGS.includes(lang)) || (group !== undefined) === given.notAsked || (group !== undefined && !GROUPS.map(String).includes(group));
       if (bad) {
         err(`usage: choices --group <${GROUPS.join("|")}> [--lang ${LANGS.join("|")}] | choices --not-asked [--lang ${LANGS.join("|")}]`);
         return 2;
@@ -571,8 +582,22 @@ async function main() {
       out(JSON.stringify(detectProject(process.cwd()), null, 2));
       return 0;
     case "config": {
+      if (argv.length !== 2 || sub !== "--check") {
+        err("usage: config --check");
+        return 2;
+      }
       const root = findRoot();
-      const raw = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
+      let raw;
+      try {
+        raw = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
+      } catch {
+        err(`✗ ${CONFIG_FILE} is not valid JSON`);
+        return 1;
+      }
+      if (raw === null || typeof raw !== "object" || Array.isArray(raw)) {
+        err(`✗ ${CONFIG_FILE} is not a JSON object`);
+        return 1;
+      }
       const errors = validateConfig(raw);
       for (const e of errors) err(`✗ ${e}`);
       if (!errors.length) out(`✓ ${CONFIG_FILE} is valid`);

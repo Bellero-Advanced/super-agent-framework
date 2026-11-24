@@ -1,14 +1,168 @@
 {
   "id": "T-M3-20",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:43:02.440Z",
     "base": "21ce1982fdddb57d069d5d959897a1dc649d6fee",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 2,
   "branch": "card/T-M3-20",
-  "worktree": ".claude/worktrees/T-M3-20"
+  "worktree": ".claude/worktrees/T-M3-20",
+  "verified": {
+    "at": "2026-11-24T16:44:08.329Z",
+    "head": "6a38c624dc8622ec545cbb7a4039c16c5b6d9e1e",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/cli-strict.test.mjs test/unit/setup-choices.test.mjs test/unit/test-mode-verify.test.mjs",
+        "exit": 0,
+        "ms": 3451,
+        "tail": [
+          "ok 24 - TMODE-AC-08 every-card mode: criteria run exactly as written, nothing deferred",
+          "  ---",
+          "  duration_ms: 238.795625",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-05 a card with no full-suite command runs as written in every mode (rule 14)",
+          "ok 25 - TMODE-AC-05 a card with no full-suite command runs as written in every mode (rule 14)",
+          "  ---",
+          "  duration_ms: 275.205583",
+          "  type: 'test'",
+          "  ...",
+          "1..25",
+          "# tests 25",
+          "# suites 0",
+          "# pass 25",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3391.406791"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 445,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (in progress) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "174 scenario(s) in 19 spec(s) · with test 138 · gaps 36 · gaps of started cards 0 · started in another folder 3"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 340,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 579 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 275,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 268 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/cli-strict.test.mjs'",
+        "exit": 0,
+        "ms": 2294,
+        "tail": [
+          "ok 3 - SETUP-AC-13 a config that is valid JSON but fails the schema still gives its chatLanguage",
+          "  ---",
+          "  duration_ms: 409.128375",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-20 each targeted.fallback names its own cause: no command, no {files} placeholder, no targeted files",
+          "ok 4 - TMODE-AC-20 each targeted.fallback names its own cause: no command, no {files} placeholder, no targeted files",
+          "  ---",
+          "  duration_ms: 654.632167",
+          "  type: 'test'",
+          "  ...",
+          "1..4",
+          "# tests 4",
+          "# suites 0",
+          "# pass 4",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2240.382209"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "test/unit/cli-strict.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/bin/saf.mjs": "881f1191e4e0478ae007b9d16a0f7c7398152d3e",
+        "kit/tools-saf/lib/task.mjs": "7b5b0b9dd7f1a3649a31b0dedbae65a603b640e7",
+        "test/unit/cli-strict.test.mjs": "34726f641ba5dd24395ed164447b3d20c4f903f2"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-12",
+        "SETUP-AC-13",
+        "TMODE-AC-20"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 47,
+        "cap": 150
+      },
+      "test": {
+        "lines": 91,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/cli-strict.test.mjs"
+      ]
+    }
+  }
 }
