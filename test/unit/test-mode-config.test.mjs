@@ -19,7 +19,7 @@ const project = (repo = {}, local) => {
 test("tables: modes, default, local keys, full-suite keys and the schema enum agree", () => {
   assert.deepEqual(TEST_MODES, ["every-card", "targeted", "milestone"]);
   assert.equal(DEFAULT_TEST_MODE, "milestone");
-  assert.deepEqual(LOCAL_KEYS, ["workflow.testMode"]);
+  assert.deepEqual(LOCAL_KEYS, ["workflow.testMode", "workflow.lanes.code", "workflow.sideLanes.max"]);
   assert.deepEqual(FULL_SUITE_KEYS, ["test", "e2e"]);
   assert.equal(TEST_MODE_ENV, "SAF_TEST_MODE");
   assert.equal(LOCAL_CONFIG_FILE, "saf.config.local.json");
@@ -45,8 +45,8 @@ test("TMODE-AC-02 env beats the local file, the local file beats the repo file",
 });
 
 test("TMODE-AC-03 a local key outside the allow-list is an error that names it", () => {
-  const root = project({}, { workflow: { lanes: { code: 1 } } });
-  assert.throws(() => loadConfig(root, {}), (e) => e instanceof ConfigError && e.message.includes("workflow.lanes") && e.message.includes(LOCAL_CONFIG_FILE));
+  const root = project({}, { workflow: { lanes: { main: 1 } } });
+  assert.throws(() => loadConfig(root, {}), (e) => e instanceof ConfigError && e.message.includes("workflow.lanes.main") && e.message.includes(LOCAL_CONFIG_FILE));
   const top = project({}, { project: { name: "x" } });
   assert.throws(() => loadConfig(top, {}), /project/);
 });

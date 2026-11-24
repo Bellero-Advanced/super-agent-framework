@@ -251,6 +251,8 @@ export const NOT_ASKED = {
 /** Per-machine settings: the LOCAL_KEYS keys and the environment variables. */
 export const MACHINE_SWITCHES = {
   "workflow.testMode": ns("How often the full test suite runs, for this machine only", "ความถี่ที่รันชุดทดสอบทั้งหมด เฉพาะเครื่องนี้"),
+  "workflow.lanes.code": ns("How many code lanes may run at once, for this machine only", "จำนวนเลนโค้ดที่รันพร้อมกันได้ เฉพาะเครื่องนี้"),
+  "workflow.sideLanes.max": ns("How many side cards may be in progress at once, for this machine only", "จำนวนการ์ดข้างที่ทำพร้อมกันได้ เฉพาะเครื่องนี้"),
   [TEST_MODE_ENV]: ns("Environment variable: the test mode for this shell or run; it beats the local file and saf.config.json", "ตัวแปรสภาพแวดล้อม: โหมดทดสอบของ shell หรือการรันนี้ ชนะทั้งไฟล์ local และ saf.config.json"),
   [`${STOP_HOOK_ENV}=off`]: ns("Environment variable: turns off the Stop-hook reminder about a card that has not passed", "ตัวแปรสภาพแวดล้อม: ปิดการเตือนของ Stop hook เรื่องการ์ดที่ยังไม่ผ่าน"),
 };

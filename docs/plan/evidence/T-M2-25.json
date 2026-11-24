@@ -1,14 +1,185 @@
 {
   "id": "T-M2-25",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T05:52:14.902Z",
     "base": "6883860e9f459a0c7f9e078c4bda8cf9a4caeaef",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M2-25",
-  "worktree": ".claude/worktrees/T-M2-25"
+  "worktree": ".claude/worktrees/T-M2-25",
+  "verified": {
+    "at": "2026-11-24T05:53:31.471Z",
+    "head": "03d006c1dc51203bc6c0cfa87a95e44b9ff6ef74",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 205,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "99 scenario(s) in 12 spec(s) · with test 55 · gaps 44 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/lane-caps.test.mjs test/unit/test-mode-config.test.mjs test/unit/setup-choices.test.mjs test/unit/side-lanes.test.mjs",
+        "exit": 0,
+        "ms": 1903,
+        "tail": [
+          "ok 31 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "  ---",
+          "  duration_ms: 61.585",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 32 - this repo pins targeted with a testFiles command and ignores the local file",
+          "  ---",
+          "  duration_ms: 0.224417",
+          "  type: 'test'",
+          "  ...",
+          "1..32",
+          "# tests 32",
+          "# suites 0",
+          "# pass 32",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1868.667791"
+        ]
+      },
+      {
+        "cmd": "node -e \"import('./kit/tools-saf/lib/config.mjs').then(m=>{if(m.LANE_CEILING!==32||!m.LOCAL_KEYS.includes('workflow.lanes.code')||!m.LOCAL_KEYS.includes('workflow.sideLanes.max'))process.exit(1)})\"",
+        "exit": 0,
+        "ms": 33,
+        "tail": []
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 216,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 491 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 179,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 245 markdown file(s) · 187 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/lane-caps.test.mjs' 'test/unit/test-mode-config.test.mjs'",
+        "exit": 0,
+        "ms": 317,
+        "tail": [
+          "ok 12 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "  ---",
+          "  duration_ms: 59.271375",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 13 - this repo pins targeted with a testFiles command and ignores the local file",
+          "  ---",
+          "  duration_ms: 0.193833",
+          "  type: 'test'",
+          "  ...",
+          "1..13",
+          "# tests 13",
+          "# suites 0",
+          "# pass 13",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 280.601375"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/choices.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/parallel.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/schema/saf.config.schema.json",
+        "test/unit/lane-caps.test.mjs",
+        "test/unit/test-mode-config.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/choices.mjs": "e179a4ca55cfb3192c558dfd9a3e28b6a5bc3541",
+        "kit/tools-saf/lib/config.mjs": "113f070aeaf270cacae5fcb47ed698db0dfed9f5",
+        "kit/tools-saf/lib/parallel.mjs": "5b313ef13c7e245d476a8239b15869e4287d6b76",
+        "kit/tools-saf/lib/task.mjs": "59fd998bdb394e2c3cdfb70df257af50245dcf38",
+        "kit/tools-saf/schema/saf.config.schema.json": "f3f91c6fb877d2f4e568bc30ccf3878fdcca6a4b",
+        "test/unit/lane-caps.test.mjs": "dcf963cd9b2bb780861b31c347295a7694ae2d65",
+        "test/unit/test-mode-config.test.mjs": "2c4fc8df6f6125d7c77de931bfe727e142094087"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "LCAP-AC-01",
+        "LCAP-AC-02",
+        "LCAP-AC-03",
+        "LCAP-AC-04",
+        "LCAP-AC-05"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 41,
+        "cap": 150
+      },
+      "test": {
+        "lines": 127,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/lane-caps.test.mjs",
+        "test/unit/test-mode-config.test.mjs"
+      ]
+    }
+  }
 }

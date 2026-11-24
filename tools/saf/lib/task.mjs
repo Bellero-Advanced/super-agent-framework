@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, normalize, sep } from "node:path";
-import { scriptCommand } from "./config.mjs";
+import { LOCAL_CONFIG_FILE, scriptCommand } from "./config.mjs";
 import {
   changedSince,
   commitSubject,
@@ -353,7 +353,7 @@ export function startCard(ctx, id, opts = {}) {
   }
   if (side && !opts.restart) {
     const running = activeSideCards(plan).filter((c) => c.id !== id);
-    if (running.length >= sideLaneMax(plan)) throw new TaskError(`side lanes are full (${sideLaneMax(plan)} at a time): ${running.map((c) => c.id).join(", ")} in progress — pass or abandon it first`);
+    if (running.length >= sideLaneMax(plan)) throw new TaskError(`side lanes are full (${sideLaneMax(plan)} at a time${ctx.config.workflow.localKeys?.includes("workflow.sideLanes.max") ? `, this machine: ${LOCAL_CONFIG_FILE}` : ""}): ${running.map((c) => c.id).join(", ")} in progress — pass or abandon it first`);
   }
   const status = cardStatus(plan, id);
   if (status !== "todo" && !opts.restart) {

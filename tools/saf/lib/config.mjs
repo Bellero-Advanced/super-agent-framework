@@ -27,7 +27,11 @@ export const TEST_MODES = ["every-card", "targeted", "milestone"];
 export const DEFAULT_TEST_MODE = "milestone";
 export const TEST_MODE_ENV = "SAF_TEST_MODE";
 /** Keys saf.config.local.json (per machine, not tracked) may set — any other key is an error. */
-export const LOCAL_KEYS = ["workflow.testMode"];
+export const LOCAL_KEYS = ["workflow.testMode", "workflow.lanes.code", "workflow.sideLanes.max"];
+/** Typo guard for the lane caps (the schema maximum of workflow.lanes.code and workflow.sideLanes.max equals it). */
+export const LANE_CEILING = 32;
+/** The highest TCP port; the highest lane port must stay at or below it. */
+export const MAX_PORT = 65535;
 /** `stack.commands` keys whose command is "the full test suite". */
 export const FULL_SUITE_KEYS = ["test", "e2e"];
 
@@ -288,19 +292,34 @@ export function loadConfig(root, env = process.env) {
   const config = resolveConfig(raw);
   let mode = DEFAULT_TEST_MODE;
   let source = "default";
+  const localKeys = [];
+  let codeCapFile = CONFIG_FILE;
   if (raw.workflow?.testMode) [mode, source] = [raw.workflow.testMode, "repo"];
   if (existsSync(join(root, LOCAL_CONFIG_FILE))) {
     const local = readJsonFile(root, LOCAL_CONFIG_FILE);
     const bad = local !== null && typeof local === "object" && !Array.isArray(local) ? disallowedPaths(local, LOCAL_KEYS) : ["$"];
     const lerrors = [...bad.map((k) => `${k} is not allowed here (allowed: ${LOCAL_KEYS.join(", ")})`), ...validateConfig(local)];
     if (lerrors.length) throw new ConfigError([`${LOCAL_CONFIG_FILE} is invalid:`, ...lerrors.map((e) => `  ✗ ${e}`)].join("\n"));
-    if (local.workflow?.testMode) [mode, source] = [local.workflow.testMode, "local"];
+    for (const key of LOCAL_KEYS) {
+      const path = key.split(".");
+      const value = path.reduce((o, k) => o?.[k], local);
+      if (value === undefined) continue;
+      localKeys.push(key);
+      if (key === "workflow.testMode") [mode, source] = [value, "local"];
+      else path.slice(0, -1).reduce((o, k) => o[k], config)[path.at(-1)] = value;
+    }
+    if (localKeys.includes("workflow.lanes.code")) codeCapFile = LOCAL_CONFIG_FILE;
   }
   const fromEnv = env[TEST_MODE_ENV];
   if (fromEnv) {
     if (!TEST_MODES.includes(fromEnv)) throw new ConfigError(`${TEST_MODE_ENV}=${fromEnv} is not a test mode — use one of: ${TEST_MODES.join(", ")}`);
     [mode, source] = [fromEnv, "env"];
   }
+  const w = config.workflow;
+  const top = w.lanePorts.base + w.lanePorts.step * w.lanes.code;
+  if (w.worktrees && w.lanes.code >= 1 && w.lanePorts.env.length && top > MAX_PORT)
+    throw new ConfigError(`workflow.lanes.code (${w.lanes.code}, from ${codeCapFile}) with workflow.lanePorts.base (${w.lanePorts.base}) and workflow.lanePorts.step (${w.lanePorts.step}) needs port ${top}, above ${MAX_PORT} — lower the cap or the base/step`);
+  config.workflow.localKeys = localKeys;
   config.workflow.testMode = mode;
   config.workflow.testModeSource = source;
   return config;
