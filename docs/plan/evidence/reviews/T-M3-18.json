@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-18",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T16:38:02.677Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch"
+      ],
+      "note": "Ctrl-C during install step: exit 1 and install-failure line instead of interrupted/130",
+      "head": "0c6571d7c0e69535a29181e6a42f9d4c3498743e",
+      "verifyAttempts": 4,
+      "verifyAt": "2026-11-24T16:35:26.140Z"
+    }
+  ]
+}
