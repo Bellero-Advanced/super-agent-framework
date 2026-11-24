@@ -11,7 +11,7 @@
     "docs/specs/_template.md": "7bad7fa24e3be7621f77977ba966a3a730f12cfe",
     "docs/plan/milestones/M1.md": "471e958b114a548bd3021f25a6c435b84164fa57",
     ".claude/commands/saf.md": "99b4c3185a631fd0b57374d9aa29ef9f487ef2c9",
-    ".claude/commands/saf-plan.md": "703e6e3c14f4b67e9a9d3be27f9b329ad42b0e9c",
+    ".claude/commands/saf-plan.md": "27ba78a81c87ccb6c9332fef8b68f9c29796e066",
     ".claude/agents/designer.md": "7a59dc939c9c7f58258e4647c777f7cf72bdaeb4",
     ".claude/agents/spec-reviewer.md": "d4345b065c390fb9a8c0674c07405c3a6956561c",
     ".claude/agents/implementer.md": "fc534c265c3abbe03db058a400f19ef80dfe317d",
@@ -29,6 +29,8 @@
     ".claude/skills/evidence-before-done/SKILL.md": "7d9712b7a0ebdca7cea9111fbb13881741729ce0",
     ".claude/skills/test-runner/SKILL.md": "445b3fc69ba944b6d8fc45d0c27c392aa3a66e81",
     "docs/plan/evidence/.gitkeep": "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-    "docs/plan/STATE.md": "c342caf41cb3a425825ca369291a727ea4ddb4e5"
+    "docs/plan/STATE.md": "c342caf41cb3a425825ca369291a727ea4ddb4e5",
+    ".claude/agents/designer-medium.md": "951cf5023e8f4c2badac4aa6b73a3f0668050980",
+    ".claude/agents/implementer-medium.md": "d7258761d88d22052d85c5c246ee87a696e2d62b"
   }
 }

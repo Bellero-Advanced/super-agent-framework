@@ -7,7 +7,7 @@ argument-hint: <milestone id or goal>
 
 Target: $ARGUMENTS
 
-1. Hand the work to the `designer` agent. Give it: the milestone id (or the goal),
+1. Hand the work to a designer agent: `designer` for large design work (a plan that adds a new spec file, or a decision row that affects more than one card), `designer-medium` for any other plan work. Give it: the milestone id (or the goal),
    `docs/plan/README.md`, the existing milestone file if any, and the specs in `docs/specs/` it touches.
 2. The designer writes or updates:
    - `docs/plan/milestones/M<n>.md` — goal · scope · risks · exit gates · ordered `cards:` · `status: planned`
