@@ -115,3 +115,4 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 ## T-M3-16 (setup keeps) — non-blocking
 - K1 "nothing was changed" is false after `saf init --answers` on a broken manifest (copyKit/.gitignore run before generate throws); check before copyKit or scope the sentence; maybe with T-M3-26.
 - K2 setup report counts `same` files as written ("generated N file(s)"). K3 duplicate helper isObject vs mergeable. K4 upgrade prints a kept path twice. K5 UPG-AC-07 does not run dry-run CLI. K6 no direct test for keep-unplanned in refresh.
+- T-M3-22 round 2: with deploy:none steps 2-5 still render after "stop" (wrap in unless deployNone); test name "owner-order keeps its text" misleading; owner-order wording differs a little between agent file and CLAUDE.md git line; "owner" hardcoded in agent description (pre-existing); Thai "ยกเว้น push ไป main" reads more naturally.
