@@ -30,7 +30,7 @@ One card at a time. The card is the contract. Skills: `tdd` · `debug-protocol` 
 
 After the last `{{cmd.taskVerify}}`:
 
-1. Failing first: revert the code part of the change (keep the tests), run each new test, see it fail, restore. A test that cannot fail without the feature is a guard — name it as one, with the reason.
+1. Failing first: copy the changed code files aside (or `git stash push -- <files>`; never `git checkout --` on uncommitted work), keep the tests, run each new test, see it fail, then restore the files byte for byte — a different byte makes `{{cmd.taskMerge}}` refuse — and run `{{cmd.taskVerify}}` again if anything differs. A test that cannot fail without the feature is a guard — name it as one, with the reason.
 2. Read every document the card edited whole, after the edit: no line repeats or contradicts another.
 3. Size: quote the number `task:verify` stored in the evidence (`verified.size`: code and test lines), never your own count.
 4. For every sentence a user reads that the card adds or changes (docs, templates, explanations, CLI messages): list "sentence → the code that makes it true" (file:line, template variable or data entry). None added: write "no user-facing text".

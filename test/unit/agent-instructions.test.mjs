@@ -20,7 +20,7 @@ const REPORT_PARTS = [/verify result/, /files changed/, /size/, /failing-first/,
 const TYPES = {
   text: [/every changed sentence/, /conditions/, /number or model id/, /repeated or contradicting/, /sentence → code list/],
   data: [/missing/, /dry run/, /archive before write/, /unreadable/, /second run changes nothing/],
-  security: [/untrusted text/, /secret value/, /shell string/, /escapes the project/, /security-review/],
+  security: [/untrusted text, secrets, commands, release/, /\.claude\/skills\/security-review\/SKILL\.md/, /check-secrets. result from the evidence/, /secret value/, /shell string/, /escapes the project/, /security-review/],
   refactor: [/old versus new/, /same inputs/, /every caller/],
 };
 const DESCRIPTIONS = {
@@ -48,6 +48,7 @@ test("AGENT-AC-01 the implementer agent has 'Before you report' with the six che
   const report = text.slice(text.indexOf("Report in English"));
   for (const re of REPORT_PARTS) assert.match(report, re, String(re));
   assert.match(body, /no user-facing text/, "a card without user text says so");
+  assert.match(body, /never `git checkout --`.*byte for byte/s, "restore without destroying uncommitted work");
   assert.match(body, /guard/, "a guard test is named as one");
   assert.doesNotMatch(text, /\{\{|\}\}/, "no unrendered placeholder");
 });
@@ -62,7 +63,7 @@ test("AGENT-AC-02 the spec-reviewer agent names the four types, their checklists
   }
   assert.match(section(text, "Check"), /size within/, "the general list stays above the types");
   assert.ok(text.indexOf("## Check") < text.indexOf("## Review types"), "types come below the general list");
-  assert.match(section(text, "Verdict"), /types: .*none/s, "the verdict names the types (or none)");
+  assert.match(section(text, "Verdict"), /type: .*none/s, "the verdict names the types (or none)");
   assert.match(section(text, "Verdict"), /general list only/);
   assert.match(section(text, "Input"), /text.*data.*security.*refactor/s, "the input names the types");
   assert.doesNotMatch(text, /\{\{|\}\}/, "no unrendered placeholder");
