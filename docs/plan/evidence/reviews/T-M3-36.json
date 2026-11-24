@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-36",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T19:05:14.977Z",
+      "result": "fail",
+      "kinds": [
+        "docs"
+      ],
+      "note": "choices.mjs light-rigor cost says fewer reviews but D-021(d) makes light review every new card",
+      "head": "a42e0e7ec9c33425a9b014ae14bc040e03e99b6d",
+      "verifyAttempts": 1,
+      "verifyAt": "2026-11-24T18:59:23.865Z"
+    }
+  ]
+}
