@@ -5,6 +5,7 @@ import { after, test } from "node:test";
 import { REPO, cleanup, gitRepo, lib } from "../helpers.mjs";
 
 const { generate, planSetup } = await lib("generate.mjs");
+const { variantAgents } = await lib("effort.mjs");
 after(cleanup);
 
 /** docs/specs/agent-instructions.md — the standing checks live in the agent templates. Data, not logic: what each file must say. */
@@ -73,7 +74,8 @@ test("AGENT-AC-03 planSetup on this repository reports 'same' for every .claude/
   const config = JSON.parse(readFileSync(join(REPO, "saf.config.json"), "utf8"));
   const plan = planSetup(REPO, config);
   const agents = plan.actions.filter((a) => a.path.startsWith(".claude/agents/"));
-  assert.deepEqual(agents.map((a) => a.path.split("/").pop().replace(/\.md$/, "")).sort(), [...config.roles.enabled].sort());
+  const expected = [...config.roles.enabled, ...variantAgents(config).map((v) => v.name)].sort();
+  assert.deepEqual(agents.map((a) => a.path.split("/").pop().replace(/\.md$/, "")).sort(), expected);
   assert.deepEqual(agents.filter((a) => a.action !== "same").map((a) => `${a.path}: ${a.action}`), []);
   assert.ok(agents.some((a) => a.path.endsWith("implementer.md")) && agents.some((a) => a.path.endsWith("spec-reviewer.md")));
 });

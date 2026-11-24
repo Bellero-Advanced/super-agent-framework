@@ -1,7 +1,7 @@
 {
   "id": "T-M3-06",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T17:42:20.830Z",
     "base": "266ca7c9b1cc0c2dd9eae696073eef65705d528c",
@@ -13,8 +13,336 @@
       "source": "default"
     }
   },
-  "attempts": 0,
+  "attempts": 4,
   "lane": 2,
   "branch": "card/T-M3-06",
-  "worktree": ".claude/worktrees/T-M3-06"
+  "worktree": ".claude/worktrees/T-M3-06",
+  "verified": {
+    "at": "2026-11-24T17:45:37.394Z",
+    "head": "d0de216b4839cbde5458a7f4a03f75638ce7ef66",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node -e \"const c=JSON.parse(require('fs').readFileSync('saf.config.json','utf8'));if(c.models.effort!=='by-size')process.exit(1)\"",
+        "exit": 0,
+        "ms": 53,
+        "tail": []
+      },
+      {
+        "cmd": "node -e \"const fs=require('fs');for(const r of ['implementer','designer']){const s=fs.readFileSync('.claude/agents/'+r+'-medium.md','utf8');if(!/^effort: medium$/m.test(s)||!s.includes('name: '+r+'-medium'))process.exit(1)}\"",
+        "exit": 0,
+        "ms": 46,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 300,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 277 markdown file(s) · 282 local link(s) · 97 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/agent-instructions.test.mjs'",
+        "exit": 0,
+        "ms": 327,
+        "tail": [
+          "ok 3 - AGENT-AC-03 planSetup on this repository reports 'same' for every .claude/agents file of an enabled role",
+          "  ---",
+          "  duration_ms: 52.618417",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+          "ok 4 - AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+          "  ---",
+          "  duration_ms: 29.813708",
+          "  type: 'test'",
+          "  ...",
+          "1..4",
+          "# tests 4",
+          "# suites 0",
+          "# pass 4",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 276.381292"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/agents/designer-medium.md",
+        ".claude/agents/implementer-medium.md",
+        ".claude/commands/saf-plan.md",
+        "CLAUDE.md",
+        "saf.config.json",
+        "test/unit/agent-instructions.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/agents/designer-medium.md": "951cf5023e8f4c2badac4aa6b73a3f0668050980",
+        ".claude/agents/implementer-medium.md": "d7258761d88d22052d85c5c246ee87a696e2d62b",
+        ".claude/commands/saf-plan.md": "27ba78a81c87ccb6c9332fef8b68f9c29796e066",
+        "CLAUDE.md": "1ea75cb4bbeb325c26748082938c37fc0d7c7ff1",
+        "saf.config.json": "10f00a65fd25c2c0dc6c7bcaadd97db6c2edada9",
+        "test/unit/agent-instructions.test.mjs": "b062e7d087e2470b19bf672d0f8e0f8cd7a32e63"
+      }
+    },
+    "scenarios": {
+      "required": [],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 87,
+        "cap": 150
+      },
+      "test": {
+        "lines": 4,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/agent-instructions.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T17:43:30.532Z",
+      "head": "d0de216b4839cbde5458a7f4a03f75638ce7ef66",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "npm test",
+          "exit": 1,
+          "ms": 42116,
+          "tail": [
+            "  duration_ms: 341.79125",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "ok 383 - UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "  ---",
+            "  duration_ms: 339.415167",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "ok 384 - UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "  ---",
+            "  duration_ms: 315.066458",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-03 nothing missing → package.json is byte-identical",
+            "ok 385 - UPG-AC-03 nothing missing → package.json is byte-identical",
+            "  ---",
+            "  duration_ms: 402.580459",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "ok 386 - UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "  ---",
+            "  duration_ms: 1141.102292",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-04 a byte-order mark is kept when adding, with the indentation and line endings after it",
+            "ok 387 - UPG-AC-04 a byte-order mark is kept when adding, with the indentation and line endings after it",
+            "  ---",
+            "  duration_ms: 274.018125",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-05 a saf.config.json that fails the schema, and a package.json with a non-object root or scripts, are left alone with a line",
+            "ok 388 - UPG-AC-05 a saf.config.json that fails the schema, and a package.json with a non-object root or scripts, are left alone with a line",
+            "  ---",
+            "  duration_ms: 1789.326541",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "ok 389 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "  ---",
+            "  duration_ms: 909.30175",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "ok 390 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "  ---",
+            "  duration_ms: 1.654417",
+            "  type: 'test'",
+            "  ...",
+            "1..390",
+            "# tests 390",
+            "# suites 0",
+            "# pass 388",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 1",
+            "# todo 0",
+            "# duration_ms 41850.111"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "2026-11-24T17:45:23.697Z",
+      "head": "d0de216b4839cbde5458a7f4a03f75638ce7ef66",
+      "attempts": 2,
+      "commands": [
+        {
+          "cmd": "node --test 'test/unit/agent-instructions.test.mjs'",
+          "exit": 1,
+          "ms": 342,
+          "tail": [
+            "    -     name: 'implementer-medium',",
+            "    -     role: 'implementer'",
+            "    -   },",
+            "        'designer',",
+            "    +   'designer-medium',",
+            "        'implementer',",
+            "    +   'implementer-medium',",
+            "        'qa-runner',",
+            "        'release-operator',",
+            "        'spec-reviewer'",
+            "      ]",
+            "  code: 'ERR_ASSERTION'",
+            "  name: 'AssertionError'",
+            "  expected:",
+            "    0:",
+            "      role: 'designer'",
+            "      effort: 'medium'",
+            "      name: 'designer-medium'",
+            "    1:",
+            "      role: 'implementer'",
+            "      effort: 'medium'",
+            "      name: 'implementer-medium'",
+            "    2: 'designer'",
+            "    3: 'implementer'",
+            "    4: 'qa-runner'",
+            "    5: 'release-operator'",
+            "    6: 'spec-reviewer'",
+            "  actual:",
+            "    0: 'designer'",
+            "    1: 'designer-medium'",
+            "    2: 'implementer'",
+            "    3: 'implementer-medium'",
+            "    4: 'qa-runner'",
+            "    5: 'release-operator'",
+            "    6: 'spec-reviewer'",
+            "  operator: 'deepStrictEqual'",
+            "  stack: |-",
+            "    TestContext.<anonymous> (file:///Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M3-06/test/unit/agent-instructions.test.mjs:78:10)",
+            "    Test.runInAsyncScope (node:async_hooks:214:14)",
+            "    Test.run (node:internal/test_runner/test:1047:25)",
+            "    Test.processPendingSubtests (node:internal/test_runner/test:744:18)",
+            "    Test.postRun (node:internal/test_runner/test:1173:19)",
+            "    Test.run (node:internal/test_runner/test:1101:12)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+            "ok 4 - AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+            "  ---",
+            "  duration_ms: 31.561875",
+            "  type: 'test'",
+            "  ...",
+            "1..4",
+            "# tests 4",
+            "# suites 0",
+            "# pass 3",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 289.87775"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "2026-11-24T17:45:30.494Z",
+      "head": "d0de216b4839cbde5458a7f4a03f75638ce7ef66",
+      "attempts": 3,
+      "commands": [
+        {
+          "cmd": "node --test 'test/unit/agent-instructions.test.mjs'",
+          "exit": 1,
+          "ms": 336,
+          "tail": [
+            "    -     name: 'implementer-medium',",
+            "    -     role: 'implementer'",
+            "    -   },",
+            "        'designer',",
+            "    +   'designer-medium',",
+            "        'implementer',",
+            "    +   'implementer-medium',",
+            "        'qa-runner',",
+            "        'release-operator',",
+            "        'spec-reviewer'",
+            "      ]",
+            "  code: 'ERR_ASSERTION'",
+            "  name: 'AssertionError'",
+            "  expected:",
+            "    0:",
+            "      role: 'designer'",
+            "      effort: 'medium'",
+            "      name: 'designer-medium'",
+            "    1:",
+            "      role: 'implementer'",
+            "      effort: 'medium'",
+            "      name: 'implementer-medium'",
+            "    2: 'designer'",
+            "    3: 'implementer'",
+            "    4: 'qa-runner'",
+            "    5: 'release-operator'",
+            "    6: 'spec-reviewer'",
+            "  actual:",
+            "    0: 'designer'",
+            "    1: 'designer-medium'",
+            "    2: 'implementer'",
+            "    3: 'implementer-medium'",
+            "    4: 'qa-runner'",
+            "    5: 'release-operator'",
+            "    6: 'spec-reviewer'",
+            "  operator: 'deepStrictEqual'",
+            "  stack: |-",
+            "    TestContext.<anonymous> (file:///Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M3-06/test/unit/agent-instructions.test.mjs:78:10)",
+            "    Test.runInAsyncScope (node:async_hooks:214:14)",
+            "    Test.run (node:internal/test_runner/test:1047:25)",
+            "    Test.processPendingSubtests (node:internal/test_runner/test:744:18)",
+            "    Test.postRun (node:internal/test_runner/test:1173:19)",
+            "    Test.run (node:internal/test_runner/test:1101:12)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+            "ok 4 - AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+            "  ---",
+            "  duration_ms: 31.75825",
+            "  type: 'test'",
+            "  ...",
+            "1..4",
+            "# tests 4",
+            "# suites 0",
+            "# pass 3",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 282.597291"
+          ]
+        }
+      ]
+    }
+  ]
 }

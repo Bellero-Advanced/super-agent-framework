@@ -41,6 +41,7 @@
     "planner": "claude-opus-5-5",
     "builder": "claude-sonnet-5-5",
     "sessionDefault": "claude-opus-5-5",
+    "effort": "by-size",
     "overrides": {}
   },
   "roles": {
