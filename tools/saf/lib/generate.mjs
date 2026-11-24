@@ -6,6 +6,7 @@ import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRES
 import { detectProject } from "./detect.mjs";
 import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
+import { FRICTION_FILE } from "./friction.mjs";
 import { loadPlan } from "./plan.mjs";
 import { generatedFiles } from "./task.mjs";
 import { render } from "./template.mjs";
@@ -185,6 +186,9 @@ export function templateData(config, detected, opts = {}) {
       taskEnv: c("task:env"),
       taskReport: c("task:report", "<M>"),
       taskCulprit: c("task:culprit", "<M>"),
+      taskFriction: c("task:friction"),
+      taskFrictionAdd: c("task:friction", "add --kind <kind> --area <area> --evidence <text> <summary>"),
+      taskFrictionClose: c("task:friction", "close <F-id> carded|fixed|dropped <card id or reason>"),
       docsCheck: c("docs:check"),
       specMatrix: c("spec:matrix"),
       specMatrixCheck: c("spec:matrix", "--check"),
@@ -390,7 +394,7 @@ function actionFor(abs, text) {
   return readText(abs) === text.replace(/\r\n/g, "\n") ? "same" : "update";
 }
 
-export const GITIGNORE_LINES = [".claude/settings.local.json", `${ARCHIVE}/${SETTINGS_LOCAL}*`, `${ARCHIVE}/${SETTINGS}*`, ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
+export const GITIGNORE_LINES = [".claude/settings.local.json", `${ARCHIVE}/${SETTINGS_LOCAL}*`, `${ARCHIVE}/${SETTINGS}*`, ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", `${FRICTION_FILE}.lock`, ".env", ".env.local", ".env.*.local"];
 
 /** The `.gitignore` merge as data: the lines to add and the new text (`text: null` when nothing is missing). */
 function planGitignore(root, config) {

@@ -176,6 +176,7 @@ export const ENGINE_SCRIPTS = {
   "task:env": "task env",
   "task:report": "task report",
   "task:culprit": "task culprit",
+  "task:friction": "task friction",
   "docs:check": "docs-check",
   "spec:matrix": "spec-matrix",
   "check-secrets": "check-secrets",

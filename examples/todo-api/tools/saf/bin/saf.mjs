@@ -7,14 +7,16 @@ import { CONFIG_FILE, ConfigError, findRoot, loadConfig, scriptCommand, validate
 import { culpritLines, findCulprit } from "../lib/culprit.mjs";
 import { detectProject } from "../lib/detect.mjs";
 import { docsInputFor, runDocsCheck } from "../lib/docs.mjs";
+import { CLOSE_STATUSES, FRICTION_FILE, FRICTION_MARKER, FrictionError, appendClose, appendEntry, countByStatus, entryLine } from "../lib/friction.mjs";
 import { listRepoFiles } from "../lib/git.mjs";
 import { blockingGaps, buildMatrix, completeGaps, renderMatrix, summarize } from "../lib/matrix.mjs";
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
-import { CARD_ID, activeCards, activeMilestone, cardStatus, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
+import { CARD_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
 import { htmlPath, renderEvidencePage } from "../lib/viewer.mjs";
 import { taskRunner } from "../lib/run.mjs";
+import { textFor } from "../lib/text.mjs";
 import { scanSecrets } from "../lib/secrets.mjs";
 import {
   MergeStop,
@@ -45,6 +47,8 @@ import {
  *   task abandon <id> · task merge <id>    (merge exit 3 refused · 4 conflict · 5 merge checks failed)
  *   task state [--check] · task next [--parallel] [--json] · task probe [--bin <claude>] · task env · task report <M> [--html]
  *     (task next lists the active milestone's cards first, then side cards of planned milestones — --json has a `side` list)
+ *   task friction [add --kind <kind> --area <area> --evidence <text> [--card <id>] <summary…> | close <F-id> carded|fixed|dropped <card id or reason…>]
+ *     (the friction log docs/plan/friction.md: no sub-command lists open and carded entries · add/close are refused in a lane)
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
@@ -243,14 +247,82 @@ async function task(sub, rest) {
       }
       return 0;
     }
+    case "friction":
+      return friction(ctx, rest);
     case "culprit": {
       const r = await findCulprit(ctx, requireId(), { cmd: option("--cmd") });
       culpritLines(r).forEach(out);
       return r.exit;
     }
     default:
-      err("usage: task start|verify|abandon|merge|state|next|probe|env|report|culprit — see docs/plan/README.md");
+      err("usage: task start|verify|abandon|merge|state|next|probe|env|report|culprit|friction — see docs/plan/README.md");
       return 2;
+  }
+}
+
+const FRICTION_FLAGS = ["--kind", "--area", "--evidence", "--card"];
+
+/** `task friction` — the friction log (docs/specs/friction-log.md rules 7-10). A refused value exits 1 (nothing written) · a wrong shape of arguments (unknown sub-command or option, a flag without a value, `--flag=value`) exits 2 with the usage line. */
+function friction(ctx, rest) {
+  const { root, config } = ctx;
+  const c = (s, a) => scriptCommand(config.stack.packageManager, s, a);
+  const [sub, ...args] = rest;
+  const plan = loadPlan(root, config);
+  if (sub === undefined) {
+    const { entries, issues } = plan.friction;
+    for (const i of issues) err(`⚠ ${i}`);
+    if (!entries.length) {
+      out("no friction recorded");
+      return 0;
+    }
+    for (const e of entries.filter((x) => x.status === "open" || x.status === "carded")) out(entryLine(e));
+    out(Object.entries(countByStatus(entries)).map(([k, n]) => `${k} ${n}`).join(" · "));
+    return 0;
+  }
+  const usage = {
+    add: `${c("task:friction", "add --kind <kind> --area <area> --evidence <text> [--card <id>] <summary…>")}`,
+    close: `${c("task:friction", `close <F-id> ${CLOSE_STATUSES.join("|")} <card id or reason…>`)}`,
+  };
+  if (!usage[sub]) {
+    err(`usage: ${usage.add} · ${usage.close} · ${c("task:friction")}`);
+    return 2;
+  }
+  const lane = laneFolder(root, plan);
+  if (lane) {
+    throw new TaskError(`this folder is the worktree of lane ${lane.lane}, card ${lane.card} — task:friction ${sub} writes the log in the main folder: run ${usage[sub]} there (here put a "friction:" line in your report; the main session records it)`);
+  }
+  const text = textFor(config.people.docLanguage);
+  const opts = {
+    today: formatTime(new Date().toISOString(), config.people.timeZone).slice(0, 10),
+    cards: (id) => plan.cards.has(id) || plan.milestones.some((m) => m.legacy[id]),
+    header: text.frictionHeader(FRICTION_MARKER, usage.add),
+  };
+  try {
+    if (sub === "add") {
+      const fields = {};
+      const words = [];
+      for (let i = 0; i < args.length; i++) {
+        const a = args[i];
+        if (FRICTION_FLAGS.includes(a) && args[i + 1] !== undefined && !args[i + 1].startsWith("--")) fields[a.slice(2)] = args[++i];
+        else if (a.startsWith("--")) {
+          err(`✗ ${FRICTION_FLAGS.includes(a) ? `${a} needs a value (a value cannot start with --)` : `unknown option ${a} (write --option value, not --option=value)`} — usage: ${usage.add}`);
+          return 2;
+        } else words.push(a);
+      }
+      fields.summary = words.join(" ");
+      const id = appendEntry(root, fields, opts);
+      out(id);
+      err(`  recorded in ${FRICTION_FILE} (not committed — commit it alone: git commit -m "chore(plan): friction ${id}" -- ${FRICTION_FILE})`);
+      return 0;
+    }
+    const [id = "", status = "", ...ref] = args;
+    appendClose(root, id, status, ref.join(" "), opts);
+    out(`${id} ${status}`);
+    err(`  recorded in ${FRICTION_FILE} (not committed)`);
+    return 0;
+  } catch (e) {
+    if (!(e instanceof FrictionError)) throw e;
+    throw new TaskError(`${e.message} — nothing written · usage: ${usage[sub]}`);
   }
 }
 

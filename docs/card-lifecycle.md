@@ -157,6 +157,24 @@ uses `targeted`, because its cards change the engine that writes the evidence.
 worktrees. Names marked `idle` also wait until the machine is quiet. Exit **75** = never got the lock or a quiet machine —
 nothing was measured; run again later. `measure --status` shows the holder.
 
+## Friction log
+
+When SAF itself gets in the way of a card — a review fails because of a gap in SAF, an engine command fails or does the wrong
+thing, a document contradicts the code, or the work needs a step the workflow does not support — record it in
+`docs/plan/friction.md`, one append-only file:
+
+- `task:friction add --kind <kind> --area <area> --evidence <text> <summary>` appends one line dated today and prints its id
+  (kinds: `review-bounce` · `command-failed` · `doc-drift` · `workaround`; `--card <id>` links a card of the plan)
+- `task:friction close <F-id> carded|fixed|dropped <card id or reason>` appends a closing line; an entry that is `fixed` or
+  `dropped` cannot be closed again
+- `task:friction` alone lists the open and carded entries with the count per status
+- lines are never edited or removed; a line that breaks the format is a plan problem that `task:state --check` reports with its
+  line number
+- the commands only write the file, they never commit — commit it on its own
+- inside a lane worktree `add` and `close` are refused: the agent writes a `friction:` line in its report and the main session
+  records it
+- while an entry is open or carded, the SessionStart summary shows `Friction: <open> open · <carded> carded`
+
 ## Hooks
 
 - **SessionStart** prints the milestone, cards done, the card in progress with its criteria and `touch`, the next cards and

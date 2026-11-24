@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { roleTable, scriptCommand } from "./config.mjs";
+import { FRICTION_FILE, countByStatus, readFriction } from "./friction.mjs";
 import { submodulePaths } from "./git.mjs";
 import { codeSpans, findSection, frontmatter, scanLines, sections } from "./markdown.mjs";
 import { stripComment } from "./yaml.mjs";
@@ -37,7 +38,7 @@ const MILESTONE_STATUS = ["planned", "active", "paused", "done"];
 export const CRITERIA_HEADINGS = ["Done when", "Pass criteria", "Criteria", "เกณฑ์ผ่าน"];
 export const MILESTONE_HEADINGS = { goal: ["Goal", "เป้าหมาย"], scope: ["Scope", "ขอบเขต"], risks: ["Risks", "ความเสี่ยง"] };
 
-export const alwaysAllowed = (config) => [`${EVIDENCE_DIR}/**`, STATE_FILE, MIRROR_FILE, ".saf/memory/**", ...(config?.workflow?.alwaysAllowed ?? [])];
+export const alwaysAllowed = (config) => [`${EVIDENCE_DIR}/**`, STATE_FILE, MIRROR_FILE, ".saf/memory/**", FRICTION_FILE, `${FRICTION_FILE}.lock`, ...(config?.workflow?.alwaysAllowed ?? [])];
 
 const asRecord = (v) => (v && typeof v === "object" && !Array.isArray(v) ? v : {});
 const str = (v) => (typeof v === "string" ? v.trim() : "");
@@ -185,8 +186,9 @@ export function loadPlan(root, config) {
       issues.push(`${f}: JSON is not readable`);
     }
   }
-  const plan = { config, milestones, cards, evidence, gateEvidence, submodules: submodulePaths(root), issues };
-  issues.push(...validatePlan(plan));
+  const friction = readFriction(root);
+  const plan = { config, milestones, cards, evidence, gateEvidence, friction, submodules: submodulePaths(root), issues };
+  issues.push(...validatePlan(plan), ...friction.issues);
   return plan;
 }
 
@@ -498,6 +500,8 @@ export function sessionContext(plan, laneStatus = () => "-") {
   if (recent.length) out.push(t.sessionRecent(recent.map((e) => `${e.id} ${e.verified?.pass ? "✓" : "✗"} ${timeOf(plan, e.verified?.at)}`).join(" · ")));
   out.push(t.sessionHow(c("task:start", "<id>"), c("task:verify", "<id>")));
   if (plan.issues.length) out.push(t.sessionIssues(plan.issues.length, c("task:state", "--check")));
+  const n = countByStatus(plan.friction?.entries ?? []);
+  if (n.open || n.carded) out.push(t.sessionFriction(n.open, n.carded, c("task:friction")));
   return `${out.join("\n")}\n`;
 }
 

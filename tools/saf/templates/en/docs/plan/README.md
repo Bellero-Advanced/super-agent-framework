@@ -116,6 +116,23 @@ Exit 75 = the lock was busy and nothing was measured — run it again later. `{{
 - "Done" means a real run: attach the command output, never a guess or a ticked box
 - `docs/plan/evidence/` is written by the engine; never edit or delete it by hand
 - If a check is flaky, fix the flakiness first — never retry until green and call it done
+
+## 8. Friction log
+
+When the workflow itself gets in the way of a card, record it in `docs/plan/friction.md` — one append-only file. Kinds:
+`review-bounce` (a spec review failed because of a gap in SAF, not in the card's work) · `command-failed` (an engine command
+failed, crashed or did the wrong thing) · `doc-drift` (a document, card or template contradicted the code) · `workaround`
+(the work needed a step the workflow does not support).
+
+- add: `{{cmd.taskFrictionAdd}}` appends one line dated today (in `people.timeZone`) and prints its id. `--card <id>` links a card of the plan; `area` says where the friction lives (for example `task:merge` or a file path); no field may contain ` · ` or a line break
+- close: `{{cmd.taskFrictionClose}}` appends a closing line: `carded` and `fixed` need a card id of the plan, `dropped` needs a reason. An entry that is `fixed` or `dropped` cannot be closed again
+- `{{cmd.taskFriction}}` without an argument lists the open and carded entries and the count per status
+- lines are never edited or removed: a mistake is closed with `dropped` (and, if needed, a new entry). A line that breaks the format is a plan problem — `{{cmd.taskStateCheck}}` names its line number
+- the commands only write the file and never commit: commit it on its own, `git commit -m "chore(plan): friction F-<nnn>" -- docs/plan/friction.md`
+{{#if lanesOn}}
+- `add` and `close` are refused inside a lane worktree: an agent in a lane puts a `friction:` line in its report and the main session records it
+{{/if}}
+- while an entry is open or carded the session summary shows `Friction: <open> open · <carded> carded`
 {{#if pmNpm}}
 
 npm passes arguments after `--`: `npm run task:start -- T-M1-01`.

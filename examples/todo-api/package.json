@@ -20,7 +20,8 @@
     "docs:check": "node tools/saf/bin/saf.mjs docs-check",
     "spec:matrix": "node tools/saf/bin/saf.mjs spec-matrix",
     "check-secrets": "node tools/saf/bin/saf.mjs check-secrets",
-    "task:culprit": "node tools/saf/bin/saf.mjs task culprit"
+    "task:culprit": "node tools/saf/bin/saf.mjs task culprit",
+    "task:friction": "node tools/saf/bin/saf.mjs task friction"
   },
   "engines": {
     "node": ">=20"
