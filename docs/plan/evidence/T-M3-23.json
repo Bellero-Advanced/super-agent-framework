@@ -7,29 +7,29 @@
     "base": "355089ccd9a79d5cb01b4fa2b9a24f5d842f2461",
     "dirty": {}
   },
-  "attempts": 2,
+  "attempts": 3,
   "lane": 2,
   "branch": "card/T-M3-23",
   "worktree": ".claude/worktrees/T-M3-23",
   "verified": {
-    "at": "2026-11-24T16:34:54.060Z",
-    "head": "1b11bbeaf2d779eeacaed82dc397965f948a7099",
+    "at": "2026-11-24T16:39:07.847Z",
+    "head": "956a51126f49d10568ac655228f27141a97df310",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/docs-wording.test.mjs test/unit/setup-rerun-docs.test.mjs test/unit/lane-caps-docs.test.mjs test/unit/doc-languages.test.mjs test/unit/dogfood.test.mjs",
         "exit": 0,
-        "ms": 753,
+        "ms": 1431,
         "tail": [
           "ok 20 - LCAP-AC-06 rule 12 file by file: the three local keys, LANE_CEILING, no environment variable for caps and why the main lane stays one",
           "  ---",
-          "  duration_ms: 3.130542",
+          "  duration_ms: 1.643209",
           "  type: 'test'",
           "  ...",
           "# Subtest: RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
           "ok 21 - RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
           "  ---",
-          "  duration_ms: 4.295708",
+          "  duration_ms: 2.963167",
           "  type: 'test'",
           "  ...",
           "1..21",
@@ -40,13 +40,13 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 664.3295"
+          "# duration_ms 1330.093291"
         ]
       },
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 543,
+        "ms": 386,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -73,7 +73,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 547,
+        "ms": 366,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -83,7 +83,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 414,
+        "ms": 337,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -93,17 +93,17 @@
       {
         "cmd": "node --test 'test/unit/docs-wording.test.mjs'",
         "exit": 0,
-        "ms": 174,
+        "ms": 130,
         "tail": [
           "ok 7 - LCAP-AC-07 the skill's per-machine paragraph says the local file is absent in a lane worktree and what lane verifies use",
           "  ---",
-          "  duration_ms: 0.362042",
+          "  duration_ms: 0.275417",
           "  type: 'test'",
           "  ...",
           "# Subtest: LANG-AC-06 docs/config-reference.md language rows name text.mjs and hold no hand-made language list",
           "ok 8 - LANG-AC-06 docs/config-reference.md language rows name text.mjs and hold no hand-made language list",
           "  ---",
-          "  duration_ms: 0.754959",
+          "  duration_ms: 0.567458",
           "  type: 'test'",
           "  ...",
           "1..8",
@@ -114,7 +114,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 98.272375"
+          "# duration_ms 77.167209"
         ]
       }
     ],
@@ -138,16 +138,16 @@
       "hashes": {
         "README.md": "f08a65fd973d6858d250160d11da15e0d5cd0a87",
         "README.th.md": "7d0522cd016e6924a84e6999eb16b7c98c76e84e",
-        "docs/card-lifecycle.md": "9d5fdd2ee122069839da42d69e03efb474864823",
+        "docs/card-lifecycle.md": "f6a9933f94a598684798b962fc123af7cbabca9a",
         "docs/config-reference.md": "3ccdaeb7def303a25ec22409517bc97705beb762",
-        "docs/plan/README.md": "fd6337b5dab9b58ce1353036e756af2725822d0c",
+        "docs/plan/README.md": "ae31262c694266023b16294aeda0aab0b22d5892",
         "docs/setup-questions.md": "fb439ee1ac7f6875c40ee2ad87f42d692ee954be",
         "docs/upgrade.md": "8b75377aadafe3d039dc9e8cb445dc620742c436",
-        "kit/claude/skills/saf-setup/SKILL.md": "19547b8e52445ed8d1a932c79058ea544343cc1f",
+        "kit/claude/skills/saf-setup/SKILL.md": "77abc28997ce3803dd6db9fa93d2ee48d85ac964",
         "kit/tools-saf/lib/testmode.mjs": "8f8867b1a79fffa5116d638c0c60459219c782b0",
-        "kit/tools-saf/templates/en/docs/plan/README.md": "7ad770d4c4d2a5c7a62f714bb50ac4eabbca4fdb",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "5c7b750a9cca8216e396b0db9c0288a74a805daa",
         "kit/tools-saf/templates/th/docs/plan/README.md": "3ba5a1d82473381ecb7b3360115cb3cace80ebfc",
-        "test/unit/docs-wording.test.mjs": "46bb9a75e4cab29b5722f2f0438aa9142e241959"
+        "test/unit/docs-wording.test.mjs": "7eec3672b49ec5bb0e58dc64fa969330702e5d3d"
       }
     },
     "scenarios": {
@@ -162,11 +162,11 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 94,
+        "lines": 105,
         "cap": 150
       },
       "test": {
-        "lines": 109,
+        "lines": 108,
         "cap": 250
       },
       "over": []

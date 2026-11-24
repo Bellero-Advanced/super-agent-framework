@@ -94,7 +94,7 @@ Cards whose role works in a **code lane** (`implementer` `qa-runner` ) can run i
 parallel, each in its own git worktree under `.claude/worktrees/` on branch `card/<id>`.
 Other cards run in the main folder, one at a time.
 
-- `npm run task:next -- --parallel` lists cards that can start together (no `touch` overlap · caps: code 3 · main 1) and why others wait — these are the project's caps; a machine may set its own `workflow.lanes.code` in `saf.config.local.json`, (at most `LANE_CEILING` in `tools/saf/lib/config.mjs`; there is no environment variable for caps). The main-folder lane stays one card because `npm run task:verify -- <id>` counts every file changed in the folder since a card's start commit as that card's, so two cards there cannot be told apart
+- `npm run task:next -- --parallel` lists cards that can start together (no `touch` overlap · caps: code 3 · main 1) and why others wait — these are the project's caps; a machine may set its own `workflow.lanes.code` in `saf.config.local.json` (at most `LANE_CEILING` in `tools/saf/lib/config.mjs`; there is no environment variable for caps). The main-folder lane stays one card because `npm run task:verify -- <id>` counts every file changed in the folder since a card's start commit as that card's, so two cards there cannot be told apart
 - `npm run task:start -- <id> --worktree` opens the lane: the card files must be committed first; evidence is committed on the main branch.
   If steps 3–5 fail it exits 6 — fix the cause, then re-run with `--resume`
 - inside the lane: work, then `npm run task:verify -- <id>` (writes evidence on the lane branch only) · `npm run task:env` prints the lane's ports

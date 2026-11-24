@@ -55,9 +55,9 @@ test("RERUN-AC-22 the skill's re-run step 3 shows --keep quoting for single quot
 test("RERUN-AC-22 the skill's re-run step 1 says how a dry-run line splits and which lines it leaves out", () => {
   const step = flat(part(SKILL, RERUN, "2. For each `replace-edited`"));
   const split = sentences(step, "two spaces")[0];
-  assert.match(split, /action/);
-  assert.match(split, /path/);
-  assert.match(split, /reason/);
+  assert.match(split, /action padded with spaces to a fixed width, then the path, then two spaces and the reason/);
+  assert.match(split, /reason is the text after the two spaces that follow the path/);
+  assert.ok(!/the action, a space/.test(step), "the one-space wording is gone");
   const left = sentences(step, "per-file")[0];
   assert.match(left, /leaving out only/);
   assert.match(left, /action is `same`/);
@@ -71,7 +71,8 @@ test("SETUP-AC-15 the skill asks the chat-language question first with `choices 
   const first = sentences(para, "--group 1 --lang en")[0];
   assert.match(first, /chat-language question/);
   assert.match(first, /first/);
-  assert.match(first, /in English/);
+  assert.match(first, /option table together with the question/);
+  assert.match(first, /table is in English/);
   const later = sentences(para, "--group 1 --lang <chat language>")[0];
   assert.match(later, /do not show the chat-language table again/);
   assert.ok(!/right after that answer and before the other group-1 questions/.test(para), "the old one-run wording is gone");
@@ -83,8 +84,7 @@ test("LCAP-AC-07 docs/card-lifecycle.md 'Per machine' says the local file is abs
   assert.match(s, /saf\.config\.local\.json/);
   assert.match(s, /git-ignored/);
   assert.match(s, /lane card's `task:verify`/);
-  assert.match(s, /repository's test mode and lane caps/);
-  assert.match(s, /unless `SAF_TEST_MODE` is set/);
+  assert.match(s, /use the repository's lane caps, and its test mode unless `SAF_TEST_MODE` is set/);
 });
 
 test("LCAP-AC-07 the skill's per-machine paragraph says the local file is absent in a lane worktree and what lane verifies use", () => {
@@ -92,8 +92,7 @@ test("LCAP-AC-07 the skill's per-machine paragraph says the local file is absent
   const s = sentences(para, "absent inside a lane worktree")[0];
   assert.match(s, /git-ignores/);
   assert.match(s, /lane card's `task:verify`/);
-  assert.match(s, /repository's test mode and lane caps/);
-  assert.match(s, /unless `SAF_TEST_MODE` is set/);
+  assert.match(s, /use the repository's lane caps, and its test mode unless `SAF_TEST_MODE` is set/);
 });
 
 test("LANG-AC-06 docs/config-reference.md language rows name text.mjs and hold no hand-made language list", () => {

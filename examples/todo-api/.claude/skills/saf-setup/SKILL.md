@@ -43,13 +43,17 @@ Test mode and the two lane caps are per-machine choices. The untracked `saf.conf
 test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
 code-lane cap (`workflow.lanes.code`, at most `LANE_CEILING` in `config.mjs`) or a side-card cap (`workflow.sideLanes.max`)
 there. The installer git-ignores that file, so it is absent inside a lane worktree: engine commands run there, such as a
-lane card's `task:verify`, use the repository's test mode and lane caps unless `SAF_TEST_MODE` is set. `SAF_TEST_MODE` sets the
-test mode for one shell; lane caps have no environment variable (sessions in different shells must count the same caps). The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart. None of this changes generated files.
+lane card's `task:verify`, use the repository's lane caps, and its test mode unless `SAF_TEST_MODE` is set. `SAF_TEST_MODE`
+sets the test mode for one shell; lane caps have no environment variable (sessions in different shells must count the
+same caps). The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a
+card's start commit as that card's, so two cards in one folder cannot be told apart. None of this changes generated
+files.
 
 **Before each group**, run `node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>` (`<g>` is `1` to `8`;
 `<chat language>` is `en` or `th`, the language the person picked). Group 1 starts with the bilingual chat-language
 question, and the chat language is not known yet: ask that question first, run
-`node tools/saf/bin/saf.mjs choices --group 1 --lang en` and show its option table in English. After the answer run
+`node tools/saf/bin/saf.mjs choices --group 1 --lang en` and show its option table together with the question (the table
+is in English). After the answer run
 `choices --group 1 --lang <chat language>` for the other group-1 questions and do not show the chat-language table again.
 The output has, for each question, its keys and for each option four lines: what it is · good for · cost ·
 pick it when (the rigor and preset options also carry the values they derive). Then:
@@ -102,9 +106,10 @@ already know, instead of forcing them into options.
 
 1. Write `.saf/setup-answers.json` (step 1 above), then run
    `node tools/saf/bin/saf.mjs setup --answers .saf/setup-answers.json <adopt flag> --dry-run` with the same adopt flag as
-   the real run. It writes nothing. Show the list as printed, leaving out only the per-file lines whose action is `same`; show the
-   `merges:` block whole, including its own `<path>: same` lines. Each per-file line is the action, a space, the path, two
-   spaces, then the reason: read the reason as the text after those two spaces, because a path may hold spaces.
+   the real run. It writes nothing. Show the list as printed, leaving out only the per-file lines whose action is `same`;
+   show the `merges:` block whole, including its own `<path>: same` lines. Each per-file line is the action padded with
+   spaces to a fixed width, then the path, then two spaces and the reason: the reason is the text after the two spaces
+   that follow the path, because a path may hold spaces.
    If the list has no `replace-edited` line, skip steps 2 and 5: nothing needs a decision; go on with step 4 and generate.
 2. For each `replace-edited` line (a file someone edited, or SAF did not write) ask once with AskUserQuestion. One call
    holds up to 4 questions, so batch the files 4 at a time, and offer "take the recommendation for all the rest":
@@ -116,8 +121,8 @@ already know, instead of forcing them into options.
      `--- a/` header: show that line and say the diff is too large. Then ask the same question again with the first two options.
 3. Every file answered "Keep mine" goes to the real run as `--keep <path>`, written exactly like that: a space, then the
    path as the list printed it. When a path holds spaces, quote it: single quotes on macOS and Linux
-   (`--keep 'docs/my notes.md'`), double quotes on Windows (`--keep "docs/my notes.md"`). Never `--keep=<path>` — the CLI silently ignores that form and the file would be
-   archived and replaced. Repeat `--keep` per file (or give one comma-separated list). A path must be a file the dry run
+   (`--keep 'docs/my notes.md'`), double quotes on Windows (`--keep "docs/my notes.md"`). Never `--keep=<path>` — the CLI
+   silently ignores that form and the file would be archived and replaced. Repeat `--keep` per file (or give one comma-separated list). A path must be a file the dry run
    planned and that exists; anything else exits 2. `--diff` works only together with `--dry-run`.
 4. List every `keep-edited` file (living files: decision log, index, milestone and card files) with one line: your edits
    stay; the diff shows what the new settings would change — port it by hand, or add a decision row when a setting changed.
