@@ -58,6 +58,7 @@ agent อยู่ใน `.claude/agents/` (โมเดล + effort ตาย�
 {{cmd.taskProbe}}  # พิสูจน์ว่า session ใหม่รู้การ์ดปัจจุบันจาก hook จริง
 {{cmd.taskReport}}  # รายงาน milestone จากหลักฐาน
 {{cmd.taskCulprit}}  # ประตูออกรัน test ทั้งชุดแล้วล้ม: หาการ์ดที่ทำให้ล้ม (--cmd "<คำสั่ง>" เลือกคำสั่งเอง)
+{{cmd.taskFriction}}  # workflow ขวางการทำการ์ด: จดลง docs/plan/friction.md (add · close · ไม่ใส่อาร์กิวเมนต์ = แสดงรายการที่ยังเปิดหรือออกการ์ดแล้ว) — add กับ close รันได้ที่โฟลเดอร์หลักเท่านั้น
 {{cmd.docsCheck}}  # ลิงก์ · คำสั่ง · path ในเอกสาร agent · agent · settings
 {{cmd.specMatrix}}  # ตารางฉากยอมรับ ↔ test (--check = การ์ดที่เริ่มแล้วต้องมี test)
 {{cmd.checkSecrets}}  # ห้ามมีค่าลับในไฟล์ที่ track

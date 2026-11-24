@@ -49,6 +49,7 @@ npm run task:env                       # export lines (ports) for servers you st
 npm run task:state                     # rebuild STATE.md + .saf/plan.md (--check = verify only)
 npm run task:probe                     # prove a fresh session knows the current card from the hook
 npm run task:report -- <M>             # milestone report from evidence
+npm run task:friction                  # the workflow got in the way of a card: log it in docs/plan/friction.md (add · close · no argument lists what is open or carded) — add and close: main folder only
 npm run docs:check                     # links · commands · paths in agent docs · agents · settings
 npm run spec:matrix                    # acceptance scenarios ↔ tests (--check = started cards must have tests)
 npm run check-secrets                  # no secret values in tracked files

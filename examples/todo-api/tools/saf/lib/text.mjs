@@ -64,6 +64,9 @@ const en = {
   sessionRecent: (l) => `latest evidence: ${l}`,
   sessionHow: (s, v) => `how to work: ${s} → do the card → ${v} (the only way a card becomes "done") → commit · .saf/plan.md and STATE.md are generated, never tick boxes by hand`,
   sessionIssues: (n, cmd) => `⚠ the plan has ${n} problem(s) — run ${cmd}`,
+  sessionFriction: (open, carded, cmd) => `Friction: ${open} open · ${carded} carded — ${cmd}`,
+  frictionHeader: (marker, cmd) =>
+    `# Friction log\n\nWhere the workflow got in the way of a card: a review bounced because of a gap in SAF, an engine command failed or misbehaved, a document contradicted the code, or the work needed a step the workflow does not support. Record one with \`${cmd}\` (what to write: docs/plan/README.md). Lines below the marker are append-only: never edit or remove one — a mistake is closed with a new line.\n\n${marker}`,
   laneHead: (name, lane, id, title, br) => `[${name} work status] this folder is lane ${lane} of card ${id} ${title} — a separate worktree (branch ${br}); only this card is worked on here`,
   laneStatus: (s) => `status: ${s}`,
   laneCardFile: (f) => `card: ${f}`,
@@ -196,6 +199,9 @@ const th = {
   sessionRecent: (l) => `หลักฐานล่าสุด: ${l}`,
   sessionHow: (s, v) => `วิธีทำงาน: ${s} → ทำตามการ์ด → ${v} (ทางเดียวที่การ์ดเป็น "เสร็จ") → commit · .saf/plan.md และ STATE.md สร้างอัตโนมัติ ห้ามติ๊กช่องด้วยมือ`,
   sessionIssues: (n, cmd) => `⚠ แผนมีปัญหา ${n} จุด — รัน ${cmd} เพื่อดู`,
+  sessionFriction: (open, carded, cmd) => `Friction: ค้างอยู่ ${open} · ออกการ์ดแล้ว ${carded} — ดูด้วย ${cmd}`,
+  frictionHeader: (marker, cmd) =>
+    `# Friction log\n\nจุดที่ workflow ขวางการทำการ์ด: รีวิวตกเพราะช่องโหว่ของ SAF เอง · คำสั่งของ engine พังหรือทำผิด · เอกสารขัดกับโค้ด · หรืองานต้องมีขั้นตอนที่ workflow ไม่รองรับ บันทึกด้วย \`${cmd}\` (ควรเขียนอะไร: ดู docs/plan/README.md) บรรทัดใต้เครื่องหมายด้านล่างเพิ่มต่อท้ายอย่างเดียว: ห้ามแก้หรือลบบรรทัดเดิม ถ้าผิดให้ปิดด้วยบรรทัดใหม่\n\n${marker}`,
   laneHead: (name, lane, id, title, br) => `[สถานะงาน ${name}] โฟลเดอร์นี้คือสาย ${lane} ของการ์ด ${id} ${title} — โฟลเดอร์งานแยก (branch ${br}) ทำได้เฉพาะการ์ดใบนี้`,
   laneStatus: (s) => `สถานะ: ${s}`,
   laneCardFile: (f) => `การ์ด: ${f}`,

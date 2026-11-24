@@ -1,14 +1,230 @@
 {
   "id": "T-M3-01",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T07:22:29.800Z",
     "base": "29be96710d55d448e459c998486f2766b47e5078",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M3-01",
-  "worktree": ".claude/worktrees/T-M3-01"
+  "worktree": ".claude/worktrees/T-M3-01",
+  "verified": {
+    "at": "2026-11-24T07:29:02.582Z",
+    "head": "7a220fd43f48d97bac2b154bd910f61684c1e0cc",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 208,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "126 scenario(s) in 12 spec(s) · with test 68 · gaps 58 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/friction.test.mjs",
+        "exit": 0,
+        "ms": 3069,
+        "tail": [
+          "ok 11 - FRIC-AC-07 an entry appended while a card is in progress is not reported outside touch; a real file outside touch still is",
+          "  ---",
+          "  duration_ms: 176.744875",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
+          "ok 12 - the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
+          "  ---",
+          "  duration_ms: 54.547667",
+          "  type: 'test'",
+          "  ...",
+          "1..12",
+          "# tests 12",
+          "# suites 0",
+          "# pass 12",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3034.944875"
+        ]
+      },
+      {
+        "cmd": "npm run task:friction",
+        "exit": 0,
+        "ms": 179,
+        "tail": [
+          "> super-agent-framework@0.1.0 task:friction",
+          "> node tools/saf/bin/saf.mjs task friction",
+          "F-001 · open · workaround · - · examples/todo-api · every kit card restores examples/todo-api/.claude and package.json by hand after the example upgrade",
+          "F-002 · open · workaround · - · task:verify · after a spec review fails, verifying again needs task:start --restart, which resets the attempt history",
+          "F-003 · open · workaround · - · docs/plan/notes · non-blocking review notes of T-M2-04 and T-M2-06 to T-M2-08 were never written down",
+          "F-004 · open · doc-drift · - · docs/plan/README.md · section 1 says the evidence reads \"full suite deferred to gate\", but the evidence JSON carries deferred and targeted fields",
+          "open 4 · carded 0 · fixed 0 · dropped 0"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('docs/plan/friction.md','utf8');if((s.match(/^- F-\\d{3,} · /gm)||[]).length<4)process.exit(1)\"",
+        "exit": 0,
+        "ms": 29,
+        "tail": []
+      },
+      {
+        "cmd": "npm run task:state -- --check",
+        "exit": 0,
+        "ms": 181,
+        "tail": [
+          "> super-agent-framework@0.1.0 task:state",
+          "> node tools/saf/bin/saf.mjs task state --check",
+          "✓ plan is valid (lane worktree — state files are not compared here)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 189,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 259 markdown file(s) · 206 local link(s) · 66 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 219,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 519 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/friction.test.mjs'",
+        "exit": 0,
+        "ms": 2953,
+        "tail": [
+          "ok 11 - FRIC-AC-07 an entry appended while a card is in progress is not reported outside touch; a real file outside touch still is",
+          "  ---",
+          "  duration_ms: 177.64975",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
+          "ok 12 - the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
+          "  ---",
+          "  duration_ms: 51.765834",
+          "  type: 'test'",
+          "  ...",
+          "1..12",
+          "# tests 12",
+          "# suites 0",
+          "# pass 12",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2919.191625"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "CLAUDE.md",
+        "docs/INDEX.md",
+        "docs/card-lifecycle.md",
+        "docs/plan/README.md",
+        "examples/todo-api/package.json",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/friction.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/plan.mjs",
+        "kit/tools-saf/lib/text.mjs",
+        "kit/tools-saf/templates/en/CLAUDE.template.md",
+        "kit/tools-saf/templates/en/docs/plan/README.md",
+        "kit/tools-saf/templates/th/CLAUDE.template.md",
+        "kit/tools-saf/templates/th/docs/plan/README.md",
+        "package.json",
+        "test/unit/friction.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "CLAUDE.md": "286db9b7c1988320964061cc0eeadd8ee138a609",
+        "docs/INDEX.md": "766bc01d8b0b322dcca554cab5732057668bcb22",
+        "docs/card-lifecycle.md": "15cbdf37e42e1f03d224c7934cdfae408b25dfbe",
+        "docs/plan/README.md": "946bb2b83b6a78260884f8ae3d71efb7ec1dccae",
+        "examples/todo-api/package.json": "e090e72b3c38a351866d9be22ea8e341d18e7492",
+        "kit/tools-saf/bin/saf.mjs": "1f1cf74a6cc86acde6988527773f8dcca9f063a6",
+        "kit/tools-saf/lib/config.mjs": "7d6525813c7f65aefe05637604a39be34a12134f",
+        "kit/tools-saf/lib/friction.mjs": "db88ade6bac97103d9ab5266aa0f80ee8dd09235",
+        "kit/tools-saf/lib/generate.mjs": "357c4d75f655d4ce7588f7f9a58586743585824a",
+        "kit/tools-saf/lib/plan.mjs": "914dde22878daa6fe2aec28acf8dd1a922dc8056",
+        "kit/tools-saf/lib/text.mjs": "b7c78f4f604aa98584dd90f971c3b0d41a91c6fe",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "f08332689530b35924ff9db10818b8862e378ab8",
+        "kit/tools-saf/templates/en/docs/plan/README.md": "0b5a7d6e3f32a4ed1ffda0103f96b90f17abc7cd",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "aab0ce2a797bb709e3b9452618b550f4773b342f",
+        "kit/tools-saf/templates/th/docs/plan/README.md": "c8afebc440a1e67aab0bb63028c3d7f544e94f4b",
+        "package.json": "29a2c4703918f8b035c26b1103d19e55eafa0416",
+        "test/unit/friction.test.mjs": "a6a15e668c18533068bcaaa0a068e057e477205e"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "FRIC-AC-01",
+        "FRIC-AC-02",
+        "FRIC-AC-03",
+        "FRIC-AC-04",
+        "FRIC-AC-05",
+        "FRIC-AC-06",
+        "FRIC-AC-07"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 367,
+        "cap": 400
+      },
+      "test": {
+        "lines": 281,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/friction.test.mjs"
+      ]
+    }
+  }
 }

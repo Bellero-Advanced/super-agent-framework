@@ -58,6 +58,7 @@ Agents live in `.claude/agents/` (model + effort fixed per role — `{{cmd.docsC
 {{cmd.taskProbe}}            # prove a fresh session knows the current card from the hook
 {{cmd.taskReport}}           # milestone report from evidence
 {{cmd.taskCulprit}}          # the exit gate's full suite failed: find the card that broke it (--cmd "<command>" picks the command)
+{{cmd.taskFriction}}         # the workflow got in the way of a card: log it in docs/plan/friction.md (add · close · no argument lists what is open or carded) — add and close: main folder only
 {{cmd.docsCheck}}            # links · commands · paths in agent docs · agents · settings
 {{cmd.specMatrix}}           # acceptance scenarios ↔ tests (--check = started cards must have tests)
 {{cmd.checkSecrets}}         # no secret values in tracked files
