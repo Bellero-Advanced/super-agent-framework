@@ -1,14 +1,173 @@
 {
   "id": "T-M3-29",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T09:06:37.716Z",
     "base": "59cd007ceeeca3708302b3ec6b150450654c11d5",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-29",
-  "worktree": ".claude/worktrees/T-M3-29"
+  "worktree": ".claude/worktrees/T-M3-29",
+  "verified": {
+    "at": "2026-11-24T09:12:34.445Z",
+    "head": "07c785af17a62eb2605c3844afd575902c72e40d",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/agent-instructions.test.mjs test/unit/generate.test.mjs",
+        "exit": 0,
+        "ms": 2114,
+        "tail": [
+          "ok 15 - generated CLAUDE.md lists task:culprit in en and th, and the plan README names the test mode",
+          "  ---",
+          "  duration_ms: 91.918542",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
+          "ok 16 - SETUP-AC-10 the release-operator agent follows policies.push and the push: allowed explanation no longer says it forbids pushing",
+          "  ---",
+          "  duration_ms: 108.469959",
+          "  type: 'test'",
+          "  ...",
+          "1..16",
+          "# tests 16",
+          "# suites 0",
+          "# pass 16",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2022.230125"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 927,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "157 scenario(s) in 17 spec(s) · with test 94 · gaps 63 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 738,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 542 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 706,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 270 markdown file(s) · 246 local link(s) · 76 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/agent-instructions.test.mjs'",
+        "exit": 0,
+        "ms": 842,
+        "tail": [
+          "ok 3 - AGENT-AC-03 planSetup on this repository reports 'same' for every .claude/agents file of an enabled role",
+          "  ---",
+          "  duration_ms: 176.469333",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+          "ok 4 - AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+          "  ---",
+          "  duration_ms: 127.762417",
+          "  type: 'test'",
+          "  ...",
+          "1..4",
+          "# tests 4",
+          "# suites 0",
+          "# pass 4",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 725.062208"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/agents/implementer.md",
+        ".claude/agents/spec-reviewer.md",
+        "kit/tools-saf/templates/agents/implementer.md",
+        "kit/tools-saf/templates/agents/spec-reviewer.md",
+        "test/unit/agent-instructions.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/agents/implementer.md": "a3193a4743aa2398b39d4b7584728894d5da8c0d",
+        ".claude/agents/spec-reviewer.md": "6c94e8e28cbbff2c635cfdfbdc057f4bca66c1b2",
+        "kit/tools-saf/templates/agents/implementer.md": "6fe894fd559c49299b09809178c3daa208b54e6a",
+        "kit/tools-saf/templates/agents/spec-reviewer.md": "fee01bda76a8443f723687c41ee3967bcc9179b7",
+        "test/unit/agent-instructions.test.mjs": "e4f00af50821be87c9b941a510920bd6ec97e7a5"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "AGENT-AC-01",
+        "AGENT-AC-02",
+        "AGENT-AC-03",
+        "AGENT-AC-04"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 52,
+        "cap": 150
+      },
+      "test": {
+        "lines": 89,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/agent-instructions.test.mjs"
+      ]
+    }
+  }
 }
