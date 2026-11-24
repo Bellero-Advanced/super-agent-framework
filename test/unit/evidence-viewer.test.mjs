@@ -82,6 +82,7 @@ test("VIEW-AC-02 hostile text is escaped once, nothing can load or run, the CSP 
   assert.ok(html.includes("&quot;&gt;&lt;img src=x onerror=alert(1)&gt;"), "attribute-breaking text");
   assert.ok(html.includes("&lt;/details&gt; --&gt; done"));
   assert.ok(!html.includes("\u001b"), "no raw escape character");
+  assert.doesNotMatch(renderEvidencePage(markers().plan, "M1"), /[\u061c\u200e\u200f\u202e]/, "bidi marks and overrides are made visible");
   assert.ok(html.includes("\\x1b[31mred"), "control characters are made visible");
   assert.ok(html.includes("x".repeat(5000)), "long lines are kept whole");
   assert.ok(html.includes("First &lt;b&gt;"), "milestone title");
@@ -94,7 +95,7 @@ test("VIEW-AC-02 hostile text is escaped once, nothing can load or run, the CSP 
   assert.doesNotMatch(markup, /\son[a-z]+\s*=/i);
   assert.doesNotMatch(markup, /https?:|\/\/|javascript:/i);
   assert.doesNotMatch(html.match(/<style>[^]*<\/style>/)[0], /https?:|\/\/|url\(|@import/i);
-  assert.match(html, /<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">/);
+  assert.match(html, /<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'unsafe-inline'">/);
   assert.equal(html.split("<style>").length, 2);
   // a broken or hostile evidence record is shown, never executed
   const p = fixture();
@@ -150,4 +151,54 @@ test("VIEW-AC-01 a milestone without any evidence lists every card as not starte
   assert.equal(html.split(TEXT.en.status.todo).length - 1, 3);
   assert.ok(html.includes(TEXT.en.gateNotRun));
   assert.ok(!html.includes(`<details class="card">`), "no card section without evidence");
+});
+
+const MARK = [];
+const X = (name, cut = Infinity) => {
+  const text = `<i>${name}</i>`;
+  MARK.push([name, text.slice(0, cut)]); // commits are cut to 7 characters on the page
+  return text;
+};
+/** Every string the page prints, replaced by a marker tag; tails also carry bidi characters. */
+function markers() {
+  MARK.length = 0;
+  const cmdX = (n, exit) => ({ cmd: X(`${n}cmd`), exit, ms: X(`${n}ms`), tail: [X(`${n}tail`), "\u202e\u200f\u061c"] });
+  const ids = [X("idA"), X("idB"), X("idC")];
+  const titles = [X("titleA"), X("titleB")];
+  const evA = {
+    id: ids[0], status: X("statusA"), attempts: X("attemptsA"), started: { at: X("startA"), base: X("baseA", 7) },
+    verified: { at: X("verA"), head: X("headA", 7), pass: true, commands: [cmdX("a1", 0)], files: { changed: [X("changedA")], outside: [X("outsideA")], forbidden: [X("forbA")] },
+      scenarios: { required: [X("reqA")], missing: [X("missA")] }, size: { code: { lines: X("codeA"), cap: X("codeCapA") }, test: { lines: X("testA"), cap: X("testCapA") }, over: [] },
+      testMode: { mode: X("modeA") }, deferred: [X("deferA")], targeted: { files: [X("targetA")] } },
+    failures: [{ at: X("failAt"), attempts: X("failN"), commands: [cmdX("f1", 3)] }],
+  };
+  const evB = {
+    id: ids[1], status: "done", attempts: 1, started: { at: "2026-01-01T00:00:00.000Z", base: "abc" },
+    verified: { at: X("verB"), head: "abc", pass: false, commands: [cmdX("b1", 9)], files: { changed: [], outside: [X("outsideB")], forbidden: [X("forbB")] },
+      scenarios: { required: [], missing: [X("missB")] }, targeted: { fallback: X("fallbackB") } },
+  };
+  const gate = (id, commands) => ({ id, pass: true, commands });
+  const m = {
+    id: "M1", title: X("msTitle"), status: X("msStatus"), cards: ids, legacy: { [ids[2]]: { commits: [X("legacyCommit")], title: X("legacyTitle") } },
+    gates: [{ id: X("gateId1"), text: X("gateText1"), run: [] }, { id: X("gateId2"), text: X("gateText2"), run: [X("gateRun2")] }],
+  };
+  const plan = {
+    config: cfg(),
+    milestones: [m],
+    cards: new Map(ids.slice(0, 2).map((id, i) => [id, { id, title: titles[i] }])),
+    evidence: new Map([[ids[0], evA], [ids[1], evB]]),
+    gateEvidence: new Map([["M1", { id: "M1", kind: "milestone", verified: { at: X("gateAt"), head: X("gateHead", 7), gates: [gate(m.gates[0].id, [cmdX("g1", 0)]), gate(X("undeclaredId"), [cmdX("g3", 0)])] } }]]),
+  };
+  return { plan, names: [...MARK] };
+}
+
+test("VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag", () => {
+  const { plan, names } = markers();
+  const html = renderEvidencePage(plan, "M1");
+  assert.equal(html.includes("<i>"), false, "no marker tag as markup");
+  assert.equal(/<\/?i[\s>]/i.test(html), false);
+  const esc1 = (x) => x.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  assert.deepEqual(names.filter(([, text]) => !html.includes(esc1(text))).map(([n]) => n), [], "every marked field is printed, escaped (a field dropped from the page would hide a later bug)");
+  assert.doesNotMatch(html, /[\u202e\u200f\u061c]/);
+  assert.equal(renderEvidencePage(markers().plan, "M1"), html, "deterministic with hostile data too");
 });

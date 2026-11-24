@@ -7,19 +7,19 @@
     "base": "6b18751f8d85b6d57ee40f2736d0dea67e177c98",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-05",
   "worktree": ".claude/worktrees/T-M2-05",
   "verified": {
-    "at": "2026-11-24T04:47:43.894Z",
-    "head": "04e59024d2d0a0bf504e16c3e8f161a840b99fca",
+    "at": "2026-11-24T04:52:53.119Z",
+    "head": "895b4f399ba7049e0dc3e3c16ce3258184267b7b",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 203,
+        "ms": 202,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,40 +46,40 @@
       {
         "cmd": "node --test test/unit/evidence-viewer.test.mjs",
         "exit": 0,
-        "ms": 483,
+        "ms": 503,
         "tail": [
-          "ok 4 - VIEW-AC-04 task report --html writes the .md and the .html twice byte-identical; without --html no .html",
-          "  ---",
-          "  duration_ms: 369.467541",
-          "  type: 'test'",
-          "  ...",
-          "# Subtest: VIEW-AC-01 a milestone without any evidence lists every card as not started and every gate as not checked",
           "ok 5 - VIEW-AC-01 a milestone without any evidence lists every card as not started and every gate as not checked",
           "  ---",
-          "  duration_ms: 0.400083",
+          "  duration_ms: 0.507375",
           "  type: 'test'",
           "  ...",
-          "1..5",
-          "# tests 5",
+          "# Subtest: VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "ok 6 - VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "  ---",
+          "  duration_ms: 1.565708",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
           "# suites 0",
-          "# pass 5",
+          "# pass 6",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 448.423166"
+          "# duration_ms 470.173125"
         ]
       },
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/viewer.mjs','utf8');if(/<script|https?:\\/\\//i.test(s))process.exit(1)\"",
         "exit": 0,
-        "ms": 27,
+        "ms": 30,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 189,
+        "ms": 191,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -89,28 +89,28 @@
       {
         "cmd": "node --test 'test/unit/evidence-viewer.test.mjs'",
         "exit": 0,
-        "ms": 475,
+        "ms": 473,
         "tail": [
-          "ok 4 - VIEW-AC-04 task report --html writes the .md and the .html twice byte-identical; without --html no .html",
-          "  ---",
-          "  duration_ms: 360.403",
-          "  type: 'test'",
-          "  ...",
-          "# Subtest: VIEW-AC-01 a milestone without any evidence lists every card as not started and every gate as not checked",
           "ok 5 - VIEW-AC-01 a milestone without any evidence lists every card as not started and every gate as not checked",
           "  ---",
-          "  duration_ms: 0.410834",
+          "  duration_ms: 0.510958",
           "  type: 'test'",
           "  ...",
-          "1..5",
-          "# tests 5",
+          "# Subtest: VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "ok 6 - VIEW-AC-02 every plan or evidence string the page prints is escaped: a marker tag in each field never survives as a tag",
+          "  ---",
+          "  duration_ms: 1.567834",
+          "  type: 'test'",
+          "  ...",
+          "1..6",
+          "# tests 6",
           "# suites 0",
-          "# pass 5",
+          "# pass 6",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 440.121583"
+          "# duration_ms 441.198125"
         ]
       }
     ],
@@ -130,10 +130,10 @@
         "docs/card-lifecycle.md": "3405ef07c18155397ee1c88300c3aec666afebad",
         "kit/tools-saf/bin/saf.mjs": "84174192d6145a8e2acf13b29331373a2740c666",
         "kit/tools-saf/lib/text.mjs": "2a35960b8f353529d5eb4d5e8b2484a69fae952f",
-        "kit/tools-saf/lib/viewer.mjs": "f8c8517ad147052748603c816959985b019e6e39",
+        "kit/tools-saf/lib/viewer.mjs": "722f33baf123477c241e999d632ca2c5aaf07d25",
         "kit/tools-saf/templates/en/docs/plan/README.md": "2af01928ac46611e9ca3c60585391b6345de2f8b",
         "kit/tools-saf/templates/th/docs/plan/README.md": "95b077d22eefaa4527b01492c90fffde1aba29d3",
-        "test/unit/evidence-viewer.test.mjs": "545ee3bff51d3edfc513bc0d698af3c8d9c44f42"
+        "test/unit/evidence-viewer.test.mjs": "1954e89d7ae92e58b9e00362df907aa05372a3ff"
       }
     },
     "scenarios": {
@@ -152,7 +152,7 @@
         "cap": 400
       },
       "test": {
-        "lines": 153,
+        "lines": 204,
         "cap": 600
       },
       "over": []

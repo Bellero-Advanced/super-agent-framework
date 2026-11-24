@@ -11,8 +11,8 @@ import { textFor } from "./text.mjs";
 export const htmlPath = (mid) => `${PLAN_DIR}/reports/${mid}.html`;
 
 const ENTITY = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-// control characters (not \t \n), DEL, C1, line/paragraph separators, bidi overrides: shown as text, never passed through
-const HIDDEN = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g;
+// control characters (not \t \n), DEL, C1, line/paragraph separators, bidi marks and overrides: shown as text, never passed through
+const HIDDEN = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u061c\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g;
 const visible = (c) => {
   const n = c.charCodeAt(0);
   return n < 256 ? `\\x${n.toString(16).padStart(2, "0")}` : `\\u${n.toString(16).padStart(4, "0")}`;
@@ -125,5 +125,5 @@ export function renderEvidencePage(plan, mid) {
     el("section", "", el("h2", "", esc(v.cards)) + cardTable + (folds.length ? el("h2", "", esc(v.details)) + folds.join("") : "")),
     el("p", "muted", esc(v.note(scriptCommand(plan.config.stack.packageManager, "task:report", `${m.id} --html`)))),
   ].join("\n");
-  return `<!DOCTYPE html>\n<html lang="${v.htmlLang}"><head><meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(v.title(m.id, m.title))}</title>\n<style>${CSS}</style></head>\n<body><main>\n${body}\n</main></body></html>\n`;
+  return `<!DOCTYPE html>\n<html lang="${v.htmlLang}"><head><meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="default-src 'none'; base-uri 'none'; form-action 'none'; style-src 'unsafe-inline'">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${esc(v.title(m.id, m.title))}</title>\n<style>${CSS}</style></head>\n<body><main>\n${body}\n</main></body></html>\n`;
 }
