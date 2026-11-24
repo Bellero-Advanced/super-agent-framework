@@ -1,35 +1,35 @@
 {
   "id": "T-M3-28",
   "milestone": "M3",
-  "status": "failed",
+  "status": "done",
   "started": {
     "at": "2026-11-24T08:45:18.562Z",
     "base": "13da6fa2b383b410e4bea3d4c43958c1fedaaf9b",
     "dirty": {}
   },
-  "attempts": 3,
+  "attempts": 4,
   "lane": 2,
   "branch": "card/T-M3-28",
   "worktree": ".claude/worktrees/T-M3-28",
   "verified": {
-    "at": "2026-11-24T08:50:58.759Z",
-    "head": "c34d1c43e5304820022989686ed9f3b29eb63378",
-    "pass": false,
+    "at": "2026-11-24T08:57:11.844Z",
+    "head": "94c0182e4e19825e3c1c440cea501ff35abfb160",
+    "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/role-lanes.test.mjs test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs test/unit/lane-caps.test.mjs test/unit/config.test.mjs",
         "exit": 0,
-        "ms": 3379,
+        "ms": 3108,
         "tail": [
           "ok 36 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 1.265833",
+          "  duration_ms: 1.060625",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "ok 37 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.932958",
+          "  duration_ms: 0.996917",
           "  type: 'test'",
           "  ...",
           "1..37",
@@ -40,46 +40,14 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 3317.957166"
+          "# duration_ms 3048.381042"
         ]
       },
       {
         "cmd": "npm run spec:matrix -- --check",
-        "exit": 1,
-        "ms": 367,
+        "exit": 0,
+        "ms": 375,
         "tail": [
-          "| RERUN-AC-07 | setup-rerun:222 | T-M2-22 (done) | test/unit/setup-rerun-docs.test.mjs | ✓ 1 test(s) |",
-          "| RERUN-AC-08 | setup-rerun:223 | T-M2-27 (done) · T-M3-24 (not started) | test/unit/settings-archive.test.mjs +2 | ✓ 3 test(s) |",
-          "| RERUN-AC-09 | setup-rerun:224 | T-M2-27 (done) · T-M3-24 (not started) | test/unit/settings-archive.test.mjs +1 | ✓ 2 test(s) |",
-          "| RERUN-AC-10 | setup-rerun:225 | T-M2-29 (done) | test/unit/setup-guards.test.mjs | ✓ 1 test(s) |",
-          "| RERUN-AC-11 | setup-rerun:226 | T-M2-29 (done) | test/unit/setup-guards.test.mjs | ✓ 1 test(s) |",
-          "| RERUN-AC-12 | setup-rerun:227 | T-M2-30 (done) | test/unit/settings-env-merge.test.mjs +1 | ✓ 2 test(s) |",
-          "| RERUN-AC-13 | setup-rerun:228 | T-M2-30 (done) | test/unit/settings-env-merge.test.mjs +2 | ✓ 3 test(s) |",
-          "| RERUN-AC-14 | setup-rerun:229 | T-M3-16 (not started) | — | ✗ gap |",
-          "| RERUN-AC-15 | setup-rerun:230 | T-M3-16 (not started) | — | ✗ gap |",
-          "| RERUN-AC-16 | setup-rerun:231 | T-M3-16 (not started) | — | ✗ gap |",
-          "| RERUN-AC-17 | setup-rerun:232 | T-M3-17 (not started) | — | ✗ gap |",
-          "| RERUN-AC-18 | setup-rerun:233 | T-M3-17 (not started) | — | ✗ gap |",
-          "| RERUN-AC-19 | setup-rerun:234 | T-M3-17 (not started) | — | ✗ gap |",
-          "| RERUN-AC-20 | setup-rerun:235 | T-M3-21 (not started) | — | ✗ gap |",
-          "| RERUN-AC-21 | setup-rerun:236 | T-M3-26 (not started) | — | ✗ gap |",
-          "| RERUN-AC-22 | setup-rerun:237 | T-M3-23 (not started) | — | ✗ gap |",
-          "| PACK-AC-01 | skill-packs:91 | T-M3-13 (not started) | — | ✗ gap |",
-          "| PACK-AC-02 | skill-packs:92 | T-M3-13 (not started) | — | ✗ gap |",
-          "| PACK-AC-03 | skill-packs:93 | T-M3-13 (not started) | — | ✗ gap |",
-          "| PACK-AC-04 | skill-packs:94 | T-M3-14 (not started) | — | ✗ gap |",
-          "| PACK-AC-05 | skill-packs:95 | T-M3-14 (not started) | — | ✗ gap |",
-          "| PACK-AC-06 | skill-packs:96 | T-M3-14 (not started) | — | ✗ gap |",
-          "| PACK-AC-07 | skill-packs:97 | T-M3-15 (not started) | — | ✗ gap |",
-          "| TMODE-AC-01 | test-mode:150 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
-          "| TMODE-AC-02 | test-mode:151 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
-          "| TMODE-AC-03 | test-mode:152 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs +2 | ✓ 3 test(s) |",
-          "| TMODE-AC-04 | test-mode:153 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
-          "| TMODE-AC-05 | test-mode:154 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
-          "| TMODE-AC-06 | test-mode:155 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
-          "| TMODE-AC-07 | test-mode:156 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
-          "| TMODE-AC-08 | test-mode:157 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
-          "| TMODE-AC-09 | test-mode:158 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
           "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
@@ -99,51 +67,39 @@
           "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
           "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
           "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
-          "157 scenario(s) in 17 spec(s) · with test 82 · gaps 75 · gaps of started cards 8",
-          "✗ COPIES-AC-01 (docs/specs/refresh-copies.md:79) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-02 (docs/specs/refresh-copies.md:80) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-03 (docs/specs/refresh-copies.md:81) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-04 (docs/specs/refresh-copies.md:82) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-05 (docs/specs/refresh-copies.md:83) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-06 (docs/specs/refresh-copies.md:84) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-07 (docs/specs/refresh-copies.md:85) has no test — card T-M3-27 has started",
-          "✗ COPIES-AC-08 (docs/specs/refresh-copies.md:86) has no test — card T-M3-27 has started"
+          "157 scenario(s) in 17 spec(s) · with test 90 · gaps 67 · gaps of started cards 0"
         ]
       },
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 376,
+        "ms": 359,
         "tail": [
-          "> super-agent-framework@0.1.0 check-secrets",
-          "> node tools/saf/bin/saf.mjs check-secrets",
-          "✓ check-secrets: <redacted> findings in 538 scanned file(s)"
+          "✓ check-secrets: <redacted> findings in 540 scanned file(s)"
         ]
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 339,
+        "ms": 280,
         "tail": [
-          "> super-agent-framework@0.1.0 docs:check",
-          "> node tools/saf/bin/saf.mjs docs-check",
-          "✓ docs:check passed — 270 markdown file(s) · 245 local link(s) · 70 command(s) in agent docs · 5 agent(s)"
+          "✓ docs:check passed — 270 markdown file(s) · 245 local link(s) · 72 command(s) in agent docs · 5 agent(s)"
         ]
       },
       {
         "cmd": "node --test 'test/unit/role-lanes.test.mjs'",
         "exit": 0,
-        "ms": 2126,
+        "ms": 1816,
         "tail": [
           "ok 8 - RLANE-AC-06 choices --group 6 prints role-lanes in en and th within FIELD_MAX, role-lanes is asked and in questions.md, and the movable roles say 'by default'",
           "  ---",
-          "  duration_ms: 172.828375",
+          "  duration_ms: 133.719542",
           "  type: 'test'",
           "  ...",
           "# Subtest: RLANE-AC-07 roles.md and config-reference.md name roles.lanes, and the locked roles roles.md lists equal the laneLocked roles of ROLE_LIBRARY",
           "ok 9 - RLANE-AC-07 roles.md and config-reference.md name roles.lanes, and the locked roles roles.md lists equal the laneLocked roles of ROLE_LIBRARY",
           "  ---",
-          "  duration_ms: 1.263666",
+          "  duration_ms: 0.921916",
           "  type: 'test'",
           "  ...",
           "1..9",
@@ -154,7 +110,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2074.4405"
+          "# duration_ms 1763.167875"
         ]
       }
     ],
