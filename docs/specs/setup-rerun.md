@@ -153,7 +153,7 @@ takes the project value and the local value is gone, and a string or array `env`
     warning per kept path (setup already warns for `keep-edited`; `keep-unplanned` files and the edited files
     `refreshKitFiles` keeps gain theirs).
 
-### Reading the plan, the task template and the skill's re-run test
+### Reading the plan, the card template and the skill's re-run test
 
 32. Setup computes the regenerated status files (rule 11) by calling `loadPlan` with a read overlay — the planned
     texts of `docs/plan/` files laid over the files on disk, the files adopt moves aside left out — instead of copying
