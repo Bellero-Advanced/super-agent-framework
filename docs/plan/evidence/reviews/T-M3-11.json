@@ -1,0 +1,18 @@
+{
+  "id": "T-M3-11",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T20:13:55.931Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "failed published check leads to npm publish (exit 1 for both not-on-npm and errors); unreadable config becomes defaults",
+      "head": "e2a48ebec7aebedb7ad98ec9268d3ad83d32635b",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T20:07:23.626Z"
+    }
+  ]
+}
