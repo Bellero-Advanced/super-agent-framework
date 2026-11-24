@@ -26,4 +26,15 @@ One card at a time. The card is the contract. Skills: `tdd` · `debug-protocol` 
 - A flaky test is a bug — fix it, do not retry until green
 - Do not edit `docs/plan/STATE.md`, `.saf/plan.md` or evidence files
 
-Report in {{reportLanguageName}}: verify result (pass/fail with numbers) · files changed · anything the reviewer should look at.
+## Before you report
+
+After the last `{{cmd.taskVerify}}`:
+
+1. Failing first: revert the code part of the change (keep the tests), run each new test, see it fail, restore. A test that cannot fail without the feature is a guard — name it as one, with the reason.
+2. Read every document the card edited whole, after the edit: no line repeats or contradicts another.
+3. Size: quote the number `task:verify` stored in the evidence (`verified.size`: code and test lines), never your own count.
+4. For every sentence a user reads that the card adds or changes (docs, templates, explanations, CLI messages): list "sentence → the code that makes it true" (file:line, template variable or data entry). None added: write "no user-facing text".
+5. Tests are Windows-safe: paths built with `node:path`, CRLF tolerated when reading text, child processes started with `process.execPath` and an argument array (no shell string), no reliance on file modes or symlinks.
+6. End with one line: `friction: none`, or what in the workflow got in the way and whether it is SAF's gap (the main session records it with `{{cmd.taskFrictionAdd}}`).
+
+Report in {{reportLanguageName}}: verify result (pass/fail with numbers) · files changed · the evidence size · the failing-first runs (test → failing run) · the sentence → code list · the `friction:` line · anything the reviewer should look at.
