@@ -42,3 +42,11 @@ C7. untested: rule 9 (restore after step (b) fails, exit 1 naming the step), "an
 C8. the snapshot also reads tools/saf/** into memory though the spec excludes it (no behaviour difference); restored deleted files lose the executable bit; EACCES during restore gives a stack trace
 C9. F-007 half fixed: the example manifest is restored with .claude (must be), the ROOT .saf/manifest.json is still rewritten by step (a) and must be in kit cards' touch or this repo's alwaysAllowed — restoring it would make the next upgrade treat the refreshed /saf commands as edited (designer action)
 C10. CLAUDE.md:97 gap fixed together with CONTRIBUTING: the command needs a card in progress, else the two by-hand upgrade commands
+
+## T-M3-28 (review FAIL ×1 → fixed → merged) — notes for the designer
+
+D1. SPEC GAP: in-progress cards are counted by their CURRENT role lane (parallel.mjs:57 `laneOf`, not the evidence lane): after a role moves while one of its cards runs, `task:next --parallel` miscounts until that card finishes (moved main→code while a main card X runs: X takes a code slot on paper; code→main while lane card L is open: L fills the main slot on paper). No deadlock, no real double use (startCard/openLane refuse); count by evidence (`ev.lane`) instead — parallel.mjs was dont_touch; RLANE-AC-05's second test locks in today's behaviour
+D2. schema.mjs `props[k]` has the same inherited-property weakness (`constructor: "side"` under roles.lanes gets only the 'unknown' error) — outside touch
+D3. card-lifecycle "By default the roles … run in the main folder" — submodule cards can never move (fixed in the card)
+D4. wording polish applied in the card; SKILL.md:36 (outside touch) does not name role-lanes in the group 6 list (it also omits solo and ports) — `choices --group 6` prints the question anyway
+D5. FRICTION F-008 hit again: `spec:matrix --check` in a lane fails while ANOTHER lane's started card has its tests only on its own branch — T-M3-28 and T-M3-29 blocked each other (deadlock); broken by `task:abandon` of T-M3-29 (non-destructive for lanes: worktree and branch stay) then restart. Fix: the check must count a lane card's gaps only in its own lane (and cards in progress in the main folder only in the main folder) — carded below
