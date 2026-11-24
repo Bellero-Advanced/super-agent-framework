@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-07",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T17:46:05.106Z",
+      "result": "fail",
+      "kinds": [
+        "docs"
+      ],
+      "note": "card-lifecycle.md:207 copies the recurring limit 2 from the data table and does not say only open entries are grouped",
+      "head": "c3d5139179995210fdef1054a9a2aeddba909aa6",
+      "verifyAttempts": 1,
+      "verifyAt": "2026-11-24T17:39:13.363Z"
+    }
+  ]
+}
