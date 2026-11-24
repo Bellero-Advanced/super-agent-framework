@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { createHash } from "node:crypto";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 import { spawnSync } from "node:child_process";
 import { after, test } from "node:test";
 import { REPO, cleanup, fakeCtx, git, lib, planRepo, tmp, write } from "../helpers.mjs";
@@ -8,6 +9,7 @@ import { REPO, cleanup, fakeCtx, git, lib, planRepo, tmp, write } from "../helpe
 const { pathToFileURL } = await import("node:url");
 const script = await import(pathToFileURL(join(REPO, "scripts", "refresh-copies.mjs")).href);
 const task = await lib("task.mjs");
+const { planSetup } = await lib("generate.mjs");
 after(cleanup);
 
 const EX = "examples/todo-api";
@@ -34,21 +36,38 @@ function harness(root, change) {
 }
 
 const upgradeB = (ex) => {
-  writeFileSync(join(ex, ".claude/commands/saf.md"), "upgraded\n");
+  writeFileSync(join(ex, ".claude/settings.json"), "upgraded settings\n");
   writeFileSync(join(ex, "package.json"), "upgraded package\n");
   mkdirSync(join(ex, "tools/saf"), { recursive: true });
   writeFileSync(join(ex, "tools/saf/x.mjs"), "engine\n");
+  mkdirSync(join(ex, "docs"), { recursive: true });
+  writeFileSync(join(ex, "docs/new.md"), "new doc\n");
+};
+
+/** The files SAF owns in the example (spec rule 12): commands, a skill and the manifest. */
+const upgradeOwned = (ex) => {
+  mkdirSync(join(ex, "tools/saf"), { recursive: true });
+  writeFileSync(join(ex, "tools/saf/x.mjs"), "engine\n");
+  writeFileSync(join(ex, ".claude/commands/saf.md"), "upgraded\n");
+  writeFileSync(join(ex, ".saf/manifest.json"), '{"files":{"x":"y"}}\n');
   mkdirSync(join(ex, ".claude/skills/new"), { recursive: true });
   writeFileSync(join(ex, ".claude/skills/new/SKILL.md"), "new skill\n");
 };
 
-async function started(touch) {
-  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch }] });
+function seedExample(root) {
+  put(root, `${EX}/.claude/settings.json`, OLD);
   put(root, `${EX}/.claude/commands/saf.md`, OLD);
+  put(root, `${EX}/.saf/manifest.json`, "{}\n");
+  put(root, `${EX}/README.md`, "readme\n");
   put(root, `${EX}/package.json`, "old package\n");
   equalCopies(root);
   git(root, "add", "-A");
   git(root, "commit", "-q", "-m", "example");
+}
+
+async function started(touch) {
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch }] });
+  seedExample(root);
   task.startCard(fakeCtx(root, config), "T-M1-01");
   return { root, config };
 }
@@ -57,21 +76,21 @@ test("COPIES-AC-01 restores example files outside touch, keeps touch and the exa
   const { root } = await started([`${EX}/package.json`]);
   const h = harness(root, upgradeB);
   assert.equal(await h.run(), 0);
-  assert.equal(read(root, `${EX}/.claude/commands/saf.md`), OLD);
-  assert.ok(!existsSync(join(root, `${EX}/.claude/skills/new/SKILL.md`)));
+  assert.equal(read(root, `${EX}/.claude/settings.json`), OLD);
+  assert.ok(!existsSync(join(root, `${EX}/docs/new.md`)));
   assert.equal(read(root, `${EX}/package.json`), "upgraded package\n");
   assert.equal(read(root, `${EX}/tools/saf/x.mjs`), "engine\n");
-  assert.deepEqual(h.lines.filter((l) => l.startsWith("  ")), [`  ${EX}/.claude/commands/saf.md`, `  ${EX}/.claude/skills/new/SKILL.md`]);
+  assert.deepEqual(h.lines.filter((l) => l.startsWith("  ")), [`  ${EX}/.claude/settings.json`, `  ${EX}/docs/new.md`]);
   assert.ok(h.lines.includes("restored: 2"));
   assert.equal(h.calls.length, 2);
 });
 
 test("COPIES-AC-02 a file edited before the run keeps the edited bytes, not HEAD and not the upgrade", async () => {
   const { root } = await started(["scripts/**"]);
-  put(root, `${EX}/.claude/commands/saf.md`, "edited before the run\n");
-  const h = harness(root, upgradeB);
+  put(root, `${EX}/README.md`, "edited before the run\n");
+  const h = harness(root, (ex) => (upgradeB(ex), writeFileSync(join(ex, "README.md"), "upgraded readme\n")));
   assert.equal(await h.run(), 0);
-  assert.equal(read(root, `${EX}/.claude/commands/saf.md`), "edited before the run\n");
+  assert.equal(read(root, `${EX}/README.md`), "edited before the run\n");
   assert.equal(read(root, `${EX}/package.json`), "old package\n");
 });
 
@@ -96,19 +115,15 @@ test("COPIES-AC-03 refuses with exit 2 and runs nothing: no card, only a lane ca
 
 test("COPIES-AC-04 in a lane worktree the card is the lane's and the restore runs on its example folder", async () => {
   const { root, config } = await planRepo({ config: { workflow: { lanes: { code: 2, main: 1 } } }, cards: [{ id: "T-M1-01", touch: ["src/**"] }, { id: "T-M1-02", touch: [`${EX}/package.json`] }] });
-  put(root, `${EX}/.claude/commands/saf.md`, OLD);
-  put(root, `${EX}/package.json`, "old package\n");
-  equalCopies(root);
-  git(root, "add", "-A");
-  git(root, "commit", "-q", "-m", "example");
+  seedExample(root);
   const ev = task.startCard(fakeCtx(root, config), "T-M1-02", { worktree: true });
   const lane = join(root, ev.worktree);
   const h = harness(lane, upgradeB);
   assert.equal(await h.run(), 0);
   assert.ok(h.lines.includes("card: T-M1-02"));
-  assert.equal(read(lane, `${EX}/.claude/commands/saf.md`), OLD);
+  assert.equal(read(lane, `${EX}/.claude/settings.json`), OLD);
   assert.equal(read(lane, `${EX}/package.json`), "upgraded package\n", "the lane card owns package.json");
-  assert.equal(read(root, `${EX}/.claude/commands/saf.md`), OLD, "the main folder was not touched");
+  assert.equal(read(root, `${EX}/.claude/settings.json`), OLD, "the main folder was not touched");
 });
 
 test("COPIES-AC-05 a second run writes nothing and says nothing to restore", async () => {
@@ -118,7 +133,7 @@ test("COPIES-AC-05 a second run writes nothing and says nothing to restore", asy
   const first = snap();
   assert.equal(await harness(root, upgradeB).run(), 0);
   assert.deepEqual(snap(), first, "the example holds the same bytes after the second run");
-  assert.equal(read(root, `${EX}/.claude/commands/saf.md`), OLD);
+  assert.equal(read(root, `${EX}/.claude/settings.json`), OLD);
 });
 
 test("COPIES-AC-06 --check: CRLF only is equal, different content is named with the fix, nothing written, no card", () => {
@@ -186,4 +201,88 @@ test("COPIES-AC-03 refusals without a usable card print the by-hand fallback", a
 test("COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check", () => {
   assert.equal(JSON.parse(read(REPO, "package.json")).scripts["saf:refresh"], "node scripts/refresh-copies.mjs");
   assert.equal(JSON.parse(read(REPO, "saf.config.json")).workflow.mergeChecks[0], "npm run saf:refresh -- --check");
+});
+
+test("COPIES-AC-09 the example files SAF owns keep the upgrade's bytes and are never listed as restored", async () => {
+  const { root } = await started(["scripts/**"]);
+  const h = harness(root, upgradeOwned);
+  assert.equal(await h.run(), 0);
+  assert.equal(read(root, `${EX}/.claude/commands/saf.md`), "upgraded\n");
+  assert.equal(read(root, `${EX}/.saf/manifest.json`), '{"files":{"x":"y"}}\n');
+  assert.equal(read(root, `${EX}/.claude/skills/new/SKILL.md`), "new skill\n");
+  assert.ok(h.lines.includes("nothing to restore"), h.lines.join("\n"));
+  assert.deepEqual(h.lines.filter((l) => l.startsWith("  ")), []);
+});
+
+const sha1 = (s) => createHash("sha1").update(s).digest("hex");
+const readJson = (root, rel) => JSON.parse(read(root, rel));
+const rendered = (root) => planSetup(join(root, EX), readJson(root, `${EX}/saf.config.json`));
+
+/** A copy of the real example in a card repository: everything fresh, then CLAUDE.md and implementer older (unedited), designer edited. */
+async function exampleCopy() {
+  const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch: ["scripts/**"] }] });
+  cpSync(join(REPO, EX), join(root, EX), { recursive: true, filter: (src) => !/^(node_modules|tools)$/.test(relative(join(REPO, EX), src).split(sep)[0]) });
+  rmSync(join(root, EX, ".git"), { recursive: true, force: true });
+  const manifestPath = `${EX}/.saf/manifest.json`;
+  const manifest = readJson(root, manifestPath);
+  const want = new Map();
+  for (const a of rendered(root).actions.filter((x) => x.path === "CLAUDE.md" || x.path.startsWith(".claude/agents/"))) {
+    put(root, `${EX}/${a.path}`, a.content);
+    manifest.files[a.path] = sha1(a.content);
+    want.set(a.path, a.content);
+  }
+  for (const rel of ["CLAUDE.md", ".claude/agents/implementer.md"]) {
+    put(root, `${EX}/${rel}`, `older ${rel}\n`);
+    manifest.files[rel] = sha1(`older ${rel}\n`);
+  }
+  put(root, `${EX}/.claude/agents/designer.md`, "edited by the team\n");
+  put(root, manifestPath, manifest);
+  equalCopies(root);
+  put(root, `${EX}/tools/saf/x.mjs`, "engine\n");
+  git(root, "add", "-A");
+  git(root, "commit", "-q", "-m", "example copy");
+  task.startCard(fakeCtx(root, config), "T-M1-01");
+  return { root, want };
+}
+
+test("COPIES-AC-10 the example re-render writes unedited CLAUDE.md and agents, records their hashes, keeps the edited agent", async () => {
+  const { root, want } = await exampleCopy();
+  const h = harness(root);
+  assert.equal(await h.run(), 0, h.lines.join("\n"));
+  for (const rel of ["CLAUDE.md", ".claude/agents/implementer.md"]) assert.equal(read(root, `${EX}/${rel}`), want.get(rel));
+  assert.equal(read(root, `${EX}/.claude/agents/designer.md`), "edited by the team\n");
+  const files = readJson(root, `${EX}/.saf/manifest.json`).files;
+  const setup = JSON.parse(rendered(root).merges.manifest.text).files; // the hash function setup uses
+  for (const rel of ["CLAUDE.md", ".claude/agents/implementer.md"]) assert.equal(files[rel], setup[rel]);
+  assert.notEqual(files[".claude/agents/designer.md"], sha1("edited by the team\n"), "an edited file keeps its old manifest entry");
+  assert.ok(h.lines.includes("kept (edited): .claude/agents/designer.md"), h.lines.join("\n"));
+  assert.ok(h.lines.includes("example re-rendered: 2"), h.lines.join("\n"));
+});
+
+test("COPIES-AC-11 a second run re-renders nothing and restores nothing", async () => {
+  const { root } = await exampleCopy();
+  assert.equal(await harness(root).run(), 0);
+  const snap = () => script.listFiles(join(root, EX)).map((f) => [f, read(root, `${EX}/${f}`)]);
+  const first = snap();
+  const h = harness(root);
+  assert.equal(await h.run(), 0);
+  assert.deepEqual(snap(), first);
+  assert.ok(h.lines.includes("example re-rendered: 0"), h.lines.join("\n"));
+  assert.ok(h.lines.includes("nothing to restore"));
+});
+
+test("COPIES-AC-10 an example whose saf.config.json is invalid stops at the re-render, restores, exits 1 naming the step", async () => {
+  const { root } = await exampleCopy();
+  put(root, `${EX}/saf.config.json`, "{ not json");
+  const h = harness(root, (ex) => writeFileSync(join(ex, "package.json"), "upgraded package\n"));
+  assert.equal(await h.run(), 1);
+  assert.match(h.lines.join("\n"), /step re-render failed/);
+  assert.notEqual(read(root, `${EX}/package.json`), "upgraded package\n", "the restore still ran");
+});
+
+test("COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed", () => {
+  const allowed = readJson(REPO, "saf.config.json").workflow.alwaysAllowed;
+  assert.ok(allowed.includes(".saf/manifest.json"));
+  for (const g of script.TABLE.ownedGlobs) assert.ok(allowed.includes(g), `${g} is in alwaysAllowed`);
+  for (const rel of ["tools/saf/**", ".claude/commands/**", ".claude/skills/**", ".claude/agents/**", "CLAUDE.md", ".saf/manifest.json"]) assert.ok(script.TABLE.ownedGlobs.includes(`${EX}/${rel}`), rel);
 });

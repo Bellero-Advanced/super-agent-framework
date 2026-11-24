@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // One command refreshes every engine copy of this repository (spec docs/specs/refresh-copies.md). Repository-only: not shipped.
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, rmdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadConfig } from "../kit/tools-saf/lib/config.mjs";
+import { planSetup } from "../kit/tools-saf/lib/generate.mjs";
 import { globToRegExp, toGlob } from "../kit/tools-saf/lib/glob.mjs";
 import { activeCards, loadPlan } from "../kit/tools-saf/lib/plan.mjs";
 import { laneFolder, stateCheck } from "../kit/tools-saf/lib/task.mjs";
@@ -12,7 +14,9 @@ import { laneFolder, stateCheck } from "../kit/tools-saf/lib/task.mjs";
 /** Data, not logic: the example, what the restore never touches, the folder pairs `--check` compares. */
 export const TABLE = {
   example: "examples/todo-api",
-  engineGlobs: ["examples/todo-api/tools/saf/**"], // the example engine copy is the upgrade's job, never restored
+  // example files SAF owns (rule 12): never restored, and every entry is in saf.config.json workflow.alwaysAllowed
+  ownedGlobs: ["examples/todo-api/tools/saf/**", "examples/todo-api/.claude/commands/**", "examples/todo-api/.claude/skills/**", "examples/todo-api/.claude/agents/**", "examples/todo-api/CLAUDE.md", "examples/todo-api/.saf/manifest.json"],
+  rerender: { config: "saf.config.json", manifest: ".saf/manifest.json", only: (p) => p === "CLAUDE.md" || p.startsWith(".claude/agents/"), write: "update", kept: ["keep-edited", "replace-edited"] },
   skipDirs: ["node_modules"],
   pairs: [["kit/tools-saf", "tools/saf"], ["kit/claude/skills/saf-setup", ".claude/skills/saf-setup"], ["kit/tools-saf", "examples/todo-api/tools/saf"]],
   listMax: 20,
@@ -61,6 +65,29 @@ function reportCheck(root, out, err) {
   return 1;
 }
 
+/**
+ * Rule 13: write the planned content of the example's own CLAUDE.md and agents when they are generated and unedited (`update`),
+ * record the hash setup records (sha1 of the content), print the edited ones. Throws when `planSetup` does. Returns the lines to print.
+ */
+function rerenderExample(ex) {
+  const R = TABLE.rerender;
+  if (!existsSync(join(ex, R.config))) return [];
+  const plan = planSetup(ex, JSON.parse(readFileSync(join(ex, R.config), "utf8")));
+  const mine = plan.actions.filter((a) => R.only(a.path));
+  const todo = mine.filter((a) => a.action === R.write);
+  if (todo.length) {
+    const manifestPath = join(ex, R.manifest);
+    const manifest = existsSync(manifestPath) ? JSON.parse(readFileSync(manifestPath, "utf8")) : { files: {} };
+    for (const a of todo) {
+      mkdirSync(dirname(join(ex, a.path)), { recursive: true });
+      writeFileSync(join(ex, a.path), a.content);
+      manifest.files[a.path] = createHash("sha1").update(a.content).digest("hex");
+    }
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+  }
+  return [`example re-rendered: ${todo.length}`, ...mine.filter((a) => R.kept.includes(a.action)).map((a) => `kept (edited): ${a.path}`)];
+}
+
 const BY_HAND = () => ` · outside a card, refresh by hand: node bin/cli.mjs upgrade --dir .  then  node bin/cli.mjs upgrade --dir ${TABLE.example}`;
 
 /** The card in progress here: the lane's card in a lane worktree, the one main-folder card in the main folder. Throws the refusal text. */
@@ -91,7 +118,7 @@ export async function refresh({ root = REPO, argv = [], spawn = defaultSpawn, ou
   }
   out(`card: ${card.id}`);
   const ex = join(root, TABLE.example);
-  const keep = [...card.touch, ...TABLE.engineGlobs].map((g) => globToRegExp(toGlob(g)));
+  const keep = [...card.touch, ...TABLE.ownedGlobs].map((g) => globToRegExp(toGlob(g)));
   const before = new Map(listFiles(ex, TABLE.skipDirs).map((f) => [f, readFileSync(join(ex, f))]));
   let failed = null;
   for (const [step, dir] of [["a", root], ["b", ex]]) {
@@ -103,6 +130,14 @@ export async function refresh({ root = REPO, argv = [], spawn = defaultSpawn, ou
     }
   }
   if (failed === "a") return err("step a failed — stopped"), 1;
+  if (!failed) {
+    try {
+      for (const l of rerenderExample(ex)) out(l);
+    } catch (e) {
+      failed = "re-render";
+      err(`step re-render: ${e.message}`);
+    }
+  }
   const restored = [];
   for (const f of [...new Set([...before.keys(), ...listFiles(ex, TABLE.skipDirs)])].sort()) {
     const [abs, rel, was] = [join(ex, f), `${TABLE.example}/${f}`, before.get(f) ?? null];

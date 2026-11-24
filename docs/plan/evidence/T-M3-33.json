@@ -1,14 +1,337 @@
 {
   "id": "T-M3-33",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T09:58:54.903Z",
     "base": "866d1e613da789f5623bfc168499717888e74073",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-33",
-  "worktree": ".claude/worktrees/T-M3-33"
+  "worktree": ".claude/worktrees/T-M3-33",
+  "verified": {
+    "at": "2026-11-24T10:03:31.042Z",
+    "head": "1a0f32290759610a23a0179d926e710c69ce7c54",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/repo-sync.test.mjs",
+        "exit": 0,
+        "ms": 330,
+        "tail": [
+          "ok 2 - COPIES-AC-14 this repository's CLAUDE.md Commands block equals the rendering, and a copy missing a line does not",
+          "  ---",
+          "  duration_ms: 64.111833",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: COPIES-AC-15 the example plans no update for CLAUDE.md, commands, skills or agents",
+          "ok 3 - COPIES-AC-15 the example plans no update for CLAUDE.md, commands, skills or agents",
+          "  ---",
+          "  duration_ms: 16.948333",
+          "  type: 'test'",
+          "  ...",
+          "1..3",
+          "# tests 3",
+          "# suites 0",
+          "# pass 3",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 273.554209"
+        ]
+      },
+      {
+        "cmd": "node -e \"const c=require('./saf.config.json');if(!c.workflow.alwaysAllowed.includes('.saf/manifest.json'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 43,
+        "tail": []
+      },
+      {
+        "cmd": "node --test test/unit/refresh-copies.test.mjs",
+        "exit": 0,
+        "ms": 3712,
+        "tail": [
+          "ok 14 - COPIES-AC-10 an example whose saf.config.json is invalid stops at the re-render, restores, exits 1 naming the step",
+          "  ---",
+          "  duration_ms: 308.650709",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed",
+          "ok 15 - COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed",
+          "  ---",
+          "  duration_ms: 0.257541",
+          "  type: 'test'",
+          "  ...",
+          "1..15",
+          "# tests 15",
+          "# suites 0",
+          "# pass 15",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3662.941125"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/agent-instructions.test.mjs",
+        "exit": 0,
+        "ms": 370,
+        "tail": [
+          "ok 3 - AGENT-AC-03 planSetup on this repository reports 'same' for every .claude/agents file of an enabled role",
+          "  ---",
+          "  duration_ms: 87.161208",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+          "ok 4 - AGENT-AC-04 the description line of both roles is unchanged in the template and in the rendering",
+          "  ---",
+          "  duration_ms: 32.622166",
+          "  type: 'test'",
+          "  ...",
+          "1..4",
+          "# tests 4",
+          "# suites 0",
+          "# pass 4",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 313.410416"
+        ]
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 291,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 350,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "171 scenario(s) in 18 spec(s) · with test 120 · gaps 51 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 339,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 559 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 289,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 273 markdown file(s) · 257 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/refresh-copies.test.mjs' 'test/unit/repo-sync.test.mjs'",
+        "exit": 0,
+        "ms": 3801,
+        "tail": [
+          "ok 17 - COPIES-AC-14 this repository's CLAUDE.md Commands block equals the rendering, and a copy missing a line does not",
+          "  ---",
+          "  duration_ms: 88.462542",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: COPIES-AC-15 the example plans no update for CLAUDE.md, commands, skills or agents",
+          "ok 18 - COPIES-AC-15 the example plans no update for CLAUDE.md, commands, skills or agents",
+          "  ---",
+          "  duration_ms: 22.469833",
+          "  type: 'test'",
+          "  ...",
+          "1..18",
+          "# tests 18",
+          "# suites 0",
+          "# pass 18",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3749.073459"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "CLAUDE.md",
+        "saf.config.json",
+        "scripts/refresh-copies.mjs",
+        "test/unit/refresh-copies.test.mjs",
+        "test/unit/repo-sync.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "CLAUDE.md": "e18b6bc0d690696dfa25df69a04f3a8b7223c3ef",
+        "saf.config.json": "1f7b65a8872b0dd0f97271dc69a11aba2607821a",
+        "scripts/refresh-copies.mjs": "951a03622edbe08815ef80df9ae87c9b540cb4d8",
+        "test/unit/refresh-copies.test.mjs": "af9829afc9f28339559666647b4db815c6e70b4b",
+        "test/unit/repo-sync.test.mjs": "7986dd8f65034744df9a2796f0d708a52f4dcaed"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "COPIES-AC-09",
+        "COPIES-AC-10",
+        "COPIES-AC-11",
+        "COPIES-AC-12",
+        "COPIES-AC-13",
+        "COPIES-AC-14",
+        "COPIES-AC-15"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 58,
+        "cap": 400
+      },
+      "test": {
+        "lines": 192,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/refresh-copies.test.mjs",
+        "test/unit/repo-sync.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T10:00:07.632Z",
+      "head": "1a0f32290759610a23a0179d926e710c69ce7c54",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/repo-sync.test.mjs",
+          "exit": 1,
+          "ms": 69,
+          "tail": [
+            "Could not find 'test/unit/repo-sync.test.mjs'"
+          ]
+        },
+        {
+          "cmd": "node -e \"const c=require('./saf.config.json');if(!c.workflow.alwaysAllowed.includes('.saf/manifest.json'))process.exit(1)\"",
+          "exit": 1,
+          "ms": 42,
+          "tail": []
+        },
+        {
+          "cmd": "npm run spec:matrix -- --check",
+          "exit": 1,
+          "ms": 355,
+          "tail": [
+            "| RERUN-AC-06 | setup-rerun:221 | T-M2-21 (done) · T-M3-24 (not started) | test/unit/setup-diff.test.mjs +4 | ✓ 5 test(s) |",
+            "| RERUN-AC-07 | setup-rerun:222 | T-M2-22 (done) | test/unit/setup-rerun-docs.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-08 | setup-rerun:223 | T-M2-27 (done) · T-M3-24 (not started) | test/unit/settings-archive.test.mjs +2 | ✓ 3 test(s) |",
+            "| RERUN-AC-09 | setup-rerun:224 | T-M2-27 (done) · T-M3-24 (not started) | test/unit/settings-archive.test.mjs +1 | ✓ 2 test(s) |",
+            "| RERUN-AC-10 | setup-rerun:225 | T-M2-29 (done) | test/unit/setup-guards.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-11 | setup-rerun:226 | T-M2-29 (done) | test/unit/setup-guards.test.mjs | ✓ 1 test(s) |",
+            "| RERUN-AC-12 | setup-rerun:227 | T-M2-30 (done) | test/unit/settings-env-merge.test.mjs +1 | ✓ 2 test(s) |",
+            "| RERUN-AC-13 | setup-rerun:228 | T-M2-30 (done) | test/unit/settings-env-merge.test.mjs +2 | ✓ 3 test(s) |",
+            "| RERUN-AC-14 | setup-rerun:229 | T-M3-16 (not started) | — | ✗ gap |",
+            "| RERUN-AC-15 | setup-rerun:230 | T-M3-16 (not started) | — | ✗ gap |",
+            "| RERUN-AC-16 | setup-rerun:231 | T-M3-16 (not started) | — | ✗ gap |",
+            "| RERUN-AC-17 | setup-rerun:232 | T-M3-17 (not started) | — | ✗ gap |",
+            "| RERUN-AC-18 | setup-rerun:233 | T-M3-17 (not started) | — | ✗ gap |",
+            "| RERUN-AC-19 | setup-rerun:234 | T-M3-17 (not started) | — | ✗ gap |",
+            "| RERUN-AC-20 | setup-rerun:235 | T-M3-21 (not started) | — | ✗ gap |",
+            "| RERUN-AC-21 | setup-rerun:236 | T-M3-26 (not started) | — | ✗ gap |",
+            "| RERUN-AC-22 | setup-rerun:237 | T-M3-23 (not started) | — | ✗ gap |",
+            "| PACK-AC-01 | skill-packs:91 | T-M3-13 (not started) | — | ✗ gap |",
+            "| PACK-AC-02 | skill-packs:92 | T-M3-13 (not started) | — | ✗ gap |",
+            "| PACK-AC-03 | skill-packs:93 | T-M3-13 (not started) | — | ✗ gap |",
+            "| PACK-AC-04 | skill-packs:94 | T-M3-14 (not started) | — | ✗ gap |",
+            "| PACK-AC-05 | skill-packs:95 | T-M3-14 (not started) | — | ✗ gap |",
+            "| PACK-AC-06 | skill-packs:96 | T-M3-14 (not started) | — | ✗ gap |",
+            "| PACK-AC-07 | skill-packs:97 | T-M3-15 (not started) | — | ✗ gap |",
+            "| TMODE-AC-01 | test-mode:150 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-02 | test-mode:151 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-03 | test-mode:152 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-04 | test-mode:153 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-05 | test-mode:154 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-06 | test-mode:155 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+            "| TMODE-AC-07 | test-mode:156 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-08 | test-mode:157 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+            "| TMODE-AC-09 | test-mode:158 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+            "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+            "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+            "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+            "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+            "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+            "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+            "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+            "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+            "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+            "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+            "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+            "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+            "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+            "171 scenario(s) in 18 spec(s) · with test 113 · gaps 58 · gaps of started cards 7",
+            "✗ COPIES-AC-09 (docs/specs/refresh-copies.md:129) has no test — card T-M3-33 has started",
+            "✗ COPIES-AC-10 (docs/specs/refresh-copies.md:130) has no test — card T-M3-33 has started",
+            "✗ COPIES-AC-11 (docs/specs/refresh-copies.md:131) has no test — card T-M3-33 has started",
+            "✗ COPIES-AC-12 (docs/specs/refresh-copies.md:132) has no test — card T-M3-33 has started",
+            "✗ COPIES-AC-13 (docs/specs/refresh-copies.md:133) has no test — card T-M3-33 has started",
+            "✗ COPIES-AC-14 (docs/specs/refresh-copies.md:134) has no test — card T-M3-33 has started",
+            "✗ COPIES-AC-15 (docs/specs/refresh-copies.md:135) has no test — card T-M3-33 has started"
+          ]
+        }
+      ]
+    }
+  ]
 }

@@ -38,15 +38,19 @@ Node ≥ 20, no dependencies — node:http and node:test
 
 ```bash
 npm test
-npm run task:start -- <id>    # start a card (records the starting point to compare files)
-npm run task:verify -- <id>   # the only way a card becomes "done" · task:verify <M> = milestone exit gates
-npm run task:abandon -- <id>  # give up an unfinished card
-npm run task:state            # rebuild STATE.md + .saf/plan.md (--check = verify only)
-npm run task:probe            # prove a fresh session knows the current card from the hook
-npm run task:report -- <M>    # milestone report from evidence
-npm run docs:check            # links · commands · paths in agent docs · agents · settings
-npm run spec:matrix           # acceptance scenarios ↔ tests (--check = started cards must have tests)
-npm run check-secrets         # no secret values in tracked files
+npm run task:start -- <id>                                                                 # start a card (records the starting point to compare files)
+npm run task:verify -- <id>                                                                # the only way a card becomes "done" · task:verify <M> = milestone exit gates
+npm run task:abandon -- <id>                                                               # give up an unfinished card
+npm run task:review -- <id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]  # record a spec review round: pass, or fail with --kind (a fail reopens the card for verify) — main folder only
+npm run task:diff -- <id>                                                                  # write the reviewer's diff of a started card (exactly the files task:verify counts) and print its path
+npm run task:state                                                                         # rebuild STATE.md + .saf/plan.md (--check = verify only)
+npm run task:probe                                                                         # prove a fresh session knows the current card from the hook
+npm run task:report -- <M>                                                                 # milestone report from evidence
+npm run task:culprit -- <M>                                                                # the exit gate's full suite failed: find the card that broke it (--cmd "<command>" picks the command)
+npm run task:friction                                                                      # the workflow got in the way of a card: log it in docs/plan/friction.md (add · close · no argument lists what is open or carded) — add and close: main folder only
+npm run docs:check                                                                         # links · commands · paths in agent docs · agents · settings
+npm run spec:matrix                                                                        # acceptance scenarios ↔ tests (--check = started cards must have tests)
+npm run check-secrets                                                                      # no secret values in tracked files
 ```
 
 npm passes arguments after `--`: `npm run task:verify -- T-M1-01`.

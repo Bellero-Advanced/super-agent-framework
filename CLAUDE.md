@@ -42,7 +42,7 @@ npm run test:e2e
 npm run task:start -- <id>             # start a card (records the starting point to compare files)
 npm run task:verify -- <id>            # the only way a card becomes "done" · task:verify <M> = milestone exit gates
 npm run task:abandon -- <id>           # give up an unfinished card
-npm run task:review -- <id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]  # record a spec review round (a fail reopens the card for verify) — main folder only
+npm run task:review -- <id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]  # record a spec review round: pass, or fail with --kind (a fail reopens the card for verify) — main folder only
 npm run task:diff -- <id>              # write the reviewer's diff of a started card (exactly the files task:verify counts) and print its path
 npm run task:start -- <id> --worktree  # open a lane in its own worktree (code-lane cards)
 npm run task:merge -- <id>             # merge one lane card back (exit 3 refused · 4 conflict · 5 merge checks failed)
@@ -51,6 +51,7 @@ npm run task:env                       # export lines (ports) for servers you st
 npm run task:state                     # rebuild STATE.md + .saf/plan.md (--check = verify only)
 npm run task:probe                     # prove a fresh session knows the current card from the hook
 npm run task:report -- <M>             # milestone report from evidence
+npm run task:culprit -- <M>            # the exit gate's full suite failed: find the card that broke it (--cmd "<command>" picks the command)
 npm run task:friction                  # the workflow got in the way of a card: log it in docs/plan/friction.md (add · close · no argument lists what is open or carded) — add and close: main folder only
 npm run docs:check                     # links · commands · paths in agent docs · agents · settings
 npm run spec:matrix                    # acceptance scenarios ↔ tests (--check = started cards must have tests)
@@ -92,7 +93,7 @@ tools/saf/   workflow engine (vendored, no dependencies) · saf.config.json = it
   templates · `kit/claude/skills/saf-setup/` · `packages/create-saf/` · user docs in `docs/*.md`, `README*.md`
 - **Our own SAF install** (never shipped): `tools/saf/` · `.claude/` · `CLAUDE.md` · `docs/plan/` · `docs/INDEX.md` ·
   `docs/DECISIONS.md` · `.saf/` · `saf.config.json`
-- Change the engine in `kit/`, never in `tools/saf/` — then refresh the installed copy (a unit test fails while they differ):
+- Change the engine in `kit/`, never in `tools/saf/` — then refresh the installed copy (a unit test fails while they differ). A unit test also keeps `.claude/commands`, `.claude/skills` and the Commands block above equal to the templates, so a kit card that changes the commands block lists `CLAUDE.md` in `touch`:
 
 ```bash
 npm run saf:refresh                    # needs a card in progress: refreshes this repo AND examples/todo-api, puts back example files outside the card's touch
