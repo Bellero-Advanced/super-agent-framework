@@ -29,3 +29,16 @@ R7. docs/INDEX.md has a friction row but none for review rounds / `task:review`
 R8. CLAUDE.md and the CLAUDE templates show `<id> pass|fail …` only; the listing form `task:review <id>` is visible in card-lifecycle only
 R9. reviews.mjs:297 does not check that the branch evidence `lane` matches the main evidence (task:merge precheck does)
 R10. FRICTION: `saf:refresh` and the example upgrade rewrite `.saf/manifest.json` and `examples/todo-api/.saf/manifest.json`, which are not in touch or alwaysAllowed → the first verify fails until reverted by hand (same class as F-001, F-006)
+
+## T-M3-27 (review FAIL ×1 → fixed → merged) — notes for the designer
+
+C1. data-loss crash window: the restore snapshot lives only in memory; Ctrl-C during step (b) kills script and upgrade so the restore never runs, and (b) has already deleted/re-copied examples/todo-api/.claude/skills/saf-setup/ — write the snapshot under .saf/memory/ before (b) and restore from it on the next run
+C2. no lock: two runs in the same folder can interleave (user bytes not lost; verify would show it); lanes are separate folders so parallel lanes are safe
+C3. an emptied-folder removal now uses rmdirSync (fixed in the card, no red proof); folders are not recorded, so a folder empty before the run that got a file from the upgrade is removed with the file
+C4. symlinks: `listFiles` treats a symlink to a folder as a file → readFileSync crashes with EISDIR before any upgrade runs (nothing written); writing back through a file symlink follows the link (example has none today)
+C5. rule 4 edge: a card whose touch lists examples/todo-api/.claude/** but not examples/todo-api/.saf/manifest.json keeps the new .claude bytes while the manifest is put back → next upgrade treats those files as "edited — kept"; the spec edge case should pair the manifest with .claude/**
+C6. SPEC DEFECT rule 7 / AC-05: a second real run rewrites saf.md/SKILL.md again and restores them (restored: 2), not "nothing to restore" — reword: the example's bytes after run 2 equal those after run 1 (the test now does this with the same fake upgrade twice)
+C7. untested: rule 9 (restore after step (b) fails, exit 1 naming the step), "an example file the upgrade deletes is written back", rmdirSync cleanup
+C8. the snapshot also reads tools/saf/** into memory though the spec excludes it (no behaviour difference); restored deleted files lose the executable bit; EACCES during restore gives a stack trace
+C9. F-007 half fixed: the example manifest is restored with .claude (must be), the ROOT .saf/manifest.json is still rewritten by step (a) and must be in kit cards' touch or this repo's alwaysAllowed — restoring it would make the next upgrade treat the refreshed /saf commands as edited (designer action)
+C10. CLAUDE.md:97 gap fixed together with CONTRIBUTING: the command needs a card in progress, else the two by-hand upgrade commands
