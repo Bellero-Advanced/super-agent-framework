@@ -99,6 +99,13 @@ test("SETUP-AC-11 strict rigor puts a security-auditor review in the Definition 
   assert.match(strictEntry.en.cost, /requires a security-auditor review per milestone even if that role is off/);
   assert.match(strictEntry.th.cost, /แม้ไม่ได้เปิด role นี้/);
   assert.match(strictEntry.en.when, /the interview then suggests the security-auditor role/);
+  assert.match(text(entry("ui-languages", "several"), "en"), /suggests the content-writer role/);
+  const row = read(REPO, "kit/claude/skills/saf-setup/questions.md").split(/\r?\n/).find((l) => l.includes("`roles.enabled`")) ?? "";
+  for (const [role, when] of [["security-auditor", "strict rigor"], ["content-writer", "several UI languages"]]) {
+    assert.ok(!ROLE_LIBRARY[role].core, `${role} is an optional role`);
+    assert.ok(row.includes(`${when} → ${role}`), `questions.md suggests ${role} for ${when}`);
+  }
+  assert.equal(ROLE_LIBRARY["security-auditor"].tier, "planner");
 
   for (const lang of ["en", "th"]) {
     assert.ok(NOT_ASKED["workflow.measure.waitMs"][lang].includes(`exit ${EXIT_BUSY}`), `${lang}: the exit code comes from EXIT_BUSY`);

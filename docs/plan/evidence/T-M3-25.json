@@ -1,14 +1,185 @@
 {
   "id": "T-M3-25",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:59:51.524Z",
     "base": "473b1cad508de76c9bf6d813e7ff25408a47fa2e",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 2,
   "branch": "card/T-M3-25",
-  "worktree": ".claude/worktrees/T-M3-25"
+  "worktree": ".claude/worktrees/T-M3-25",
+  "verified": {
+    "at": "2026-11-24T17:02:06.055Z",
+    "head": "3320192980b4057028fbea13d203b47578c90347",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs test/unit/test-mode-gate-coverage.test.mjs test/unit/lane-caps.test.mjs test/unit/lane-caps-docs.test.mjs",
+        "exit": 0,
+        "ms": 3487,
+        "tail": [
+          "ok 36 - TMODE-AC-15 a milestone gate with the id full-suite is a plan issue in every mode",
+          "  ---",
+          "  duration_ms: 803.206459",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-15 task:verify <M> refuses before any command runs",
+          "ok 37 - TMODE-AC-15 task:verify <M> refuses before any command runs",
+          "  ---",
+          "  duration_ms: 144.29975",
+          "  type: 'test'",
+          "  ...",
+          "1..37",
+          "# tests 37",
+          "# suites 0",
+          "# pass 37",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3421.82775"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 463,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (in progress) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (in progress) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (in progress) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (in progress) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 145 · gaps 29 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 386,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 590 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 318,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 272 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/lane-caps-docs.test.mjs' 'test/unit/lane-caps.test.mjs' 'test/unit/setup-choices-facts.test.mjs' 'test/unit/setup-choices.test.mjs' 'test/unit/test-mode-gate-coverage.test.mjs'",
+        "exit": 0,
+        "ms": 2827,
+        "tail": [
+          "ok 36 - TMODE-AC-15 a milestone gate with the id full-suite is a plan issue in every mode",
+          "  ---",
+          "  duration_ms: 561.126625",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-15 task:verify <M> refuses before any command runs",
+          "ok 37 - TMODE-AC-15 task:verify <M> refuses before any command runs",
+          "  ---",
+          "  duration_ms: 137.120625",
+          "  type: 'test'",
+          "  ...",
+          "1..37",
+          "# tests 37",
+          "# suites 0",
+          "# pass 37",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 2773.035333"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "test/unit/lane-caps-docs.test.mjs",
+        "test/unit/lane-caps.test.mjs",
+        "test/unit/setup-choices-facts.test.mjs",
+        "test/unit/setup-choices.test.mjs",
+        "test/unit/test-mode-gate-coverage.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "test/unit/lane-caps-docs.test.mjs": "e54074d688d05c4e9b3d656e332bd46954141eb7",
+        "test/unit/lane-caps.test.mjs": "c5fc6f8aac874f4f6b18e651c97a99ce42bb3479",
+        "test/unit/setup-choices-facts.test.mjs": "f3efbc77289afd6bfeadd1049f792495ee2fd082",
+        "test/unit/setup-choices.test.mjs": "e3d0cfcbb72c6142ce7e7827631f0b943c13bedc",
+        "test/unit/test-mode-gate-coverage.test.mjs": "e12a792d10518410ad08b47eb5ca841f777a4a9a"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "SETUP-AC-01",
+        "SETUP-AC-02",
+        "SETUP-AC-05",
+        "SETUP-AC-07",
+        "SETUP-AC-09",
+        "SETUP-AC-11",
+        "TMODE-AC-14",
+        "TMODE-AC-15",
+        "LCAP-AC-02",
+        "LCAP-AC-03",
+        "LCAP-AC-05",
+        "LCAP-AC-06"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 0,
+        "cap": 150
+      },
+      "test": {
+        "lines": 127,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/lane-caps-docs.test.mjs",
+        "test/unit/lane-caps.test.mjs",
+        "test/unit/setup-choices-facts.test.mjs",
+        "test/unit/setup-choices.test.mjs",
+        "test/unit/test-mode-gate-coverage.test.mjs"
+      ]
+    }
+  }
 }

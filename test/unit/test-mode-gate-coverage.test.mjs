@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 import { after, test } from "node:test";
-import { cleanup, fakeCtx, lib, planRepo } from "../helpers.mjs";
+import { LIB, cleanup, fakeCtx, lib, planRepo } from "../helpers.mjs";
 
 const task = await lib("task.mjs");
 const tm = await lib("testmode.mjs");
 const { loadPlan } = await lib("plan.mjs");
 after(cleanup);
 
+const BIN = join(LIB, "..", "bin", "saf.mjs");
 const COMMANDS = { test: "npm test", e2e: "npm run test:e2e" };
 
 async function setup(mode, gates) {
@@ -35,11 +38,28 @@ test("TMODE-AC-14 gates that run both full-suite commands get no extra gate", as
 });
 
 test("TMODE-AC-14 a gate command with extra spaces around npm test still covers it", () => {
-  const { config } = { config: { workflow: { testMode: "milestone" }, stack: { commands: COMMANDS } } };
+  const config = { workflow: { testMode: "milestone" }, stack: { commands: COMMANDS } };
   const out = tm.gatesWithFullSuite(config, [{ id: "G1", text: "unit", run: ["  npm test  "] }]);
   assert.deepEqual(out.map((g) => g.id), ["G1", "full-suite"]);
   assert.deepEqual(out[1].run, ["npm run test:e2e"]);
   assert.equal(out[1].text, tm.FULL_SUITE_GATE.text);
+});
+
+test("TMODE-AC-14 one command set under two config keys is one command: it runs once, and a gate that runs it leaves no extra gate", () => {
+  const config = { workflow: { testMode: "milestone" }, stack: { commands: { test: "npm test", e2e: "npm test" } } };
+  assert.deepEqual(tm.fullSuiteCommands(config), ["npm test"]);
+  assert.deepEqual(tm.gatesWithFullSuite(config, []).map((g) => g.run), [["npm test"]]);
+  const gates = [{ id: "G1", text: "unit", run: ["npm test"] }];
+  assert.equal(tm.gatesWithFullSuite(config, gates), gates);
+});
+
+test("TMODE-AC-14 the reverse partial case: a gate that runs only the e2e command leaves an extra gate with only npm test", async () => {
+  const { root, config } = await setup("milestone", [{ id: "G1", text: "e2e", run: ["npm run test:e2e"] }]);
+  const ctx = fakeCtx(root, config);
+  const res = await task.verifyMilestone(ctx, "M1");
+  assert.deepEqual(res.evidence.verified.gates.map((g) => g.id), ["G1", "full-suite"]);
+  assert.deepEqual(ctx.ran, ["npm run test:e2e", "npm test"]);
+  assert.deepEqual(tm.gatesWithFullSuite(config, [{ id: "G1", text: "e2e", run: ["npm run test:e2e"] }])[1].run, ["npm test"]);
 });
 
 test("TMODE-AC-14 other modes add no gate", () => {
@@ -54,6 +74,9 @@ test("TMODE-AC-15 a milestone gate with the id full-suite is a plan issue in eve
     const issue = plan.issues.find((i) => i.includes('gate id "full-suite" is reserved'));
     assert.ok(issue, mode);
     assert.ok(issue.startsWith("docs/plan/milestones/M1.md:"), issue);
+    const check = spawnSync(process.execPath, [BIN, "task", "state", "--check"], { cwd: root, encoding: "utf8" });
+    assert.equal(check.status, 1, `${mode}: task:state --check exits 1`);
+    assert.ok(check.stderr.includes(issue), `${mode}: it prints the plan problem`);
   }
 });
 

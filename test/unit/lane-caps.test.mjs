@@ -2,13 +2,14 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
-import { cleanup, gitRepo, lib, planRepo, tmp, write } from "../helpers.mjs";
+import { cleanup, fakeCtx, gitRepo, lib, planRepo, tmp, write } from "../helpers.mjs";
 
 /** Lane caps (docs/specs/lane-caps.md): high ceiling, per-machine caps in saf.config.local.json, port check. */
 const { loadConfig, ConfigError, validateConfig, loadSchema, LANE_CEILING, MAX_PORT, LOCAL_CONFIG_FILE } = await lib("config.mjs");
 const { generate } = await lib("generate.mjs");
 const { loadPlan, activeMilestone } = await lib("plan.mjs");
 const { pickParallel } = await lib("parallel.mjs");
+const task = await lib("task.mjs");
 after(cleanup);
 
 const project = (repo = {}, local) => {
@@ -76,12 +77,32 @@ test("LCAP-AC-02 caps come from the local file, localKeys lists them, and the fu
   assert.equal(sl.workflow.lanes.code, 5, "a key the local file does not set keeps the repo value");
 });
 
+test("LCAP-AC-02 task:start's own side-lane refusal carries the machine suffix inside its parentheses only when the cap came from the local file", async () => {
+  const cards = [{ id: "T-M1-01", touch: ["a/**"] }, { id: "T-M2-01", touch: ["s1/**"] }, { id: "T-M2-02", touch: ["s2/**"] }];
+  const extra = [{ id: "M2", status: "planned", cards: ["T-M2-01", "T-M2-02"], sideCards: ["T-M2-01", "T-M2-02"] }];
+  const refusal = async (local) => {
+    const r = await planRepo({ config: wf({ lanes: { code: 5 }, sideLanes: { max: 1 } }), cards, extra });
+    if (local) write(r.root, LOCAL_CONFIG_FILE, wf({ sideLanes: { max: 1 } }));
+    const ctx = fakeCtx(r.root, loadConfig(r.root, {}));
+    task.startCard(ctx, "T-M2-01", { worktree: true });
+    try { task.startCard(ctx, "T-M2-02", { worktree: true }); } catch (e) { return e.message; }
+    return assert.fail("the second side card must be refused");
+  };
+  assert.ok((await refusal(true)).includes(`side lanes are full (1 at a time, this machine: ${LOCAL_CONFIG_FILE}): T-M2-01`));
+  const repoCap = await refusal(false);
+  assert.ok(repoCap.includes("side lanes are full (1 at a time): T-M2-01") && !repoCap.includes("this machine"), repoCap);
+});
+
 test("LCAP-AC-03 lanes.main and sideLanes.enabled are not local keys; bad values name key and file; SAF_LANES changes nothing", () => {
   fails(project({}, wf({ lanes: { main: 1 } })), "workflow.lanes.main", LOCAL_CONFIG_FILE);
   fails(project({}, wf({ sideLanes: { enabled: false } })), "workflow.sideLanes.enabled", LOCAL_CONFIG_FILE);
   fails(project({}, wf({ lanes: { code: LANE_CEILING + 1 } })), "workflow.lanes.code", LOCAL_CONFIG_FILE);
   fails(project({}, wf({ lanes: { code: "x" } })), "workflow.lanes.code", LOCAL_CONFIG_FILE);
   fails(project({}, wf({ sideLanes: { max: 0 } })), "workflow.sideLanes.max", LOCAL_CONFIG_FILE);
+  for (const bad of [true, 2.5]) {
+    fails(project({}, wf({ lanes: { code: bad } })), "workflow.lanes.code", LOCAL_CONFIG_FILE);
+    fails(project({}, wf({ sideLanes: { max: bad } })), "workflow.sideLanes.max", LOCAL_CONFIG_FILE);
+  }
   const ok = project(wf({ lanes: { code: 2 } }));
   const c = loadConfig(ok, { SAF_LANES: "8", SAF_LANES_CODE: "8" });
   assert.deepEqual([c.workflow.lanes.code, c.workflow.localKeys], [2, []]);
@@ -113,9 +134,12 @@ test("LCAP-AC-05 generated files are byte-equal with and without a local file th
   generate(b, answers, { now });
   const files = (r) => JSON.parse(readFileSync(join(r, ".saf", "manifest.json"), "utf8")).files;
   assert.deepEqual(files(a), files(b));
-  const rel = Object.keys(files(a)).length ? Object.keys(files(a)) : [];
-  assert.ok(rel.length > 5);
+  const rel = Object.keys(files(a));
+  assert.ok(rel.length > 5 && rel.includes("docs/plan/README.md"));
   for (const f of rel) assert.equal(readFileSync(join(a, f), "utf8"), readFileSync(join(b, f), "utf8"), f);
+  const readme = readFileSync(join(b, "docs", "plan", "README.md"), "utf8");
+  assert.ok(readme.includes("caps: code 2 · main 1") && readme.includes("at most 1 side card(s)"), "the README shows the repo caps");
+  assert.ok(!readme.includes("caps: code 9") && !readme.includes("at most 7 side card(s)"), "the README never shows the local caps");
   assert.deepEqual(JSON.parse(readFileSync(join(b, "saf.config.json"), "utf8")).workflow.lanes, { code: 2, main: 1 });
   assert.equal(JSON.parse(readFileSync(join(b, "saf.config.json"), "utf8")).workflow.sideLanes.max, 1);
 });

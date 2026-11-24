@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { lib } from "../helpers.mjs";
 
 /** Lane caps explanations and docs (docs/specs/lane-caps.md rules 10-12). */
-const { LOCAL_KEYS, LANE_CEILING, LOCAL_CONFIG_FILE } = await lib("config.mjs");
+const { LOCAL_KEYS, LANE_CEILING, MAX_PORT, LOCAL_CONFIG_FILE } = await lib("config.mjs");
 const { CHOICES, MACHINE_SWITCHES } = await lib("choices.mjs");
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -59,4 +59,6 @@ test("LCAP-AC-06 rule 12 file by file: the three local keys, LANE_CEILING, no en
   }
   const ref = read("docs/config-reference.md");
   assert.ok(ref.includes(`(${LANE_CEILING}, in`), "config-reference names the ceiling value");
+  assert.ok(ref.includes(`now ${LANE_CEILING})`), "the lanes row names the ceiling value");
+  assert.ok(ref.includes(`above ${MAX_PORT}`) && ref.includes(`at most ${MAX_PORT}`), "config-reference names the highest port in both places");
 });

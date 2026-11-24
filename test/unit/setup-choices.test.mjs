@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync, readdirSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, lib, tmp, write } from "../helpers.mjs";
 
-const { QUESTIONS, CHOICES, FIELD_MAX, GROUPS, LABELS, NOT_ASKED, INTERNAL_KEYS, MACHINE_SWITCHES, DOCS_URL, schemaLeaves } = await lib("choices.mjs");
+const { QUESTIONS, CHOICES, FIELD_MAX, GROUPS, LABELS, NOT_ASKED, INTERNAL_KEYS, MACHINE_SWITCHES, DOCS_URL, schemaLeaves, notAskedText } = await lib("choices.mjs");
 const { LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SKILL_PACKS, loadSchema } = await lib("config.mjs");
 
 after(cleanup);
@@ -50,12 +50,15 @@ test("SETUP-AC-02 asked keys equal the Key column of questions.md, and option va
   const col = keyColumn();
   assert.ok(col.length > 30);
   assert.ok(col.every((k) => /^[A-Za-z][A-Za-z0-9]*(\.[A-Za-z][A-Za-z0-9]*)*$/.test(k)), "full dotted keys only");
-  assert.deepEqual([...new Set(col)].sort(), [...new Set(asked)].sort());
+  assert.equal(new Set(col).size, col.length, "a key is listed once in the Key column");
+  assert.deepEqual([...col].sort(), [...asked].sort());
   assert.equal(new Set(asked).size, asked.length, "a key belongs to one question");
+  const packEnum = loadSchema().properties.skills.properties.packs.oneOf.find((o) => o.type === "array").items.enum;
+  assert.deepEqual(SKILL_PACKS, packEnum, "SKILL_PACKS equals the schema enum");
   const node = (p) => p.split(".").reduce((n, k) => n.properties[k], loadSchema());
   for (const q of QUESTIONS.filter((x) => x.kind === "choice")) {
     const first = q.keys[0] && node(q.keys[0]);
-    const source = q.id === "extra-roles" ? Object.keys(ROLE_LIBRARY).filter((r) => !ROLE_LIBRARY[r].core) : q.id === "skill-packs" ? SKILL_PACKS : first?.enum ?? (q.keys.length === 1 && first?.type === "boolean" ? ["yes", "no"] : undefined);
+    const source = q.id === "extra-roles" ? Object.keys(ROLE_LIBRARY).filter((r) => !ROLE_LIBRARY[r].core) : q.id === "skill-packs" ? packEnum : first?.enum ?? (q.keys.length === 1 && first?.type === "boolean" ? ["yes", "no"] : undefined);
     if (source) assert.deepEqual(q.options, source, q.id);
     else assert.ok(q.options?.length, `${q.id} lists its values`);
   }
@@ -63,7 +66,8 @@ test("SETUP-AC-02 asked keys equal the Key column of questions.md, and option va
 });
 
 const run = (cwd, ...args) => spawnSync(process.execPath, [join(REPO, "kit", "tools-saf", "bin", "saf.mjs"), "choices", ...args], { cwd, encoding: "utf8" });
-const snapshot = (dir) => readdirSync(dir, { recursive: true }).sort().map((f) => `${f}`);
+/** Every entry with its content (a folder shows as a folder), so a rewritten file changes the snapshot. */
+const snapshot = (dir) => readdirSync(dir, { recursive: true }).sort().map((f) => `${f}:${statSync(join(dir, f)).isDirectory() ? "dir" : readFileSync(join(dir, f), "utf8")}`);
 
 test("SETUP-AC-03 choices --not-asked lists every key with its summary, where to change it and the per-machine switches", () => {
   const root = tmp();
@@ -83,7 +87,19 @@ test("SETUP-AC-03 choices --not-asked lists every key with its summary, where to
   assert.ok(!run(root, "--not-asked").stdout.includes(NOT_ASKED["workflow.review"].en));
   check(run(root, "--not-asked", "--lang", "en"), "en");
   assert.deepEqual(snapshot(root), withConfig);
-  assert.deepEqual(withConfig.filter((f) => !before.includes(f)), ["saf.config.json"]);
+  assert.deepEqual(withConfig.filter((f) => !before.includes(f)).map((f) => f.split(":")[0]), ["saf.config.json"]);
+});
+
+test("SETUP-AC-03 choices --not-asked walks up from a subfolder to the saf.config.json that sets the language", () => {
+  const root = tmp();
+  write(root, "saf.config.json", { version: 1, people: { chatLanguage: "th" } });
+  const sub = join(root, "packages", "app");
+  mkdirSync(sub, { recursive: true });
+  const before = snapshot(root);
+  const r = run(sub, "--not-asked");
+  assert.equal(r.status, 0, r.stderr);
+  assert.ok(r.stdout.includes(NOT_ASKED["workflow.review"].th) && !r.stdout.includes(NOT_ASKED["workflow.review"].en), "Thai from the config two folders up");
+  assert.deepEqual(snapshot(root), before);
 });
 
 const USAGE = /usage: choices --group <1\|2\|3\|4\|5\|6\|7\|8\|flow> \[--lang en\|th\] \| choices --not-asked \[--lang en\|th\]/;
@@ -156,8 +172,11 @@ test("SETUP-AC-05 every explanation has four short fields in en and th, no numbe
       }
     }
   }
-  for (const q of QUESTIONS.filter((x) => entriesOf(x.id).length && x.kind === "choice")) {
-    assert.deepEqual(entriesOf(q.id).flatMap((e) => e.values).sort(), [...q.options].sort(), `${q.id}: every option covered exactly once`);
+  const explained = QUESTIONS.filter((x) => entriesOf(x.id).length);
+  assert.ok(explained.some((q) => q.group === "flow") && [1, 2, 3, 4, 5, 6, 7, 8].every((g) => explained.some((q) => q.group === g)), "every group has a question that is checked");
+  for (const q of explained) {
+    const values = entriesOf(q.id).flatMap((e) => e.values).sort();
+    assert.deepEqual(values, q.kind === "choice" ? [...q.options].sort() : [], `${q.id}: every option covered exactly once`);
   }
   assert.deepEqual(CHOICES.filter((e) => !QUESTIONS.some((q) => q.id === e.question)), []);
 });
@@ -240,10 +259,25 @@ test("SETUP-AC-07 config-reference names every schema leaf in the section of its
   }
 });
 
+test("SETUP-AC-07 the printed anchor of a key whose top-level part is camelCase is lowercase", () => {
+  const key = "tokenSaving.fixtureKey";
+  NOT_ASKED[key] = { en: "fixture summary", th: "สรุปทดสอบ" };
+  try {
+    for (const lang of ["en", "th"]) {
+      const line = notAskedText(lang).split("\n").find((l) => l.includes(key));
+      assert.ok(line?.endsWith(` · ${DOCS_URL}#tokensaving`), `${lang}: ${line}`);
+    }
+  } finally {
+    delete NOT_ASKED[key];
+  }
+  assert.ok(!notAskedText("en").includes(key));
+});
+
 test("SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2", () => {
   const skill = read("kit", "claude", "skills", "saf-setup", "SKILL.md");
   const one = step(skill, 1);
   assert.ok(one.includes("node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>"));
+  assert.match(one.replace(/\s+/g, " "), /\*\*Before each group\*\*, run `node tools\/saf\/bin\/saf\.mjs choices --group <g> --lang <chat language>`/, "the command runs before each group");
   assert.ok(/pick it when/i.test(one) && /option · what it is · good for · cost · pick it when/.test(one), "the compact table and the description line");
   assert.ok(/offer[^\n]*only (when|if) (the person|they|asked)/i.test(one.replace(/\s+/g, " ")), "skipped questions explain only on request");
   const two = step(skill, 2);
@@ -257,9 +291,12 @@ test("SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly 
   const one = step(skill, 1).replace(/\s+/g, " ");
   assert.ok(/adopt: true/.test(one) && /keep the old docs as history/.test(one) && one.includes("choices --group flow"));
   assert.ok(/new project[^.]*skip/i.test(one), "a new project skips the question and says so");
-  const three = step(skill, 3).replace(/\s+/g, " ");
-  assert.ok(three.includes("--adopt") && three.includes("--no-adopt") && /exactly one/.test(three));
-  assert.ok(/--adopt[^\n]*yes/i.test(three) && /--no-adopt[^\n]*(no|skipped)/i.test(three));
+  const item = step(skill, 3).split(/\r?\n(?=\d+\. )/).find((i) => /^\d+\. Run `node tools\/saf\/bin\/saf\.mjs setup --answers/.test(i))?.replace(/\s+/g, " ") ?? "";
+  assert.ok(item && /exactly one adopt flag/.test(item), "step 3 item 2 passes exactly one adopt flag");
+  const flags = item.split(/(?=`--(?:no-)?adopt`)/).filter((p) => p.startsWith("`--"));
+  assert.deepEqual(flags.map((p) => p.slice(1, p.indexOf("`", 1))), ["--adopt", "--no-adopt"], "each flag is named once, as a whole word");
+  assert.ok(/\byes\b/.test(flags[0]) && !/\bno\b/.test(flags[0]), "--adopt is for yes");
+  assert.ok(/\bno\b/.test(flags[1]) && /\bskipped\b/.test(flags[1]), "--no-adopt is for no or a skipped question");
   const flow = sections(read("kit", "claude", "skills", "saf-setup", "questions.md")).find((s) => /^Setup flow/.test(s.heading));
   assert.ok(flow && !/^\|/m.test(flow.body), "a list, not a table");
   assert.ok(/adopt[^\n]*recommended[^\n]*yes/i.test(flow.body) && /commit[^\n]*recommended[^\n]*yes/i.test(flow.body));
