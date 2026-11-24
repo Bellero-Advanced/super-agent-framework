@@ -1,0 +1,14 @@
+{
+  "id": "T-M2-05",
+  "milestone": "M2",
+  "status": "in_progress",
+  "started": {
+    "at": "2026-11-24T04:44:10.830Z",
+    "base": "6b18751f8d85b6d57ee40f2736d0dea67e177c98",
+    "dirty": {}
+  },
+  "attempts": 0,
+  "lane": 1,
+  "branch": "card/T-M2-05",
+  "worktree": ".claude/worktrees/T-M2-05"
+}
