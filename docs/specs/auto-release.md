@@ -73,7 +73,9 @@ the engine created, through npm trusted publishing (no stored token).
 ### Release workflow (this repository, T-M3-11)
 
 15. `.github/workflows/release.yml` runs only on `push` of tags matching `v*`. Top-level `permissions: contents: read`;
-    the publish job has `contents: write` and `id-token: write`, runs in the GitHub environment `npm`, on Node ≥ the
+    the publish job has `contents: write`, `id-token: write` and `actions: read` — nothing more than these three
+    (`actions: read` lets the guards of rule 17 read the CI run with `gh run list` / `gh run view`; an explicit
+    permissions block leaves every other scope at none) — and runs in the GitHub environment `npm`, on Node ≥ the
     minimum npm trusted publishing needs and an npm CLI ≥ its minimum (both pinned in the workflow, with a comment
     linking npm's trusted-publishing docs).
 16. No step references `secrets.NPM_TOKEN`, `NODE_AUTH_TOKEN` or any npm token; publishing authenticates through OIDC
@@ -83,10 +85,16 @@ the engine created, through npm trusted publishing (no stored token).
     `## <version>` section · the CI run for the tag commit is green with every job successful and at least one job per
     OS of the CI matrix (`ubuntu`, `macos`, `windows`, read from `ci.yml`) · `policies.release.auto` is `on` on
     `origin/main`. Reuses `nextVersion`, the CHANGELOG reader and the release-log reader from
-    `tools/saf/lib/release.mjs` (no copy).
+    `tools/saf/lib/release.mjs` (no copy). The policy is read from the tag commit's `saf.config.json`: when that file
+    is missing, is not valid JSON or fails schema validation, `guards` fails with that reason — never a silent
+    default.
 18. Publish order: `super-agent-framework`, then wait until `npm view super-agent-framework@<version>` answers (bounded
-    retries), then `create-saf`; each publish is skipped when that exact version is already on npm (safe re-run after
-    a partial failure); the kill-switch check of rule 17 runs again right before each publish. Then
+    retries), then `create-saf`. Before each publish the step runs `node scripts/release-check.mjs published <dir>
+    <version>`, whose own exit code decides: 0 (that exact version is on npm) → that publish is skipped (safe re-run
+    after a partial failure); 3 (npm answers definitely not found, E404) → publish; every other outcome — exit 1 (a
+    crash or Node's default failure exit), exit 2 (usage error), any error, `saf.config.json` unreadable, the folder
+    not in `policies.release.packages`, an `npm view` failure other than not-found — stops the job and nothing more is
+    published. Exit 3, not 1, means "publish" so that a crashed process can never lead to a publish. The kill-switch check of rule 17 runs again right before each publish. Then
     `gh release create v<version>` with the CHANGELOG section as notes (skipped when it exists), then
     `node scripts/release-check.mjs npm` and `release`.
 19. `node scripts/release-check.mjs workflow` (read-only, no network) checks `release.yml` statically for rules 15–16
@@ -101,8 +109,9 @@ the engine created, through npm trusted publishing (no stored token).
 
 ## 3. Data
 
-- `nextVersion`, `releaseGuards`, `readChangelog`, `RELEASE_LOG`, `appendReleaseLog`, `RELEASE_LIMITS` (registry
-  wait): `kit/tools-saf/lib/release.mjs`
+- `nextVersion`, `releaseGuards`, `readChangelog`, `RELEASE_LOG`, `appendReleaseLog`: `kit/tools-saf/lib/release.mjs`
+- Registry wait after a publish (tries and delay), job permissions and the other workflow rules: `POLICY` (`wait`,
+  `jobPermissions`) in `scripts/release-check.mjs`
 - `policies.release`: schema `kit/tools-saf/schema/saf.config.schema.json` · defaults `config.mjs` · not-asked lines
   `choices.mjs` (en, th)
 - Script `task:release`: `ENGINE_SCRIPTS` in `config.mjs`
@@ -131,8 +140,10 @@ the engine created, through npm trusted publishing (no stored token).
 | REL-AC-05 | guards hold, a bare origin | `--prepare` | versions bumped in every package, dependency and version file; CHANGELOG renamed with a new empty Unreleased; one release-log line; one commit with exactly those files; pushed without force | integration |
 | REL-AC-06 | the release commit at HEAD, CI fake reports one skipped job, then all green | `--tag` | first refused (G-ci), then the annotated tag is created and only it is pushed | integration |
 | REL-AC-07 | the release engine source | scanned | no force push, tag deletion, unpublish, deprecate or `npm publish` | unit |
-| REL-AC-08 | `release.yml` | `release-check workflow` | passes; fails for a token reference, a missing `id-token: write`, a trigger other than `v*` tags, or a missing guards step | unit |
+| REL-AC-08 | `release.yml` | `release-check workflow` | passes; fails for a token reference, a missing `id-token: write`, a missing `actions: read` or any fourth job permission, a trigger other than `v*` tags, or a missing guards step | unit |
 | REL-AC-09 | a tag that differs from a package version, a missing CHANGELOG section, auto off on main, a CI run without a windows job | `release-check guards <tag>` (injected runners) | each fails with the reason; a consistent fixture passes | unit |
+| REL-AC-10 | the tag commit's `saf.config.json` missing, not valid JSON, or failing schema validation | `release-check guards <tag>` (injected runners) | fails naming that cause, exit 1 | unit |
+| REL-AC-11 | `npm view` (injected runner) answers the version / not found (E404) / another failure; the folder not in `policies.release.packages`; `saf.config.json` unreadable | `release-check published <dir> <version>` | exit 0 / 3 / 1 / 1 / 1 with the reason (never 3 except for E404); the workflow check fails when a publish step publishes on any exit other than 3 or skips on any exit other than 0 | unit |
 
 ## 6. Out of scope
 
