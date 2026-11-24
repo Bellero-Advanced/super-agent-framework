@@ -123,3 +123,17 @@ N4. `viewer.mjs:64` milestone evidence `gates` that is an object, not an array, 
 N5. the milestone status is shown raw ("active") on a Thai page
 N6. the card Done-when grep for `<script|https?://` in viewer.mjs fails on any harmless future comment — use a narrower check
 N7. an evidence tail is never truncated by the viewer (spec §4): a hand-crafted 10 MB tail makes a 10 MB page — tails are capped at capture time (20 pass / 60 fail lines)
+
+## T-M2-02 (review FAIL → fixed → merged) — notes for the designer
+
+DATA-LOSS FOLLOW-UPS (pre-existing behaviour, kept by the refactor):
+F1. REAL DATA LOSS — an invalid `.claude/settings.local.json` is silently replaced by `{env}` when `settings.json` has an `env` block that moves (planSettings ~326, `readJson(..., {})`); the user's local settings (permissions, possibly secret env values) are overwritten WITHOUT an archive. Card now (S): archive the invalid local file with `archiveDest` like `settings.json`, show it in the dry-run merges line
+F2. adopt on a first run archives everything under `docs/plan` that has no manifest entry (STATE.md, evidence JSON) — with the manifest deleted but the plan intact (reinstall) evidence leaves docs/plan and cards look not done; files are moved not deleted. Needs a DECISIONS row / spec rule (e.g. skip adopt when docs/plan already has SAF's shape)
+F3. a `keep-unplanned` file loses its manifest entry in setup (next.files is built fresh) while `refreshKitFiles` keeps it — spec rule next to rule 7
+F4. `same` files are rewritten, so a CRLF checkout becomes LF while the dry run says "same" — skip writing `same` files
+F5. `planStatus` copies docs/plan to an os.tmpdir() scratch folder (new failure mode if the temp dir is read-only/full; cost on every real setup) — better: `loadPlan(root, config, { read, list })` overlay (touches plan.mjs), no temp folder
+OTHER:
+N3. no test shows the `saf-plan-*` scratch folder is removed after success or error
+N4. test tidy-up: `const bad = cli(empty, "--dry-run")` expects 0 (misleading name); `assert.deepEqual(x.length > 5, true)` → `assert.ok`
+N5. `report.kept` still mixes plain paths and decorated strings — T-M2-21/22 should read `plan.actions`
+N6. evidence defers `npm test` (targeted mode); the milestone gate must cover the full suite
