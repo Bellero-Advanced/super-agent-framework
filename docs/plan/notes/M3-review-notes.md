@@ -81,3 +81,13 @@ Q6. a merged lane card whose worktree was removed gets `--worktree --resume` adv
 Q7. en "none fits → none" vs th "ไม่มีข้อไหนตรง → ไม่ระบุ" say slightly different things
 Q8. examples/todo-api/.claude/commands/saf.md and its CLAUDE.md are stale against the templates; no sync test for this repo's `.claude/commands/*` vs the rendered templates (agents have one) — F-009 root cause: card
 Q9. AC-04 refusal inside a lane does not check that nothing was written in the lane folder
+
+## T-M3-32 (review PASS at round 1; one docs sentence made precise before merge) — notes for the designer
+
+M1. CI/PR checkout of an unfinished lane branch: the checkout is detached and has no label (gitignored), so laneFolder returns null and the run is treated as the main folder → that lane card's in-progress gaps are skipped there and counted only in the lane worktree (by design, rule 5 "only the evidence decides"; matters only if lane branches are pushed before they are verified) — say so in the spec
+M2. main folder checked out on a card branch: laneFolder (task.mjs:176) returns null so that card is skipped in the one folder holding its tests — rare, no spec rule
+M3. spec rule 9 and a test comment suggested spec:matrix is a merge check; it is NOT in the default mergeChecks (config.mjs:208) nor this repo's saf.config.json — nothing escapes (lane verify + milestone gate), word it "if listed in mergeChecks" (comment fixed in the card)
+M4. the lane-label fallback stderr line embeds the TaskError text "every command is refused here" then "— checking every started card" (follows rule 6, confusing to read)
+M5. two extra tests carry the MSCOPE-AC-04 id but test the merge path and rule 2/10 selection
+M6. spec §4 says submodule cards' evidence carries `lane` — `--worktree` refuses cards outside the root repo (task.mjs:374), so submodule cards are always main-folder cards (wording)
+M7. FRICTION candidate: on Node 22 `node --test <existing file> <missing file>` exits 0 → a combined Done-when command hides a missing new test file (task:prerun caught it on T-M3-33)
