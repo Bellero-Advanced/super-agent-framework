@@ -7,29 +7,29 @@
     "base": "4878a5434d635b13e82b61b824346ca203b0edbc",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-32",
   "worktree": ".claude/worktrees/T-M3-32",
   "verified": {
-    "at": "2026-11-24T09:52:01.874Z",
-    "head": "29ef566df6ea053fa128c4b9e50fc4a31eaf3eaa",
+    "at": "2026-11-24T09:57:26.795Z",
+    "head": "6f95e835cd79e3b298289cba8c2958d11c633e84",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/matrix-scope.test.mjs",
         "exit": 0,
-        "ms": 5196,
+        "ms": 5240,
         "tail": [
           "ok 9 - MSCOPE-AC-04 a lane card counts once done on main (merge checks run there)",
           "  ---",
-          "  duration_ms: 1049.383667",
+          "  duration_ms: 1048.424416",
           "  type: 'test'",
           "  ...",
           "# Subtest: MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
           "ok 10 - MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
           "  ---",
-          "  duration_ms: 1.597375",
+          "  duration_ms: 1.379584",
           "  type: 'test'",
           "  ...",
           "1..10",
@@ -40,23 +40,23 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 5134.36825"
+          "# duration_ms 5177.536084"
         ]
       },
       {
         "cmd": "node --test test/unit/checks.test.mjs",
         "exit": 0,
-        "ms": 1174,
+        "ms": 1065,
         "tail": [
           "ok 5 - measure lock: second holder waits then exits 75; lock is released",
           "  ---",
-          "  duration_ms: 67.192084",
+          "  duration_ms: 59.406042",
           "  type: 'test'",
           "  ...",
           "# Subtest: probe: passes when hooks answer and the hook-less control does not",
           "ok 6 - probe: passes when hooks answer and the hook-less control does not",
           "  ---",
-          "  duration_ms: 867.095",
+          "  duration_ms: 784.710791",
           "  type: 'test'",
           "  ...",
           "1..6",
@@ -67,19 +67,19 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1119.796541"
+          "# duration_ms 1008.213375"
         ]
       },
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('docs/card-lifecycle.md','utf8');if(!s.includes('another folder'))process.exit(1)\"",
         "exit": 0,
-        "ms": 45,
+        "ms": 43,
         "tail": []
       },
       {
         "cmd": "npm run saf:refresh -- --check",
         "exit": 0,
-        "ms": 313,
+        "ms": 251,
         "tail": [
           "> super-agent-framework@0.1.0 saf:refresh",
           "> node scripts/refresh-copies.mjs --check",
@@ -89,7 +89,7 @@
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 349,
+        "ms": 347,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -116,7 +116,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 331,
+        "ms": 327,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -126,7 +126,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 285,
+        "ms": 283,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -136,17 +136,17 @@
       {
         "cmd": "node --test 'test/unit/matrix-scope.test.mjs'",
         "exit": 0,
-        "ms": 5347,
+        "ms": 5479,
         "tail": [
           "ok 9 - MSCOPE-AC-04 a lane card counts once done on main (merge checks run there)",
           "  ---",
-          "  duration_ms: 1120.513375",
+          "  duration_ms: 1195.97975",
           "  type: 'test'",
           "  ...",
           "# Subtest: MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
           "ok 10 - MSCOPE-AC-04 selection is a pure function: lane card counts only in its own lane",
           "  ---",
-          "  duration_ms: 1.393834",
+          "  duration_ms: 1.375125",
           "  type: 'test'",
           "  ...",
           "1..10",
@@ -157,7 +157,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 5296.416625"
+          "# duration_ms 5423.53275"
         ]
       }
     ],
@@ -171,10 +171,10 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/card-lifecycle.md": "9d39c31013c3ac87bdf7eff50cc7e600a580a434",
+        "docs/card-lifecycle.md": "59d26dd97d319eaedd03d45bebd6c6b9299974dc",
         "kit/tools-saf/bin/saf.mjs": "8a74afa06b641ba7fe8c592181d7b81256f24957",
         "kit/tools-saf/lib/matrix.mjs": "397d716e9d545267969958b6d0b3fea28f7d79b7",
-        "test/unit/matrix-scope.test.mjs": "8eeded0e6c6abf2dc570fd83e2d690a0324b9a2d"
+        "test/unit/matrix-scope.test.mjs": "33eecfde13fa11e2a2f02b6004e78de29afed262"
       }
     },
     "scenarios": {
@@ -192,7 +192,7 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 55,
+        "lines": 57,
         "cap": 150
       },
       "test": {

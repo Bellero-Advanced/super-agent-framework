@@ -39,7 +39,7 @@ test("MSCOPE-AC-01 two lane cards: each lane sees only its own card's gap", asyn
   commitAll(laneA, "A test");
   write(laneB, "test/b/b.test.mjs", testFile("B-AC-01"));
   commitAll(laneB, "B test");
-  // remove B's test from A's lane view: it exists only on B's branch (A's worktree never had it)
+  // B's test is committed only on B's branch: A's worktree never sees it, so B's gap is skipped in A
   const a = matrixCli(laneA, "--check");
   assert.equal(a.code, 0, a.err);
   assert.match(a.out, /\| B-AC-01 .*✗ gap \(started in another folder\)/);
@@ -149,7 +149,7 @@ test("MSCOPE-AC-04 a lane card counts once done on main (merge checks run there)
   write(laneA, "test/a/a.test.mjs", testFile("A-AC-01"));
   assert.equal((await task.verifyCard(laneCtx, "T-M1-01")).status, "done");
   commitAll(laneA, "A work");
-  // B's lane never merged; A merges with the matrix check as its merge check: B stays skipped in main (still in progress)
+  // B's lane never merged; as if spec:matrix were listed in mergeChecks (it is not by default): B stays skipped in main (still in progress)
   const before = matrixCli(root, "--check");
   assert.equal(before.code, 0, before.err);
   git(root, "merge", "--no-ff", "-q", "-m", "merge A", "card/T-M1-01");

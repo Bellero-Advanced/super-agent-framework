@@ -77,8 +77,10 @@ Specs live in `docs/specs/<system>.md`. The "Acceptance" (or "ฉากยอม
 scenario id `<AREA>-AC-<nn>`. `spec:matrix` maps ids to tests (JS/TS: the test name contains the id; other languages: the
 id appears in a test file). `spec:matrix --check` fails when a started card has a scenario without a test;
 `--complete=auth,billing` demands every scenario of those specs. A card still being built counts only in the folder
-where it is built (its lane, or the main folder for a card without a lane) — other folders list its gaps as "started in
-another folder"; a finished card counts everywhere.
+where it is built (its lane, or the main folder for a card without a lane); a finished card counts everywhere. A gap
+whose only started cards are being built in another folder is marked "started in another folder" and does not fail
+`--check`. If the lane label does not match the evidence, `--check` prints `lane not recognised (…)` and counts every
+started card.
 
 ## Parallel lanes
 
