@@ -20,6 +20,27 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - **Review rounds** ([spec](../../specs/review-rounds.md), D-017): T-M3-02 — `task:review <id> pass|fail --kind …`
   stores each round in `docs/plan/evidence/reviews/<id>.json`; a fail reopens a main-folder card without `--restart`;
   kind `framework` logs friction; the report shows rounds per card
+- **Workflow efficiency** (owner order 2026-11-24 — fewer tokens and less wall time, same quality; D-020 proposed,
+  recommended defaults, the cards follow them unless the owner says otherwise): T-M3-27 … T-M3-31 run right after
+  T-M3-02 because they make every later card cheaper. Evidence: about sixty M2/M3 card and review prompts repeated
+  the same manual steps and ~400-word instructions.
+  - T-M3-27 ([spec](../../specs/refresh-copies.md), friction F-001): `npm run saf:refresh` refreshes this repository
+    and the example in one step and puts back the example files outside the card's `touch`; `-- --check` reports
+    stale copies in a second and is the first merge check here (repository-only, `scripts/` does not ship)
+  - T-M3-28 ([spec](../../specs/role-lanes.md)): `roles.lanes` moves a role to the other lane (image or copy cards in a
+    worktree); `designer`, `spec-reviewer`, `release-operator` are locked; the main lane stays one card (D-018)
+  - T-M3-29 ([spec](../../specs/agent-instructions.md)): the implementer and spec-reviewer agents carry the checks
+    every prompt repeated (failing-first tests, evidence size, sentence → code, Windows-safe tests, friction line;
+    review types `text` · `data` · `security` · `refactor` with checklists); a test keeps this repository's agent
+    files equal to the templates' rendering
+  - T-M3-30 ([spec](../../specs/designer-prerun.md)): the designer runs every new "Done when" command before the
+    hand-over; `task:prerun <id>` shows which already pass (`— passes by design: <reason>` marks the intended ones);
+    no automatic warning in `task:state` / `spec:matrix` (it would need to run every command and could not tell a
+    guard from a proof)
+  - T-M3-31 ([spec](../../specs/review-diff.md)): `task:diff <id>` writes `.saf/memory/review/<id>.diff` with exactly
+    the card's files; `/saf` hands the reviewer "card id · review types · diff path"
+  - From T-M3-27 on, `npm run saf:refresh` replaces the three refresh lines older cards still list (refresh, example
+    upgrade, restore); kit cards written from now on list `npm run saf:refresh -- --check` in "Done when"
 - **Effort by size** ([spec](../../specs/effort-by-size.md), D-016): T-M3-03 (setting `models.effort`, `EFFORT_BY_SIZE`,
   `<role>-<effort>` agent files, docs:check, per-machine override) → T-M3-04 (`task:start` names the agent, evidence,
   summary, `/saf` and `/saf-plan` wording, report table of effort × review rounds) and T-M3-05 (setup question and
@@ -69,6 +90,11 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 ## Task List
 - [x] T-M3-01 Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count — passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate
 - [x] T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — passed 2026-11-24 08:09 (6 commands) · full suite deferred to gate
+- [ ] T-M3-27 npm run saf:refresh refreshes this repository and the example in one step and puts back the example files the card does not own; --check reports stale copies in a second
+- [ ] T-M3-28 A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai
+- [ ] T-M3-29 The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists
+- [ ] T-M3-30 The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass
+- [ ] T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path
 - [ ] T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read
 - [ ] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
 - [ ] T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names
