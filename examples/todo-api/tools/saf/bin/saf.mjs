@@ -13,6 +13,7 @@ import { blockingGaps, buildMatrix, completeGaps, countsHere, renderMatrix, summ
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, MILESTONE_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
+import { packShowLines, readPack, safe } from "../lib/packs.mjs";
 import { prerunCard } from "../lib/prerun.mjs";
 import { commandRunner, prepareRelease, runRelease, tagRelease } from "../lib/release.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
@@ -70,6 +71,8 @@ import {
  *   setup --answers <file.json> [--adopt|--no-adopt] [--dry-run] [--diff] [--keep <path>[,<path>…]] · detect · config --check · version
  *   choices --group <1-8|flow> [--lang en|th]   what each option of an interview group means (exit 2 usage)
  *   choices --not-asked [--lang en|th]          settings the setup interview does not ask, and where to change them (exit 2 usage)
+ *   pack show <path>   read-only: everything the skill pack in that folder would install, the tools its skills ask for, the files it refuses and the content hash (exit 0 valid · 1 invalid, problems listed · 2 usage)
+ *     (reads files, runs and fetches nothing from the pack, writes nothing)
  *
  * A lone `--` (npm passes arguments after it) is ignored everywhere except `measure`, where it separates the command.
  */
@@ -615,6 +618,21 @@ async function main() {
       out(group === undefined ? notAskedText(chosen) : groupText(group, chosen));
       return 0;
     }
+    case "pack": {
+      const given = argv.slice(2);
+      if (sub !== "show" || given.length !== 1 || given[0].startsWith("-")) {
+        err("usage: pack show <path>");
+        return 2;
+      }
+      const pack = readPack(given[0]);
+      if (!pack.ok) {
+        err(`✗ ${safe(given[0], 500)} is not a valid skill pack:`);
+        for (const p of pack.problems) err(`  - ${p}`);
+        return 1;
+      }
+      for (const line of packShowLines(pack, given[0])) out(line);
+      return 0;
+    }
     case "detect":
       out(JSON.stringify(detectProject(process.cwd()), null, 2));
       return 0;
@@ -645,7 +663,7 @@ async function main() {
       out(readFileSync(new URL("../VERSION", import.meta.url), "utf8").trim());
       return 0;
     default:
-      err("usage: saf task <…> | hook <…> | docs-check | spec-matrix | check-secrets | measure | setup | choices | detect | config --check | version");
+      err("usage: saf task <…> | hook <…> | docs-check | spec-matrix | check-secrets | measure | setup | choices | pack show | detect | config --check | version");
       return 2;
   }
 }

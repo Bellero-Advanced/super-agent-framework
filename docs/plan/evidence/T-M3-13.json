@@ -1,7 +1,7 @@
 {
   "id": "T-M3-13",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T21:06:18.168Z",
     "base": "72dc987c52fc8a2250e2bec126f85ee76f82b28e",
@@ -13,8 +13,175 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M3-13",
-  "worktree": ".claude/worktrees/T-M3-13"
+  "worktree": ".claude/worktrees/T-M3-13",
+  "verified": {
+    "at": "2026-11-24T21:22:04.379Z",
+    "head": "13a4f86ff9e80c2fec8d6d284db23656390fb45c",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 574,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (done) | test/unit/upgrade-scripts.test.mjs +1 | ✓ 2 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (done) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "191 scenario(s) in 20 spec(s) · with test 185 · gaps 6 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/skill-packs.test.mjs",
+        "exit": 0,
+        "ms": 4569,
+        "tail": [
+          "ok 13 - PACK-AC-02 a folder that cannot be read is reported with a name cleaned of control characters",
+          "  ---",
+          "  duration_ms: 2.448",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
+          "ok 14 - PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
+          "  ---",
+          "  duration_ms: 0.46125",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 13",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 4516.305875"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/lib/packs.mjs','utf8');if(/child_process|import\\(|fetch\\(|https?:/.test(s))process.exit(1)\"",
+        "exit": 0,
+        "ms": 57,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 475,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 282 markdown file(s) · 315 local link(s) · 108 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 546,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 648 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/skill-packs.test.mjs'",
+        "exit": 0,
+        "ms": 4280,
+        "tail": [
+          "ok 13 - PACK-AC-02 a folder that cannot be read is reported with a name cleaned of control characters",
+          "  ---",
+          "  duration_ms: 3.186875",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
+          "ok 14 - PACK-AC-02 docs/skills.md states the same limits and frontmatter keys as packs.mjs",
+          "  ---",
+          "  duration_ms: 0.596",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 13",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 4223.332875"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "CHANGELOG.md",
+        "docs/skills.md",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/packs.mjs",
+        "test/unit/skill-packs.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "CHANGELOG.md": "9686cfd8d21890b26f340ad92942d3ed18cd9286",
+        "docs/skills.md": "7cc957c84a276b3659a62c55d83965a3a6022f29",
+        "kit/tools-saf/bin/saf.mjs": "753527ab3e07a43148b8e770502c0ef35fd0f48b",
+        "kit/tools-saf/lib/packs.mjs": "3942ec789d2aee95aca7ff2a0b65f20f121ada4e",
+        "test/unit/skill-packs.test.mjs": "b12ed7ea04937d96e4b73fdc65cfbc1302ac310f"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "PACK-AC-01",
+        "PACK-AC-02",
+        "PACK-AC-03"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 471,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 308,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/skill-packs.test.mjs"
+      ]
+    }
+  }
 }

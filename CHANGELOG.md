@@ -62,6 +62,9 @@ and the project uses [Semantic Versioning](https://semver.org/).
 - **`roles.lanes`** moves a role to the other lane, so image or copy cards can run in a worktree beside other cards
 - **Lane caps up to 32** (was 9), and each machine can set its own `workflow.lanes.code` and `workflow.sideLanes.max` in
   `saf.config.local.json`; the setup explanations say what a lane costs
+- **`saf pack show <path>`** — a documented skill-pack format (a folder with `saf-pack.json` and `skills/<name>/SKILL.md`) and a
+  read-only command that lists everything a pack would install, the tools its skills ask for, the files it refuses and the
+  content hash before anyone trusts it; nothing from a pack is run, fetched or written (`docs/skills.md`)
 
 ### Changed
 

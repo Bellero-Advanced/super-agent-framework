@@ -147,7 +147,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit — passed 2026-11-24 20:52 (6 commands) · full suite deferred to gate
 - [x] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again — passed 2026-11-24 20:30 (7 commands) · full suite deferred to gate
 - [x] T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 — passed 2026-11-24 21:03 (3 commands)
-- [ ] T-M3-13 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it — started 2026-11-24 21:06 · not verified yet · lane 1 · .claude/worktrees/T-M3-13
+- [x] T-M3-13 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it — passed 2026-11-24 21:22 (6 commands) · full suite deferred to gate
 - [ ] T-M3-14 Setup and upgrade install skill packs named in skills.external only when their content hash matches
 - [ ] T-M3-15 /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes
 - [ ] T-M3-26 Reinstalling SAF into a project that already has a plan keeps docs/plan and its evidence in place (waits for D-019)
