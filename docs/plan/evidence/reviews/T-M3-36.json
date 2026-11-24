@@ -12,6 +12,18 @@
       "head": "a42e0e7ec9c33425a9b014ae14bc040e03e99b6d",
       "verifyAttempts": 1,
       "verifyAt": "2026-11-24T18:59:23.865Z"
+    },
+    {
+      "round": 2,
+      "at": "2026-11-24T19:08:13.065Z",
+      "result": "fail",
+      "kinds": [
+        "docs"
+      ],
+      "note": "light 'what' en says only merge check; merge also runs check-secrets and docs:check; en/th differ",
+      "head": "1c7e57b0092ee16886dead0033ff76e069ca9224",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T19:06:05.649Z"
     }
   ]
 }
