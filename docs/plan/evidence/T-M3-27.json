@@ -7,46 +7,46 @@
     "base": "8b11597c906f932133c67e9406fec4ad98a8836f",
     "dirty": {}
   },
-  "attempts": 2,
+  "attempts": 6,
   "lane": 1,
   "branch": "card/T-M3-27",
   "worktree": ".claude/worktrees/T-M3-27",
   "verified": {
-    "at": "2026-11-24T08:48:43.184Z",
-    "head": "13da6fa2b383b410e4bea3d4c43958c1fedaaf9b",
+    "at": "2026-11-24T08:55:47.940Z",
+    "head": "ec799c08696d7a7d78bf305e082b837973abe4d4",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/refresh-copies.test.mjs test/unit/doc-languages.test.mjs",
         "exit": 0,
-        "ms": 1861,
+        "ms": 2360,
         "tail": [
-          "ok 13 - COPIES-AC-07 each upgrade is process.execPath with an argument array, also when the path has a space",
+          "ok 15 - COPIES-AC-03 refusals without a usable card print the by-hand fallback",
           "  ---",
-          "  duration_ms: 249.645959",
+          "  duration_ms: 350.091458",
           "  type: 'test'",
           "  ...",
           "# Subtest: COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
-          "ok 14 - COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
+          "ok 16 - COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
           "  ---",
-          "  duration_ms: 0.342334",
+          "  duration_ms: 0.770208",
           "  type: 'test'",
           "  ...",
-          "1..14",
-          "# tests 14",
+          "1..16",
+          "# tests 16",
           "# suites 0",
-          "# pass 14",
+          "# pass 16",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1800.144708"
+          "# duration_ms 2303.347041"
         ]
       },
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 343,
+        "ms": 332,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -73,7 +73,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 334,
+        "ms": 348,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -83,7 +83,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 283,
+        "ms": 284,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -93,28 +93,28 @@
       {
         "cmd": "node --test 'test/unit/refresh-copies.test.mjs'",
         "exit": 0,
-        "ms": 1831,
+        "ms": 2356,
         "tail": [
-          "ok 7 - COPIES-AC-07 each upgrade is process.execPath with an argument array, also when the path has a space",
+          "ok 9 - COPIES-AC-03 refusals without a usable card print the by-hand fallback",
           "  ---",
-          "  duration_ms: 241.843708",
+          "  duration_ms: 364.918042",
           "  type: 'test'",
           "  ...",
           "# Subtest: COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
-          "ok 8 - COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
+          "ok 10 - COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check",
           "  ---",
-          "  duration_ms: 0.327875",
+          "  duration_ms: 0.796334",
           "  type: 'test'",
           "  ...",
-          "1..8",
-          "# tests 8",
+          "1..10",
+          "# tests 10",
           "# suites 0",
-          "# pass 8",
+          "# pass 10",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1778.317167"
+          "# duration_ms 2306.361667"
         ]
       }
     ],
@@ -130,12 +130,12 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "CLAUDE.md": "77a6706fd47c567b1b0e68ce6a3d71d1b8a6f9a6",
-        "CONTRIBUTING.md": "875552268bdadd241a1dc0aeaea3632a38334e5a",
+        "CLAUDE.md": "51970205789ffb18444ac74d00ac9ee36ea6c10e",
+        "CONTRIBUTING.md": "f76f14c2c2ad339455afdbc5563d6caa6714d5fa",
         "package.json": "980db51de43d9eafdc460a88b4c6b9998a187fb9",
         "saf.config.json": "27a6187c3168c36ec514e7e546fa8e9447b333a2",
-        "scripts/refresh-copies.mjs": "a351b00dc1cd880e7b1a52012a79b94f167ddccf",
-        "test/unit/refresh-copies.test.mjs": "8d3ec1902ecd8fbe0705c133728e9414d9e3e3a4"
+        "scripts/refresh-copies.mjs": "9b5909e60bb80f392c8c477caa092e8d51eeb15c",
+        "test/unit/refresh-copies.test.mjs": "04ffc24ed485f7dd5ae1e6e086bacdf408b4b49e"
       }
     },
     "scenarios": {
@@ -154,11 +154,11 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 148,
+        "lines": 150,
         "cap": 150
       },
       "test": {
-        "lines": 169,
+        "lines": 189,
         "cap": 250
       },
       "over": []

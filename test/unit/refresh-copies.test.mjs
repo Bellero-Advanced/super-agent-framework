@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import { after, test } from "node:test";
 import { REPO, cleanup, fakeCtx, git, lib, planRepo, tmp, write } from "../helpers.mjs";
 
@@ -113,9 +114,10 @@ test("COPIES-AC-04 in a lane worktree the card is the lane's and the restore run
 test("COPIES-AC-05 a second run writes nothing and says nothing to restore", async () => {
   const { root } = await started([`${EX}/package.json`]);
   assert.equal(await harness(root, upgradeB).run(), 0);
-  const h = harness(root, undefined);
-  assert.equal(await h.run(), 0);
-  assert.ok(h.lines.includes("nothing to restore"));
+  const snap = () => script.listFiles(join(root, EX)).map((f) => [f, read(root, `${EX}/${f}`)]);
+  const first = snap();
+  assert.equal(await harness(root, upgradeB).run(), 0);
+  assert.deepEqual(snap(), first, "the example holds the same bytes after the second run");
   assert.equal(read(root, `${EX}/.claude/commands/saf.md`), OLD);
 });
 
@@ -161,6 +163,24 @@ test("COPIES-AC-07 each upgrade is process.execPath with an argument array, also
     [join(spaced, "bin", "cli.mjs"), "upgrade", "--dir", join(spaced, EX)],
   ]);
   assert.ok(h.calls.every((c) => Array.isArray(c.args)));
+});
+
+test("COPIES-AC-06 the script run as a program: --check on this repository exits 0 (main-module guard works)", () => {
+  const r = spawnSync(process.execPath, [join(REPO, "scripts", "refresh-copies.mjs"), "--check"], { encoding: "utf8", shell: false });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /copies equal kit/);
+});
+
+test("COPIES-AC-03 refusals without a usable card print the by-hand fallback", async () => {
+  const none = await planRepo({ cards: [{ id: "T-M1-01" }] });
+  const h = harness(none.root);
+  assert.equal(await h.run(), 2);
+  assert.match(h.lines.join("\n"), /upgrade --dir \.\s+then\s+node bin\/cli\.mjs upgrade --dir examples\/todo-api/);
+  const lane = await planRepo({ config: { workflow: { lanes: { code: 2, main: 1 } } }, cards: [{ id: "T-M1-01", touch: ["src/**"] }] });
+  task.startCard(fakeCtx(lane.root, lane.config), "T-M1-01", { worktree: true });
+  const h2 = harness(lane.root);
+  assert.equal(await h2.run(), 2);
+  assert.match(h2.lines.join("\n"), /refresh by hand/);
 });
 
 test("COPIES-AC-08 package.json and saf.config.json wire the script and the first merge check", () => {

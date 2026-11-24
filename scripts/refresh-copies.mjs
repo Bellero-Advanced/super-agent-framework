@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // One command refreshes every engine copy of this repository (spec docs/specs/refresh-copies.md). Repository-only: not shipped.
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, realpathSync, rmSync, rmdirSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadConfig } from "../kit/tools-saf/lib/config.mjs";
@@ -61,6 +61,8 @@ function reportCheck(root, out, err) {
   return 1;
 }
 
+const BY_HAND = () => ` · outside a card, refresh by hand: node bin/cli.mjs upgrade --dir .  then  node bin/cli.mjs upgrade --dir ${TABLE.example}`;
+
 /** The card in progress here: the lane's card in a lane worktree, the one main-folder card in the main folder. Throws the refusal text. */
 function cardHere(root) {
   const config = loadConfig(root, {});
@@ -72,9 +74,9 @@ function cardHere(root) {
   const open = activeCards(plan);
   const mine = open.filter((c) => !plan.evidence.get(c.id)?.lane);
   if (mine.length === 1) return mine[0];
-  if (mine.length) throw new Error(`more than one main-folder card in progress (${mine.map((c) => c.id).join(" · ")}) — cannot tell which files to keep`);
-  if (open.length) throw new Error(`only lane cards are in progress — run the refresh in their worktree: ${open.map((c) => `${c.id} (${plan.evidence.get(c.id)?.worktree ?? "-"})`).join(" · ")}`);
-  throw new Error("no card in progress in this folder — outside a card, refresh by hand: node bin/cli.mjs upgrade --dir .  then  node bin/cli.mjs upgrade --dir examples/todo-api");
+  if (mine.length) throw new Error(`more than one main-folder card in progress (${mine.map((c) => c.id).join(" · ")}) — cannot tell which files to keep${BY_HAND()}`);
+  if (open.length) throw new Error(`only lane cards are in progress — run the refresh in their worktree: ${open.map((c) => `${c.id} (${plan.evidence.get(c.id)?.worktree ?? "-"})`).join(" · ")}${BY_HAND()}`);
+  throw new Error(`no card in progress in this folder${BY_HAND()}`);
 }
 
 export async function refresh({ root = REPO, argv = [], spawn = defaultSpawn, out = console.log, err = console.error } = {}) {
@@ -103,20 +105,19 @@ export async function refresh({ root = REPO, argv = [], spawn = defaultSpawn, ou
   if (failed === "a") return err("step a failed — stopped"), 1;
   const restored = [];
   for (const f of [...new Set([...before.keys(), ...listFiles(ex, TABLE.skipDirs)])].sort()) {
-    const [abs, rel] = [join(ex, f), `${TABLE.example}/${f}`];
-    const [was, now] = [before.get(f) ?? null, existsSync(join(ex, f)) ? readFileSync(abs) : null];
+    const [abs, rel, was] = [join(ex, f), `${TABLE.example}/${f}`, before.get(f) ?? null];
+    const now = existsSync(abs) ? readFileSync(abs) : null;
     if (keep.some((re) => re.test(rel)) || (was && now ? was.equals(now) : !was && !now)) continue;
     if (was) {
       mkdirSync(dirname(abs), { recursive: true });
       writeFileSync(abs, was);
     } else {
       rmSync(abs, { force: true });
-      for (let d = dirname(abs); d !== ex && existsSync(d) && !readdirSync(d).length; d = dirname(d)) rmSync(d, { recursive: true });
+      for (let d = dirname(abs); d !== ex && existsSync(d) && !readdirSync(d).length; d = dirname(d)) rmdirSync(d);
     }
     restored.push(rel);
   }
-  out(restored.length ? `restored: ${restored.length}` : "nothing to restore");
-  for (const r of restored) out(`  ${r}`);
+  for (const l of [restored.length ? `restored: ${restored.length}` : "nothing to restore", ...restored.map((r) => `  ${r}`)]) out(l);
   return failed ? (err(`step ${failed} failed — stopped`), 1) : reportCheck(root, out, err);
 }
 

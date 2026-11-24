@@ -27,8 +27,8 @@ Thanks for helping. SAF is small on purpose: a zero-dependency engine, a set of 
 
 This repository also runs SAF on itself: `tools/saf/`, `.claude/`, `CLAUDE.md`, `docs/plan/` and `saf.config.json` at the
 root are the maintainers' own setup, not what users get. Edit the kit under `kit/`, then refresh the installed copy with
-`npm run saf:refresh` (it also runs `node bin/cli.mjs upgrade --dir examples/todo-api` and puts back the example files
-outside the card's `touch`; a test fails while a copy differs, and `npm run saf:refresh -- --check` tells in a second).
+`npm run saf:refresh` when a card is in progress in your folder, otherwise by hand: `node bin/cli.mjs upgrade --dir .` and
+`node bin/cli.mjs upgrade --dir examples/todo-api`. A test fails while a copy differs; `npm run saf:refresh -- --check` tells in a second.
 
 ## Develop
 
@@ -52,9 +52,10 @@ language can ship in parts. Agent, rule and skill templates stay English.
    out falls back to English with a warning.
 3. **Schema.** Add the code to the three enums in `kit/tools-saf/schema/saf.config.schema.json`: `people.docLanguage`,
    `people.chatLanguage` and `roles.reportLanguage`.
-4. **Refresh, then test.** Run `npm run saf:refresh`: it refreshes this repository and runs
-   `node bin/cli.mjs upgrade --dir examples/todo-api`, then puts back the example files outside the card's `touch` (the
-   tests fail while an installed engine copy differs from `kit/`; `npm run saf:refresh -- --check` tells in a second).
+4. **Refresh, then test.** With a card in progress in your folder run `npm run saf:refresh`: it
+   refreshes this repository and runs `node bin/cli.mjs upgrade --dir examples/todo-api`, then puts back the example files
+   outside the card's `touch`. Without a card it refuses: run `node bin/cli.mjs upgrade --dir .` and
+   `node bin/cli.mjs upgrade --dir examples/todo-api` by hand (`npm run saf:refresh -- --check` tells in a second).
    Then `npm test`. The language test names any enum that differs from the languages in `TEXT` and any table without
    `langName`; the setup-choices tests list the new language automatically (the explanations of the three questions
    cover every language, so no explanation text is added).
