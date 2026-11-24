@@ -63,7 +63,9 @@ test("SIZE-AC-10 the rigor options promise no larger or smaller cards, and the r
     assert.ok(!/ใหญ่ขึ้น|เล็กลง/.test(e.th.what), `${value} th: ${e.th.what}`);
   }
   const light = entry("project-rigor", "light");
-  assert.match(light.en.what, /spec review for every new M and L card \(legacy S cards in one batch at the gate\)/);
+  assert.match(light.en.what, /spec review for every new M and L card \(legacy S cards batched at the gate\)/);
+  assert.match(light.en.what, /the test command as the only project check at merge\.$/);
+  assert.match(light.th.what, /เป็นเช็กเดียวของโปรเจกต์$/);
   assert.match(light.th.what, /การ์ด M และ L ใหม่ทุกใบ \(การ์ด S เดิมตรวจรวมที่ gate\)/);
   assert.equal(light.en.cost, "Fewer checks at merge, so mistakes are found later and cost more to fix.");
   assert.equal(light.th.cost, "เช็กตอน merge น้อยลง จึงเจอข้อผิดพลาดช้าและแก้แพงกว่า");

@@ -13,19 +13,19 @@
       "source": "repo"
     }
   },
-  "attempts": 2,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M3-36",
   "worktree": ".claude/worktrees/T-M3-36",
   "verified": {
-    "at": "2026-11-24T19:06:05.649Z",
-    "head": "a42e0e7ec9c33425a9b014ae14bc040e03e99b6d",
+    "at": "2026-11-24T19:08:30.327Z",
+    "head": "1c7e57b0092ee16886dead0033ff76e069ca9224",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 409,
+        "ms": 392,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -52,17 +52,17 @@
       {
         "cmd": "node --test test/unit/card-sizes-text.test.mjs",
         "exit": 0,
-        "ms": 330,
+        "ms": 329,
         "tail": [
           "ok 11 - SIZE-AC-11 config-reference: rigor row without sizes, the sizes row ({ M, L }, the table, the hard stop, the ignored old shape), the review row, the effort row",
           "  ---",
-          "  duration_ms: 0.508667",
+          "  duration_ms: 0.508208",
           "  type: 'test'",
           "  ...",
           "# Subtest: SIZE-AC-11 setup-questions lists the card size caps as M / L and the effort question as lowering M cards",
           "ok 12 - SIZE-AC-11 setup-questions lists the card size caps as M / L and the effort question as lowering M cards",
           "  ---",
-          "  duration_ms: 0.181583",
+          "  duration_ms: 0.186208",
           "  type: 'test'",
           "  ...",
           "1..12",
@@ -73,29 +73,29 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 279.993708"
+          "# duration_ms 277.823167"
         ]
       },
       {
         "cmd": "node -e \"const fs=require('fs');const bad=['docs/card-lifecycle.md','docs/config-reference.md','kit/claude/skills/saf-setup/questions.md','kit/tools-saf/templates/en/commands/saf.md'].filter(f=>/S ≤|S \\/ M|<S\\|M>|size S card|size-M cards|(?<!legacy )S cards/.test(fs.readFileSync(f,'utf8')));if(bad.length){console.error(bad.join('\\n'));process.exit(1)}\"",
         "exit": 0,
-        "ms": 45,
+        "ms": 42,
         "tail": []
       },
       {
         "cmd": "node --test test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs test/unit/effort-setup.test.mjs test/unit/self-fix.test.mjs test/unit/docs-wording.test.mjs test/unit/lane-caps-docs.test.mjs test/unit/repo-sync.test.mjs",
         "exit": 0,
-        "ms": 6053,
+        "ms": 5134,
         "tail": [
           "ok 56 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.984833",
+          "  duration_ms: 0.9215",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "ok 57 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 1.634709",
+          "  duration_ms: 1.446",
           "  type: 'test'",
           "  ...",
           "1..57",
@@ -106,13 +106,13 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 5989.638375"
+          "# duration_ms 5080.285375"
         ]
       },
       {
         "cmd": "npm run saf:refresh -- --check",
         "exit": 0,
-        "ms": 265,
+        "ms": 268,
         "tail": [
           "> super-agent-framework@0.1.0 saf:refresh",
           "> node scripts/refresh-copies.mjs --check",
@@ -122,7 +122,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 316,
+        "ms": 298,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -142,17 +142,17 @@
       {
         "cmd": "node --test 'test/unit/card-sizes-text.test.mjs' 'test/unit/effort-setup.test.mjs'",
         "exit": 0,
-        "ms": 335,
+        "ms": 330,
         "tail": [
           "ok 19 - EFFORT-AC-08 SKILL.md per-machine paragraph says by-size on this machine needs a project whose saf.config.json says by-size",
           "  ---",
-          "  duration_ms: 0.5875",
+          "  duration_ms: 0.58625",
           "  type: 'test'",
           "  ...",
           "# Subtest: EFFORT-AC-08 shipped texts name decision D-016 as SAF's own, the designer variant is explained, and SKILL.md lists the effort question in group 4",
           "ok 20 - EFFORT-AC-08 shipped texts name decision D-016 as SAF's own, the designer variant is explained, and SKILL.md lists the effort question in group 4",
           "  ---",
-          "  duration_ms: 0.667708",
+          "  duration_ms: 0.640334",
           "  type: 'test'",
           "  ...",
           "1..20",
@@ -163,7 +163,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 282.359375"
+          "# duration_ms 278.662375"
         ]
       }
     ],
@@ -192,12 +192,12 @@
         "docs/setup-questions.md": "43a699ebf36f6ee76d1de3fc61dfc40686b22552",
         "kit/claude/skills/saf-setup/SKILL.md": "047ce75bb0a406463566a4308848412d76b942ae",
         "kit/claude/skills/saf-setup/questions.md": "d670ef6a076009fae8b6a5b40a4d2618edd73ee2",
-        "kit/tools-saf/lib/choices.mjs": "62606fd96db438c59dc2fbbe035ee5069788d452",
+        "kit/tools-saf/lib/choices.mjs": "51e97d55045d5c7f2e468189e6b7034dec23e0e4",
         "kit/tools-saf/templates/en/CLAUDE.template.md": "f794e7aedb8cd14d5a5bee836259de88a79b009b",
         "kit/tools-saf/templates/en/commands/saf.md": "613c077c1bc51a5bc62eb603961a436401a33b8d",
         "kit/tools-saf/templates/th/CLAUDE.template.md": "e537d90d7d6a5c141279f7b18b883a5791314421",
         "kit/tools-saf/templates/th/commands/saf.md": "86767a6431d3db1613b1c88c2d8421bb6d582338",
-        "test/unit/card-sizes-text.test.mjs": "98bdc1265b2c2517f5bcc4c829b8f5e42fcb6edb",
+        "test/unit/card-sizes-text.test.mjs": "134ec170fed27bb9d3dacfc2038f99845b9c5d2b",
         "test/unit/effort-setup.test.mjs": "fe32eb863c13bb9ff60aa64e236f7ff331bf41d1"
       }
     },
@@ -216,7 +216,7 @@
         "stop": 1600
       },
       "test": {
-        "lines": 204,
+        "lines": 206,
         "cap": 600,
         "stop": 1200
       },
