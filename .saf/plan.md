@@ -100,7 +100,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence — passed 2026-11-24 04:52 (5 commands) · full suite deferred to gate
 - [x] T-M2-02 saf setup --dry-run lists, per file, what a setup run would do — and writes nothing — passed 2026-11-24 05:05 (5 commands) · full suite deferred to gate
 - [x] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it — passed 2026-11-24 05:09 (5 commands) · full suite deferred to gate
-- [ ] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — started 2026-11-24 05:13 · not verified yet · lane 1 · .claude/worktrees/T-M2-22
+- [x] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — passed 2026-11-24 05:17 (5 commands) · full suite deferred to gate
 - [ ] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning
 
 ## Risks

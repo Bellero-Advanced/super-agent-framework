@@ -18,6 +18,6 @@ npx github:Bellero-Advanced/super-agent-framework upgrade      # in the project 
 - never touches CLAUDE.md, docs, the plan, cards, evidence, agents or rules
 
 To regenerate project files with the new templates, run `/saf-setup` again (or `node tools/saf/bin/saf.mjs setup --answers .saf/setup-answers.json`).
-Files SAF wrote and nobody edited are replaced; edited ones are archived to `docs/archive/pre-saf/` first.
-Your edited decision log, index, milestone and card files are the exception: a re-run keeps them as they are and says so in its output, so your working plan is never reset; `package.json` is written only when a script is missing.
+Files SAF wrote and nobody edited are replaced. Your edited decision log, index, milestone and card files are living files: a re-run keeps them as they are and lists them as kept, so your working plan is never reset. Any other edited file is archived to `docs/archive/pre-saf/` first and replaced, unless you keep it (`--keep <path>`). `package.json` is written only when a script is missing.
+To see it first, add `--dry-run` (lists every change, writes nothing) and `--dry-run --diff` (also shows each change as a diff). `/saf-setup` does this for you and asks per edited file.
 `.saf/manifest.json` records what SAF wrote (with hashes) to make that decision.

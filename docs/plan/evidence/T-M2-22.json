@@ -1,14 +1,158 @@
 {
   "id": "T-M2-22",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T05:13:29.821Z",
     "base": "9f626b0a33eef5b360ad35e45222ca54b41d0873",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-22",
-  "worktree": ".claude/worktrees/T-M2-22"
+  "worktree": ".claude/worktrees/T-M2-22",
+  "verified": {
+    "at": "2026-11-24T05:17:37.297Z",
+    "head": "860990bc2e6ff92d5c05505baecd10efaca7ab01",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 208,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "90 scenario(s) in 11 spec(s) · with test 43 · gaps 47 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/setup-rerun-docs.test.mjs test/unit/setup-choices.test.mjs",
+        "exit": 0,
+        "ms": 1526,
+        "tail": [
+          "ok 13 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "  ---",
+          "  duration_ms: 0.536375",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
+          "ok 14 - RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
+          "  ---",
+          "  duration_ms: 2.0235",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 14",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1491.1285"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/claude/skills/saf-setup/SKILL.md','utf8');if(!s.includes('--dry-run')||!s.includes('--keep'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 30,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 189,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 240 markdown file(s) · 166 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-rerun-docs.test.mjs'",
+        "exit": 0,
+        "ms": 76,
+        "tail": [
+          "TAP version 13",
+          "# Subtest: RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
+          "ok 1 - RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
+          "  ---",
+          "  duration_ms: 1.426417",
+          "  type: 'test'",
+          "  ...",
+          "1..1",
+          "# tests 1",
+          "# suites 0",
+          "# pass 1",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 43.820208"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "docs/upgrade.md",
+        "kit/claude/skills/saf-setup/SKILL.md",
+        "test/unit/setup-rerun-docs.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "docs/upgrade.md": "6575b8a208667ebc635ad7b7c01e556f308e770c",
+        "kit/claude/skills/saf-setup/SKILL.md": "6a2fe53d53d7c3b57f339b66200053b9bd627c2a",
+        "test/unit/setup-rerun-docs.test.mjs": "e8afb241efea4eaed47a9a0868b73ac698b6cd1f"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RERUN-AC-07"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 43,
+        "cap": 150
+      },
+      "test": {
+        "lines": 29,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-rerun-docs.test.mjs"
+      ]
+    }
+  }
 }
