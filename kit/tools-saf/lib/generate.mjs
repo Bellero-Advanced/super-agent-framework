@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { scriptOf } from "./docs.mjs";
 import { loadPlan } from "./plan.mjs";
-import { writeGenerated } from "./task.mjs";
+import { generatedFiles } from "./task.mjs";
 import { render } from "./template.mjs";
 
 /**
@@ -240,72 +241,129 @@ function skillFiles(config, data) {
   return out;
 }
 
+/** The reasons shown next to each action (data, so the dry run and the report say the same words). */
+const REASONS = {
+  create: "missing",
+  same: "already what SAF would write",
+  update: "SAF wrote it, nobody edited it — new content",
+  "replace-edited": `edited, or not written by SAF — moved to ${ARCHIVE}/ and replaced`,
+  "keep-edited": "edited living file — kept, the new settings do not reach it",
+  remove: "no longer shipped, unedited — removed",
+  "keep-unplanned": "no longer shipped, but edited in this project — kept",
+  adopt: "existing file SAF did not write — moved aside first",
+};
+
+/** Where a file would be archived: the first free name, counting the moves already planned in this plan. */
+function archiveDest(root, rel, taken) {
+  let dest = `${ARCHIVE}/${rel}`;
+  for (let n = 1; existsSync(join(root, dest)) || taken.has(dest); n++) dest = `${ARCHIVE}/${rel}.${n}`;
+  taken.add(dest);
+  return dest;
+}
+
+function moveAside(root, rel, to) {
+  mkdirSync(dirname(join(root, to)), { recursive: true });
+  renameSync(join(root, rel), join(root, to));
+}
+
 /**
- * Remove files SAF wrote earlier under OWNED_DIRS that are no longer planned (a dropped command, role, rule or skill pack)
- * — only when nobody edited them since. Edited ones are kept and reported. Files SAF never wrote are never touched.
+ * Files SAF wrote earlier under OWNED_DIRS that are no longer planned (a dropped command, role, rule or skill pack):
+ * `remove` when nobody edited them since, `keep-unplanned` when edited, `forget` when the file is already gone (only the
+ * manifest entry goes). Files SAF never wrote are never touched. Computes only.
  */
-function retireUnplanned(root, manifest, plannedDests, report) {
-  for (const rel of Object.keys(manifest.files)) {
+function planRetire(root, files, plannedDests) {
+  const out = [];
+  for (const [rel, hash] of Object.entries(files)) {
     if (plannedDests.has(rel) || !OWNED_DIRS.some((d) => rel.startsWith(d))) continue;
     const abs = join(root, rel);
-    if (!existsSync(abs)) {
-      delete manifest.files[rel];
+    const action = !existsSync(abs) ? "forget" : sha(readText(abs)) !== hash ? "keep-unplanned" : "remove";
+    out.push({ path: rel, action, reason: REASONS[action] ?? "recorded, but the file is gone" });
+  }
+  return out;
+}
+
+/** Performs a `planRetire` result: removes the files, drops their entries from `files`, reports kept ones. */
+function applyRetire(root, entries, files, report) {
+  for (const e of entries) {
+    if (e.action === "keep-unplanned") {
+      report.kept.push(keptLine(e));
       continue;
     }
-    if (sha(readText(abs)) !== manifest.files[rel]) {
-      report.kept.push(`${rel} (no longer shipped, but edited in this project — kept)`);
-      continue;
-    }
+    delete files[e.path];
+    if (e.action !== "remove") continue;
+    const abs = join(root, e.path);
     rmSync(abs);
-    delete manifest.files[rel];
-    report.removed.push(rel);
+    report.removed.push(e.path);
     const dir = dirname(abs);
     if (existsSync(dir) && readdirSync(dir).length === 0) rmSync(dir, { recursive: true });
   }
 }
 
+/** One shape for the plan (plain path + reason); the real report keeps its text: the reason in brackets after a no-longer-shipped file. */
+const keptLine = (e) => (e.action === "keep-unplanned" ? `${e.path} (${e.reason})` : e.path);
+
 const SETTINGS_HOOKS = {
   SessionStart: 'cd "$CLAUDE_PROJECT_DIR" && node tools/saf/bin/saf.mjs hook session-start',
   Stop: 'cd "$CLAUDE_PROJECT_DIR" && node tools/saf/bin/saf.mjs hook check-stop',
 };
+const SETTINGS = ".claude/settings.json";
+const SETTINGS_LOCAL = ".claude/settings.local.json";
 
-function mergeSettings(root, report) {
-  const file = join(root, ".claude/settings.json");
+/** `.claude/settings.json` merge as data: hooks to add, the env block that moves, the new texts. Computes only. */
+function planSettings(root, taken, report) {
+  const file = join(root, SETTINGS);
   const cur = readJson(file, existsSync(file) ? null : {});
+  let archivedTo = null;
   if (cur === null) {
-    report.warnings.push(".claude/settings.json is not valid JSON — archived and replaced");
-    archive(root, ".claude/settings.json", report);
+    report.warnings.push(`${SETTINGS} is not valid JSON — archived and replaced`);
+    archivedTo = archiveDest(root, SETTINGS, taken);
   }
   const s = cur ?? {};
+  let localText = null;
   if (s.env) {
-    const localFile = join(root, ".claude/settings.local.json");
-    const local = readJson(localFile, {});
+    const local = readJson(join(root, SETTINGS_LOCAL), {});
     local.env = { ...(local.env ?? {}), ...s.env };
-    writeFileSync(localFile, `${JSON.stringify(local, null, 2)}\n`);
+    localText = `${JSON.stringify(local, null, 2)}\n`;
     delete s.env;
-    report.warnings.push("moved the env block of .claude/settings.json into .claude/settings.local.json (not tracked) — values were not printed");
+    report.warnings.push(`moved the env block of ${SETTINGS} into ${SETTINGS_LOCAL} (not tracked) — values were not printed`);
   }
   s.hooks ??= {};
+  const hooks = [];
   for (const [event, command] of Object.entries(SETTINGS_HOOKS)) {
     const groups = (s.hooks[event] ??= []);
-    const present = groups.some((g) => (g.hooks ?? []).some((h) => h.command === command));
-    if (!present) groups.push({ hooks: [{ type: "command", command, timeout: 30 }] });
+    if (groups.some((g) => (g.hooks ?? []).some((h) => h.command === command))) continue;
+    groups.push({ hooks: [{ type: "command", command, timeout: 30 }] });
+    hooks.push(event);
   }
-  mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, `${JSON.stringify(s, null, 2)}\n`);
-  report.written.push(".claude/settings.json (merged)");
+  const text = `${JSON.stringify(s, null, 2)}\n`;
+  const action = archivedTo ? "update" : actionFor(file, text);
+  report.written.push(`${SETTINGS} (merged)`);
+  return { action, hooks, envMoved: localText !== null, text, localText, archivedTo };
+}
+
+/** create / same / update for a whole-file write, compared as LF text. */
+function actionFor(abs, text) {
+  if (!existsSync(abs)) return "create";
+  return readText(abs) === text.replace(/\r\n/g, "\n") ? "same" : "update";
 }
 
 export const GITIGNORE_LINES = [".claude/settings.local.json", ".saf-lane.json", LOCAL_CONFIG_FILE, ".saf/memory/", ".env", ".env.local", ".env.*.local"];
 
-export function mergeGitignore(root, config, report) {
+/** The `.gitignore` merge as data: the lines to add and the new text (`text: null` when nothing is missing). */
+function planGitignore(root, config) {
   const file = join(root, ".gitignore");
   const cur = existsSync(file) ? readFileSync(file, "utf8") : "";
   const have = new Set(cur.split(/\r?\n/).map((l) => l.trim()));
   const want = [...GITIGNORE_LINES, `${config.workflow.worktreeDir.replace(/\/$/, "")}/`, ...config.policies.secrets.envFiles];
   const add = [...new Set(want)].filter((l) => !have.has(l));
-  if (!add.length) return;
-  writeFileSync(file, `${cur}${cur && !cur.endsWith("\n") ? "\n" : ""}${cur ? "\n" : ""}# SAF\n${add.join("\n")}\n`);
+  if (!add.length) return { add, text: null };
+  return { add, text: `${cur}${cur && !cur.endsWith("\n") ? "\n" : ""}${cur ? "\n" : ""}# SAF\n${add.join("\n")}\n` };
+}
+
+export function mergeGitignore(root, config, report) {
+  const { text } = planGitignore(root, config);
+  if (text === null) return;
+  writeFileSync(join(root, ".gitignore"), text);
   report?.written.push(".gitignore (merged)");
 }
 
@@ -349,43 +407,57 @@ export function mergeScriptsText(text, want) {
   return { text: `${bom}${JSON.stringify(pkg, null, indent).replace(/\n/g, eol)}${tail}`, added, kept, scripts: pkg.scripts, invalid: false };
 }
 
-/** Setup's package.json step: create the file when missing, otherwise write only when a script is added. */
-function mergePackageJson(root, config, report) {
-  if (config.stack.packageManager === "none") return null;
+/** Setup's package.json step as data: create the file when missing, otherwise write only when a script is added. */
+function planPackageJson(root, config, report) {
+  const none = { state: "none", added: [], kept: [], text: null, scripts: null };
+  if (config.stack.packageManager === "none") return none;
   const file = join(root, "package.json");
   const name = config.project.name.toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "") || "project";
-  const text = existsSync(file) ? readFileSync(file, "utf8") : `${JSON.stringify({ name, private: true }, null, 2)}\n`;
+  const exists = existsSync(file);
+  const text = exists ? readFileSync(file, "utf8") : `${JSON.stringify({ name, private: true }, null, 2)}\n`;
   const want = engineScripts(config);
   const res = mergeScriptsText(text, want);
   if (res.invalid) {
     report.warnings.push("package.json is not valid JSON — scripts were not added (see docs/plan/README.md for the commands)");
-    return null;
+    return { ...none, state: "invalid" };
   }
   for (const k of res.kept) report.warnings.push(`package.json already has a different "${k}" script — kept yours; SAF docs assume "${want[k]}"`);
-  if (res.text !== null) {
-    writeFileSync(file, res.text);
-    report.written.push("package.json (scripts merged)");
-  }
-  return res.scripts;
-}
-
-function archive(root, rel, report) {
-  const src = join(root, rel);
-  if (!existsSync(src)) return;
-  let dest = join(root, ARCHIVE, rel);
-  let n = 1;
-  while (existsSync(dest)) dest = join(root, ARCHIVE, `${rel}.${n++}`);
-  mkdirSync(dirname(dest), { recursive: true });
-  renameSync(src, dest);
-  report.archived.push(`${rel} → ${relative(root, dest).split("\\").join("/")}`);
+  if (res.text !== null) report.written.push("package.json (scripts merged)");
+  return { state: !exists ? "create" : res.text !== null ? "update" : "same", added: res.added, kept: res.kept, text: res.text, scripts: res.scripts };
 }
 
 /**
+ * The status files as they will be once the plan is applied. loadPlan reads a folder, and the dry run may not write the
+ * project — so the post-apply `docs/plan/` is mirrored in a scratch folder outside the project (removed at once).
+ */
+function planStatus(root, config, writes, moved) {
+  const scratch = mkdtempSync(join(tmpdir(), "saf-plan-"));
+  const put = (rel, bytes) => {
+    mkdirSync(dirname(join(scratch, rel)), { recursive: true });
+    writeFileSync(join(scratch, rel), bytes);
+  };
+  try {
+    for (const abs of walk(join(root, "docs/plan"))) {
+      const rel = relative(root, abs).split("\\").join("/");
+      if (!moved.has(rel)) put(rel, readFileSync(abs));
+    }
+    for (const [rel, content] of writes) if (rel.startsWith("docs/plan/")) put(rel, content);
+    if (existsSync(join(root, ".gitmodules"))) put(".gitmodules", readFileSync(join(root, ".gitmodules")));
+    return loadPlan(scratch, config);
+  } finally {
+    rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+/**
+ * Computes everything a setup run would do and writes nothing (no file, folder, manifest or `.saf/`).
+ * Returns the per-file `actions` (create · same · update · replace-edited · keep-edited · remove · keep-unplanned, each with
+ * a reason), the `merges` as data, the `report` the real run returns, and the resolved `config`. `applySetup` performs it.
  * @param {string} root project folder
  * @param {object} answers partial or full config
  * @param {{now?:Date, adopt?:boolean}} opts
  */
-export function generate(root, answers, opts = {}) {
+export function planSetup(root, answers, opts = {}) {
   const errors = validateConfig(answers);
   if (errors.length) throw new Error(["setup answers are invalid:", ...errors.map((e) => `  ✗ ${e}`)].join("\n"));
   const detected = detectProject(root);
@@ -398,21 +470,30 @@ export function generate(root, answers, opts = {}) {
   // a project SAF already set up (manifest present) is a re-run: never archive in bulk, only replace files one by one
   const rerun = existsSync(join(root, MANIFEST));
   const adopt = !rerun && (opts.adopt ?? detected.adopt);
+  const taken = new Set();
+  const archiveLine = (rel, to) => `${rel} → ${to}`;
 
-  // 1. adopt: move pre-existing agent docs and plan files that SAF did not write into the archive
+  // 1. adopt: pre-existing agent docs and plan files that SAF did not write move into the archive
+  const adoptMoves = [];
   if (adopt) {
     for (const dir of [".claude/agents", ".claude/commands", ".claude/rules", "docs/plan"]) {
       for (const abs of walk(join(root, dir))) {
         const rel = relative(root, abs).split("\\").join("/");
-        if (!manifest.files[rel]) archive(root, rel, report);
+        if (manifest.files[rel]) continue;
+        const to = archiveDest(root, rel, taken);
+        adoptMoves.push({ path: rel, to, reason: REASONS.adopt });
+        report.archived.push(archiveLine(rel, to));
       }
     }
   }
+  const moved = new Set(adoptMoves.map((a) => a.path));
 
   // 2. config + package scripts first (templates need to know which scripts exist)
   let config = resolveConfig(answers);
-  mergeGitignore(root, config, report);
-  const scripts = mergePackageJson(root, config, report);
+  const gitignore = planGitignore(root, config);
+  if (gitignore.text !== null) report.written.push(".gitignore (merged)");
+  const packageJson = planPackageJson(root, config, report);
+  const scripts = packageJson.scripts;
   if (answers.workflow?.mergeChecks === undefined || answers.workflow?.mergeChecks === null) {
     config.workflow.mergeChecks = config.workflow.mergeChecks.filter((cmd) => {
       const name = scriptOf(cmd);
@@ -422,47 +503,141 @@ export function generate(root, answers, opts = {}) {
   const stored = JSON.parse(JSON.stringify(config));
   stored.$schema = "tools/saf/schema/saf.config.schema.json";
   const ordered = { $schema: stored.$schema, ...stored };
-  writeFileSync(join(root, CONFIG_FILE), `${JSON.stringify(ordered, null, 2)}\n`);
+  const configText = `${JSON.stringify(ordered, null, 2)}\n`;
   config = resolveConfig(ordered);
   report.written.push(CONFIG_FILE);
 
-  // 3. rendered files
+  // 3. rendered files: one action each
   const data = templateData(config, detected, { now: opts.now, scripts, version: SAF_VERSION() });
   const files = plannedFiles(config, data, detected);
   const next = { version: SAF_VERSION(), files: {} };
+  const actions = [];
   for (const f of files) {
     const abs = join(root, f.dest);
-    if (existsSync(abs) && statSync(abs).isFile()) {
+    const present = existsSync(abs) && !moved.has(f.dest);
+    if (present && !statSync(abs).isFile()) throw new Error(`${f.dest} is a folder — SAF plans a file there`);
+    let action = "create";
+    let to;
+    if (moved.has(f.dest)) action = "replace-edited"; // already moved aside by the adopt step
+    else if (present) {
       const cur = readText(abs);
       const edited = cur !== f.content && !ownedUnchanged(f.dest);
-      if (edited && rerun && isLiving(f.dest)) {
-        // the team's own working file: keep it, keep its old manifest entry so the next run still sees it as edited
-        if (manifest.files[f.dest]) next.files[f.dest] = manifest.files[f.dest];
-        report.kept.push(f.dest);
-        report.warnings.push(`${f.dest} has your edits — kept, the new settings did not reach it`);
-        continue;
+      action = cur === f.content ? "same" : !edited ? "update" : rerun && isLiving(f.dest) ? "keep-edited" : "replace-edited";
+      if (action === "replace-edited") {
+        to = archiveDest(root, f.dest, taken);
+        report.archived.push(archiveLine(f.dest, to));
       }
-      if (edited) archive(root, f.dest, report);
     }
-    mkdirSync(dirname(abs), { recursive: true });
-    writeFileSync(abs, f.content);
+    const reason = moved.has(f.dest) ? REASONS.adopt : REASONS[action];
+    actions.push({ path: f.dest, action, reason, content: f.content, ...(to ? { to } : {}) });
+    if (action === "keep-edited") {
+      // the team's own working file: keep its old manifest entry so the next run still sees it as edited
+      if (manifest.files[f.dest]) next.files[f.dest] = manifest.files[f.dest];
+      report.kept.push(f.dest);
+      report.warnings.push(`${f.dest} has your edits — kept, the new settings did not reach it`);
+      continue;
+    }
     next.files[f.dest] = sha(f.content);
     report.written.push(f.dest);
   }
-  retireUnplanned(root, manifest, new Set(files.map((f) => f.dest)), report);
-  mkdirSync(join(root, "docs/plan/evidence"), { recursive: true });
-  if (!existsSync(join(root, "docs/plan/evidence/.gitkeep"))) writeFileSync(join(root, "docs/plan/evidence/.gitkeep"), "");
-  next.files["docs/plan/evidence/.gitkeep"] = sha(readFileSync(join(root, "docs/plan/evidence/.gitkeep"), "utf8"));
-  mergeSettings(root, report);
+  const retire = planRetire(root, manifest.files, new Set(files.map((f) => f.dest))).filter((e) => e.action !== "forget");
+  actions.push(...retire);
+  for (const e of retire) if (e.action === "keep-unplanned") report.kept.push(keptLine(e));
+  for (const e of retire) if (e.action === "remove") report.removed.push(e.path);
+  const settings = planSettings(root, taken, report);
+  if (settings.archivedTo) report.archived.push(archiveLine(SETTINGS, settings.archivedTo));
 
-  // 4. generated status files
-  const plan = loadPlan(root, config);
+  // 4. generated status files (and the evidence folder's .gitkeep), as they will be after the apply
+  const writes = new Map(actions.filter((a) => a.content !== undefined && a.action !== "keep-edited").map((a) => [a.path, a.content]));
+  const status = [];
+  const keepFile = join(root, "docs/plan/evidence/.gitkeep");
+  const keepText = existsSync(keepFile) ? readFileSync(keepFile, "utf8") : "";
+  status.push({ path: "docs/plan/evidence/.gitkeep", action: existsSync(keepFile) ? "same" : "create", content: keepText });
+  next.files["docs/plan/evidence/.gitkeep"] = sha(keepText);
+  const plan = planStatus(root, config, writes, moved);
   for (const issue of plan.issues) report.warnings.push(`plan: ${issue}`);
-  writeGenerated(root, plan);
-  next.files["docs/plan/STATE.md"] = sha(readFileSync(join(root, "docs/plan/STATE.md"), "utf8"));
-  mkdirSync(join(root, ".saf"), { recursive: true });
-  writeFileSync(join(root, MANIFEST), `${JSON.stringify(next, null, 2)}\n`);
-  return { config, report, detected };
+  for (const [rel, content] of generatedFiles(plan)) {
+    const abs = join(root, rel);
+    const there = existsSync(abs) && !moved.has(rel);
+    const same = there && readText(abs) === content.replace(/\r\n/g, "\n");
+    status.push({ path: rel, action: !there ? "create" : same ? "same" : "update", content });
+    if (rel === "docs/plan/STATE.md") next.files[rel] = sha(same ? readFileSync(abs, "utf8") : content);
+  }
+  const manifestText = `${JSON.stringify(next, null, 2)}\n`;
+  const manifestAction = actionFor(join(root, MANIFEST), manifestText);
+  return {
+    config,
+    detected,
+    rerun,
+    adopt,
+    actions,
+    report,
+    merges: {
+      adopt: adoptMoves,
+      gitignore,
+      packageJson,
+      config: { action: actionFor(join(root, CONFIG_FILE), configText), text: configText },
+      settings,
+      status,
+      manifest: { action: manifestAction, text: manifestText },
+    },
+  };
+}
+
+const writeAt = (root, rel, text) => {
+  mkdirSync(dirname(join(root, rel)), { recursive: true });
+  writeFileSync(join(root, rel), text);
+};
+
+/** Performs a `planSetup` result, in the order the old generate() did, and returns the report the plan announced. */
+export function applySetup(root, plan) {
+  const m = plan.merges;
+  const report = JSON.parse(JSON.stringify(plan.report));
+  for (const a of m.adopt) moveAside(root, a.path, a.to);
+  if (m.gitignore.text !== null) writeFileSync(join(root, ".gitignore"), m.gitignore.text);
+  if (m.packageJson.text !== null) writeFileSync(join(root, "package.json"), m.packageJson.text);
+  writeFileSync(join(root, CONFIG_FILE), m.config.text);
+  for (const a of plan.actions) {
+    if (a.content === undefined || a.action === "keep-edited") continue;
+    if (a.to) moveAside(root, a.path, a.to);
+    writeAt(root, a.path, a.content);
+  }
+  applyRetire(root, plan.actions.filter((a) => a.content === undefined), {}, { kept: [], removed: [] });
+  const s = m.settings;
+  if (s.localText !== null) writeAt(root, SETTINGS_LOCAL, s.localText);
+  if (s.archivedTo) moveAside(root, SETTINGS, s.archivedTo);
+  writeAt(root, SETTINGS, s.text);
+  for (const f of m.status) if (f.action !== "same") writeAt(root, f.path, f.content);
+  writeAt(root, MANIFEST, m.manifest.text);
+  return report;
+}
+
+/**
+ * @param {string} root project folder
+ * @param {object} answers partial or full config
+ * @param {{now?:Date, adopt?:boolean}} opts
+ */
+export function generate(root, answers, opts = {}) {
+  const plan = planSetup(root, answers, opts);
+  const report = applySetup(root, plan);
+  return { config: plan.config, report, detected: plan.detected };
+}
+
+const PAD = 15;
+/** The dry run's text: one line per path (action · path · reason), then the merges. */
+export function planLines(plan) {
+  const m = plan.merges;
+  const lines = plan.actions.map((a) => `${a.action.padEnd(PAD)} ${a.path}  ${a.reason}`);
+  for (const a of m.adopt) lines.push(`${"adopt".padEnd(PAD)} ${a.path}  ${a.reason} → ${a.to}`);
+  lines.push("", "merges:");
+  lines.push(`  .gitignore: ${m.gitignore.add.length ? `add ${m.gitignore.add.join(" ")}` : "nothing to add"}`);
+  const p = m.packageJson;
+  lines.push(`  package.json: ${p.state}${p.added.length ? ` — add scripts ${p.added.join(", ")}` : ""}${p.kept.length ? ` — keep yours ${p.kept.join(", ")}` : ""}`);
+  const s = m.settings;
+  lines.push(`  ${SETTINGS}: ${s.action}${s.archivedTo ? ` — not valid JSON, archived to ${s.archivedTo}` : ""}${s.hooks.length ? ` — add hooks ${s.hooks.join(", ")}` : ""}${s.envMoved ? ` — env block moves to ${SETTINGS_LOCAL}` : ""}`);
+  lines.push(`  ${CONFIG_FILE}: ${m.config.action}`);
+  for (const f of [...m.status, { path: MANIFEST, action: m.manifest.action }]) lines.push(`  ${f.path}: ${f.action}`);
+  return lines;
 }
 
 /**
@@ -507,7 +682,7 @@ export function refreshKitFiles(root) {
   }
   const scoped = { files: Object.fromEntries(Object.entries(manifest.files).filter(([rel]) => kitDirs.some((d) => rel.startsWith(d)))) };
   const before = Object.keys(scoped.files);
-  retireUnplanned(root, scoped, new Set(planned.map((x) => x.dest)), report);
+  applyRetire(root, planRetire(root, scoped.files, new Set(planned.map((x) => x.dest))), scoped.files, report);
   for (const rel of before) if (!(rel in scoped.files)) delete manifest.files[rel];
   manifest.version = SAF_VERSION();
   mkdirSync(join(root, ".saf"), { recursive: true });

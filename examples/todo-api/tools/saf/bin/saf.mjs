@@ -49,7 +49,7 @@ import {
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
- *   setup --answers <file.json> [--adopt|--no-adopt] · detect · config --check · version
+ *   setup --answers <file.json> [--adopt|--no-adopt] [--dry-run] · detect · config --check · version
  *   choices --group <1-8|flow> [--lang en|th]   what each option of an interview group means (exit 2 usage)
  *   choices --not-asked [--lang en|th]          settings the setup interview does not ask, and where to change them (exit 2 usage)
  *
@@ -356,7 +356,7 @@ async function main() {
       const i = rawArgv.indexOf("--answers");
       const file = i >= 0 ? rawArgv[i + 1] : undefined;
       if (!file) {
-        err("usage: setup --answers <file.json> [--adopt|--no-adopt]");
+        err("usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run]");
         return 2;
       }
       let root = process.cwd();
@@ -367,9 +367,14 @@ async function main() {
           root = process.cwd();
         }
       }
-      const { generate } = await import("../lib/generate.mjs");
+      const { generate, planSetup, planLines } = await import("../lib/generate.mjs");
       const answers = JSON.parse(readFileSync(resolve(file), "utf8"));
       const adopt = rawArgv.includes("--adopt") ? true : rawArgv.includes("--no-adopt") ? false : undefined;
+      if (rawArgv.includes("--dry-run")) {
+        out("setup --dry-run: nothing was written");
+        for (const line of planLines(planSetup(root, answers, { adopt }))) out(line);
+        return 0;
+      }
       const { report } = generate(root, answers, { adopt });
       out(`✓ SAF setup generated ${report.written.length} file(s)`);
       for (const a of report.archived) out(`  archived: ${a}`);
