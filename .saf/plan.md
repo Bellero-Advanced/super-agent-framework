@@ -49,6 +49,10 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
   re-renders the example's unedited `CLAUDE.md` and agents and stops restoring the example files SAF owns. Written by
   the designer, not through the `self_fix` field (T-M3-08 has not landed; F-009 is a `workaround` and T-M3-33 is
   size M)
+- **Self-fix #1 of 3** (owner approval 2026-11-24, D-017): T-M3-34 ([spec](../../specs/merge-allowed.md), F-011
+  `command-failed`) — `task:merge`'s post-verify check skips files allowed by the main folder's
+  `workflow.alwaysAllowed` or the branch's, so a card that adds a glob merges without copying its config to main
+  first. Carries `self_fix: F-011` (read by the plan check once T-M3-08 lands); runs first among the open cards
 - **Effort by size** ([spec](../../specs/effort-by-size.md), D-016): T-M3-03 (setting `models.effort`, `EFFORT_BY_SIZE`,
   `<role>-<effort>` agent files, docs:check, per-machine override) → T-M3-04 (`task:start` names the agent, evidence,
   summary, `/saf` and `/saf-plan` wording, report table of effort × review rounds) and T-M3-05 (setup question and
@@ -105,6 +109,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path — passed 2026-11-24 09:35 (7 commands) · full suite deferred to gate
 - [x] T-M3-32 spec:matrix --check counts a started card only in the folder where it is built, so two parallel lane cards with scenarios no longer block each other — passed 2026-11-24 09:57 (8 commands) · full suite deferred to gate
 - [x] T-M3-33 This repository's /saf commands and CLAUDE.md commands block stay equal to the templates (a test fails when they drift), and saf:refresh keeps the example's commands, skills, agents and CLAUDE.md current — passed 2026-11-24 10:03 (9 commands) · full suite deferred to gate
+- [ ] T-M3-34 task:merge accepts a lane card that adds an always-allowed glob: the post-verify check uses the main folder's list and the branch's
 - [ ] T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read
 - [ ] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates
 - [ ] T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names
