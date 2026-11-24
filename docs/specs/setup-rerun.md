@@ -1,6 +1,6 @@
 # Spec — setup re-run: see what changes first, and never lose your edits
 
-Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22. Builds on
+Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22 · T-M2-27 (rules 19–22). Builds on
 [upgrade-scripts.md](upgrade-scripts.md) (D-010) for the `package.json` rules.
 
 ## 1. Purpose
@@ -77,6 +77,23 @@ replacing it.
 18. `docs/upgrade.md` and the skill's "Re-running" section say: living files with edits are kept, other edited files
     are archived and replaced unless kept, and `--dry-run` / `--diff` show it first.
 
+### Settings files are never lost (`planSettings` in `generate.mjs`)
+
+19. A settings file is **unreadable** when it is not valid JSON, or valid JSON whose root is not an object (`null`, an
+    array, a string, a number). This holds for `.claude/settings.json` and `.claude/settings.local.json`.
+20. When `.claude/settings.json` has an `env` block that moves (as today) and `.claude/settings.local.json` exists but is
+    unreadable, setup moves the local file aside to the first free name `archiveDest` gives (the same naming as an
+    unreadable `settings.json`, under `ARCHIVE`) before it writes the new local file holding only the moved `env`
+    block. The archived copy is byte-identical to the old file. Nothing is written over it and no value is printed.
+21. The archived local file may hold secret values, so it must stay untracked: `GITIGNORE_LINES` gains
+    `<ARCHIVE>/.claude/settings.local.json*` (built from the `ARCHIVE` and `SETTINGS_LOCAL` constants, not typed twice),
+    and setup's `.gitignore` merge adds it.
+22. The plan (`planSetup().merges.settings`) carries the local archive target; the dry run's settings line says
+    `<local file> not valid JSON, archived to <dest>`; the real run lists it in `report.archived` and adds a warning
+    naming both paths. When `settings.json` has no `env` block the local file is not read and stays byte-identical,
+    readable or not. An unreadable `settings.json` whose root is valid JSON but not an object is archived like invalid
+    JSON (today only a parse failure is).
+
 ## 3. Data
 
 - `LIVING_FILES`, `planSetup`, the package-script merge function: `kit/tools-saf/lib/generate.mjs`
@@ -103,9 +120,13 @@ replacing it.
 | RERUN-AC-05 | a re-run with a line added to `CLAUDE.md`; a pair of known texts; a file over the line limit | `--dry-run --diff`; `diffLines(a, b)` | the output has `--- a/CLAUDE.md` / `+++ b/CLAUDE.md` and the added line as a `-` line; the known pair gives the expected hunk; the large file prints one line with both line counts | unit |
 | RERUN-AC-06 | a re-run with an edited `CLAUDE.md` | `setup --keep CLAUDE.md`; `--keep nope.md`; `--diff` without `--dry-run` | `CLAUDE.md` unchanged, not archived, manifest entry unchanged, and the next dry run still lists it as edited; the other two exit 2 naming the problem | unit |
 | RERUN-AC-07 | `SKILL.md` and `docs/upgrade.md` | the docs test runs | the skill's re-run step runs `--dry-run`, offers take new · keep mine · show the diff, and passes kept files with `--keep`; both files say edited living files are kept | unit |
+| RERUN-AC-08 | `settings.json` with an `env` block; `settings.local.json` holding `{ nope` (then `[]`, then `null`) | `planSetup` + `setup --dry-run`; then `generate` | the plan and the dry-run line name the archive target; after the real run the archive is byte-identical to the old local file, the new local file holds exactly the moved `env`, `report.archived` and a warning name both paths, no `env` value appears in the output, and `git check-ignore` matches the archive path with the generated `.gitignore` | unit |
+| RERUN-AC-09 | `settings.json` without `env` and an invalid `settings.local.json`; `settings.json` holding `[]` | `generate` | the local file is byte-identical and nothing is archived for it; the `[]` settings file is archived (target in the dry run and `report.archived`) and replaced by an object with the SAF hooks | unit |
 
 ## 6. Out of scope
 
 - A three-way merge of the person's edits into the new template — the diff shows the change; porting is by hand
 - `saf upgrade` regenerating project docs (it still never touches them)
 - Changing the first-run adopt behaviour
+- Other files read with a silent default (`.saf/manifest.json`, `saf.config.json` in `refreshKitFiles`) — listed in
+  T-M2-27's Why and the M2 review-notes triage

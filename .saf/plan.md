@@ -71,6 +71,14 @@ order 2026-11-24) a setup interview that explains every option and shows every s
   T-M2-21 and T-M2-05 (`generate.mjs`, `text.mjs`); may run beside T-M2-22
 - **Skill packs** ([spec](../../specs/skill-packs.md), D-013 decided: **deferred**): the three cards moved to
   [M3](M3.md) as T-M3-13 … T-M3-15 (were T-M2-03 · T-M2-23 · T-M2-24) — no M2 card depends on them
+- **Before the exit gate** (owner order 2026-11-24): T-M2-27 fixes real data loss found by the review of T-M2-02 (note
+  F1): an unreadable `.claude/settings.local.json` was overwritten with the moved `env` block and no archive; now it is
+  archived to a git-ignored path ([spec rules 19–22](../../specs/setup-rerun.md#settings-files-are-never-lost-plansettings-in-generatemjs)).
+  T-M2-25 → T-M2-26 ([spec](../../specs/lane-caps.md), D-018 proposed): the code-lane and side-lane caps rise to
+  `LANE_CEILING` and each machine may set them in `saf.config.local.json`; then the explanations and docs say what a
+  lane costs and why the main lane stays one. T-M2-26 waits for T-M2-25 (both touch `choices.mjs`); T-M2-27 shares no
+  `touch` file with them and may run beside T-M2-25. The other open review notes are triaged in
+  [M2-review-notes.md](../notes/M2-review-notes.md#triage-for-the-m2-exit-gate)
 - Every new card that changes `kit/` runs `npm run saf:refresh` and the example upgrade, then restores
   `examples/todo-api/.claude` and `examples/todo-api/package.json` (the stale example skill copy is review note C,
   batched for milestone end)
@@ -102,6 +110,9 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it — passed 2026-11-24 05:09 (5 commands) · full suite deferred to gate
 - [x] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — passed 2026-11-24 05:17 (5 commands) · full suite deferred to gate
 - [x] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning — passed 2026-11-24 05:27 (5 commands) · full suite deferred to gate
+- [ ] T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it
+- [ ] T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json
+- [ ] T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the

@@ -19,8 +19,8 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 2. The resolved mode comes from the first source that sets it: environment variable `SAF_TEST_MODE` → the per-user
    file `saf.config.local.json` (project root, not tracked by git) → `saf.config.json` → the default.
 3. The engine records the resolved mode and its source (`env` · `local` · `repo` · `default`) together.
-4. `saf.config.local.json` may only set keys listed in the `LOCAL_KEYS` table in `config.mjs` (today:
-   `workflow.testMode`). Any other key is an error that names the key — never silently ignored. The file is validated
+4. `saf.config.local.json` may only set keys listed in the `LOCAL_KEYS` table in `config.mjs` (`workflow.testMode`,
+   plus the lane caps of [lane-caps.md](lane-caps.md)). Any other key is an error that names the key — never silently ignored. The file is validated
    with the same schema as `saf.config.json`.
 5. An invalid `SAF_TEST_MODE` value is an error that lists the valid modes.
 6. Generated files (CLAUDE.md, docs, agents, STATE.md layout) never depend on `saf.config.local.json` or
@@ -133,7 +133,7 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 |---|---|---|---|---|
 | TMODE-AC-01 | no `testMode` in any source | config loads | mode `milestone`, source `default` | unit |
 | TMODE-AC-02 | repo `targeted`, local file `every-card` | config loads; then with `SAF_TEST_MODE=milestone` | `every-card` from `local`; then `milestone` from `env` | unit |
-| TMODE-AC-03 | local file sets `workflow.lanes`; or `SAF_TEST_MODE=fast` | config loads | error naming `workflow.lanes`; error listing the valid modes | unit |
+| TMODE-AC-03 | local file sets `workflow.lanes.main`; or `SAF_TEST_MODE=fast` | config loads | error naming `workflow.lanes.main`; error listing the valid modes | unit |
 | TMODE-AC-04 | a project with and without `saf.config.local.json` | `init` / `upgrade` generate files | generated files are byte-equal; `.gitignore` lists `saf.config.local.json` | unit |
 | TMODE-AC-05 | `milestone` mode, card criteria `npm test` + another command, the card changed one test file | `task:verify` | the other command and one targeted run of that file run, `npm test` does not; evidence has `testMode`, `deferred`, `targeted.files`; STATE.md says "full suite deferred to gate" | unit |
 | TMODE-AC-06 | `milestone` mode, no `testFiles` command (or no targeted files) | `task:verify` | the full suite runs; evidence has `targeted.fallback`; nothing deferred | unit |
@@ -153,4 +153,5 @@ milestone exit gate ("collect the problems once and fix them before the mileston
 - running only tests "affected" by changed source files (dependency graphs) — targeted means changed test files and
   scenario tests only
 - a repo-level floor that a per-user setting cannot go below (open question on D-008)
-- other per-user keys (lane caps, measure lock) — `LOCAL_KEYS` can grow later, one decision per key
+- other per-user keys (measure lock) — `LOCAL_KEYS` can grow later, one decision per key (lane caps: D-018,
+  [lane-caps.md](lane-caps.md))

@@ -164,3 +164,60 @@ N7. "without the `same` lines" is slightly unclear (the merges block also prints
 5. spec tension: rule 2 says each table has `langName` and `names` but LANG-AC-02's fixture table has only `langName` (code and CONTRIBUTING treat `names` as optional); rule 7 says the report-language text is "worded without naming a language" but the entry says "not English" / "แทนภาษาอังกฤษ" — reword the rules
 8. the upgrade path's fallback warning (generate.mjs ~721, `refreshKitFiles`) is not covered by any test
 9. the cmp.mjs old-vs-new comparison covers fresh runs only (re-run, adopt, upgrade follow by reading) — a re-run + adopt comparison would complete it
+
+## TRIAGE for the M2 exit gate
+
+Designer pass 2026-11-24. Ids are `<card>/<note>`. Closed already: 09/2 (T-M2-18) · 10/A (T-M2-16 merged) · 10/B ·
+10/G · 12/1 · 12/3 · 13/10 (T-M2-14) · 14/N1 (T-M2-19) · 14/N2 (T-M2-15) · 15/G · 18/6 (spec header already says
+decided) · 05/N6 (card done). Evidence notes 20/N6 · 02/N6 · 21/10 are closed by the exit gate's full suite.
+
+### 1. Must be a card before M2 closes
+
+- 02/F1 — real data loss (local settings overwritten, no archive) → **T-M2-27**
+- owner order (not a note) — lane caps per machine → **T-M2-25 · T-M2-26**
+- 13/4 — the `api` explanation says "adds only the server rule"; with i18n the UI rule is added too (setup text that lies)
+- 13/7 — `custom-models` says the ids are used "with the Custom preset" and "builders are the rest"; the code uses them
+  with any preset and honours custom planner roles and `models.overrides` (setup text that lies)
+- → 13/4 and 13/7 fit one S card on `choices.mjs` after T-M2-26 (same file); recommended, owner/main session decides
+
+### 2. Cheap fix worth doing now (one small card or folded into a card already touching the file)
+
+- 18/5 + refreshKitFiles `{}` default — invalid-JSON `saf.config.json`: refresh renders with defaults silently, then
+  `upgrade()` crashes; read with `null`, warn and stop (generate.mjs, src/install.mjs)
+- 02/F4 — `same` files are rewritten (CRLF → LF while the dry run says "same"): skip writing them
+- 21/2 — `--keep=CLAUDE.md` is silently ignored and the real run archives CLAUDE.md: refuse `--keep=` / empty list
+- 10/C + 12/8 — `examples/todo-api/.claude/skills/saf-setup/**` stale on GitHub: refresh it once or add it to
+  `workflow.alwaysAllowed`
+- 10/D — plan README says the evidence "says" full suite deferred; reword to where the words appear
+- 14/N6 + 19/N-b — release-operator says "only on an explicit owner order" even with `deploy: allowed` (template)
+- 13/5 · 13/6 · 13/9 — explanation omissions (UI rule for every type with i18n · strict suggests security-auditor ·
+  raw rigor ids, no unit) — fold into the 13/4 + 13/7 card
+- 12/2 — "exit 75" copied in `choices.mjs`: interpolate `EXIT_BUSY` (fold into the same card)
+- 12/4 — `models.overrides` summary should say it applies only after setup runs again (same card)
+- 14/N3 — `planVerifyRun` fallback reason names the wrong cause
+- 16/N1 · 16/N2 · 20/N1 — out-of-date code comments
+- 09/6 — culprit wording differs from spec rule 25
+- 18/2 — "not valid JSON" wording for a non-object root
+- 20/N7 — docs/upgrade.md "never reset" true only for edited files
+- 05/N2 — literal markdown backticks in the HTML viewer
+- 21/1 · 21/9 · 01/5 — spec wording only (designer, no card)
+
+### 3. Deferred to M3
+
+- 02/F2 — adopt on reinstall moves evidence out of docs/plan (moved, not lost) → needs a DECISIONS row; M3 first
+- 02/F3 · 02/F5 · 20/N3 · 20/N4/02/N5 · 20/N5 — setup internals (manifest of kept files, temp folder, `_template.md`
+  living, `report.kept` shape, non-object `scripts`) → M3 setup hardening card
+- broken `.saf/manifest.json` read as `{ files: {} }` (T-M2-27 Why) → same M3 setup hardening card
+- 09/1 · 09/4 · 09/5 · 09/7 · 09/8 · 09/9 · 09/3 — culprit robustness and tests → M3 culprit card
+- 14/N4 · 14/N5 · 13/14 — need owner decisions (real push/deploy guard, token-saving `off`, informational questions)
+- 13/15 · 17/3 — Thai wording: native-reader pass (the owner's `owner` gate can cover it)
+- 05/N1 · 05/N3 · 05/N4 · 05/N5 · 05/N7 — viewer edge cases with broken or hand-made evidence
+- 17/1 · 17/2 · 17/4 — gate-view consistency for manual undeclared gates
+- 15/N3 · 15/N6 · 19/N-a · 19/N-c · 14/N7 · 13/8 · 13/11 · 13/12 · 13/13 · 22/N5 · 22/N6 · 22/N7 · 21/3 ·
+  21/4 · 21/5 · 21/8 · 01/4 · 12/5 · 12/7 — small wording / CLI strictness items
+- test gaps: 10/E · 10/F (drop) · 12/6 · 15/N1 · 15/N2 · 16/N3 · 16/N4 · 16/N5 · 18/1 · 18/3 · 18/4 · 20/N2 ·
+  21/6 · 21/7 · 02/N3 · 02/N4 · 01/8 · 01/9
+- 22/effort — D-016 data point → T-M3-02 (review rounds)
+- **side lanes with their own slots** (owner idea 2026-11-24, not in T-M2-25): side cards get slots beside the active
+  milestone's caps instead of only the slots it leaves free. Needs a decision row when carded (changes rule "side
+  cards never raise the caps", card-lifecycle.md Side lanes); spec home would be lane-caps.md §6
