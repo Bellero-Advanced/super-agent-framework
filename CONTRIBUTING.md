@@ -27,7 +27,8 @@ Thanks for helping. SAF is small on purpose: a zero-dependency engine, a set of 
 
 This repository also runs SAF on itself: `tools/saf/`, `.claude/`, `CLAUDE.md`, `docs/plan/` and `saf.config.json` at the
 root are the maintainers' own setup, not what users get. Edit the kit under `kit/`, then refresh the installed copy with
-`npm run saf:refresh` and `node bin/cli.mjs upgrade --dir examples/todo-api` (a test fails while either copy differs).
+`npm run saf:refresh` (it also runs `node bin/cli.mjs upgrade --dir examples/todo-api` and puts back the example files
+outside the card's `touch`; a test fails while a copy differs, and `npm run saf:refresh -- --check` tells in a second).
 
 ## Develop
 
@@ -51,12 +52,12 @@ language can ship in parts. Agent, rule and skill templates stay English.
    out falls back to English with a warning.
 3. **Schema.** Add the code to the three enums in `kit/tools-saf/schema/saf.config.schema.json`: `people.docLanguage`,
    `people.chatLanguage` and `roles.reportLanguage`.
-4. **Refresh, then test.** Run `npm run saf:refresh` and `node bin/cli.mjs upgrade --dir examples/todo-api` (the tests
-   fail while either installed engine copy differs from `kit/`), then `npm test`. The language test names any enum that
-   differs from the languages in `TEXT` and any table without `langName`; the setup-choices tests list the new language
-   automatically (the explanations of the three questions cover every language, so no explanation text is added). The
-   example upgrade may also rewrite `examples/todo-api/.claude/` and its `package.json`; no test checks those, so do not
-   commit them unless you changed them (`git checkout -- examples/todo-api/.claude examples/todo-api/package.json`).
+4. **Refresh, then test.** Run `npm run saf:refresh`: it refreshes this repository and runs
+   `node bin/cli.mjs upgrade --dir examples/todo-api`, then puts back the example files outside the card's `touch` (the
+   tests fail while an installed engine copy differs from `kit/`; `npm run saf:refresh -- --check` tells in a second).
+   Then `npm test`. The language test names any enum that differs from the languages in `TEXT` and any table without
+   `langName`; the setup-choices tests list the new language automatically (the explanations of the three questions
+   cover every language, so no explanation text is added).
 
 A native reader must review the text before it ships; machine translation alone is not enough. Setup's own explanations
 (`saf choices --lang`) stay in the languages that have explanation text, and a new language reads them in English.

@@ -94,13 +94,14 @@ tools/saf/   workflow engine (vendored, no dependencies) · saf.config.json = it
 - Change the engine in `kit/`, never in `tools/saf/` — then refresh the installed copy (a unit test fails while they differ):
 
 ```bash
-npm run saf:refresh                    # saf upgrade against this repo: tools/saf/ + setup skill + /saf commands and skills
+npm run saf:refresh                    # refresh this repo AND examples/todo-api in one step; puts back example files outside the card's touch
+npm run saf:refresh -- --check         # read only: do the copies equal kit/? (kit cards list it in "Done when")
 npm run test:unit                      # unit tests only (npm test = unit + e2e + package)
 node scripts/demo.mjs                  # rebuild docs/assets/demo.svg from a real run
 ```
 
-- `examples/todo-api/` is a separate SAF project with its own `CLAUDE.md` and engine copy — refresh it with
-  `node bin/cli.mjs upgrade --dir examples/todo-api`
+- `examples/todo-api/` is a separate SAF project with its own `CLAUDE.md` and engine copy — `npm run saf:refresh` refreshes it too
+  (it runs `node bin/cli.mjs upgrade --dir examples/todo-api` and restores the example files outside the card's `touch`)
 
 ## Working with the owner
 
