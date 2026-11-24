@@ -49,6 +49,7 @@ agent อยู่ใน `.claude/agents/` (โมเดล + effort ตาย�
 {{cmd.taskVerify}}  # ทางเดียวที่การ์ดเป็น "เสร็จ" · task:verify <M> = ตรวจประตูออก milestone
 {{cmd.taskAbandon}}  # เลิกการ์ดที่ยังไม่เสร็จ
 {{cmd.taskReview}}  # บันทึกผลเทียบสเปกหนึ่งรอบ: pass หรือ fail พร้อม --kind (fail เปิดการ์ดให้ตรวจใหม่) — รันที่โฟลเดอร์หลักเท่านั้น
+{{cmd.taskDiff}}  # เขียน diff สำหรับ reviewer ของการ์ดที่เริ่มแล้ว (เฉพาะไฟล์ที่ task:verify นับ) แล้วพิมพ์ path
 {{#if lanesOn}}
 {{cmd.taskStartLane}}  # เปิดสายในโฟลเดอร์งานแยก (การ์ดสายโค้ด)
 {{cmd.taskMerge}}  # รวมการ์ดสายกลับทีละใบ (exit 3 ปฏิเสธ · 4 ชน · 5 ตรวจรวมล้ม)

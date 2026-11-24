@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 6/31
+## M3 SAF builds itself — cards done 7/31
 
-- In progress: **T-M3-31** task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path — started 2026-11-24 09:28 · not verified yet · lane 1 · .claude/worktrees/T-M3-31
-- Next: no card can start yet — T-M3-16 waits for T-M3-31 · T-M3-17 waits for T-M3-16 · T-M3-18 waits for T-M3-31 · T-M3-19 waits for T-M3-17 · T-M3-20 waits for T-M3-18 · T-M3-21 waits for T-M3-17 · T-M3-22 waits for T-M3-31 · T-M3-23 waits for T-M3-31 · T-M3-24 waits for T-M3-21 · T-M3-25 waits for T-M3-20 · T-M3-03 waits for T-M3-21 · T-M3-04 waits for T-M3-03, T-M3-19, T-M3-20, T-M3-22, T-M3-23 · T-M3-05 waits for T-M3-03, T-M3-23 · T-M3-06 waits for T-M3-04, T-M3-05 · T-M3-07 waits for T-M3-04 · T-M3-08 waits for T-M3-06, T-M3-07 · T-M3-09 waits for T-M3-08 · T-M3-10 waits for T-M3-09 · T-M3-11 waits for T-M3-09 · T-M3-12 waits for T-M3-10, T-M3-11 · T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
+- In progress: none
+- Next: T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read · T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names · T-M3-22 The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -15,7 +15,7 @@
 | [T-M3-28](tasks/M3/T-M3-28.md) | A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai | ✓ passed | [T-M3-28.json](evidence/T-M3-28.json) · passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate |
 | [T-M3-29](tasks/M3/T-M3-29.md) | The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists | ✓ passed | [T-M3-29.json](evidence/T-M3-29.json) · passed 2026-11-24 09:12 (5 commands) · full suite deferred to gate |
 | [T-M3-30](tasks/M3/T-M3-30.md) | The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass | ✓ passed | [T-M3-30.json](evidence/T-M3-30.json) · passed 2026-11-24 09:26 (6 commands) · full suite deferred to gate |
-| [T-M3-31](tasks/M3/T-M3-31.md) | task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path | ▶ in progress | [T-M3-31.json](evidence/T-M3-31.json) · started 2026-11-24 09:28 · not verified yet |
+| [T-M3-31](tasks/M3/T-M3-31.md) | task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path | ✓ passed | [T-M3-31.json](evidence/T-M3-31.json) · passed 2026-11-24 09:35 (7 commands) · full suite deferred to gate |
 | [T-M3-16](tasks/M3/T-M3-16.md) | Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read | · not started | – |
 | [T-M3-17](tasks/M3/T-M3-17.md) | Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates | · not started | – |
 | [T-M3-18](tasks/M3/T-M3-18.md) | task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names | · not started | – |
@@ -54,7 +54,7 @@
 
 ## Latest evidence
 
-- T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path — started 2026-11-24 09:28 · not verified yet
+- T-M3-31 task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path — passed 2026-11-24 09:35 (7 commands) · full suite deferred to gate
 - T-M3-30 The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass — passed 2026-11-24 09:26 (6 commands) · full suite deferred to gate
 - T-M3-29 The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists — passed 2026-11-24 09:12 (5 commands) · full suite deferred to gate
 - T-M3-28 A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai — passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate

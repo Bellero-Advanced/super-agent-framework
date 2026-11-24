@@ -143,11 +143,11 @@ export function stateCheck(ctx) {
   return { issues: [...plan.issues, ...legacyIssues(ctx.root, plan)], stale };
 }
 
-function requireValid(plan) {
+export function requireValid(plan) {
   if (plan.issues.length) throw new TaskError(["the plan has problems — fix them first:", ...plan.issues.map((i) => `  ✗ ${i}`)].join("\n"));
 }
 
-function requireCard(plan, id) {
+export function requireCard(plan, id) {
   const card = plan.cards.get(id);
   if (card) return card;
   if (cardStatus(plan, id) === "legacy") throw new TaskError(`${id} was done before cards existed (see done_before_cards in the milestone file)`);
@@ -498,7 +498,7 @@ async function runAll(ctx, cmds) {
 }
 
 /** Base to count lane files from: started.base, or — after main was merged into the lane — the merge base with main. */
-function laneFilesBase(root, ev) {
+export function laneFilesBase(root, ev) {
   if (!isAncestor(root, ev.started.base, "HEAD")) throw new TaskError(`started.base is not an ancestor of the lane HEAD — abandon the lane and open a new one`);
   const main = mainWorktreeHead(root);
   if (!main) return ev.started.base;

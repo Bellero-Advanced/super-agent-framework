@@ -1,14 +1,211 @@
 {
   "id": "T-M3-31",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T09:28:14.020Z",
     "base": "f4dfb16e89b61e718c8febf6bbb1521b0a9679fb",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-31",
-  "worktree": ".claude/worktrees/T-M3-31"
+  "worktree": ".claude/worktrees/T-M3-31",
+  "verified": {
+    "at": "2026-11-24T09:35:08.743Z",
+    "head": "0a9cc2f5d54d214138401b45e7004a066f40ebd8",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/review-diff.test.mjs test/unit/review-rounds.test.mjs test/unit/task.test.mjs",
+        "exit": 0,
+        "ms": 7862,
+        "tail": [
+          "ok 32 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.075959",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 33 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 302.359292",
+          "  type: 'test'",
+          "  ...",
+          "1..33",
+          "# tests 33",
+          "# suites 0",
+          "# pass 32",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 7798.528542"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/templates/en/commands/saf.md','utf8');if(!s.includes('taskDiff'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 47,
+        "tail": []
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 311,
+        "tail": [
+          "> super-agent-framework@0.1.0 saf:refresh",
+          "> node scripts/refresh-copies.mjs --check",
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 340,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "157 scenario(s) in 17 spec(s) · with test 106 · gaps 51 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 354,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 552 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 275,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 270 markdown file(s) · 248 local link(s) · 82 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/review-diff.test.mjs'",
+        "exit": 0,
+        "ms": 4988,
+        "tail": [
+          "ok 10 - RDIFF-AC-06 /saf (en and th): reviewerDiff on names task:diff and the review types · off has no task:diff and still names the types",
+          "  ---",
+          "  duration_ms: 135.038209",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RDIFF-AC-06 the commands block of the CLAUDE templates and the script wiring carry task:diff",
+          "ok 11 - RDIFF-AC-06 the commands block of the CLAUDE templates and the script wiring carry task:diff",
+          "  ---",
+          "  duration_ms: 63.1075",
+          "  type: 'test'",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 4939.542917"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/commands/saf.md",
+        "CLAUDE.md",
+        "docs/card-lifecycle.md",
+        "examples/todo-api/package.json",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/reviewdiff.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/templates/en/CLAUDE.template.md",
+        "kit/tools-saf/templates/en/commands/saf.md",
+        "kit/tools-saf/templates/th/CLAUDE.template.md",
+        "kit/tools-saf/templates/th/commands/saf.md",
+        "package.json",
+        "test/unit/review-diff.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/commands/saf.md": "1584460c9cf665a9eb7ed879d05bc133d10cfbbd",
+        "CLAUDE.md": "aa9d76f4a4e8de5655cdc560a06378bf63564989",
+        "docs/card-lifecycle.md": "03c42419a1413e92a49fafc439948aed98e7f7a8",
+        "examples/todo-api/package.json": "b6c50ee3aa608a5affb2ace179ffe88a319c4f08",
+        "kit/tools-saf/bin/saf.mjs": "452d9a69cc37347d8a5a70146e8ec3e98c749744",
+        "kit/tools-saf/lib/config.mjs": "848f4bc6940988fd07cc9637f42e70eca64306f5",
+        "kit/tools-saf/lib/generate.mjs": "235bf3e93f2b0dcc06ef8ff6420a12a5d4f12fc2",
+        "kit/tools-saf/lib/reviewdiff.mjs": "ea1e2c7f3d8494c3dd986fec2aa8092fe51d480e",
+        "kit/tools-saf/lib/task.mjs": "8d8c02c35b6ad838c25f35c2ec32d515843f01c8",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "e7e3e4bed8ae5a513d58652853819b9e0d6eb843",
+        "kit/tools-saf/templates/en/commands/saf.md": "ee7075ee31d36870347167c43f4720a4acc61aa3",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "856d07c920d4ad61f019d14d4e3d4578c4fe1451",
+        "kit/tools-saf/templates/th/commands/saf.md": "24b92c97ec52becee00c84801875bacb537935be",
+        "package.json": "10b37cd942cf0c6a1d1450f4ace4e0a404898c95",
+        "test/unit/review-diff.test.mjs": "fffa60a68ef61cf73d94db8b4bede6e54feb08b6"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RDIFF-AC-01",
+        "RDIFF-AC-02",
+        "RDIFF-AC-03",
+        "RDIFF-AC-04",
+        "RDIFF-AC-05",
+        "RDIFF-AC-06"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 187,
+        "cap": 400
+      },
+      "test": {
+        "lines": 237,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/review-diff.test.mjs"
+      ]
+    }
+  }
 }

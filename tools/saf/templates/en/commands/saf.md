@@ -34,9 +34,11 @@ Unclear between two routes → ask one short question with a recommendation.
 | start | main session | `{{cmd.taskStart}}`{{#if lanesOn}} (code-lane role → `{{cmd.taskStartLane}}`){{/if}} |
 | build | the card's `role` agent | touch only files in `touch` |
 | verify | same agent | `{{cmd.taskVerify}}` until it passes |
-| review | `spec-reviewer` (read only){{#unless reviewEvery}} — size M cards; S cards at the milestone gate{{/unless}} | the card id{{#if tokenSaving.reviewerDiff}} and a diff file{{/if}} |
+| review | `spec-reviewer` (read only){{#unless reviewEvery}} — size M cards; S cards at the milestone gate{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}`, then {{/if}}the card id · the review types{{#if tokenSaving.reviewerDiff}} · the diff path{{/if}} |
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
 | land | main session | commit{{#if lanesOn}} · lane card → `{{cmd.taskMerge}}`{{/if}} |
+
+Give the `spec-reviewer` the card id, the review types the card needs (a comma list of `text` · `data` · `security` · `refactor`, as its agent file defines them; none fits → none){{#if tokenSaving.reviewerDiff}} and the path `{{cmd.taskDiff}}` prints: the file holds exactly the files `{{cmd.taskVerify}}` counted as the card's — never build a diff by hand{{/if}}.
 
 After every spec review the main session records the result with `{{cmd.taskReview}}` (`pass`, or `fail` with the kinds that
 apply). On `fail` the card is open again: the builder fixes it and runs `{{cmd.taskVerify}}` again, no restart. The command

@@ -43,6 +43,7 @@ npm run task:start -- <id>             # start a card (records the starting poin
 npm run task:verify -- <id>            # the only way a card becomes "done" · task:verify <M> = milestone exit gates
 npm run task:abandon -- <id>           # give up an unfinished card
 npm run task:review -- <id> pass|fail [--kind <k>[,<k>…]] [--note <text>] [--area <area>]  # record a spec review round (a fail reopens the card for verify) — main folder only
+npm run task:diff -- <id>              # write the reviewer's diff of a started card (exactly the files task:verify counts) and print its path
 npm run task:start -- <id> --worktree  # open a lane in its own worktree (code-lane cards)
 npm run task:merge -- <id>             # merge one lane card back (exit 3 refused · 4 conflict · 5 merge checks failed)
 npm run task:next -- --parallel        # read only: cards that can start together
