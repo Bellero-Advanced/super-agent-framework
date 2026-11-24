@@ -118,7 +118,19 @@
       }
     },
     "perfBudgets": "",
-    "alwaysAllowed": ["tools/saf/**", ".claude/skills/saf-setup/**", "examples/todo-api/tools/saf/**", "docs/plan/friction.md", "docs/plan/friction.md.lock"],
+    "alwaysAllowed": [
+      "tools/saf/**",
+      ".claude/skills/saf-setup/**",
+      ".saf/manifest.json",
+      "examples/todo-api/tools/saf/**",
+      "examples/todo-api/.claude/commands/**",
+      "examples/todo-api/.claude/skills/**",
+      "examples/todo-api/.claude/agents/**",
+      "examples/todo-api/CLAUDE.md",
+      "examples/todo-api/.saf/manifest.json",
+      "docs/plan/friction.md",
+      "docs/plan/friction.md.lock"
+    ],
     "commandTimeoutMs": 1800000,
     "testMode": "targeted"
   },
