@@ -1,0 +1,18 @@
+{
+  "id": "T-M3-08",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T18:03:18.516Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "docs"
+      ],
+      "note": "closeSelfFix can throw; th /saf has English 'or'; docs stricter than code (fixed-by-this-card, closed milestone); th NOT_ASKED fragment",
+      "head": "05184f37377990c882f1500a7faf0d34b5028073",
+      "verifyAttempts": 3,
+      "verifyAt": "2026-11-24T17:56:39.766Z"
+    }
+  ]
+}
