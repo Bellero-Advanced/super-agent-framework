@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-24",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T17:06:10.150Z",
+      "result": "fail",
+      "kinds": [
+        "missing-test"
+      ],
+      "note": "setup-diff property generator degenerates (LCG overflows doubles): rnd(2)/rnd(4) almost always 0; CRLF/final-newline cases barely exercised",
+      "head": "9b60a044f58b49d8608b7bc85e4a3902f1285400",
+      "verifyAttempts": 1,
+      "verifyAt": "2026-11-24T17:02:36.024Z"
+    }
+  ]
+}
