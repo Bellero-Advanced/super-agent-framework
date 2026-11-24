@@ -9,7 +9,7 @@ import { detectProject } from "../lib/detect.mjs";
 import { docsInputFor, runDocsCheck } from "../lib/docs.mjs";
 import { CLOSE_STATUSES, FRICTION_FILE, FRICTION_MARKER, FrictionError, appendClose, appendEntry, countByStatus, entryLine } from "../lib/friction.mjs";
 import { listRepoFiles } from "../lib/git.mjs";
-import { blockingGaps, buildMatrix, completeGaps, renderMatrix, summarize } from "../lib/matrix.mjs";
+import { blockingGaps, buildMatrix, completeGaps, countsHere, renderMatrix, summarize } from "../lib/matrix.mjs";
 import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/measure.mjs";
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
@@ -445,17 +445,24 @@ async function main() {
       const completeArg = rest.find((a) => a.startsWith("--complete="));
       const complete = completeArg ? completeArg.slice(11).split(",").map((s) => s.trim()).filter(Boolean) : undefined;
       const plan = loadPlan(root, config);
-      const matrix = buildMatrix({ files: listRepoFiles(root), read: (rel) => readFileSync(join(root, rel), "utf8"), cards: [...plan.cards.values()], status: (id) => cardStatus(plan, id) });
-      out(`${matrix.rows.length ? renderMatrix(matrix) : "(no acceptance scenarios in docs/specs/ yet)"}\n\n${summarize(matrix)}`);
-      if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Scenario ↔ test\n\n${renderMatrix(matrix)}\n\n${summarize(matrix)}\n`, { flag: "a" });
+      const matrix = buildMatrix({ files: listRepoFiles(root), read: (rel) => readFileSync(join(root, rel), "utf8"), cards: [...plan.cards.values()], status: (id) => cardStatus(plan, id), lane: (id) => plan.evidence.get(id)?.lane });
+      let here; // where this runs: a lane's card, or the main folder (null) · unknown lane → every started card counts
+      try {
+        here = { laneCard: laneFolder(root, plan)?.card ?? null };
+      } catch (e) {
+        if (!(e instanceof TaskError)) throw e;
+        err(`lane not recognised (${e.message}) — checking every started card`);
+      }
+      out(`${matrix.rows.length ? renderMatrix(matrix, here) : "(no acceptance scenarios in docs/specs/ yet)"}\n\n${summarize(matrix, here)}`);
+      if (process.env.GITHUB_STEP_SUMMARY) writeFileSync(process.env.GITHUB_STEP_SUMMARY, `### Scenario ↔ test\n\n${renderMatrix(matrix, here)}\n\n${summarize(matrix, here)}\n`, { flag: "a" });
       let failed = false;
       for (const i of matrix.issues) {
         err(`✗ ${i.file}${i.line ? `:${i.line}` : ""} — ${i.message}`);
         failed = true;
       }
       if (check) {
-        for (const r of blockingGaps(matrix)) {
-          err(`✗ ${r.id} (${r.spec}:${r.line}) has no test — card ${r.cards.filter((x) => x.status !== "todo").map((x) => x.id).join(", ")} has started`);
+        for (const r of blockingGaps(matrix, here)) {
+          err(`✗ ${r.id} (${r.spec}:${r.line}) has no test — card ${r.cards.filter((x) => countsHere(x, here)).map((x) => x.id).join(", ")} has started`);
           failed = true;
         }
       }

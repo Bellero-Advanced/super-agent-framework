@@ -71,7 +71,7 @@ export function buildMatrix(input) {
   for (const card of [...input.cards].sort((a, b) => a.id.localeCompare(b.id))) {
     for (const id of card.scenarios.filter((s) => SCENARIO_ID.test(s))) {
       const row = byId.get(id);
-      if (row) row.cards.push({ id: card.id, status: input.status(card.id) });
+      if (row) row.cards.push({ id: card.id, status: input.status(card.id), lane: input.lane?.(card.id) });
       else issues.push({ file: card.file, message: `scenarios: names ${id} but no spec in ${SPEC_DIR} declares it` });
     }
   }
@@ -79,7 +79,23 @@ export function buildMatrix(input) {
 }
 
 export const gaps = (m) => m.rows.filter((r) => !r.tests.length);
-export const blockingGaps = (m) => gaps(m).filter((r) => r.cards.some((c) => c.status !== "todo"));
+
+const BUILT_ELSEWHERE = new Set(["in_progress", "failed"]);
+
+/**
+ * Does a card count for --check in the folder `here` ({ laneCard: id | null })? Finished cards count everywhere,
+ * a card still being built only where it is built (its lane · the main folder for a card without a lane).
+ * Without `here` every started card counts.
+ */
+export function countsHere(c, here) {
+  if (c.status === "todo") return false;
+  if (!here || !BUILT_ELSEWHERE.has(c.status)) return true;
+  return here.laneCard ? c.id === here.laneCard : !c.lane;
+}
+
+export const blockingGaps = (m, here) => gaps(m).filter((r) => r.cards.some((c) => countsHere(c, here)));
+/** Gaps whose started cards are all built in another folder. */
+export const elsewhereGaps = (m, here) => gaps(m).filter((r) => r.cards.some((c) => c.status !== "todo") && !r.cards.some((c) => countsHere(c, here)));
 
 export function completeGaps(m, names) {
   const specOf = (n) => `${SPEC_DIR}${n}.md`;
@@ -91,20 +107,22 @@ export function completeGaps(m, names) {
 const STATUS_TEXT = { todo: "not started", in_progress: "in progress", failed: "failed", done: "done", legacy: "done" };
 const cell = (s) => s.replace(/\|/g, "\\|");
 
-export function renderMatrix(m) {
+export function renderMatrix(m, here) {
   const out = ["| Scenario | Spec | Cards | Test | Status |", "|---|---|---|---|---|"];
-  const blocking = new Set(blockingGaps(m).map((r) => r.id));
+  const blocking = new Set(blockingGaps(m, here).map((r) => r.id));
+  const elsewhere = new Set(elsewhereGaps(m, here).map((r) => r.id));
   for (const r of m.rows) {
     const spec = `${posix.basename(r.spec, ".md")}:${r.line}`;
     const cards = r.cards.map((c) => `${c.id} (${STATUS_TEXT[c.status]})`).join(" · ") || "—";
     const test = r.tests.length ? `${r.tests[0].file}${r.tests.length > 1 ? ` +${r.tests.length - 1}` : ""}` : "—";
-    const status = r.tests.length ? `✓ ${r.tests.length} test(s)` : blocking.has(r.id) ? "✗ gap (card started)" : "✗ gap";
+    const status = r.tests.length ? `✓ ${r.tests.length} test(s)` : blocking.has(r.id) ? "✗ gap (card started)" : elsewhere.has(r.id) ? "✗ gap (started in another folder)" : "✗ gap";
     out.push(`| ${r.id} | ${cell(spec)} | ${cell(cards)} | ${cell(test)} | ${status} |`);
   }
   return out.join("\n");
 }
 
-export function summarize(m) {
+export function summarize(m, here) {
   const g = gaps(m).length;
-  return `${m.rows.length} scenario(s) in ${m.specs.length} spec(s) · with test ${m.rows.length - g} · gaps ${g} · gaps of started cards ${blockingGaps(m).length}`;
+  const other = elsewhereGaps(m, here).length;
+  return `${m.rows.length} scenario(s) in ${m.specs.length} spec(s) · with test ${m.rows.length - g} · gaps ${g} · gaps of started cards ${blockingGaps(m, here).length}${other ? ` · started in another folder ${other}` : ""}`;
 }
