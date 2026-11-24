@@ -2,7 +2,7 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 15/24
+## M2 Roadmap: next — cards done 15/21
 
 - In progress: none
 - Next: T-M2-20 A setup re-run keeps your edited decision log, index and plan files, and leaves package.json alone unless a script is missing · T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence
@@ -30,9 +30,6 @@
 | [T-M2-21](tasks/M2/T-M2-21.md) | saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it | · not started | – |
 | [T-M2-22](tasks/M2/T-M2-22.md) | /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff | · not started | – |
 | [T-M2-01](tasks/M2/T-M2-01.md) | A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning | · not started | – |
-| [T-M2-03](tasks/M2/T-M2-03.md) | A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it | · not started | – |
-| [T-M2-23](tasks/M2/T-M2-23.md) | Setup and upgrade install skill packs named in skills.external only when their content hash matches | · not started | – |
-| [T-M2-24](tasks/M2/T-M2-24.md) | /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 
@@ -54,3 +51,4 @@
 
 - M0 SAF setup works in this repo — done
 - M1 v0.1.0 public release — done
+- M3 SAF builds itself — planned

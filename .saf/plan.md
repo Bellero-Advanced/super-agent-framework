@@ -4,13 +4,13 @@ Status: active
 Source: `docs/plan/milestones/M2.md` · full status: `docs/plan/STATE.md` · a card becomes done only through `npm run task:verify -- <id>`
 
 ## Goal
-The "Next" items of [ROADMAP.md](../../../ROADMAP.md): more document languages, a guided upgrade of project docs, skill
-packs from other repositories, a card size check and an evidence viewer. Plus (owner order 2026-11-24) a setup
-interview that explains every option and shows every setting it does not ask.
+The "Next" items of [ROADMAP.md](../../../ROADMAP.md): more document languages, a guided upgrade of project docs, a card
+size check and an evidence viewer (skill packs from other repositories moved to [M3](M3.md) by D-013). Plus (owner
+order 2026-11-24) a setup interview that explains every option and shows every setting it does not ask.
 
 ## Scope
 - The four roadmap items were rewritten with `/saf-plan M2` (2026-11-24) into specs and chains of S/M cards, listed in
-  work order after the merged cards; their decisions D-011 … D-014 are **proposed** until the owner decides
+  work order after the merged cards; their decisions D-011 … D-014 are decided (owner order 2026-11-24)
 - T-M2-04 (card size check) is a **side card**: it touches only the verify step, its tests and the engine copies that
   `npm run saf:refresh` rewrites, so it may run in a side lane while M1 is active. It also fixes the lane guard that
   refuses a SAF project in a subfolder (`examples/todo-api`) inside any lane worktree — without that fix `npm test`
@@ -68,11 +68,9 @@ interview that explains every option and shows every setting it does not ask.
   T-M2-02 waits for both (`saf.mjs`, `generate.mjs`)
 - **Document languages** ([spec](../../specs/doc-languages.md), D-014): T-M2-01 — the mechanism only (registry, English
   fallback with a warning, explanations that cover any language, contributor steps); no third language ships. After
-  T-M2-21 and T-M2-05 (`generate.mjs`, `text.mjs`); may run beside T-M2-22 and T-M2-03
-- **Skill packs** ([spec](../../specs/skill-packs.md), D-013 — **recommended for deferral**): T-M2-03 (format +
-  read-only `saf pack show`) → T-M2-23 (setup and upgrade install pinned packs) → T-M2-24 (interview asks, explicit
-  yes). Local folders only, content pinned by sha256, `.md` files only, SAF never fetches or runs anything. Last in
-  the order so cutting them changes nothing else; every card uses the `security-review` skill
+  T-M2-21 and T-M2-05 (`generate.mjs`, `text.mjs`); may run beside T-M2-22
+- **Skill packs** ([spec](../../specs/skill-packs.md), D-013 decided: **deferred**): the three cards moved to
+  [M3](M3.md) as T-M3-13 … T-M3-15 (were T-M2-03 · T-M2-23 · T-M2-24) — no M2 card depends on them
 - Every new card that changes `kit/` runs `npm run saf:refresh` and the example upgrade, then restores
   `examples/todo-api/.claude` and `examples/todo-api/package.json` (the stale example skill copy is review note C,
   batched for milestone end)
@@ -104,9 +102,6 @@ interview that explains every option and shows every setting it does not ask.
 - [ ] T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it
 - [ ] T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff
 - [ ] T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning
-- [ ] T-M2-03 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it
-- [ ] T-M2-23 Setup and upgrade install skill packs named in skills.external only when their content hash matches
-- [ ] T-M2-24 /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the
@@ -117,10 +112,6 @@ interview that explains every option and shows every setting it does not ask.
   change `task:verify`, so the dogfooding risk of the test-mode cards does not apply
 - **HTML from evidence** (T-M2-05): output tails are untrusted text — one escape function for every value, no script,
   a CSP meta tag; AC-02 checks it
-- **Skill packs are third-party instructions** (T-M2-03 … T-M2-24): a malicious skill can tell an agent to run
-  commands even without scripts. The trust model limits what SAF does (no fetch, no run, `.md` only, pinned hash,
-  explicit yes after `pack show`) but cannot vet the text — the docs and the interview say so; `security-review`
-  is required on each card
 - **Languages and the schema** (T-M2-01): the schema enums stay static; a test fails when they differ from the
   registry, so a contributor cannot add half a language unnoticed
 - **Test mode and this repo (dogfooding):** cards here change the engine that runs `task:verify` and writes the

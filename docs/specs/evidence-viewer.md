@@ -1,6 +1,6 @@
 # Spec — evidence viewer (one HTML page per milestone)
 
-Decision: [D-012](../DECISIONS.md) (proposed). Card: T-M2-05.
+Decision: [D-012](../DECISIONS.md) (decided). Card: T-M2-05.
 
 ## 1. Purpose
 

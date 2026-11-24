@@ -1,6 +1,6 @@
 # Spec — document languages (add one with a template folder and a text-table entry)
 
-Decision: [D-014](../DECISIONS.md) (proposed). Card: T-M2-01.
+Decision: [D-014](../DECISIONS.md) (decided). Card: T-M2-01.
 
 ## 1. Purpose
 

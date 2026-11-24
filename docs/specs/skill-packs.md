@@ -1,7 +1,7 @@
 # Spec — skill packs from other repositories (local folder, pinned content)
 
-Decision: [D-013](../DECISIONS.md) (proposed — recommendation: defer to a later milestone). Cards: T-M2-03 · T-M2-23 ·
-T-M2-24. **Security-relevant:** every card of this spec is built and reviewed with the `security-review` skill.
+Decision: [D-013](../DECISIONS.md) (decided — deferred to M3). Cards: T-M3-13 · T-M3-14 · T-M3-15 (were T-M2-03 ·
+T-M2-23 · T-M2-24). **Security-relevant:** every card of this spec is built and reviewed with the `security-review` skill.
 
 ## 1. Purpose
 

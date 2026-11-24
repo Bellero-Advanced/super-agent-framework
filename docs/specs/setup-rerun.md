@@ -1,6 +1,6 @@
 # Spec — setup re-run: see what changes first, and never lose your edits
 
-Decision: [D-011](../DECISIONS.md) (proposed). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22. Builds on
+Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22. Builds on
 [upgrade-scripts.md](upgrade-scripts.md) (D-010) for the `package.json` rules.
 
 ## 1. Purpose

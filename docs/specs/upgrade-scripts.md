@@ -1,6 +1,6 @@
 # Spec — `saf upgrade` adds the engine's new package.json scripts
 
-Decision: [D-010](../DECISIONS.md) (proposed). Card: T-M2-18. Found by the spec review of T-M2-09.
+Decision: [D-010](../DECISIONS.md) (decided). Card: T-M2-18. Found by the spec review of T-M2-09.
 
 ## 1. Purpose
 
