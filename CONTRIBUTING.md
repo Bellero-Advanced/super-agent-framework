@@ -8,7 +8,8 @@ Thanks for helping. SAF is small on purpose: a zero-dependency engine, a set of 
 - **Every OS.** Linux, macOS and Windows (CI runs all three on Node 20 and 22). Use `node:path`, never assume `/` in
   filesystem paths (git output is always `/`), never assume bash, spawn `.cmd` shims through the shell on Windows.
 - **Evidence before done.** A pull request that changes behaviour adds or changes a test that fails without it.
-- **Templates are bilingual.** Anything under `kit/tools-saf/templates/en/` has a twin under `th/` — change both.
+- **Templates are bilingual.** Anything under `kit/tools-saf/templates/en/` has a twin under `th/` — change every language
+  folder that has the file (a language folder may lack files; those fall back to English, see "Add a document language").
   Thai text addresses the user as "คุณ" and refers to itself as "ผม".
 - **Short skill descriptions.** Every skill description sits in every session's context; keep it to one or two lines.
 
@@ -26,7 +27,7 @@ Thanks for helping. SAF is small on purpose: a zero-dependency engine, a set of 
 
 This repository also runs SAF on itself: `tools/saf/`, `.claude/`, `CLAUDE.md`, `docs/plan/` and `saf.config.json` at the
 root are the maintainers' own setup, not what users get. Edit the kit under `kit/`, then refresh the installed copy with
-`npm run saf:refresh` (a test fails while they differ).
+`npm run saf:refresh` and `node bin/cli.mjs upgrade --dir examples/todo-api` (a test fails while either copy differs).
 
 ## Develop
 
@@ -44,14 +45,18 @@ language can ship in parts. Agent, rule and skill templates stay English.
 
 1. **Table entry.** Add a table for the language code to `TEXT` in `kit/tools-saf/lib/text.mjs`. It needs `langName`
    (the language's own name); `names` (the names of other languages in this one) and `sessionWork` (the three work labels
-   of the session summary) are optional, and any key the table lacks reads in English.
+   of the session summary) are optional, and any key the table lacks reads in English. Also add the new language's
+   name to `names` in the `en` and `th` tables (otherwise English and Thai documents show its `langName` instead).
 2. **Templates.** Copy `kit/tools-saf/templates/en/` to `kit/tools-saf/templates/<code>/` and translate; a file you leave
    out falls back to English with a warning.
 3. **Schema.** Add the code to the three enums in `kit/tools-saf/schema/saf.config.schema.json`: `people.docLanguage`,
    `people.chatLanguage` and `roles.reportLanguage`.
-4. **Tests.** Run `npm test`. The language test names any enum that differs from the languages in `TEXT` and any table
-   without `langName`; the setup-choices tests list the new language automatically (the explanations of the three
-   questions cover every language, so no explanation text is added). Then run `npm run saf:refresh`.
+4. **Refresh, then test.** Run `npm run saf:refresh` and `node bin/cli.mjs upgrade --dir examples/todo-api` (the tests
+   fail while either installed engine copy differs from `kit/`), then `npm test`. The language test names any enum that
+   differs from the languages in `TEXT` and any table without `langName`; the setup-choices tests list the new language
+   automatically (the explanations of the three questions cover every language, so no explanation text is added). The
+   example upgrade may also rewrite `examples/todo-api/.claude/` and its `package.json`; no test checks those, so do not
+   commit them unless you changed them (`git checkout -- examples/todo-api/.claude examples/todo-api/package.json`).
 
 A native reader must review the text before it ships; machine translation alone is not enough. Setup's own explanations
 (`saf choices --lang`) stay in the languages that have explanation text, and a new language reads them in English.

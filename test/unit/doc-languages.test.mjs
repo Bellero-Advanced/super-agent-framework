@@ -40,7 +40,7 @@ async function fixture() {
   const en = readFileSync(join(engine, "templates", "en", "CLAUDE.template.md"), "utf8");
   writeFileSync(join(engine, "templates", "xx", "CLAUDE.template.md"), FIXTURE_DOC + en);
   const url = (...p) => pathToFileURL(join(engine, ...p)).href;
-  copied = { engine, gen: await import(url("lib", "generate.mjs")), choices: await import(url("lib", "choices.mjs")), cfg: await import(url("lib", "config.mjs")) };
+  copied = { engine, gen: await import(url("lib", "generate.mjs")), choices: await import(url("lib", "choices.mjs")) };
   return copied;
 }
 
@@ -69,6 +69,9 @@ test("LANG-AC-01 languageName reads the document language's names, then English 
   assert.equal(languageName("en", "th"), "ภาษาอังกฤษ");
   assert.equal(languageName("th", "xx"), "Thai", "an unknown document language reads English names");
   assert.equal(languageName("xx", "en"), "xx", "no table, no name: the code");
+  assert.equal(languageName("constructor", "en"), "constructor", "an inherited object key is not a language");
+  assert.equal(textFor("constructor"), TEXT.en);
+  assert.equal(textFor("__proto__"), TEXT.en);
 });
 
 test("LANG-AC-02 a language with one template reads it for that file, falls back to English with one warning per other file, and writes status files in English", async () => {
@@ -76,10 +79,12 @@ test("LANG-AC-02 a language with one template reads it for that file, falls back
   const root = tmp("saf-xx-");
   const plan = gen.planSetup(root, ANSWERS("xx"));
   const warned = plan.report.warnings.filter((w) => w.includes("is missing"));
-  assert.ok(warned.length >= 9, `one warning per fallen-back document, got ${warned.length}`);
+  // every document except CLAUDE.md (the xx template); the goal in ANSWERS gives the M1 draft too
+  const fallen = ["docs/INDEX.md", "docs/DECISIONS.md", "docs/plan/README.md", "docs/plan/milestones/M0.md", "docs/plan/milestones/M1.md", "docs/plan/tasks/T-M0-01.md", "docs/plan/tasks/_template.md", "docs/specs/_template.md", "commands/saf.md", "commands/saf-plan.md"];
+  assert.equal(warned.length, fallen.length, `one warning per fallen-back document, got ${warned.length}`);
   assert.ok(warned.every((w) => w.includes("templates/xx/") && w.includes('"xx"')), "each warning names the path and the language");
   assert.ok(!warned.some((w) => w.includes("CLAUDE.template.md")), "the file xx has is not reported");
-  for (const f of ["docs/INDEX.md", "docs/DECISIONS.md", "docs/plan/README.md", "docs/plan/milestones/M0.md", "docs/plan/tasks/T-M0-01.md", "docs/plan/tasks/_template.md", "docs/specs/_template.md", "commands/saf.md", "commands/saf-plan.md"]) {
+  for (const f of fallen) {
     assert.equal(warned.filter((w) => w.includes(`templates/xx/${f}`)).length, 1, f);
   }
   const { report } = gen.generate(root, ANSWERS("xx"));
@@ -140,7 +145,8 @@ test("LANG-AC-05 CONTRIBUTING.md has the Add a document language section with th
   const at = text.indexOf("\n## Add a document language\n");
   assert.ok(at >= 0, "section heading");
   const section = text.slice(at + 1).split(/\n## /)[0];
-  for (const step of ["1. **Table entry.**", "2. **Templates.**", "3. **Schema.**", "4. **Tests.**"]) assert.ok(section.includes(step), step);
+  for (const step of ["1. **Table entry.**", "2. **Templates.**", "3. **Schema.**", "4. **Refresh, then test.**"]) assert.ok(section.includes(step), step);
   assert.ok(section.includes("kit/tools-saf/lib/text.mjs") && section.includes("templates/en/") && section.includes("people.docLanguage") && section.includes("roles.reportLanguage"));
+  assert.ok(section.includes("npm run saf:refresh") && section.includes("upgrade --dir examples/todo-api") && section.includes("npm test"), "refresh both engine copies, then test");
   assert.ok(/native reader/i.test(section), "native-reader review");
 });

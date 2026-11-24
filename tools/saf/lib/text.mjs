@@ -281,11 +281,15 @@ export function mergeText(base, table) {
 const merged = new WeakMap();
 /** The text of a language: its table over English; an unknown language reads English. Do not modify the result. */
 export function textFor(lang) {
-  const table = TEXT[lang];
+  const table = Object.hasOwn(TEXT, lang) ? TEXT[lang] : undefined;
   if (!table || table === en) return en;
   if (!merged.has(table)) merged.set(table, mergeText(en, table));
   return merged.get(table);
 }
 
 /** The name of language `code` written in document language `docLang`: that table's `names`, else English `names`, else the language's own `langName`, else the code. */
-export const languageName = (code, docLang) => textFor(docLang).names?.[code] ?? TEXT[code]?.langName ?? code;
+export const languageName = (code, docLang) => {
+  const names = textFor(docLang).names;
+  if (names && Object.hasOwn(names, code)) return names[code];
+  return Object.hasOwn(TEXT, code) && TEXT[code].langName ? TEXT[code].langName : code;
+};
