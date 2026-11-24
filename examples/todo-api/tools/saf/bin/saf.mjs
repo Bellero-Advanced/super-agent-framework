@@ -371,8 +371,9 @@ async function main() {
       const answers = JSON.parse(readFileSync(resolve(file), "utf8"));
       const adopt = rawArgv.includes("--adopt") ? true : rawArgv.includes("--no-adopt") ? false : undefined;
       if (rawArgv.includes("--dry-run")) {
+        const lines = planLines(planSetup(root, answers, { adopt }));
         out("setup --dry-run: nothing was written");
-        for (const line of planLines(planSetup(root, answers, { adopt }))) out(line);
+        for (const line of lines) out(line);
         return 0;
       }
       const { report } = generate(root, answers, { adopt });

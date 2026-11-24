@@ -2,7 +2,7 @@ import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, cleanup, gitRepo, lib, tmp } from "../helpers.mjs";
@@ -115,6 +115,7 @@ test("RERUN-AC-03 the CLI --dry-run in a set-up project and in an empty folder: 
   assert.equal(bad.status, 0);
   const wrong = spawnSync(process.execPath, [SAF_CLI, "setup", "--answers", answersFile({ project: { type: "nope" } }), "--dry-run"], { cwd: empty, encoding: "utf8" });
   assert.equal(wrong.status, 1, "invalid answers fail like setup");
+  assert.equal(wrong.stdout, "", "the nothing-written line only follows a plan that worked");
   assert.match(wrong.stderr, /setup answers are invalid/);
   assert.deepEqual(readdirSync(empty), []);
 });
@@ -158,6 +159,7 @@ test("RERUN-AC-04 one fixture with every action: the plan's actions match the re
   put(root, "package.json", `{\n    "name": "x"\n}\n`);
 
   const plan = planSetup(root, ANSWERS, { now: NOW });
+  const prior = Object.fromEntries(plan.actions.map((a) => [a.path, existsSync(join(root, a.path)) ? read(root, a.path) : null]));
   const act = Object.fromEntries(plan.actions.map((a) => [a.path, a.action]));
   assert.equal(act[".claude/commands/saf-plan.md"], "create");
   assert.equal(act[".claude/commands/saf.md"], "same");
@@ -171,7 +173,27 @@ test("RERUN-AC-04 one fixture with every action: the plan's actions match the re
 
   const { report } = generate(root, ANSWERS, { now: NOW });
 
-  assert.deepEqual(report, plan.report, "written · archived · kept · removed · warnings are exactly what was planned");
+  // each planned action is checked against what is on disk afterwards, not against the plan's own report
+  for (const a of plan.actions) {
+    const had = prior[a.path];
+    const now = existsSync(join(root, a.path)) ? read(root, a.path) : null;
+    const archived = a.to ?? `docs/archive/pre-saf/${a.path}`;
+    if (a.action === "create" || a.action === "update") assert.equal(now, a.content, a.path);
+    if (a.action === "replace-edited") {
+      assert.equal(now, a.content, a.path);
+      assert.equal(read(root, archived), had, `${a.path} archived with its old bytes`);
+    }
+    if (a.action === "same") assert.equal(now, had, a.path);
+    if (a.action === "keep-edited" || a.action === "keep-unplanned") {
+      assert.equal(now, had, `${a.path} unchanged`);
+      assert.ok(!existsSync(join(root, archived)), `${a.path} not archived`);
+    }
+    if (a.action === "remove") assert.equal(now, null, `${a.path} gone`);
+  }
+  const wrote = plan.actions.filter((a) => a.content !== undefined && a.action !== "keep-edited").map((a) => a.path);
+  assert.deepEqual(report.written.filter((w) => wrote.includes(w)), wrote, "every non-kept rendered file is reported written, in order");
+  assert.ok(report.written.length === wrote.length + 3 && !report.written.includes("docs/DECISIONS.md"), "plus config, package.json and settings only");
+  assert.deepEqual(report.archived, plan.actions.filter((a) => a.to).map((a) => `${a.path} → ${a.to}`));
   assert.ok(report.written.includes(".claude/commands/saf-plan.md") && report.written.includes("docs/plan/README.md"));
   assert.deepEqual(report.removed, [".claude/rules/gone.md"]);
   assert.ok(report.kept.includes("docs/DECISIONS.md"));
@@ -212,4 +234,34 @@ test("RERUN-AC-04 an invalid package.json and invalid settings.json are planned 
   assert.deepEqual(report, plan.report);
   assert.equal(read(root, "package.json"), "{ not json");
   assert.ok(report.archived.some((a) => a.startsWith(".claude/settings.json → docs/archive/pre-saf/")));
+});
+
+test("RERUN-AC-04 a first run with --adopt: the status files moved aside are recreated and the plan matches the disk", () => {
+  const root = tmp();
+  put(root, "docs/plan/evidence/.gitkeep", "");
+  put(root, "docs/plan/STATE.md", "an old state\n");
+  put(root, "CLAUDE.md", "# mine\n");
+  const plan = planSetup(root, ANSWERS, { now: NOW, adopt: true });
+  assert.ok(plan.merges.adopt.some((a) => a.path === "docs/plan/evidence/.gitkeep"));
+  assert.equal(plan.merges.status.find((s) => s.path === "docs/plan/evidence/.gitkeep").action, "create");
+  generate(root, ANSWERS, { now: NOW, adopt: true });
+  for (const s of plan.merges.status) assert.equal(read(root, s.path), s.content, s.path);
+  assert.ok(existsSync(join(root, "docs/plan/evidence/.gitkeep")));
+  const files = JSON.parse(read(root, ".saf/manifest.json")).files;
+  for (const rel of ["docs/plan/evidence/.gitkeep", "docs/plan/STATE.md", "CLAUDE.md"]) assert.equal(files[rel], sha(read(root, rel)), `manifest hash of ${rel} is the file on disk`);
+});
+
+test("RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings", async (t) => {
+  const root = await project();
+  try {
+    symlinkSync(tmp(), join(root, "docs/plan/linked"), "dir");
+  } catch {
+    t.skip("cannot create a symlink here");
+    return;
+  }
+  assert.doesNotThrow(() => planSetup(root, ANSWERS, { now: NOW }));
+  put(root, ".claude/settings.json", JSON.stringify({ env: { A: "1" } }));
+  const r = cli(root, "--dry-run");
+  assert.equal(r.status, 0, r.stderr);
+  assert.match(r.stdout, /warnings:\n[\s\S]*moved the env block/);
 });

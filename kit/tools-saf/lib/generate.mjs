@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { CONFIG_FILE, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
@@ -439,7 +439,7 @@ function planStatus(root, config, writes, moved) {
   try {
     for (const abs of walk(join(root, "docs/plan"))) {
       const rel = relative(root, abs).split("\\").join("/");
-      if (!moved.has(rel)) put(rel, readFileSync(abs));
+      if (!moved.has(rel) && lstatSync(abs).isFile()) put(rel, readFileSync(abs)); // loadPlan ignores links, so the copy does too
     }
     for (const [rel, content] of writes) if (rel.startsWith("docs/plan/")) put(rel, content);
     if (existsSync(join(root, ".gitmodules"))) put(".gitmodules", readFileSync(join(root, ".gitmodules")));
@@ -551,8 +551,9 @@ export function planSetup(root, answers, opts = {}) {
   const writes = new Map(actions.filter((a) => a.content !== undefined && a.action !== "keep-edited").map((a) => [a.path, a.content]));
   const status = [];
   const keepFile = join(root, "docs/plan/evidence/.gitkeep");
-  const keepText = existsSync(keepFile) ? readFileSync(keepFile, "utf8") : "";
-  status.push({ path: "docs/plan/evidence/.gitkeep", action: existsSync(keepFile) ? "same" : "create", content: keepText });
+  const keepThere = existsSync(keepFile) && !moved.has("docs/plan/evidence/.gitkeep");
+  const keepText = keepThere ? readFileSync(keepFile, "utf8") : "";
+  status.push({ path: "docs/plan/evidence/.gitkeep", action: keepThere ? "same" : "create", content: keepText });
   next.files["docs/plan/evidence/.gitkeep"] = sha(keepText);
   const plan = planStatus(root, config, writes, moved);
   for (const issue of plan.issues) report.warnings.push(`plan: ${issue}`);
@@ -637,6 +638,7 @@ export function planLines(plan) {
   lines.push(`  ${SETTINGS}: ${s.action}${s.archivedTo ? ` — not valid JSON, archived to ${s.archivedTo}` : ""}${s.hooks.length ? ` — add hooks ${s.hooks.join(", ")}` : ""}${s.envMoved ? ` — env block moves to ${SETTINGS_LOCAL}` : ""}`);
   lines.push(`  ${CONFIG_FILE}: ${m.config.action}`);
   for (const f of [...m.status, { path: MANIFEST, action: m.manifest.action }]) lines.push(`  ${f.path}: ${f.action}`);
+  if (plan.report.warnings.length) lines.push("", "warnings:", ...plan.report.warnings.map((w) => `  ⚠ ${w}`));
   return lines;
 }
 
