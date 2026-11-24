@@ -16,3 +16,16 @@ H8. rule 4 says area is "one short token" but spaces and any length are accepted
 H9. nextId also counts `- F-<n>` bullets above the marker; a huge id can lose Number precision (harmless)
 H10. docs/plan/README.md jumps from §5 to §7 (older gap); the new §8 continues it
 H11. size: evidence says code 388/400 for the card (the implementer's first report said 294) — use evidence numbers
+
+## T-M3-02 (review PASS) — notes for the designer
+
+R1. plan.mjs:332 `verifySummary` ignores `reviewFailed`: a reopened card shows status "failed" beside "passed <time> · N checks" in STATE.md, .saf/plan.md, the session hook, the stop hook and the startCard refusal — say "review round n failed — verify again" (plan.mjs was off limits for T-M3-02)
+R2. lane asymmetry after a failed review (reviews.mjs ~293-300): the old passed evidence on the branch stays valid, so `pass` can be recorded at once with the same branch head and no new verify, and `task:merge` still accepts it — option: refuse a round whose `head` equals the head of the last failed round
+R3. partial writes (reviews.mjs ~309-324): friction append → reviews file → reopenCard are not atomic (a failure between steps leaves a friction entry without a round, or a fail round on a card still `done` — a second `fail` then records a duplicate); the reviews file has no lock (two `task:review` runs on one card can lose a round)
+R4. reviews.mjs:209 comment says kind descriptions are "shown in usage and errors" but only keys are printed
+R5. /saf lane step (en+th): on a lane `fail` the text says fix and verify again but not to commit the fix + evidence on the card branch, nor the friction file after `--kind framework` (the CLI output says both)
+R6. Thai saf.md:42-43 "คำสั่งนี้ไม่ commit ให้" + line break + "commit ไฟล์รอบรีวิว…" renders as one run-on sentence — add "—" or "·"
+R7. docs/INDEX.md has a friction row but none for review rounds / `task:review`
+R8. CLAUDE.md and the CLAUDE templates show `<id> pass|fail …` only; the listing form `task:review <id>` is visible in card-lifecycle only
+R9. reviews.mjs:297 does not check that the branch evidence `lane` matches the main evidence (task:merge precheck does)
+R10. FRICTION: `saf:refresh` and the example upgrade rewrite `.saf/manifest.json` and `examples/todo-api/.saf/manifest.json`, which are not in touch or alwaysAllowed → the first verify fails until reverted by hand (same class as F-001, F-006)
