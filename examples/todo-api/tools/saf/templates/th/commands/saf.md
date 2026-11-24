@@ -38,6 +38,10 @@ argument-hint: <สิ่งที่คุณต้องการ เป็น
 | ทดสอบจริง | `qa-runner` | เมื่อการ์ดแตะ UI · multiplayer · ประสิทธิภาพ |
 | ลงงาน | session หลัก | commit{{#if lanesOn}} · การ์ดสาย → `{{cmd.taskMerge}}`{{/if}} |
 
+หลังเทียบสเปกทุกครั้ง session หลักบันทึกผลด้วย `{{cmd.taskReview}}` (`pass` หรือ `fail` พร้อม kind ที่ตรง) ถ้า `fail` การ์ดจะเปิดอีกครั้ง:
+ผู้ลงมือแก้แล้วรัน `{{cmd.taskVerify}}` ใหม่ ไม่ต้อง restart · คำสั่งนี้ไม่ commit ให้
+commit ไฟล์รอบรีวิว `docs/plan/evidence/reviews/<id>.json` ลำพัง{{#if lanesOn}} (ก่อน `{{cmd.taskMerge}}`){{/if}} ด้วย `git commit -m "chore(plan): review <id> round <n>" -- docs/plan/evidence/reviews/<id>.json`
+
 การ์ดที่ไม่ขึ้นต่อกันทำขนานได้{{#if lanesOn}} — `{{cmd.taskNext}}` บอกชุดที่ปลอดภัย{{/if}}
 
 ## 3. รายงาน

@@ -7,6 +7,7 @@ Status is never typed by hand — it is computed from three kinds of files:
 | `docs/plan/milestones/M<n>.md` | goal · scope · risks · exit gates · ordered cards · `status` | designer; the owner approves |
 | `docs/plan/tasks/M<n>/T-M<n>-<nn>.md` | one card: frontmatter + "Done when" commands | designer |
 | `docs/plan/evidence/<id>.json` | start commit · command results · changed files | the engine only |
+| `docs/plan/evidence/reviews/<id>.json` | one entry per spec review round | the engine only (`task:review`) |
 
 `docs/plan/STATE.md` and `.saf/plan.md` are generated from them (`task:state`; `--check` verifies they are current).
 
@@ -24,7 +25,16 @@ Status is never typed by hand — it is computed from three kinds of files:
    `workflow.testCaps`). Over a cap = a warning in the output and in the evidence (`verified.size`), never a failure:
    the reviewer decides, or the designer splits the card.
 5. `spec-reviewer` (read only) compares the code with the card and the spec — every card at standard/strict rigor, size-M
-   cards at light rigor.
+   cards at light rigor. The main session records each result with `task:review <id> pass` or
+   `task:review <id> fail --kind <k>[,<k>…] [--note <text>]` (kinds: `spec-mismatch` · `missing-test` · `out-of-scope` · `docs` ·
+   `framework`) in `docs/plan/evidence/reviews/<id>.json`; the command only works in the main folder, only after the card's
+   last verify passed (for a lane card: the evidence committed on its branch), and never commits — commit that file alone
+   (`git commit -m "chore(plan): review <id> round <n>" -- docs/plan/evidence/reviews/<id>.json`), before `task:merge` for a lane
+   card. `task:review <id>` alone lists the rounds. A `fail` on a main-folder card sets its evidence back to `failed`
+   (`reviewFailed: <round>`), so `task:verify <id>` runs again without `--restart` and keeps the attempt count; a lane card
+   is verified again in its worktree; a merged card is not reopened (start a follow-up card). `fail --kind framework` also
+   needs `--area` and appends a `review-bounce` entry to the friction log. `task:start --restart` and `task:abandon` keep the
+   reviews file, and `task:report` shows rounds per card and the totals.
 6. `qa-runner` runs real tests when the card touches UI, multiplayer or performance.
 7. Commit (main-folder card) or `task:merge <id>` (lane card).
 8. When all cards pass: `task:verify M<n>` runs the exit gates (gates without commands are manual owner checks) and

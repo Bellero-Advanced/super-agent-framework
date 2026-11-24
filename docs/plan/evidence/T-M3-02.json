@@ -1,14 +1,206 @@
 {
   "id": "T-M3-02",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T08:04:02.310Z",
     "base": "8d5ef1aca4bd94a0cfb4e1b17d9adaa4a62ba163",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-02",
-  "worktree": ".claude/worktrees/T-M3-02"
+  "worktree": ".claude/worktrees/T-M3-02",
+  "verified": {
+    "at": "2026-11-24T08:09:34.299Z",
+    "head": "7c143d079ce5283fdad7e1e9a8272107adf5d033",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 310,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (not started) | — | ✗ gap |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (not started) | — | ✗ gap |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (not started) | — | ✗ gap |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (not started) | — | ✗ gap |",
+          "126 scenario(s) in 12 spec(s) · with test 75 · gaps 51 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/review-rounds.test.mjs test/unit/friction.test.mjs test/unit/task.test.mjs",
+        "exit": 0,
+        "ms": 6806,
+        "tail": [
+          "ok 34 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "  ---",
+          "  duration_ms: 0.080542",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 35 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "  ---",
+          "  duration_ms: 288.601292",
+          "  type: 'test'",
+          "  ...",
+          "1..35",
+          "# tests 35",
+          "# suites 0",
+          "# pass 34",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 1",
+          "# todo 0",
+          "# duration_ms 6754.131375"
+        ]
+      },
+      {
+        "cmd": "node -e \"const s=require('fs').readFileSync('kit/tools-saf/templates/en/commands/saf.md','utf8');if(!s.includes('taskReview'))process.exit(1)\"",
+        "exit": 0,
+        "ms": 48,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 299,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 260 markdown file(s) · 207 local link(s) · 70 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 332,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 525 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/review-rounds.test.mjs'",
+        "exit": 0,
+        "ms": 5052,
+        "tail": [
+          "ok 7 - REVIEW-AC-07 task:start --restart and task:abandon leave the reviews file unchanged",
+          "  ---",
+          "  duration_ms: 234.065791",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: REVIEW-AC-01 the CLI exits 0 when recorded, 1 when refused, 2 for a wrong shape; no result lists the rounds; a CRLF reviews file is read, an unreadable one refused",
+          "ok 8 - REVIEW-AC-01 the CLI exits 0 when recorded, 1 when refused, 2 for a wrong shape; no result lists the rounds; a CRLF reviews file is read, an unreadable one refused",
+          "  ---",
+          "  duration_ms: 1080.6445",
+          "  type: 'test'",
+          "  ...",
+          "1..8",
+          "# tests 8",
+          "# suites 0",
+          "# pass 8",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 5001.976667"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        ".claude/commands/saf.md",
+        "CLAUDE.md",
+        "docs/card-lifecycle.md",
+        "examples/todo-api/package.json",
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/config.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "kit/tools-saf/lib/report.mjs",
+        "kit/tools-saf/lib/reviews.mjs",
+        "kit/tools-saf/lib/task.mjs",
+        "kit/tools-saf/lib/text.mjs",
+        "kit/tools-saf/templates/en/CLAUDE.template.md",
+        "kit/tools-saf/templates/en/commands/saf.md",
+        "kit/tools-saf/templates/th/CLAUDE.template.md",
+        "kit/tools-saf/templates/th/commands/saf.md",
+        "package.json",
+        "test/unit/review-rounds.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        ".claude/commands/saf.md": "def859ad01898b4437ad23c2f93f82a6eeada54c",
+        "CLAUDE.md": "f42964867813931dacf2447f23a3b45e1696bfb7",
+        "docs/card-lifecycle.md": "8cbdf924c66f630e5b6dd5a3b86a56dba110d84a",
+        "examples/todo-api/package.json": "e95d9fbcb1c9352e758f38c46b28ed159dad1817",
+        "kit/tools-saf/bin/saf.mjs": "018961c289edae9d1b37075c4c3723a698bac77a",
+        "kit/tools-saf/lib/config.mjs": "ffc739dae546c12ba9f1321e7bb9b7a658d32284",
+        "kit/tools-saf/lib/generate.mjs": "1eb3c8291937b1a0da78397d6daa5fd9c513cb01",
+        "kit/tools-saf/lib/report.mjs": "f1771d3021166678b29c5d14e8ec79442adcf84b",
+        "kit/tools-saf/lib/reviews.mjs": "613b87881959d83687685cf49015f92d7b0f71c6",
+        "kit/tools-saf/lib/task.mjs": "b2bb0c02cad3d4348e3f29c0bc726e64170d8f85",
+        "kit/tools-saf/lib/text.mjs": "bbf4b62cb12d1a19ab3b7a6a715adf88e6e6fad0",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "758db45cf6392c12bfdc67c0a9f889053c8dfb44",
+        "kit/tools-saf/templates/en/commands/saf.md": "90e599c131ff4e5a81235df06fa28a15f7c39c77",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "7380b71e1a04faa0aba0608564d60b470901ddb4",
+        "kit/tools-saf/templates/th/commands/saf.md": "f5b212b2370e2beffebe7f07934a16921f2959d1",
+        "package.json": "96dd4424766e25d8e94eb58ea0f2df563fe4c6ed",
+        "test/unit/review-rounds.test.mjs": "7373d621682b086d201adb4bbe434d30cd304fa2"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "REVIEW-AC-01",
+        "REVIEW-AC-02",
+        "REVIEW-AC-03",
+        "REVIEW-AC-04",
+        "REVIEW-AC-05",
+        "REVIEW-AC-06",
+        "REVIEW-AC-07"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 269,
+        "cap": 400
+      },
+      "test": {
+        "lines": 247,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/review-rounds.test.mjs"
+      ]
+    }
+  }
 }

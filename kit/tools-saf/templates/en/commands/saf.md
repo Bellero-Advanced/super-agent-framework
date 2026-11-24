@@ -38,6 +38,11 @@ Unclear between two routes → ask one short question with a recommendation.
 | real tests | `qa-runner` | when the card touches UI · multiplayer · performance |
 | land | main session | commit{{#if lanesOn}} · lane card → `{{cmd.taskMerge}}`{{/if}} |
 
+After every spec review the main session records the result with `{{cmd.taskReview}}` (`pass`, or `fail` with the kinds that
+apply). On `fail` the card is open again: the builder fixes it and runs `{{cmd.taskVerify}}` again, no restart. The command
+does not commit: commit the round file `docs/plan/evidence/reviews/<id>.json` alone{{#if lanesOn}} (before `{{cmd.taskMerge}}`){{/if}}
+with `git commit -m "chore(plan): review <id> round <n>" -- docs/plan/evidence/reviews/<id>.json`.
+
 Independent cards may run in parallel{{#if lanesOn}} — `{{cmd.taskNext}}` lists the safe set{{/if}}.
 
 ## 3. Report

@@ -170,6 +170,7 @@ export const ENGINE_SCRIPTS = {
   "task:verify": "task verify",
   "task:abandon": "task abandon",
   "task:merge": "task merge",
+  "task:review": "task review",
   "task:state": "task state",
   "task:next": "task next",
   "task:probe": "task probe",

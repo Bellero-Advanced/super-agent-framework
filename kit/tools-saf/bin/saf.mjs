@@ -14,6 +14,7 @@ import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/me
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
+import { REVIEW_KINDS, listRounds, recordReview, reviewsPath } from "../lib/reviews.mjs";
 import { htmlPath, renderEvidencePage } from "../lib/viewer.mjs";
 import { taskRunner } from "../lib/run.mjs";
 import { textFor } from "../lib/text.mjs";
@@ -49,6 +50,8 @@ import {
  *     (task next lists the active milestone's cards first, then side cards of planned milestones — --json has a `side` list)
  *   task friction [add --kind <kind> --area <area> --evidence <text> [--card <id>] <summary…> | close <F-id> carded|fixed|dropped <card id or reason…>]
  *     (the friction log docs/plan/friction.md: no sub-command lists open and carded entries · add/close are refused in a lane)
+ *   task review <id> [pass|fail] [--kind <k>[,<k>…]] [--note <text>] [--area <area>]   record one spec review round (no result lists the rounds)
+ *     (docs/plan/evidence/reviews/<id>.json · fail reopens the card for verify · main folder only · exit 0 recorded · 1 refused · 2 usage)
  *   task culprit <M> [--cmd "<command>"]   which card broke the full suite (exit 0 found · 2 fails before the first card · 3 passes at HEAD)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
@@ -249,15 +252,52 @@ async function task(sub, rest) {
     }
     case "friction":
       return friction(ctx, rest);
+    case "review":
+      return review(ctx, rest);
     case "culprit": {
       const r = await findCulprit(ctx, requireId(), { cmd: option("--cmd") });
       culpritLines(r).forEach(out);
       return r.exit;
     }
     default:
-      err("usage: task start|verify|abandon|merge|state|next|probe|env|report|culprit|friction — see docs/plan/README.md");
+      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction — see docs/plan/README.md");
       return 2;
   }
+}
+
+const REVIEW_FLAGS = ["--kind", "--note", "--area"];
+
+/** `task review` — docs/specs/review-rounds.md. A refused value exits 1 (nothing written) · a wrong shape of arguments exits 2 with the usage line. */
+function review(ctx, args) {
+  const c = (s, a) => scriptCommand(ctx.config.stack.packageManager, s, a);
+  const usage = `${c("task:review", "<id> [pass|fail] [--kind <k>[,<k>…]] [--note <text>] [--area <area>]")} (kinds: ${Object.keys(REVIEW_KINDS).join(", ")})`;
+  const bad = (why) => {
+    err(`✗ ${why} — usage: ${usage}`);
+    return 2;
+  };
+  const fields = {};
+  const words = [];
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (REVIEW_FLAGS.includes(a) && args[i + 1] !== undefined && !args[i + 1].startsWith("--")) fields[a.slice(2)] = args[++i];
+    else if (a.startsWith("--")) return bad(REVIEW_FLAGS.includes(a) ? `${a} needs a value (a value cannot start with --)` : `unknown option ${a} (write --option value, not --option=value)`);
+    else words.push(a);
+  }
+  const [id, result, ...extra] = words;
+  if (!id || extra.length) return bad(id ? `unexpected argument "${extra[0]}"` : "give a card id");
+  if (result === undefined) {
+    if (Object.keys(fields).length) return bad("--kind, --note and --area go with pass or fail");
+    for (const l of listRounds(ctx, id)) out(l);
+    return 0;
+  }
+  if (!["pass", "fail"].includes(result)) return bad(`the result is pass or fail, not "${result}"`);
+  const kinds = (fields.kind ?? "").split(",").map((k) => k.trim()).filter(Boolean);
+  const done = recordReview(ctx, id, result, { kinds, note: fields.note, area: fields.area });
+  out(`✓ ${id} review round ${done.round}: ${result}${kinds.length ? ` (${kinds.join(", ")})` : ""}`);
+  if (done.friction) out(`  friction ${done.friction} recorded in ${FRICTION_FILE} (commit it alone: git commit -m "chore(plan): friction ${done.friction}" -- ${FRICTION_FILE})`);
+  if (result === "fail") out(done.worktree ? `  fix it in ${done.worktree}, run ${c("task:verify", id)} there again and commit the evidence on the card branch` : `  the card is reopened: fix it, then run ${c("task:verify", id)} again (no --restart)`);
+  out(`  not committed — commit it alone: git commit -m "chore(plan): review ${id} round ${done.round}" -- ${reviewsPath(id)}`);
+  return 0;
 }
 
 const FRICTION_FLAGS = ["--kind", "--area", "--evidence", "--card"];

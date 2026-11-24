@@ -2,15 +2,15 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 1/26
+## M3 SAF builds itself — cards done 2/26
 
-- In progress: **T-M3-02** The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — started 2026-11-24 08:04 · not verified yet · lane 1 · .claude/worktrees/T-M3-02
-- Next: no card can start yet — T-M3-16 waits for T-M3-02 · T-M3-17 waits for T-M3-16 · T-M3-18 waits for T-M3-02 · T-M3-19 waits for T-M3-17 · T-M3-20 waits for T-M3-18 · T-M3-21 waits for T-M3-17 · T-M3-22 waits for T-M3-02 · T-M3-23 waits for T-M3-02 · T-M3-24 waits for T-M3-21 · T-M3-25 waits for T-M3-20 · T-M3-03 waits for T-M3-02, T-M3-21 · T-M3-04 waits for T-M3-03, T-M3-19, T-M3-20, T-M3-22, T-M3-23 · T-M3-05 waits for T-M3-03, T-M3-23 · T-M3-06 waits for T-M3-04, T-M3-05 · T-M3-07 waits for T-M3-04 · T-M3-08 waits for T-M3-06, T-M3-07 · T-M3-09 waits for T-M3-08 · T-M3-10 waits for T-M3-09 · T-M3-11 waits for T-M3-09 · T-M3-12 waits for T-M3-10, T-M3-11 · T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
+- In progress: none
+- Next: T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read · T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names · T-M3-22 The release-operator agent and CLAUDE.md agree with the deploy and push policies: no owner order asked when deploy is allowed, auto-deploy branches named as the exception
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
 | [T-M3-01](tasks/M3/T-M3-01.md) | Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count | ✓ passed | [T-M3-01.json](evidence/T-M3-01.json) · passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate |
-| [T-M3-02](tasks/M3/T-M3-02.md) | The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds | ▶ in progress | [T-M3-02.json](evidence/T-M3-02.json) · started 2026-11-24 08:04 · not verified yet |
+| [T-M3-02](tasks/M3/T-M3-02.md) | The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds | ✓ passed | [T-M3-02.json](evidence/T-M3-02.json) · passed 2026-11-24 08:09 (6 commands) · full suite deferred to gate |
 | [T-M3-16](tasks/M3/T-M3-16.md) | Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read | · not started | – |
 | [T-M3-17](tasks/M3/T-M3-17.md) | Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates | · not started | – |
 | [T-M3-18](tasks/M3/T-M3-18.md) | task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names | · not started | – |
@@ -49,7 +49,7 @@
 
 ## Latest evidence
 
-- T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — started 2026-11-24 08:04 · not verified yet
+- T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — passed 2026-11-24 08:09 (6 commands) · full suite deferred to gate
 - T-M3-01 Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count — passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate
 - T-M2-30 Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value — passed 2026-11-24 06:51 (5 commands) · full suite deferred to gate
 - T-M2-29 setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything — passed 2026-11-24 06:46 (5 commands) · full suite deferred to gate

@@ -547,7 +547,8 @@ export async function verifyCard(ctx, id) {
   const attempts = ev.attempts + 1;
   const failed = commands.filter((c) => c.exit !== 0);
   const failures = failed.length ? [...(ev.failures ?? []), { at, head, attempts, commands: failed }].slice(-RUN_LIMITS.failuresKept) : ev.failures;
-  const next = { ...ev, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios, size, testMode: mode, ...(deferred.length ? { deferred } : {}), ...(targeted ? { targeted } : {}) }, ...(failures ? { failures } : {}) };
+  const { reviewFailed: _reopened, ...kept } = ev; // the marker only lasts until this verify
+  const next = { ...kept, status: pass ? "done" : "failed", attempts, verified: { at, head, pass, commands, files, scenarios, size, testMode: mode, ...(deferred.length ? { deferred } : {}), ...(targeted ? { targeted } : {}) }, ...(failures ? { failures } : {}) };
   if (pass && failures?.length) {
     ctx.log?.(`  ! passed after failing ${failures.length} time(s) (attempt ${failures.map((f) => f.attempts).join(", ")}) — flaky? ${[...new Set(failures.flatMap((f) => f.commands.map((c) => c.cmd)))].join(" · ")}`);
   }
@@ -555,6 +556,26 @@ export async function verifyCard(ctx, id) {
   writeJson(ctx.root, evidencePath(id), next);
   if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
   return next;
+}
+
+/** The evidence of a card as committed on its lane branch, or null when it is missing or broken (broken = not passed). */
+export function branchEvidence(root, branch, id) {
+  try {
+    return JSON.parse(showFile(root, `refs/heads/${branch}`, evidencePath(id)) ?? "null");
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * A failed spec review reopens a main-folder card (docs/specs/review-rounds.md rule 5): status "failed" + reviewFailed,
+ * everything else kept — task:verify then runs again without --restart and continues the attempt count.
+ */
+export function reopenCard(ctx, id, round) {
+  const ev = loadPlan(ctx.root, ctx.config).evidence.get(id);
+  if (!ev || ev.lane) throw new TaskError(`${id} is not a main-folder card with evidence — nothing to reopen`);
+  writeJson(ctx.root, evidencePath(id), { ...ev, status: "failed", reviewFailed: round });
+  writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
 }
 
 /** Exit gates: run every gate's commands (a gate without commands = manual) and write evidence/<M>.json. */
@@ -610,12 +631,7 @@ function precheck(ctx, id) {
   if (ev.status === "done") refuse(`${id} is already recorded as passed in the main folder (merged already)`);
   const { branch, worktree } = ev;
   if (!resolveCommit(root, `refs/heads/${branch}`)) refuse(`no branch ${branch}`);
-  let onBranch = null;
-  try {
-    onBranch = JSON.parse(showFile(root, `refs/heads/${branch}`, evidencePath(id)) ?? "null");
-  } catch {
-    // broken evidence = not passed
-  }
+  const onBranch = branchEvidence(root, branch, id);
   const v = onBranch?.verified;
   if (onBranch?.lane !== ev.lane || onBranch?.status !== "done" || !v?.pass) {
     refuse(`the evidence on branch ${branch} has not "passed" — run ${cmd(ctx.config, "task:verify", id)} in ${worktree} and commit the evidence on the card branch`);

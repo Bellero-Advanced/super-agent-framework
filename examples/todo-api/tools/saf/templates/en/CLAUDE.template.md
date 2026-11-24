@@ -48,6 +48,7 @@ Agents live in `.claude/agents/` (model + effort fixed per role — `{{cmd.docsC
 {{cmd.taskStart}}            # start a card (records the starting point to compare files)
 {{cmd.taskVerify}}           # the only way a card becomes "done" · task:verify <M> = milestone exit gates
 {{cmd.taskAbandon}}          # give up an unfinished card
+{{cmd.taskReview}}          # record a spec review round: pass, or fail with --kind (a fail reopens the card for verify) — main folder only
 {{#if lanesOn}}
 {{cmd.taskStartLane}}        # open a lane in its own worktree (code-lane cards)
 {{cmd.taskMerge}}            # merge one lane card back (exit 3 refused · 4 conflict · 5 merge checks failed)
