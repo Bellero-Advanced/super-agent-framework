@@ -58,3 +58,14 @@ A2. spec-reviewer.md "the dry run says what apply does" is weaker than the spec'
 A3. no test renders the reviewer with `tokenSaving.reviewerDiff: false` (spec §4) — the `{{else}}` branch is unpinned
 A4. `examples/todo-api/.claude/agents/implementer.md` is stale against its own templates (only the example's engine copy is refreshed; outside touch, same as T-M3-28)
 A5. F-008 did not recur after the restart — the cross-lane `spec:matrix` deadlock is real only while two started cards both have scenarios and neither has merged
+
+## T-M3-30 (review FAIL ×1 → fixed → merged) — notes for the designer
+
+P1. a thrown error in prerun now exits 2 (rule 8: 1 = some command passes); the stray-mark warning is advisory (exit code unchanged)
+P2. control characters are not stripped from printed command/reason (verify prints `▶ ${c}` raw — no worse); the time-limit wording depends on a tail line starting with `<stopped:` (`r.exit === 124` + marker would be stricter)
+P3. a marked command that fails shows "fails now — expected": the designer is not told the mark is now wrong (matches the spec; a hint would help)
+P4. the card template has a prose line under "Done when" while the designer rule says Done-when "items" are "never prose" (only list items count)
+P5. task:prerun is not in the generated CLAUDE.md / plan README command lists nor this repo's CLAUDE.md (the spec does not require it)
+P6. untested: the plan-with-problems refusal and yarn/bun command forms
+P7. the card's own `npm run saf:refresh -- --check` mark is redundant in this repo (it is a merge check and so already a guard)
+P8. /tmp diff file omitted examples/todo-api/package.json — build review diffs from verified.files.changed (T-M3-31 `task:diff` does this)
