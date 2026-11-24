@@ -5,7 +5,7 @@ import { spawn, spawnSync } from "node:child_process";
  * Output is passed through `redactSecrets` before it is stored or printed.
  */
 
-export const RUN_LIMITS = { tailPass: 20, tailFail: 60, failuresKept: 3, killGraceMs: 5000, keepBytes: 64 * 1024 };
+export const RUN_LIMITS = { tailPass: 20, tailFail: 60, failuresKept: 3, culpritTail: 20, killGraceMs: 5000, keepBytes: 64 * 1024 };
 
 const SECRET_ENV_NAME = /TOKEN|SECRET|PASSWORD|PASSWD|KEY|WEBHOOK|CREDENTIAL|^DATABASE_URL|_DSN$/i;
 const MIN_SECRET = 8;
