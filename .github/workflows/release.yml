@@ -6,6 +6,8 @@
 #   needs npm CLI >= 11.5.1 and Node >= 22.14.0 on a GitHub-hosted runner (checked by scripts/release-check.mjs workflow)
 #
 # Action policy (same as ci.yml): only first-party actions/* actions, by major version tag.
+# Exit codes of `release-check published`: 0 already on npm (skip) · 3 definitely not on npm (publish) · anything else stops the job.
+# The GitHub token is given only to the steps that call gh; the publish steps never see it.
 # Every value from the event reaches a script as an environment variable, never inside the script text.
 name: release
 
@@ -25,11 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: npm
     permissions:
+      actions: read
       contents: write
       id-token: write
     env:
       TAG: ${{ github.ref_name }}
-      GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
       - name: Tag name looks like a release
@@ -50,7 +52,12 @@ jobs:
       - name: Upgrade npm to the minimum version that supports trusted publishing
         run: npm install --global npm@11.5.1
       - name: Check every guard again
-        run: node scripts/release-check.mjs guards "$TAG"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          node scripts/release-check.mjs workflow
+          node scripts/release-check.mjs guards "$TAG"
       - name: Publish super-agent-framework
         run: |
           set -euo pipefail
@@ -60,7 +67,7 @@ jobs:
           node scripts/release-check.mjs published . "$VERSION" || status=$?
           case "$status" in
             0) echo "super-agent-framework@$VERSION is already on npm: skipped" ;;
-            1) npm publish . --provenance ;;
+            3) npm publish . --provenance ;;
             *) exit "$status" ;;
           esac
           node scripts/release-check.mjs published . "$VERSION" --wait
@@ -73,11 +80,13 @@ jobs:
           node scripts/release-check.mjs published packages/create-saf "$VERSION" || status=$?
           case "$status" in
             0) echo "create-saf@$VERSION is already on npm: skipped" ;;
-            1) npm publish ./packages/create-saf --provenance ;;
+            3) npm publish ./packages/create-saf --provenance ;;
             *) exit "$status" ;;
           esac
           node scripts/release-check.mjs published packages/create-saf "$VERSION" --wait
       - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           if gh release view "$TAG" > /dev/null 2>&1; then
@@ -89,4 +98,6 @@ jobs:
       - name: Confirm both packages are on npm
         run: node scripts/release-check.mjs npm
       - name: Confirm the GitHub release exists
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node scripts/release-check.mjs release

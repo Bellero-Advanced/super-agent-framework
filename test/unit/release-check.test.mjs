@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { REPO, commitAll, git, gitRepo, lib, tmp, write } from "../helpers.mjs";
-import { POLICY, checkWorkflow, isPublished, killSwitch, makeContext, releaseGuards } from "../../scripts/release-check.mjs";
+import { POLICY, checkWorkflow, killSwitch, main, makeContext, publishedCheck, releaseGuards } from "../../scripts/release-check.mjs";
 
 const { commandRunner } = await lib("release.mjs");
 after(() => import("../helpers.mjs").then((h) => h.cleanup()));
@@ -37,7 +37,26 @@ test("REL-AC-08 a workflow checked out with CRLF line endings passes too", () =>
   assert.deepEqual(failed(checkWorkflow(WORKFLOW.replace(/\n/g, "\r\n"), { packages: PACKAGES })), []);
 });
 
+const G = '          node scripts/release-check.mjs guards "$TAG"\n';
+const PUB = "npm publish . --provenance";
 const MUTATIONS = [
+  ["a missing actions: read", (w) => mutate(w, "      actions: read\n", ""), /job asks for/],
+  ["one more permission than the three", (w) => mutate(w, "      actions: read\n", "      actions: read\n      packages: write\n"), /job asks for/],
+  ["the GitHub token in the job env", (w) => mutate(w, "      GH_REPO:", "      GH_TOKEN: ${{ github.token }}\n      GH_REPO:"), /GitHub token/],
+  ["the GitHub token on a publish step", (w) => mutate(w, "      - name: Publish create-saf\n", "      - name: Publish create-saf\n        env:\n          GH_TOKEN: ${{ github.token }}\n"), /GitHub token/],
+  ["a gh step without the token", (w) => mutate(w, '      - name: Create the GitHub release\n        env:\n          GH_TOKEN: ${{ github.token }}\n', "      - name: Create the GitHub release\n"), /GitHub token/],
+  ["a publish with extra spaces in the command", (w) => mutate(w, PUB, "npm  publish . --provenance"), /published with provenance/],
+  ["an abbreviated publish command", (w) => mutate(w, PUB, "npm pub . --provenance"), /published with provenance/],
+  ["a dist-tag on publish", (w) => mutate(w, PUB, `${PUB} --tag next`), /force|tag/],
+  ["NPM_CONFIG_PROVENANCE in the env", (w) => mutate(w, "      GH_REPO:", "      NPM_CONFIG_PROVENANCE: false\n      GH_REPO:"), /no npm token/],
+  ["NPM_CONFIG_REGISTRY in the env", (w) => mutate(w, "      GH_REPO:", "      NPM_CONFIG_REGISTRY: https://example.invalid\n      GH_REPO:"), /no npm token/],
+  ["a pnpm publish", (w) => mutate(w, PUB, "pnpm publish"), /published with provenance|no npm token/],
+  ["a guards step that does not run the workflow check", (w) => mutate(w, "          node scripts/release-check.mjs workflow\n", ""), /guards step/],
+  ["a publish on exit code 1 (every error would publish)", (w) => mutate(w, "            3) npm publish . --provenance", "            1) npm publish . --provenance"), /published with provenance/, "REL-AC-11"],
+  ["a publish on any other code", (w) => mutate(w, "            3) npm publish ./packages/create-saf", "            *) npm publish ./packages/create-saf"), /published with provenance/, "REL-AC-11"],
+  ["a skip on exit 1 as well as 0", (w) => mutate(w, "            0) echo \"super-agent-framework@", "            0|1) echo \"super-agent-framework@"), /published with provenance/, "REL-AC-11"],
+  ["an extra case label (2)", (w) => mutate(w, '            *) exit "$status" ;;\n          esac\n          node scripts/release-check.mjs published . ', '            2) true ;;\n            *) exit "$status" ;;\n          esac\n          node scripts/release-check.mjs published . '), /published with provenance/, "REL-AC-11"],
+  ["a case that does not stop on other codes", (w) => mutate(w, '            *) exit "$status" ;;\n          esac\n          node scripts/release-check.mjs published . ', "            *) true ;;\n          esac\n          node scripts/release-check.mjs published . "), /published with provenance/, "REL-AC-11"],
   ["a token reference (NODE_AUTH_TOKEN from a secret)", (w) => mutate(w, "      GH_REPO:", "      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}\n      GH_REPO:"), /no npm token/],
   ["any secrets reference", (w) => mutate(w, "      GH_REPO:", "      OTHER: ${{ secrets.OTHER }}\n      GH_REPO:"), /no npm token/],
   ["a missing id-token: write", (w) => mutate(w, "      id-token: write\n", ""), /job asks for/],
@@ -47,9 +66,9 @@ const MUTATIONS = [
   ["a second trigger (workflow_dispatch)", (w) => mutate(w, "on:\n  push:", "on:\n  workflow_dispatch:\n  push:"), /runs only when/],
   ["a tag pattern that is not v*", (w) => mutate(w, '["v*"]', '["*"]'), /runs only when/],
   ["pull_request_target", (w) => mutate(w, "on:\n  push:", "on:\n  pull_request_target:\n  push:"), /pull_request_target|runs only when/],
-  ["a missing guards step", (w) => mutate(w, 'run: node scripts/release-check.mjs guards "$TAG"', "run: echo skipped"), /guards step/],
+  ["a missing guards step", (w) => mutate(w, G, "          echo skipped\n"), /guards step/],
   ["a guards step that may fail", (w) => mutate(w, "      - name: Check every guard again\n", "      - name: Check every guard again\n        continue-on-error: true\n"), /guards step/],
-  ["the guards step moved after the publish steps", (w) => `${mutate(w, 'run: node scripts/release-check.mjs guards "$TAG"', "run: echo skipped")}      - run: node scripts/release-check.mjs guards "$TAG"\n`, /comes before the guards step/],
+  ["the guards step moved after the publish steps", (w) => `${mutate(w, G, "          echo skipped\n")}      - run: node scripts/release-check.mjs guards "$TAG"\n`, /comes before the guards step/],
   ["an event value inside a script", (w) => mutate(w, 'guards "$TAG"', 'guards "${{ github.ref_name }}"'), /inside its script/],
   ["an expression that is not on the list", (w) => mutate(w, "      GH_REPO:", "      WHO: ${{ github.event.head_commit.message }}\n      GH_REPO:"), /not allowed/],
   ["a third-party action", (w) => mutate(w, "actions/setup-node@v4", "someone/setup-node@v4"), /first-party/],
@@ -68,8 +87,8 @@ const MUTATIONS = [
   ["git credentials kept by checkout", (w) => mutate(w, "persist-credentials: false", "persist-credentials: true"), /keeps no git credentials/],
   ["no GitHub release step", (w) => mutate(w, 'gh release create "$TAG" --verify-tag', 'gh release create "$TAG"'), /GitHub release comes after/],
 ];
-for (const [name, edit, label] of MUTATIONS) {
-  test(`REL-AC-08 fails for ${name}`, () => {
+for (const [name, edit, label, id = "REL-AC-08"] of MUTATIONS) {
+  test(`${id} fails for ${name}`, () => {
     const bad = failed(checkWorkflow(edit(WORKFLOW), { packages: PACKAGES }));
     assert.ok(bad.length >= 1 && bad.some((l) => label.test(l)), `a failed rule matches ${label}: ${bad.join(" | ")}`);
   });
@@ -235,26 +254,103 @@ test("REL-AC-09 the operating systems come from the CI workflow's matrix, and a 
   assert.match(guardsOf(fixture({ ci: "name: ci\njobs:\n  a:\n    runs-on: x\n" }).root).guards["G-ci"].reason, /has no os matrix/);
 });
 
-test("REL-AC-09 published: yes, no, a folder that is not released, a bad version, and the bounded wait", async () => {
+const E404 = { code: 1, out: "", err: "npm error code E404\nnpm error 404 No match found for version 0.5.1" };
+const publishedWith = (root, npm, dir, version, opts) => publishedCheck(makeContext(root, runner(root, { npm })), dir, version, opts);
+
+test("REL-AC-11 published: 0 when it is there, the dedicated not-on-npm code only for a definite E404, 1 for every error", async () => {
   const { root } = fixture();
-  const ctx = (npm) => makeContext(root, runner(root, { npm }));
   const there = (args) => ({ code: 0, out: args[1].endsWith("@0.5.0") ? "0.5.0\n" : "", err: "" });
-  assert.deepEqual(await isPublished(ctx(there), ".", "0.5.0"), { name: "demo-a", published: true });
-  assert.deepEqual(await isPublished(ctx(there), "packages/b", "0.5.1"), { name: "demo-b", published: false });
-  assert.match((await isPublished(ctx(there), "src", "0.5.0")).error, /not one of policies\.release\.packages/);
-  assert.match((await isPublished(ctx(there), "../x", "0.5.0")).error, /not one of/);
-  assert.match((await isPublished(ctx(there), ".", "0.5.0; id")).error, /not an x\.y\.z version/);
+  assert.equal(POLICY.notPublishedCode, 3);
+  assert.equal((await publishedWith(root, there, ".", "0.5.0")).code, 0);
+  assert.equal((await publishedWith(root, () => E404, "packages/b", "0.5.1")).code, POLICY.notPublishedCode);
+  // none of these may look like "not on npm": the workflow publishes only on that code
+  const errors = [
+    ["a folder that is not released", () => E404, "src", "0.5.0", /not one of policies\.release\.packages/],
+    ["a path outside the project", () => E404, "../x", "0.5.0", /not one of/],
+    ["a bad version", () => E404, ".", "0.5.0; id", /not an x\.y\.z version/],
+    ["a registry that does not answer", () => ({ code: 1, out: "", err: "npm error code ECONNREFUSED" }), ".", "0.5.1", /did not answer/],
+    ["a registry error with no code", () => ({ code: 1, out: "", err: "" }), ".", "0.5.1", /did not answer/],
+    ["npm missing", () => ({ code: 127, out: "", err: "spawn npm ENOENT" }), ".", "0.5.1", /did not answer/],
+    ["an answer that is not the version", () => ({ code: 0, out: "9.9.9", err: "" }), ".", "0.5.1", /did not answer/],
+  ];
+  for (const [name, npm, dir, version, reason] of errors) {
+    const r = await publishedWith(root, npm, dir, version);
+    assert.equal(r.code, 1, name);
+    assert.match(r.lines[0][1], reason, name);
+  }
+  const noName = fixture();
+  write(noName.root, "packages/b/package.json", { version: "0.5.0" });
+  const r = await publishedWith(noName.root, () => E404, "packages/b", "0.5.0");
+  assert.equal(r.code, 1);
+  assert.match(r.lines[0][1], /no usable name/);
+  rmSync(join(noName.root, "package.json"));
+  assert.equal((await publishedWith(noName.root, () => E404, ".", "0.5.0")).code, 1);
+});
+
+test("REL-AC-11 published --wait retries a bounded number of times, then fails with 1 (never the publish code)", async () => {
+  const { root } = fixture();
   let tries = 0;
   const waits = [];
-  const late = (args) => ({ code: 0, out: ++tries === 4 ? "0.5.0" : "", err: "" });
-  assert.equal((await isPublished(ctx(late), ".", "0.5.0", { wait: true, sleep: async (ms) => waits.push(ms) })).published, true);
+  const late = () => ({ code: 0, out: ++tries === 4 ? "0.5.0" : "", err: "" });
+  assert.equal((await publishedWith(root, late, ".", "0.5.0", { wait: true, sleep: async (ms) => waits.push(ms) })).code, 0);
   assert.deepEqual(waits, [POLICY.wait.delayMs, POLICY.wait.delayMs, POLICY.wait.delayMs]);
   let never = 0;
   const slept = [];
-  const r = await isPublished(ctx(() => ({ code: 1, out: "", err: `E404 ${++never}` })), ".", "0.5.0", { wait: true, sleep: async (ms) => slept.push(ms) });
-  assert.equal(r.published, false);
+  const r = await publishedWith(root, () => ({ ...E404, err: `E404 ${++never}` }), ".", "0.5.0", { wait: true, sleep: async (ms) => slept.push(ms) });
+  assert.equal(r.code, 1);
   assert.equal(never, POLICY.wait.tries);
   assert.equal(slept.length, POLICY.wait.tries - 1);
+});
+
+/** `main` with its output captured; a runner that throws stands for a crash. */
+async function cli2(root, argv, run) {
+  const lines = [];
+  const code = await main(argv, { root, run, out: (l) => lines.push(l), err: (l) => lines.push(l) });
+  return { code, text: lines.join("") };
+}
+
+test("REL-AC-11 main: published exits 0 / 3 / 1 and a crash exits 1 with the reason, never 3", async () => {
+  const { root } = fixture();
+  assert.equal((await cli2(root, ["published", ".", "0.5.0"], runner(root, { npm: () => ({ code: 0, out: "0.5.0", err: "" }) }))).code, 0);
+  assert.equal((await cli2(root, ["published", ".", "0.5.1"], runner(root, { npm: () => E404 }))).code, 3);
+  const crash = await cli2(root, ["published", ".", "0.5.1"], () => {
+    throw new Error("boom");
+  });
+  assert.equal(crash.code, 1);
+  assert.match(crash.text, /crashed: boom/);
+  assert.equal((await cli2(root, ["published"], runner(root))).code, 1);
+  assert.equal((await cli2(root, ["published", "src", "0.5.0"], runner(root))).code, 1);
+  assert.equal((await cli2(root, ["bogus"], runner(root))).code, 2);
+});
+
+test("REL-AC-10 a saf.config.json that is missing, not JSON or invalid fails every guard, published and switch with the reason, and starts no command", async () => {
+  const cases = [
+    ["missing", (root) => rmSync(join(root, "saf.config.json")), /saf\.config\.json is missing/],
+    ["not JSON", (root) => writeFileSync(join(root, "saf.config.json"), "{ nope"), /not valid JSON/],
+    ["invalid", (root) => write(root, "saf.config.json", { version: 1, policies: { release: { auto: "maybe", packages: "." } } }), /does not match the schema/],
+  ];
+  for (const [name, spoil, reason] of cases) {
+    const { root } = fixture();
+    spoil(root);
+    const run = runner(root);
+    const ctx = makeContext(root, run);
+    const guards = releaseGuards(ctx, "v0.5.0");
+    assert.ok(guards.length >= 1 && guards.every((g) => !g.ok), name);
+    assert.match(guards[0].reason, reason, name);
+    assert.equal(killSwitch(ctx)[0].ok, false, name);
+    for (const argv of [["published", ".", "0.5.0"], ["switch"], ["guards", "v0.5.0"]]) {
+      const r = await cli2(root, argv, run);
+      assert.equal(r.code, 1, `${name} ${argv[0]}`);
+      assert.match(r.text, reason, `${name} ${argv[0]}`);
+    }
+    assert.equal(run.calls.length, 0, `${name}: no command started`);
+  }
+});
+
+test("REL-AC-09 this repository's own saf.config.json passes the same check (two packages, one version file)", () => {
+  const ctx = makeContext(REPO, () => ({ code: 1, out: "", err: "" }));
+  assert.equal(ctx.error, undefined);
+  assert.deepEqual(ctx.config.policies.release.packages, PACKAGES);
 });
 
 test("REL-AC-09 the command line: notes for a tag with no CHANGELOG section fails, the tag is validated, unknown arguments are a usage error", () => {

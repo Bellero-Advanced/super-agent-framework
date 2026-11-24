@@ -19,7 +19,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveConfig } from "../tools/saf/lib/config.mjs";
+import { resolveConfig, validateConfig } from "../tools/saf/lib/config.mjs";
 import { RELEASE, RELEASE_LOG, changelogSection, commandRunner, compareVersions, nextVersion, readChangelog, readReleaseLog } from "../tools/saf/lib/release.mjs";
 import { parseYaml } from "../tools/saf/lib/yaml.mjs";
 
@@ -39,15 +39,20 @@ export const POLICY = {
   runner: /^ubuntu-/, // trusted publishing needs a GitHub-hosted runner
   trigger: ["v*"],
   topPermissions: { contents: "read" },
-  jobPermissions: { contents: "write", "id-token": "write" },
+  jobPermissions: { actions: "read", contents: "write", "id-token": "write" }, // actions: read is for `gh run list` in the CI guard
   jobName: "publish",
   actions: { uses: /^actions\/(checkout|setup-node)@([0-9a-f]{40}|v\d+)$/ }, // first-party only; a full commit id or a major version tag
   expressions: ["github.ref_name", "github.token", "github.repository"], // the only ${{ }} values the file may hold, never inside a script
-  forbidden: /NPM_TOKEN|NODE_AUTH_TOKEN|_authToken|\bsecrets\b|pull_request_target|unpublish|deprecate|dist-tag|--force/i,
+  forbidden: /NPM_TOKEN|NODE_AUTH_TOKEN|NPM_CONFIG_|_authToken|\.npmrc|\bnpm\s+config\b|\b(?:pnpm|yarn)\s+publish\b|\bsecrets\b|pull_request_target|unpublish|deprecate|dist-tag|--force|--tag\b/i,
   tagStep: /\[\[ "\$TAG" =~ \^v\[0-9\]\+\\\.\[0-9\]\+\\\.\[0-9\]\+\$ \]\]/,
   guardsStep: /release-check\.mjs guards "\$TAG"/,
-  publish: /npm publish (\S+) --provenance\b/g,
+  publish: /npm publish (\S+) --provenance\b/g, // the one form a publish may take
+  anyPublish: /\bnpm\s+pu\w*/g, // every spelling that could publish (extra spaces, `npm pub`)
+  notPublishedCode: 3, // `published` exits with this only when the registry definitely has no such version; the workflow publishes on this code alone
+  ghStep: /\bgh\s|release-check\.mjs (?:guards|release)\b/, // the steps that need the GitHub token
   waitStep: /release-check\.mjs published \S+ "\$VERSION" --wait\b/,
+  stopStep: /^\s*\*\) exit "\$status" ;;/m,
+  caseLabels: ["0", "3", "*"], // skip · publish · stop: the only branches of the `published` answer
   skipStep: /\|\| status=\$\?/,
   release: /gh release create "\$TAG" --verify-tag\b/,
   after: ["release-check.mjs npm", "release-check.mjs release"],
@@ -86,7 +91,8 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
     out.push([!p, p ? `${label} — ${p}` : label]);
   };
   const expressions = [...src.matchAll(/\$\{\{\s*([^}]*?)\s*\}\}/g)].map((m) => m[1]);
-  const publishes = runs.map((r, i) => ({ i, targets: [...r.matchAll(POLICY.publish)].map((m) => clean(m[1])) })).filter((p) => p.targets.length || runs[p.i].includes("npm publish"));
+  const publishes = runs.map((r, i) => ({ i, all: [...r.matchAll(POLICY.anyPublish)].length, at: r.search(POLICY.anyPublish), targets: [...r.matchAll(POLICY.publish)].map((m) => clean(m[1])) })).filter((p) => p.all > 0);
+  const whenMissing = new RegExp(`^\\s*${POLICY.notPublishedCode}\\) npm publish `, "m");
 
   rule("runs only when a v* tag is pushed", () => {
     const on = doc?.on;
@@ -115,6 +121,16 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
     const other = expressions.find((e) => !POLICY.expressions.includes(e));
     return other ? `expression "${other}" is not allowed` : null;
   });
+  rule("the GitHub token goes only to the steps that call gh", () => {
+    if (job?.env && Object.hasOwn(job.env, "GH_TOKEN")) return "GH_TOKEN is set for the whole job";
+    for (const [i, s] of steps.entries()) {
+      const needs = POLICY.ghStep.test(runs[i]);
+      const has = s.env?.GH_TOKEN;
+      if (needs && has !== "${{ github.token }}") return `step ${i + 1} calls gh without GH_TOKEN: \${{ github.token }}`;
+      if (!needs && has !== undefined) return `step ${i + 1} has GH_TOKEN but does not call gh`;
+    }
+    return null;
+  });
   rule("the tag name is validated first", () => {
     if (job?.env?.TAG !== "${{ github.ref_name }}") return "TAG is not set from github.ref_name in the job env";
     return POLICY.tagStep.test(runs[0] ?? "") ? null : "the first step must test $TAG against v<major>.<minor>.<patch>";
@@ -140,15 +156,20 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
     if (steps.some((s) => s["continue-on-error"] !== undefined)) return "a step has continue-on-error";
     if (steps[g].if !== undefined) return "the guards step has an `if`";
     const early = [...publishes.map((p) => p.i), at(POLICY.release)].filter((i) => i >= 0 && i < g);
-    return early.length ? "a publish or release step comes before the guards step" : null;
+    if (early.length) return "a publish or release step comes before the guards step";
+    const own = runs[g].indexOf("release-check.mjs workflow");
+    return own >= 0 && own < runs[g].search(POLICY.guardsStep) ? null : "the guards step must run `release-check.mjs workflow` first, so the rules are checked in the real run";
   });
   rule("each package is published with provenance, in order, the kill switch checked right before", () => {
     const got = publishes.flatMap((p) => p.targets);
-    if (JSON.stringify(got) !== JSON.stringify(packages.map(clean)) || publishes.some((p) => p.targets.length !== 1)) return `publish steps are [${got.join(", ")}], expected one each for [${packages.join(", ")}]`;
-    const slow = publishes.find((p) => runs[p.i].indexOf("release-check.mjs switch") < 0 || runs[p.i].indexOf("release-check.mjs switch") > runs[p.i].indexOf("npm publish"));
+    if (JSON.stringify(got) !== JSON.stringify(packages.map(clean)) || publishes.some((p) => p.targets.length !== 1 || p.all !== 1)) return `publish steps are [${got.join(", ")}], expected one each for [${packages.join(", ")}]`;
+    const slow = publishes.find((p) => runs[p.i].indexOf("release-check.mjs switch") < 0 || runs[p.i].indexOf("release-check.mjs switch") > p.at);
     if (slow) return `step ${slow.i + 1} does not check the kill switch before npm publish`;
     const unsafe = publishes.find((p) => !POLICY.skipStep.test(runs[p.i]) || !POLICY.waitStep.test(runs[p.i]));
-    return unsafe ? `step ${unsafe.i + 1} must skip a version already on npm and wait for it afterwards` : null;
+    if (unsafe) return `step ${unsafe.i + 1} must skip a version already on npm and wait for it afterwards`;
+    const labels = (r) => [...(r.split(/\bcase\b[^\n]*\bin\b/)[1]?.split(/\besac\b/)[0] ?? "").matchAll(/^\s*(\S+?)\) /gm)].map((m) => m[1]).join();
+    const broad = publishes.find((p) => !whenMissing.test(runs[p.i]) || !POLICY.stopStep.test(runs[p.i]) || labels(runs[p.i]) !== POLICY.caseLabels.join());
+    return broad ? `step ${broad.i + 1} must publish only on exit code ${POLICY.notPublishedCode} and stop on every other code` : null;
   });
   rule("the GitHub release comes after the last publish, then the npm and release checks", () => {
     const rel = at(POLICY.release);
@@ -162,14 +183,18 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
 
 // ── guards: the release workflow checks the tag again (spec rule 17) ─────────
 
-/** What the guards read: the project root, the checked config and the runner (`run(cmd, args)` → `{ code, out, err }`). */
+/** What the guards read: the project root, the checked config and the runner (`run(cmd, args)` → `{ code, out, err }`). A config that is missing, not JSON or invalid is `error` — never a silent default. */
 export function makeContext(root, run = commandRunner(root)) {
-  let raw = {};
+  const file = join(root, CONFIG_FILE);
+  if (!existsSync(file)) return { root, run, error: `${CONFIG_FILE} is missing` };
+  let raw;
   try {
-    raw = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
+    raw = JSON.parse(readFileSync(file, "utf8"));
   } catch {
-    raw = {};
+    return { root, run, error: `${CONFIG_FILE} is not valid JSON` };
   }
+  const problems = validateConfig(raw);
+  if (problems.length) return { root, run, error: `${CONFIG_FILE} does not match the schema (${oneLine(problems[0])})` };
   return { root, run, config: resolveConfig(raw) };
 }
 
@@ -236,6 +261,7 @@ function ciProblems(ctx, sha) {
 
 /** Every guard for `tag` as `[{ id, ok, reason }]`; a failed read fails its guard, an invalid tag stops at the first. */
 export function releaseGuards(ctx, tag) {
+  if (ctx.error) return [{ id: "G-config", ok: false, reason: ctx.error }];
   const version = versionOf(tag);
   if (!version) return [{ id: "G-tag", ok: false, reason: `"${oneLine(tag).slice(0, 40)}" is not a v<major>.<minor>.<patch> tag` }];
   const rel = ctx.config.policies.release;
@@ -290,6 +316,7 @@ export function releaseGuards(ctx, tag) {
 
 /** The kill switch alone, fresh from origin: `[{ id, ok, reason }]`. */
 export function killSwitch(ctx) {
+  if (ctx.error) return [{ id: "G-config", ok: false, reason: ctx.error }];
   const sw = switchOnOrigin(ctx);
   const ok = !sw.error && sw.auto === "on";
   return [{ id: "G-switch", ok, reason: sw.error ?? `policies.release.auto is "${oneLine(sw.auto)}" on ${RELEASE.remote}/${sw.branch}` }];
@@ -303,23 +330,33 @@ function releasedPackage(ctx, dir) {
   if (!ctx.config.policies.release.packages.map(clean).includes(want)) return { error: `${oneLine(dir)} is not one of policies.release.packages` };
   try {
     const name = JSON.parse(text(ctx, `${want}/package.json`)).name;
-    return RELEASE.packageName.test(String(name)) ? { name } : { error: `${want}/package.json has no usable name` };
+    return typeof name === "string" && RELEASE.packageName.test(name) ? { name } : { error: `${want}/package.json has no usable name` };
   } catch {
     return { error: `${want}/package.json is missing or not valid JSON` };
   }
 }
 
-/** Is `<name>@<version>` on npm? `{ name, published }` or `{ error }`. `wait` retries (bounded) until it is. */
-export async function isPublished(ctx, dir, version, { wait = false, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
+/**
+ * Is `<name>@<version>` on npm? `{ code, lines }` — 0 it is there · POLICY.notPublishedCode only when the registry says E404 (the one answer
+ * that lets the workflow publish) · 1 for everything else: a folder that is not released, a bad version, no answer, an answer that is not the
+ * version. `wait` retries (bounded) until it is there and then never answers "not published": it fails with 1.
+ */
+export async function publishedCheck(ctx, dir, version, { wait = false, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = {}) {
+  const fail = (reason) => ({ code: 1, lines: [[false, reason]] });
+  if (ctx.error) return fail(ctx.error);
   const pkg = releasedPackage(ctx, dir);
-  if (pkg.error) return pkg;
-  if (!RELEASE.version.test(String(version))) return { error: `"${oneLine(version).slice(0, 40)}" is not an x.y.z version` };
+  if (pkg.error) return fail(pkg.error);
+  if (!RELEASE.version.test(String(version))) return fail(`"${oneLine(version).slice(0, 40)}" is not an x.y.z version`);
+  const label = `${pkg.name}@${version} on npm`;
+  let last;
   for (let i = 1; i <= (wait ? POLICY.wait.tries : 1); i++) {
     const r = ctx.run("npm", ["view", `${pkg.name}@${version}`, "version"]);
-    if (r.code === 0 && r.out.trim() === version) return { name: pkg.name, published: true };
+    if (r.code === 0 && r.out.trim() === version) return { code: 0, lines: [[true, label]] };
+    last = r.code !== 0 && RELEASE.registryMissing.test(`${r.err}${r.out}`) ? null : `the registry did not answer for ${label} (${why(r)})`;
     if (wait && i < POLICY.wait.tries) await sleep(POLICY.wait.delayMs);
   }
-  return { name: pkg.name, published: false };
+  if (last) return fail(last);
+  return wait ? fail(`${label}: not there after ${POLICY.wait.tries} tries`) : { code: POLICY.notPublishedCode, lines: [[false, label]] };
 }
 
 // ── the command line ─────────────────────────────────────────────────────────
@@ -331,7 +368,7 @@ const shell = (cmd, args) => {
   return { ok: r.status === 0, out: `${r.stdout ?? ""}`.trim(), err: `${r.stderr ?? ""}`.trim() };
 };
 
-/** Each check returns `[ok, label]` lines (or a string to print). */
+/** Each check gets `(args, env)` and returns `[ok, label]` lines, a string to print, or `{ lines, code }` when it has its own exit code. */
 const checks = {
   npm: () => ["super-agent-framework", "create-saf"].map((pkg) => {
     const r = shell("npm", ["view", `${pkg}@${pkgVersion()}`, "version"]);
@@ -349,42 +386,46 @@ const checks = {
     const r = shell("gh", ["api", "graphql", "-f", `query={repository(owner:"Bellero-Advanced",name:"super-agent-framework"){usesCustomOpenGraphImage}}`, "--jq", ".data.repository.usesCustomOpenGraphImage"]);
     return [[r.ok && r.out === "true", "custom social preview uploaded (Settings → General → Social preview)"]];
   },
-  guards: ([tag]) => listed(releaseGuards(makeContext(ROOT), tag)),
-  switch: () => listed(killSwitch(makeContext(ROOT))),
-  published: async ([dir, version, flag]) => {
-    const r = await isPublished(makeContext(ROOT), dir, version, { wait: flag === "--wait" });
-    return r.error ? [[false, r.error]] : [[r.published, `${r.name}@${version} on npm`]];
-  },
-  notes: ([tag]) => {
+  guards: ([tag], env) => listed(releaseGuards(makeContext(env.root, env.run), tag)),
+  switch: (_args, env) => listed(killSwitch(makeContext(env.root, env.run))),
+  published: async ([dir, version, flag], env) => publishedCheck(makeContext(env.root, env.run), dir, version, { wait: flag === "--wait", sleep: env.sleep }),
+  notes: ([tag], env) => {
     const version = versionOf(tag);
-    const log = version ? text(makeContext(ROOT), RELEASE.changelog) : null;
+    const ctx = makeContext(env.root, env.run);
+    const log = version && !ctx.error ? text(ctx, RELEASE.changelog) : null;
     const body = log === null ? null : changelogSection(log, version)?.split("\n").slice(1).join("\n").trim();
-    return body ? `${body}\n` : [[false, `${RELEASE.changelog} has no filled section for ${oneLine(tag).slice(0, 40)}`]];
+    return body ? `${body}\n` : [[false, ctx.error ?? `${RELEASE.changelog} has no filled section for ${oneLine(tag).slice(0, 40)}`]];
   },
-  workflow: ([file]) => {
-    const target = resolve(ROOT, file ?? POLICY.workflowFile);
+  workflow: ([file], env) => {
+    const ctx = makeContext(env.root, env.run);
+    if (ctx.error) return [[false, ctx.error]];
+    const target = resolve(env.root, file ?? POLICY.workflowFile);
     if (!existsSync(target)) return [[false, `${file ?? POLICY.workflowFile} does not exist`]];
-    return checkWorkflow(readFileSync(target, "utf8"), { packages: makeContext(ROOT).config.policies.release.packages });
+    return checkWorkflow(readFileSync(target, "utf8"), { packages: ctx.config.policies.release.packages });
   },
 };
 
-async function main(argv) {
+/** Run one check. `env` = `{ root, run, out, err, sleep }` (tests inject fakes). Returns the exit code: 0 all hold · 1 one failed or a crash · 2 usage · or the check's own code. */
+export async function main(argv, env = {}) {
+  const e = { root: ROOT, out: (l) => process.stdout.write(l), err: (l) => process.stderr.write(l), ...env };
   const [what, ...rest] = argv;
   if (!Object.hasOwn(checks, what ?? "")) {
-    process.stderr.write(`usage: node scripts/release-check.mjs ${Object.keys(checks).join("|")}\n`);
+    e.err(`usage: node scripts/release-check.mjs ${Object.keys(checks).join("|")}\n`);
     return 2;
   }
-  const result = await checks[what](rest);
-  if (typeof result === "string") {
-    process.stdout.write(result);
-    return 0;
+  try {
+    const result = await checks[what](rest, e);
+    if (typeof result === "string") {
+      e.out(result);
+      return 0;
+    }
+    const lines = Array.isArray(result) ? result : result.lines;
+    for (const [ok, label] of lines) e.out(`${ok ? "✓" : "✗"} ${label}\n`);
+    return Array.isArray(result) ? (lines.some(([ok]) => !ok) ? 1 : 0) : result.code;
+  } catch (error) {
+    e.out(`✗ release-check ${what} crashed: ${oneLine(error?.message)}\n`); // a crash is never a "not on npm" answer: exit 1
+    return 1;
   }
-  let failed = 0;
-  for (const [ok, label] of result) {
-    process.stdout.write(`${ok ? "✓" : "✗"} ${label}\n`);
-    if (!ok) failed++;
-  }
-  return failed ? 1 : 0;
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) process.exit(await main(process.argv.slice(2)));

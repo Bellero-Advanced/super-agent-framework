@@ -33,6 +33,7 @@ entry of `policies.protectedBranches`, `main` when empty). To stop every release
    plain `git push`.
 4. Wait for CI on that commit.
 5. `npm run task:release -- <M> --tag` — creates the annotated tag `v<version>` and pushes only that tag.
+   (`--prepare` and `--tag`, steps 3 and 5, come with SAF's second release card, T-M3-10; until it is installed only the dry run exists.)
 6. Your tag workflow publishes (next section). SAF never runs `npm publish` itself.
 
 The version comes from `CHANGELOG.md`: a `### Breaking` section under `## Unreleased` is a major bump (minor while the
@@ -57,17 +58,18 @@ SAF does not publish; a workflow in your repository does, on the tag. This repos
 [`.github/workflows/release.yml`](../.github/workflows/release.yml) is the example. A workflow that is safe to copy:
 
 1. Runs only on `push` of tags `v*` — no branch, pull-request or manual trigger.
-2. Asks for `contents: read` at the top, and in its one job `contents: write` (the GitHub release) and `id-token: write`
-   (how npm recognises the run). No stored npm token anywhere.
+2. Asks for `contents: read` at the top, and in its one job `contents: write` (the GitHub release), `id-token: write`
+   (how npm recognises the run) and `actions: read` (to read the CI run of the commit). No stored npm token anywhere, and the GitHub token is given only to the steps that call `gh`, never to the publish steps.
 3. Runs in a GitHub environment (here `npm`) that only tags can deploy to.
 4. Checks the tag name first, passes it to scripts as an environment variable — never inside the script text.
-5. Uses Node 22.14.0 or newer and npm 11.5.1 or newer (trusted publishing needs both) on a GitHub-hosted runner.
-6. Runs a guards step before anything is published and stops if it fails. Here: `node scripts/release-check.mjs guards "$TAG"` — the tag equals
+5. Uses Node 22.14.0 or newer and npm 11.5.1 or newer on a GitHub-hosted runner. Source: npm's page [Trusted publishing](https://docs.npmjs.com/trusted-publishers) says "Trusted publishing requires npm CLI version 11.5.1 or later and Node version 22.14.0 or higher." It says self-hosted runners are not supported; check that page again before a release, the numbers may move.
+6. Runs a guards step before anything is published and stops if it fails. Here: `node scripts/release-check.mjs workflow` (the workflow checks its own rules) and then `node scripts/release-check.mjs guards "$TAG"` — the tag equals
    `v` + every package version and version file, the commit is the release commit and is on the release branch, `CHANGELOG.md`
    has the section, CI was green on the commit with a job for every operating system of its matrix, and `auto` is `on` on
-   `origin/main`.
-7. Publishes each package with `npm publish … --provenance`, in order, checks the kill switch right before each one, skips a
-   version that is already on npm (so a re-run after a partial failure is safe), and waits until the first package is visible
+   the release branch of `origin`.
+7. Publishes each package with `npm publish … --provenance`, in order, checks the kill switch right before each one, publishes only
+   when `release-check published` answers with exit code 3 (the registry definitely has no such version; 0 means it is already
+   there and is skipped, so a re-run after a partial failure is safe; any other code, an error or a crash, stops the job), and waits until the first package is visible
    before the next.
 8. Creates the GitHub release with the CHANGELOG section as notes, skipped when it exists.
 
@@ -77,17 +79,15 @@ commit ids if your policy asks for it (`release-check workflow` accepts both).
 
 ## Set up npm trusted publishing (once, in a browser)
 
-Names must match exactly; they are case-sensitive. npm does not test the settings when you save them: a mistake shows up
-only at the first publish. A new setting also expires if its first publish does not happen within 2 days — so do this
-shortly before the first release tag.
+Names must match exactly; npm says all fields are case-sensitive. Source: [npm trusted publishing](https://docs.npmjs.com/trusted-publishers) — "npm does not verify your trusted publisher configuration when you save it" and "errors will only appear when you attempt to publish"; "A newly created trusted publisher configuration must complete its first successful publish within 2 days" and, if not, "it expires and can no longer be used or edited". So do this shortly before the first release tag.
 
 1. npmjs.com → your package → **Settings** → **Trusted Publisher** → **GitHub Actions**. Fill in: organization or user, the
    repository name, workflow filename `release.yml` (the file name only, with `.yml`), environment name `npm`. Save.
    Do it for **every** released package. This repository: `Bellero-Advanced` · `super-agent-framework` · `release.yml` · `npm`,
    for both `super-agent-framework` and `create-saf`.
-2. Each `package.json` needs a `repository.url` that equals the GitHub repository, or provenance fails.
+2. Each `package.json` needs a `repository.url` that equals the GitHub repository: npm says it "must exactly match your GitHub repository" (same page).
 3. GitHub → repository → **Settings** → **Environments** → New environment `npm` → **Deployment branches and tags** →
-   *Selected branches and tags* → add a **tag** rule `v*`. Add *required reviewers* only if you want a person to approve every
+   *Selected branches and tags* → add a **tag** rule `v*`. Create the environment **before** the first tag: GitHub says a workflow that references an environment that does not exist "will create an environment with the referenced name" without protection rules or secrets ([GitHub: managing environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)), so the tag rule would be missing. Add *required reviewers* only if you want a person to approve every
    release (it breaks full automation).
 4. GitHub → **Settings** → **Rules** → **Rulesets** → new **tag** ruleset for `v*`: restrict updates and deletions, no bypass —
    a release tag then can never move.
