@@ -86,7 +86,7 @@ export async function init(root, opts = {}) {
 async function mergeUpgradeScripts(root, log) {
   const result = { added: [], kept: [] };
   const { CONFIG_FILE, validateConfig, resolveConfig } = await engineModule(root, "config.mjs");
-  const { engineScripts, mergeScriptsText } = await engineModule(root, "generate.mjs");
+  const { PACKAGE_INVALID, engineScripts, mergeScriptsText } = await engineModule(root, "generate.mjs");
   let raw = null;
   try {
     raw = JSON.parse(readFileSync(join(root, CONFIG_FILE), "utf8"));
@@ -106,7 +106,7 @@ async function mergeUpgradeScripts(root, log) {
   const want = engineScripts(config);
   const res = mergeScriptsText(readFileSync(file, "utf8"), want);
   if (res.invalid) {
-    log(`  ⚠ package.json is not valid JSON — scripts were not added; ${hint}`);
+    log(`  ⚠ ${PACKAGE_INVALID[res.reason]} — scripts were not added; ${hint}`);
     return result;
   }
   result.added = res.added;
