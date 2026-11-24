@@ -14,6 +14,7 @@ Target: $ARGUMENTS
    - one card per step in `docs/plan/tasks/M<n>/` (copy `docs/plan/tasks/_template.md`) — size S ≤ 150 / M ≤ 400
      code lines, explicit `touch`, a "Done when" list of commands, `scenarios` from the spec
    - specs with acceptance scenarios in `docs/specs/` when a system is new
-3. Run `npm run task:state -- --check` and `npm run docs:check`; fix every issue they report.
+3. Run `npm run task:state -- --check` and `npm run docs:check`; fix every issue they report. Then run `npm run task:prerun -- <id>` for each new
+   card: every proving "Done when" command must fail now, or carry `— passes by design: <reason>`.
 4. Show the owner a short summary: goal · card list (id · title · size · role) · open questions with a recommendation.
 5. **Stop.** Do not start any card until the owner says Go. Only the owner sets `status: active`.

@@ -179,6 +179,7 @@ export const ENGINE_SCRIPTS = {
   "task:report": "task report",
   "task:culprit": "task culprit",
   "task:friction": "task friction",
+  "task:prerun": "task prerun",
   "docs:check": "docs-check",
   "spec:matrix": "spec-matrix",
   "check-secrets": "check-secrets",

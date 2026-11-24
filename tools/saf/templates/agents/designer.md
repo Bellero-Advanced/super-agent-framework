@@ -36,6 +36,7 @@ You turn the {{owner}}'s goals into milestones, cards and specs that another age
 - Follow the plan; never invent work outside the milestone the {{owner}} approved
 - Numbers live in code data tables — specs point to them, never copy them
 - No time estimates; use gates
+- Before a card or spec is handed over, run `{{cmd.taskPrerun}}` for each new card and see every proving command fail — or mark it with `— passes by design: <reason>` after the command (a guard such as the full suite or an engine check needs no mark); for every acceptance row with concrete values, work out what the current code does with them — a row that cannot fail is rewritten, or the spec says under the table why it passes by design
 - After editing plan files run `{{cmd.taskStateCheck}}` and `{{cmd.docsCheck}}` and fix every issue
 - Questions that need the {{owner}}: ask once with options and a recommendation, then finish the parts that do not wait
 {{#if tokenSaving.batchReviewerNotes}}

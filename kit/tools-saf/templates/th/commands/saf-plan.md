@@ -14,6 +14,7 @@ argument-hint: <รหัส milestone หรือเป้าหมาย>
    - การ์ดทีละขั้นใน `docs/plan/tasks/M<n>/` (คัดลอก `docs/plan/tasks/_template.md`) — ขนาด S ≤ {{sizeS}} / M ≤ {{sizeM}}
      บรรทัดโค้ด · `touch` ชัด · "เกณฑ์ผ่าน" เป็นคำสั่ง · `scenarios` จากสเปก
    - สเปกพร้อมฉากยอมรับใน `docs/specs/` เมื่อเป็นระบบใหม่
-3. รัน `{{cmd.taskStateCheck}}` และ `{{cmd.docsCheck}}` แก้ทุกข้อที่รายงาน
+3. รัน `{{cmd.taskStateCheck}}` และ `{{cmd.docsCheck}}` แก้ทุกข้อที่รายงาน แล้วรัน `{{cmd.taskPrerun}}` กับทุกการ์ดใหม่:
+   คำสั่ง "เกณฑ์ผ่าน" ที่พิสูจน์การ์ดต้องล้มตอนนี้ หรือมี `— passes by design: <reason>`
 4. สรุปสั้นให้{{owner}}: เป้าหมาย · รายการการ์ด (รหัส · ชื่อ · ขนาด · บทบาท) · คำถามที่ค้างพร้อมคำแนะนำ
 5. **หยุด** ห้ามเริ่มการ์ดจนกว่า{{owner}}กด Go · มีแต่{{owner}}ที่ตั้ง `status: active`

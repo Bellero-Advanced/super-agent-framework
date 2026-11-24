@@ -187,6 +187,7 @@ export function templateData(config, detected, opts = {}) {
       taskEnv: c("task:env"),
       taskReport: c("task:report", "<M>"),
       taskCulprit: c("task:culprit", "<M>"),
+      taskPrerun: c("task:prerun", "<id>"),
       taskFriction: c("task:friction"),
       taskFrictionAdd: c("task:friction", "add --kind <kind> --area <area> --evidence <text> <summary>"),
       taskFrictionClose: c("task:friction", "close <F-id> carded|fixed|dropped <card id or reason>"),

@@ -34,5 +34,7 @@ The user-visible reason in one or two sentences. Link the spec section.
 
 ## Done when
 
+Each command fails before the card (check: `npm run task:prerun -- <id>`) or carries `— passes by design: <reason>` after the backticked command (anywhere else it is not read). Guard commands (the full suite, the engine checks) need no mark.
+
 - `npm run spec:matrix -- --check`
 - `npm test`

@@ -23,6 +23,7 @@ What happens on empty input, failure, retry, concurrency, permission denied.
 ## 5. Acceptance
 
 One table row per scenario; the first cell is the id `<PREFIX>-AC-<nn>`. A card that lists the id in `scenarios:` needs a test with the id in its name.
+Each row must be able to fail on the code before the card: work out what the current code does with its values — a row that already holds proves nothing — rewrite it, or the spec says under the table why it passes by design.
 
 | id | given | when | then | test layer |
 |---|---|---|---|---|
