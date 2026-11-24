@@ -13,19 +13,19 @@
       "source": "repo"
     }
   },
-  "attempts": 2,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M3-35",
   "worktree": ".claude/worktrees/T-M3-35",
   "verified": {
-    "at": "2026-11-24T18:45:06.808Z",
-    "head": "2be46c88ef816366f2567f9c5ecab314460b1931",
+    "at": "2026-11-24T18:52:50.572Z",
+    "head": "79c710877e24a860819248c0d7fde8db6812c403",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 383,
+        "ms": 394,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -52,34 +52,34 @@
       {
         "cmd": "node --test test/unit/card-sizes.test.mjs",
         "exit": 0,
-        "ms": 2886,
+        "ms": 4005,
         "tail": [
-          "ok 8 - SIZE-AC-08 generate in en and th shows the M and L caps in every line of rule 14, the stop lines also the factor, and says size: M in the card template and T-M0-01",
+          "ok 10 - SIZE-AC-08 generate in en and th shows the M and L caps in every line of rule 14, the stop lines also the factor, and says size: M in the card template and T-M0-01",
           "  ---",
-          "  duration_ms: 128.197417",
+          "  duration_ms: 128.274917",
           "  type: 'test'",
           "  ...",
           "# Subtest: SIZE-AC-09 saf choices --group 2 follows every rigor option with the M / L code caps and test caps in the labels of en and th",
-          "ok 9 - SIZE-AC-09 saf choices --group 2 follows every rigor option with the M / L code caps and test caps in the labels of en and th",
+          "ok 11 - SIZE-AC-09 saf choices --group 2 follows every rigor option with the M / L code caps and test caps in the labels of en and th",
           "  ---",
-          "  duration_ms: 176.595875",
+          "  duration_ms: 173.310834",
           "  type: 'test'",
           "  ...",
-          "1..9",
-          "# tests 9",
+          "1..11",
+          "# tests 11",
           "# suites 0",
-          "# pass 9",
+          "# pass 11",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2835.697583"
+          "# duration_ms 3952.797625"
         ]
       },
       {
         "cmd": "node --input-type=module -e \"const m=await import('./kit/tools-saf/lib/config.mjs');if(!m.SIZE_CAPS||!m.HARD_STOP_FACTOR||m.RIGOR.standard.sizes||!m.EFFORT_BY_SIZE.implementer.L)process.exit(1)\"",
         "exit": 0,
-        "ms": 49,
+        "ms": 51,
         "tail": []
       },
       {
@@ -91,17 +91,17 @@
       {
         "cmd": "node --test test/unit/config.test.mjs test/unit/task.test.mjs test/unit/plan.test.mjs test/unit/effort-by-size.test.mjs test/unit/effort-setup.test.mjs test/unit/effort-shown.test.mjs test/unit/self-fix.test.mjs test/unit/friction-triage.test.mjs test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs test/unit/review-diff.test.mjs test/unit/agent-instructions.test.mjs test/unit/repo-sync.test.mjs",
         "exit": 0,
-        "ms": 9307,
+        "ms": 13443,
         "tail": [
           "ok 104 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
           "  ---",
-          "  duration_ms: 0.080792",
+          "  duration_ms: 0.107292",
           "  type: 'test'",
           "  ...",
           "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
           "ok 105 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
           "  ---",
-          "  duration_ms: 288.482417",
+          "  duration_ms: 399.948792",
           "  type: 'test'",
           "  ...",
           "1..105",
@@ -112,13 +112,13 @@
           "# cancelled 0",
           "# skipped 1",
           "# todo 0",
-          "# duration_ms 9247.321958"
+          "# duration_ms 13381.029083"
         ]
       },
       {
         "cmd": "npm run saf:refresh -- --check",
         "exit": 0,
-        "ms": 312,
+        "ms": 330,
         "tail": [
           "> super-agent-framework@0.1.0 saf:refresh",
           "> node scripts/refresh-copies.mjs --check",
@@ -128,7 +128,7 @@
       {
         "cmd": "npm run task:state -- --check",
         "exit": 0,
-        "ms": 293,
+        "ms": 313,
         "tail": [
           "> super-agent-framework@0.1.0 task:state",
           "> node tools/saf/bin/saf.mjs task state --check",
@@ -148,7 +148,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 349,
+        "ms": 359,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -158,28 +158,28 @@
       {
         "cmd": "node --test 'test/e2e/init.test.mjs' 'test/unit/card-sizes.test.mjs' 'test/unit/config.test.mjs' 'test/unit/effort-by-size.test.mjs' 'test/unit/effort-setup.test.mjs' 'test/unit/effort-shown.test.mjs' 'test/unit/friction-triage.test.mjs' 'test/unit/review-diff.test.mjs' 'test/unit/self-fix.test.mjs' 'test/unit/setup-choices-facts.test.mjs' 'test/unit/setup-choices.test.mjs' 'test/unit/task.test.mjs'",
         "exit": 0,
-        "ms": 16676,
+        "ms": 20804,
         "tail": [
-          "ok 106 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
+          "ok 108 - lane guard: samePath sees a Windows 8.3 short name as the long name # SKIP",
           "  ---",
-          "  duration_ms: 0.057125",
+          "  duration_ms: 0.086833",
           "  type: 'test'",
           "  ...",
           "# Subtest: lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
-          "ok 107 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
+          "ok 109 - lane guard: a linked worktree that only its card/* branch name reveals is refused; a subfolder of it is not",
           "  ---",
-          "  duration_ms: 249.935625",
+          "  duration_ms: 298.514208",
           "  type: 'test'",
           "  ...",
-          "1..107",
-          "# tests 107",
+          "1..109",
+          "# tests 109",
           "# suites 0",
-          "# pass 106",
+          "# pass 108",
           "# fail 0",
           "# cancelled 0",
           "# skipped 1",
           "# todo 0",
-          "# duration_ms 16615.909042"
+          "# duration_ms 20740.453417"
         ]
       }
     ],
@@ -269,7 +269,7 @@
         "kit/tools-saf/lib/friction.mjs": "9058842f78314bdb94b81d5d93a62c8949f47aa5",
         "kit/tools-saf/lib/generate.mjs": "cfbbcdab137ffffaaafc6cad7c37aa0012d8dba9",
         "kit/tools-saf/lib/plan.mjs": "59e4cc397ea20d7669a89c4d85bd96670406bfa3",
-        "kit/tools-saf/lib/task.mjs": "43ea9fecae6b00b56f99fbad92b4736f2c65f778",
+        "kit/tools-saf/lib/task.mjs": "55c88941fa88621b3676299ae326e51e650fbcfc",
         "kit/tools-saf/schema/saf.config.schema.json": "93340ec9a4955a07d07eadf80a159a3b0b9fcb87",
         "kit/tools-saf/templates/agents/designer.md": "4da8125be65968107915f7a75517d970d11b5183",
         "kit/tools-saf/templates/agents/implementer.md": "3426f0eece7dd9bcbd8ecb575daefe22b3f8d8c0",
@@ -292,7 +292,7 @@
         "scripts/demo.mjs": "5ed51541df1cda79d6946be3cc593bb59b2d1a2c",
         "test/e2e/init.test.mjs": "3f83494459857fd3b897351bbf8a0fdd6f4d5d00",
         "test/helpers.mjs": "a80c8249f6245d0902143ea7981a5e58409f6b79",
-        "test/unit/card-sizes.test.mjs": "176561a2543ef120fa567666086069f09ab7dc12",
+        "test/unit/card-sizes.test.mjs": "b1f83bb13d061238303dd525dedf820e954ae272",
         "test/unit/config.test.mjs": "f8ce37f31b96646d72a5e4920942fad859a5df13",
         "test/unit/effort-by-size.test.mjs": "4cbdee6d14a455edcfa78421fe78d4bacf155a43",
         "test/unit/effort-setup.test.mjs": "1de18f683739c22c93bc6f1a30a821480852cfbb",
@@ -322,12 +322,12 @@
     "size": {
       "size": "M",
       "code": {
-        "lines": 259,
+        "lines": 261,
         "cap": 800,
         "stop": 1600
       },
       "test": {
-        "lines": 310,
+        "lines": 336,
         "cap": 600,
         "stop": 1200
       },

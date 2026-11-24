@@ -80,8 +80,8 @@ function startEffort(config, card) {
 /** The lines `task:start` prints about the agent: rule 11's line, the legacy-size note and the missing-variants warning. */
 export function effortLines(config, card, ev) {
   const e = ev.started?.effort;
-  if (!e) return [];
   const { size, note } = countedSize(card);
+  if (!e) return note ? [`  size ${size} (${note})`] : [];
   const out = [`  agent ${e.agent} · effort ${e.effort} · size ${size}${note ? ` (${note})` : ""} · models.effort ${e.mode} (${e.source})`];
   const warning = cardEffort(config, card).warning;
   if (warning) out.push(`  warning: ${warning}`);
@@ -572,14 +572,14 @@ function closeSelfFix(ctx, plan, card) {
 }
 
 /** Rule 7: the size is above a hard stop before any command — no command runs, the attempt is recorded as failed. */
-function stopCard(ctx, plan, ev, card, size, files, head) {
+function stopCard(ctx, lane, ev, card, size, files, head) {
   ctx.log?.(sizeStopLine(ev.id, size));
   const { reviewFailed: _reopened, ...kept } = ev;
   const scenarios = cardScenarios(ctx.root, card.scenarios);
   const mode = { mode: ctx.config.workflow.testMode ?? null, source: ctx.config.workflow.testModeSource ?? null };
   const next = { ...kept, status: "failed", attempts: ev.attempts + 1, verified: { at: nowIso(ctx), head, pass: false, commands: [], files, scenarios, size, testMode: mode } };
   writeJson(ctx.root, evidencePath(ev.id), next);
-  if (!ev.lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
+  if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
   return next;
 }
 
@@ -598,7 +598,7 @@ export async function verifyCard(ctx, id) {
   for (const key of ctx.config.workflow.sizesLegacy ?? []) ctx.log?.(`  ${legacySizeLine(key)}`);
   const first = cardFiles(ctx, card, ev, filesBase);
   const before = cardSize(ctx, card, first, filesBase);
-  if (before.stopped.length) return stopCard(ctx, plan, ev, card, before, first, head);
+  if (before.stopped.length) return stopCard(ctx, lane, ev, card, before, first, head);
   const { run, deferred, targeted } = planVerifyRun(ctx, card, ev, filesBase, !!lane);
   const mode = { mode: ctx.config.workflow.testMode ?? null, source: ctx.config.workflow.testModeSource ?? null };
   if (deferred.length) ctx.log?.(`  ! full suite deferred to gate (test mode ${mode.mode} from ${mode.source}): ${deferred.join(" · ")}`);

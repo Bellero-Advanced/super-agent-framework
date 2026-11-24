@@ -127,6 +127,32 @@ test("SIZE-AC-04 a legacy S card and a card without size are valid, counted as M
   assert.equal(loadPlan(root, config).cards.get("T-M1-01").size, "S", "the plan still reads S");
 });
 
+test("SIZE-AC-04 a card without a role gets the size line only when counted size has a note; a legacy caps value is named by verify", async () => {
+  for (const [size, note] of [["S", "legacy S counted as M"], ["", "no size — counted as M"], ["M", null]]) {
+    const { root } = await planRepo({ cards: [{ id: ID, size, role: "", touch: ["src/**"] }] });
+    const out = cli(root, "task", "start", ID).stdout;
+    assert.equal(out.split("\n").includes(`  size M (${note})`), !!note, `${JSON.stringify(size)}: ${out}`);
+    assert.ok(!out.includes("  agent "), "no role, no agent line");
+  }
+  const { root, config } = await planRepo({ config: { workflow: { sizes: { S: 150, M: 400 } } }, cards: [{ id: ID, touch: ["src/**"] }] });
+  const ctx = fakeCtx(root, config, { logged: [] });
+  ctx.log = (l) => ctx.logged.push(l);
+  task.startCard(ctx, ID);
+  await task.verifyCard(ctx, ID);
+  assert.ok(ctx.logged.includes(`  ${legacySizeLine("sizes")}`), ctx.logged.join("\n"));
+});
+
+test("SIZE-AC-03 a size above the hard stop only after the commands ran fails the card with the closing line", async () => {
+  const { root, ctx } = await started();
+  ctx.run = async (cmd) => {
+    write(root, "src/big.js", lines(SIZE_CAPS.M.code * HARD_STOP_FACTOR + 1));
+    return { cmd, exit: 0, ms: 1, tail: [] };
+  };
+  const r = await task.verifyCard(ctx, ID);
+  assert.deepEqual([r.status, r.verified.commands.length, r.verified.size.stopped], ["failed", 1, ["code"]]);
+  assert.ok(ctx.logged.includes(`  ✗ ${ID} is over the hard stop (M): code ${SIZE_CAPS.M.code * HARD_STOP_FACTOR + 1} > ${SIZE_CAPS.M.code * HARD_STOP_FACTOR} changed lines (${HARD_STOP_FACTOR} × the cap) — the card fails; the designer splits the card`), ctx.logged.join("\n"));
+});
+
 test("SIZE-AC-05 a planned milestone refuses S, no size and XL with the rule-10 texts; M, L, a started S card and a done milestone's S card are valid", async () => {
   const f = (m, n) => `docs/plan/tasks/${m}/T-${m}-0${n}.md`;
   const mk = (n, size, extra = {}) => ({ id: `T-M2-0${n}`, size, touch: ["src/**"], ...extra });
