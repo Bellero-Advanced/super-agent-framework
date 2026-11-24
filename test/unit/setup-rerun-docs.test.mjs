@@ -18,7 +18,12 @@ test("RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks p
   assert.ok(/your edits stay/.test(t) && /keep-edited/.test(t), "living files note");
   const re = flat(skill.slice(skill.indexOf("## Re-running")));
   assert.ok(/living files/.test(re) && /archived/.test(re) && re.includes("--dry-run") && re.includes("--diff"));
-  const up = flat(read("docs", "upgrade.md"));
-  assert.ok(/living files/.test(up) && /archived/.test(up) && up.includes("--dry-run") && up.includes("--diff") && up.includes("--keep"));
-  assert.ok(!up.includes("T-M2-20"));
+  const raw = read("docs", "upgrade.md");
+  const up = flat(raw);
+  assert.ok(!up.includes("edited ones are archived to `docs/archive/pre-saf/` first."), "the old sentence is gone");
+  assert.ok(!up.includes("are the exception"), "the old exception sentence is gone");
+  assert.ok(up.includes("living files") && up.includes("archived to `docs/archive/pre-saf/` first and replaced, unless you keep it (`--keep <path>`)"));
+  assert.ok(up.includes("`--dry-run`") && up.includes("`--dry-run --diff`"));
+  const lines = raw.split("\n").map((l) => l.trim()).filter(Boolean);
+  assert.deepEqual(lines.filter((l, i) => lines.indexOf(l) !== i), [], "no line appears twice");
 });

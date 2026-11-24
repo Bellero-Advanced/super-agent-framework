@@ -7,19 +7,19 @@
     "base": "9f626b0a33eef5b360ad35e45222ca54b41d0873",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M2-22",
   "worktree": ".claude/worktrees/T-M2-22",
   "verified": {
-    "at": "2026-11-24T05:14:19.946Z",
-    "head": "667d7b6a97130573171f25f4e3c19598f7e7a6b5",
+    "at": "2026-11-24T05:17:37.297Z",
+    "head": "860990bc2e6ff92d5c05505baecd10efaca7ab01",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 202,
+        "ms": 208,
         "tail": [
           "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
           "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
@@ -46,17 +46,17 @@
       {
         "cmd": "node --test test/unit/setup-rerun-docs.test.mjs test/unit/setup-choices.test.mjs",
         "exit": 0,
-        "ms": 1525,
+        "ms": 1526,
         "tail": [
           "ok 13 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.537417",
+          "  duration_ms: 0.536375",
           "  type: 'test'",
           "  ...",
           "# Subtest: RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
           "ok 14 - RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
           "  ---",
-          "  duration_ms: 1.714708",
+          "  duration_ms: 2.0235",
           "  type: 'test'",
           "  ...",
           "1..14",
@@ -67,19 +67,19 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1487.788542"
+          "# duration_ms 1491.1285"
         ]
       },
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('kit/claude/skills/saf-setup/SKILL.md','utf8');if(!s.includes('--dry-run')||!s.includes('--keep'))process.exit(1)\"",
         "exit": 0,
-        "ms": 32,
+        "ms": 30,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 200,
+        "ms": 189,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -89,13 +89,13 @@
       {
         "cmd": "node --test 'test/unit/setup-rerun-docs.test.mjs'",
         "exit": 0,
-        "ms": 79,
+        "ms": 76,
         "tail": [
           "TAP version 13",
           "# Subtest: RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
           "ok 1 - RERUN-AC-07 SKILL.md detects a re-run by the manifest, dry-runs and asks per edited file, passes --keep <path>; upgrade.md and Re-running describe it",
           "  ---",
-          "  duration_ms: 1.17875",
+          "  duration_ms: 1.426417",
           "  type: 'test'",
           "  ...",
           "1..1",
@@ -106,7 +106,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 44.55"
+          "# duration_ms 43.820208"
         ]
       }
     ],
@@ -119,9 +119,9 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/upgrade.md": "43743939639811f457fc53a43a33dce95e4af647",
-        "kit/claude/skills/saf-setup/SKILL.md": "1bffb006485190a6634ad572303df21c76263d8a",
-        "test/unit/setup-rerun-docs.test.mjs": "8b1a292b7bfcd97e5dc5fd98b382f95036822063"
+        "docs/upgrade.md": "6575b8a208667ebc635ad7b7c01e556f308e770c",
+        "kit/claude/skills/saf-setup/SKILL.md": "6a2fe53d53d7c3b57f339b66200053b9bd627c2a",
+        "test/unit/setup-rerun-docs.test.mjs": "e8afb241efea4eaed47a9a0868b73ac698b6cd1f"
       }
     },
     "scenarios": {
@@ -133,11 +133,11 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 44,
+        "lines": 43,
         "cap": 150
       },
       "test": {
-        "lines": 24,
+        "lines": 29,
         "cap": 250
       },
       "over": []

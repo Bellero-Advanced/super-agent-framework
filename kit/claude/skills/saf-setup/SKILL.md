@@ -97,11 +97,15 @@ already know, instead of forcing them into options.
 1. Write `.saf/setup-answers.json` (step 1 above), then run
    `node tools/saf/bin/saf.mjs setup --answers .saf/setup-answers.json <adopt flag> --dry-run` with the same adopt flag as
    the real run. It writes nothing. Show the list as printed, without the `same` lines.
-2. For each `replace-edited` line (a file someone edited, or SAF did not write) ask once with AskUserQuestion:
+   If the list has no `replace-edited` line, skip steps 2 and 5: nothing needs a decision; go on with step 4 and generate.
+2. For each `replace-edited` line (a file someone edited, or SAF did not write) ask once with AskUserQuestion. One call
+   holds up to 4 questions, so batch the files 4 at a time, and offer "take the recommendation for all the rest":
    - **Take the new version — yours is archived to `docs/archive/pre-saf/` (recommended)**
    - **Keep mine**
    - **Show the diff first** — run the same command with `--dry-run --diff` added, show only that file's part (from its
-     `--- a/<path>` line to the next `---` line), then ask the same question again with the first two options.
+     `--- a/<path>` line to the next `--- a/` line or the end of the output; a removed line that starts with `--` prints as
+     `----`, so match `--- a/` exactly). A file over the line limit prints one line `<path>: too large to diff — …` with no
+     `--- a/` header: show that line and say the diff is too large. Then ask the same question again with the first two options.
 3. Every file answered "Keep mine" goes to the real run as `--keep <path>`, written exactly like that: a space, then the
    path as the list printed it. Never `--keep=<path>` — the CLI silently ignores that form and the file would be
    archived and replaced. Repeat `--keep` per file (or give one comma-separated list). A path must be a file the dry run
@@ -109,7 +113,8 @@ already know, instead of forcing them into options.
 4. List every `keep-edited` file (living files: decision log, index, milestone and card files) with one line: your edits
    stay; the diff shows what the new settings would change — port it by hand, or add a decision row when a setting changed.
    Do not ask about these.
-5. Run the dry run again with the `--keep` flags to confirm: each kept file shows `keep-edited`. Then generate.
+5. Run the dry run again with the `--keep` flags to confirm: each kept file shows `keep-edited`. Then generate. If a `--keep` run exits 2 (for example the
+   file vanished meanwhile), drop that path, run the dry run again, and tell the person.
 
 ## Step 4 — self-checks (real runs, report real results)
 
