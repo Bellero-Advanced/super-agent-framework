@@ -49,8 +49,8 @@ Status is never typed by hand — it is computed from three kinds of files:
 8. When all cards pass: `task:verify M<n>` runs the exit gates (gates without commands are manual owner checks) and
    `task:report M<n>` writes the report from evidence (`--html` also writes one page for people who do not read JSON). The owner closes the milestone.
 9. Friction triage: the designer reads the report's Friction section, runs `task:friction draft`, and turns the drafts into
-   cards (the milestone needs the owner's Go) or closes entries with `task:friction close <F-id> dropped <reason>`
-   ([details](#friction-log)).
+   cards (the milestone needs the owner's Go) or closes entries with `task:friction close <F-id> dropped <reason>`. Once a draft
+   becomes a card, close its entries with `task:friction close <F-id> carded <card id>` ([details](#friction-log)).
 
 `task:abandon <id>` gives up an unfinished card. `task:start <id> --restart` re-opens a passed card.
 
@@ -204,7 +204,8 @@ thing, a document contradicts the code, or the work needs a step the workflow do
   records it
 - while an entry is open or carded, the SessionStart summary shows `Friction: <open> open · <carded> carded`
 - at milestone end `task:report` adds a Friction section after the gates: every open and carded entry, then a brief with one row
-  per kind and area (count, ids, newest evidence); a group with two or more open entries is marked recurring
+  per kind and area (count, ids, newest evidence). The brief groups only open entries (carded ones appear in the entry list only);
+  a group with at least `FRICTION_LIMITS.recurring` (`kit/tools-saf/lib/friction.mjs`) open entries is marked recurring
 - `task:friction draft` prints card drafts to the screen and writes nothing: one per recurring group, and — only when
   `workflow.selfFix` is `on` — one per open `command-failed` or `doc-drift` entry. A draft names the milestone (`T-M<n>-??`),
   quotes the evidence under "Why" and leaves `touch` and "Done when" as `TODO`. The engine never adds a card to a plan file: the

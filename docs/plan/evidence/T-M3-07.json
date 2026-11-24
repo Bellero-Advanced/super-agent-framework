@@ -13,19 +13,19 @@
       "source": "default"
     }
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-07",
   "worktree": ".claude/worktrees/T-M3-07",
   "verified": {
-    "at": "2026-11-24T17:39:13.363Z",
-    "head": "df4b6106becaad51f7e7bbaf46dd5a07d13ca6a0",
+    "at": "2026-11-24T17:46:35.211Z",
+    "head": "c3d5139179995210fdef1054a9a2aeddba909aa6",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 371,
+        "ms": 382,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -52,34 +52,34 @@
       {
         "cmd": "node --test test/unit/friction-triage.test.mjs test/unit/friction.test.mjs",
         "exit": 0,
-        "ms": 5055,
+        "ms": 5394,
         "tail": [
-          "ok 19 - FRIC-AC-07 an entry appended while a card is in progress is not reported outside touch; a real file outside touch still is",
+          "ok 21 - FRIC-AC-07 an entry appended while a card is in progress is not reported outside touch; a real file outside touch still is",
           "  ---",
-          "  duration_ms: 261.647417",
+          "  duration_ms: 261.693541",
           "  type: 'test'",
           "  ...",
           "# Subtest: the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
-          "ok 20 - the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
+          "ok 22 - the engine knows the task:friction script and the cmd table, and CLAUDE.md + the plan README of both languages name the commands",
           "  ---",
-          "  duration_ms: 71.405584",
+          "  duration_ms: 69.406375",
           "  type: 'test'",
           "  ...",
-          "1..20",
-          "# tests 20",
+          "1..22",
+          "# tests 22",
           "# suites 0",
-          "# pass 20",
+          "# pass 22",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 5003.601167"
+          "# duration_ms 5340.894541"
         ]
       },
       {
         "cmd": "npm run task:friction -- draft",
         "exit": 0,
-        "ms": 263,
+        "ms": 254,
         "tail": [
           "> super-agent-framework@0.1.0 task:friction",
           "> node tools/saf/bin/saf.mjs task friction draft",
@@ -89,7 +89,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 305,
+        "ms": 317,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -99,7 +99,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 347,
+        "ms": 381,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -109,28 +109,28 @@
       {
         "cmd": "node --test 'test/unit/friction-triage.test.mjs'",
         "exit": 0,
-        "ms": 1299,
+        "ms": 1260,
         "tail": [
-          "ok 6 - FRIC-AC-09 with workflow.selfFix on, an open entry of a self-fix kind gets its own draft with self_fix; the others never have it",
+          "ok 8 - FRIC-AC-09 a summary with a colon, a quote and a backslash becomes a title that a strict card parse reads back unchanged",
           "  ---",
-          "  duration_ms: 78.817584",
+          "  duration_ms: 0.520833",
           "  type: 'test'",
           "  ...",
-          "# Subtest: FRIC-AC-09 the target milestone is the active one, else the next planned one; no entries: one line, exit 0, nothing written",
-          "ok 7 - FRIC-AC-09 the target milestone is the active one, else the next planned one; no entries: one line, exit 0, nothing written",
+          "# Subtest: FRIC-AC-08 docs/card-lifecycle.md names FRICTION_LIMITS.recurring (not a number) and says the brief groups open entries only",
+          "ok 9 - FRIC-AC-08 docs/card-lifecycle.md names FRICTION_LIMITS.recurring (not a number) and says the brief groups open entries only",
           "  ---",
-          "  duration_ms: 350.803",
+          "  duration_ms: 0.80775",
           "  type: 'test'",
           "  ...",
-          "1..7",
-          "# tests 7",
+          "1..9",
+          "# tests 9",
           "# suites 0",
-          "# pass 7",
+          "# pass 9",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1245.123291"
+          "# duration_ms 1207.284792"
         ]
       }
     ],
@@ -146,12 +146,12 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/card-lifecycle.md": "4ae8bc6572240aa6def683e7fd1f0dd1fd05366d",
+        "docs/card-lifecycle.md": "2810f440b85ce7c50eae2e363113fb442d9959c3",
         "kit/tools-saf/bin/saf.mjs": "55a228d0e683ad8f0d9a61e0232cc172ba69f8e6",
         "kit/tools-saf/lib/friction.mjs": "e7e4de413000b655e9755fc08110b841548aeabb",
         "kit/tools-saf/lib/report.mjs": "4a07fa0e94ca097f9ee7f345203f3b0341504fd6",
         "kit/tools-saf/lib/text.mjs": "f699e9afc393c538d9f7dfc3de0b145b158684f0",
-        "test/unit/friction-triage.test.mjs": "2188aee2a9ee6c1644ac795f9bb6a1b92fd43f90"
+        "test/unit/friction-triage.test.mjs": "0c0706aed56b8aab76ab0ba432a553233922e451"
       }
     },
     "scenarios": {
@@ -164,11 +164,11 @@
     "size": {
       "size": "M",
       "code": {
-        "lines": 155,
+        "lines": 156,
         "cap": 400
       },
       "test": {
-        "lines": 139,
+        "lines": 162,
         "cap": 600
       },
       "over": []

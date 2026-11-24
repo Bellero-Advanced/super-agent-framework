@@ -137,3 +137,26 @@ test("FRIC-AC-09 the target milestone is the active one, else the next planned o
   assert.equal(git(empty.root, "status", "--porcelain"), "");
   assert.equal(cli(empty.root, "task", "friction", "draft", "extra").status, 2, "extra words are a usage error");
 });
+
+test("FRIC-AC-09 a summary with a colon, a quote and a backslash becomes a title that a strict card parse reads back unchanged", () => {
+  const summary = 'verify said: "no \\ path" at C:\\tmp';
+  const text = `${fr.FRICTION_MARKER}\n- F-001 · 2026-01-01 · doc-drift · - · docs/x.md · ${summary} · evidence: e`;
+  const plan = { config: { people: { docLanguage: "en" }, workflow: { selfFix: "on" } }, milestones: [{ id: "M1", status: "active" }], friction: fr.parseFriction(text) };
+  const [d] = fr.renderDrafts(plan);
+  const card = d.replace(/T-M1-\?\?/g, "T-M1-09").replace(/- TODO: commands[^\n]*/, "- `true`");
+  const got = parseCard(card, "docs/plan/tasks/M1/T-M1-09.md", ["implementer"]);
+  assert.deepEqual(got.issues, []);
+  assert.equal(got.card.title, summary);
+  assert.equal(got.card.id, "T-M1-09");
+});
+
+test("FRIC-AC-08 docs/card-lifecycle.md names FRICTION_LIMITS.recurring (not a number) and says the brief groups open entries only", () => {
+  const doc = readFileSync(join(REPO, "docs", "card-lifecycle.md"), "utf8").replace(/\r\n/g, "\n").replace(/\n {2}/g, " ");
+  const bullet = doc.split("\n").find((l) => l.startsWith("- at milestone end `task:report` adds a Friction section"));
+  assert.ok(bullet, "the report bullet exists");
+  assert.ok(bullet.includes("`FRICTION_LIMITS.recurring` (`kit/tools-saf/lib/friction.mjs`)"), bullet);
+  assert.ok(!/\b(two|2|three|3)\b/i.test(bullet), "no literal limit");
+  assert.ok(/groups only open entries/.test(bullet) && /carded[^.]*entry list only/.test(bullet), bullet);
+  const step = doc.split("\n").find((l) => l.startsWith("9. Friction triage"));
+  assert.ok(step.includes("`task:friction close <F-id> carded <card id>`"), step);
+});
