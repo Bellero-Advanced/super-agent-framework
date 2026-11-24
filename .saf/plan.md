@@ -111,7 +111,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-33 This repository's /saf commands and CLAUDE.md commands block stay equal to the templates (a test fails when they drift), and saf:refresh keeps the example's commands, skills, agents and CLAUDE.md current — passed 2026-11-24 10:03 (9 commands) · full suite deferred to gate
 - [x] T-M3-34 task:merge accepts a lane card that adds an always-allowed glob: the post-verify check uses the main folder's list and the branch's — passed 2026-11-24 16:19 (8 commands) · full suite deferred to gate
 - [x] T-M3-16 Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read — passed 2026-11-24 16:26 (5 commands) · full suite deferred to gate
-- [ ] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates — started 2026-11-24 16:43 · not verified yet · lane 1 · .claude/worktrees/T-M3-17
+- [x] T-M3-17 Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates — passed 2026-11-24 16:50 (5 commands) · full suite deferred to gate
 - [x] T-M3-18 task:culprit cleans up when interrupted, streams its runs, refuses a bad plan or id, and settles ties the spec names — passed 2026-11-24 16:39 (5 commands) · full suite deferred to gate
 - [ ] T-M3-19 STATE.md, the plan mirror, the report and the HTML page give every exit gate the same result word, and broken evidence never crashes them
 - [x] T-M3-20 saf choices and config --check refuse arguments they do not know, and a verify fallback names its real cause — passed 2026-11-24 16:44 (5 commands) · full suite deferred to gate

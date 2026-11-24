@@ -1,6 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, posix, relative } from "node:path";
 import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
@@ -34,7 +33,7 @@ const readTemplate = (p) => readFileSync(p, "utf8").replace(/\r\n/g, "\n");
 export const COMMANDS = ["saf", "saf-plan"];
 /** Files the team keeps writing in after setup: a re-run keeps them when edited (a trailing "/" = everything under that folder). */
 export const LIVING_FILES = ["docs/DECISIONS.md", "docs/INDEX.md", "docs/plan/milestones/", "docs/plan/tasks/"];
-const isLiving = (rel) => LIVING_FILES.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
+const isLiving = (rel) => !posix.basename(rel).startsWith("_") && LIVING_FILES.some((p) => (p.endsWith("/") ? rel.startsWith(p) : rel === p));
 
 /** Agent-facing folders SAF owns files in — a file SAF wrote there that is no longer planned is removed when unedited. */
 const OWNED_DIRS = [".claude/commands/", ".claude/skills/", ".claude/agents/", ".claude/rules/"];
@@ -503,26 +502,31 @@ function planPackageJson(root, config, report) {
 }
 
 /**
- * The status files as they will be once the plan is applied. loadPlan reads a folder, and the dry run may not write the
- * project — so the post-apply `docs/plan/` is mirrored in a scratch folder outside the project (removed at once).
+ * The status files as they will be once the plan is applied. loadPlan reads through an overlay — the files under
+ * `docs/plan/` on disk (minus the ones adopt moves aside) with the planned writes laid over them — so nothing is
+ * written, not even to a scratch folder.
  */
 function planStatus(root, config, writes, moved) {
-  const scratch = mkdtempSync(join(tmpdir(), "saf-plan-"));
-  const put = (rel, bytes) => {
-    mkdirSync(dirname(join(scratch, rel)), { recursive: true });
-    writeFileSync(join(scratch, rel), bytes);
-  };
-  try {
-    for (const abs of walk(join(root, "docs/plan"))) {
-      const rel = relative(root, abs).split("\\").join("/");
-      if (!moved.has(rel) && lstatSync(abs).isFile()) put(rel, readFileSync(abs)); // loadPlan ignores links, so the copy does too
-    }
-    for (const [rel, content] of writes) if (rel.startsWith("docs/plan/")) put(rel, content);
-    if (existsSync(join(root, ".gitmodules"))) put(".gitmodules", readFileSync(join(root, ".gitmodules")));
-    return loadPlan(scratch, config);
-  } finally {
-    rmSync(scratch, { recursive: true, force: true });
+  const files = new Map(); // rel → planned text, or null = read it from disk
+  for (const abs of walk(join(root, "docs/plan"))) {
+    const rel = relative(root, abs).split("\\").join("/");
+    if (!moved.has(rel) && lstatSync(abs).isFile()) files.set(rel, null); // loadPlan ignores links, so the overlay does too
   }
+  for (const [rel, content] of writes) if (rel.startsWith("docs/plan/")) files.set(rel, String(content));
+  const io = {
+    has: (rel) => files.has(rel),
+    read: (rel) => files.get(rel) ?? readFileSync(join(root, rel), "utf8"),
+    list: (dir) => {
+      const seen = new Map();
+      for (const rel of files.keys()) {
+        if (!rel.startsWith(`${dir}/`)) continue;
+        const [name, ...rest] = rel.slice(dir.length + 1).split("/");
+        seen.set(name, rest.length > 0);
+      }
+      return [...seen].map(([name, isDirectory]) => ({ name, isDirectory }));
+    },
+  };
+  return loadPlan(root, config, io);
 }
 
 /** A path as `--keep` may give it: forward slashes, no "./" or "a/../", relative to the project root. */

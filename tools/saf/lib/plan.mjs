@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { roleTable, scriptCommand } from "./config.mjs";
-import { FRICTION_FILE, countByStatus, readFriction } from "./friction.mjs";
+import { FRICTION_FILE, countByStatus, parseFriction } from "./friction.mjs";
 import { submodulePaths } from "./git.mjs";
 import { codeSpans, findSection, frontmatter, scanLines, sections } from "./markdown.mjs";
 import { stripComment } from "./yaml.mjs";
@@ -146,38 +146,44 @@ export function parseMilestone(src, file) {
   return { milestone: { id, title: str(data.title), status, file, cards: strList(data.cards), sideCards: strList(data.side_cards), legacy, gates, sections: body }, issues };
 }
 
-function listFiles(root, dir, ext, recursive) {
-  const abs = join(root, dir);
-  if (!existsSync(abs)) return [];
+/** The plan as files on disk: `has(rel)` → does the path exist (links followed), `list(rel)` → [{ name, isDirectory }] (empty when the folder is missing; links are left out), `read(rel)` → text. */
+export const diskIo = (root) => ({
+  has: (rel) => existsSync(join(root, rel)),
+  read: (rel) => readFileSync(join(root, rel), "utf8"),
+  list: (rel) => (existsSync(join(root, rel)) ? readdirSync(join(root, rel), { withFileTypes: true }).filter((e) => e.isDirectory() || e.isFile()).map((e) => ({ name: e.name, isDirectory: e.isDirectory() })) : []),
+});
+
+function listFiles(io, dir, ext, recursive) {
   const out = [];
-  for (const e of readdirSync(abs, { withFileTypes: true })) {
+  for (const e of io.list(dir)) {
     const rel = `${dir}/${e.name}`;
-    if (e.isDirectory() && recursive) out.push(...listFiles(root, rel, ext, recursive));
-    else if (e.isFile() && e.name.endsWith(ext) && !e.name.startsWith("_")) out.push(rel);
+    if (e.isDirectory && recursive) out.push(...listFiles(io, rel, ext, recursive));
+    else if (!e.isDirectory && e.name.endsWith(ext) && !e.name.startsWith("_")) out.push(rel);
   }
   return out.sort();
 }
 
-export function loadPlan(root, config) {
+/** `io` (optional) is a read overlay `{ has(rel), read(rel), list(rel) }` — setup uses it to read the plan as it will be after the apply, without writing it. */
+export function loadPlan(root, config, io = diskIo(root)) {
   const issues = [];
-  const read = (rel) => readFileSync(join(root, rel), "utf8");
+  const read = (rel) => io.read(rel);
   const roles = roleTable(config).map((r) => r.name);
   const milestones = [];
-  for (const f of listFiles(root, MILESTONE_DIR, ".md", false)) {
+  for (const f of listFiles(io, MILESTONE_DIR, ".md", false)) {
     const r = parseMilestone(read(f), f);
     issues.push(...r.issues);
     if (r.milestone) milestones.push(r.milestone);
   }
   milestones.sort((a, b) => Number(a.id.slice(1)) - Number(b.id.slice(1)));
   const cards = new Map();
-  for (const f of listFiles(root, TASK_DIR, ".md", true)) {
+  for (const f of listFiles(io, TASK_DIR, ".md", true)) {
     const r = parseCard(read(f), f, roles);
     issues.push(...r.issues);
     if (r.card) cards.set(r.card.id, r.card);
   }
   const evidence = new Map();
   const gateEvidence = new Map();
-  for (const f of listFiles(root, EVIDENCE_DIR, ".json", false)) {
+  for (const f of listFiles(io, EVIDENCE_DIR, ".json", false)) {
     try {
       const data = JSON.parse(read(f));
       if (data.kind === "milestone") gateEvidence.set(data.id, data);
@@ -186,7 +192,7 @@ export function loadPlan(root, config) {
       issues.push(`${f}: JSON is not readable`);
     }
   }
-  const friction = readFriction(root);
+  const friction = io.has(FRICTION_FILE) ? parseFriction(read(FRICTION_FILE)) : { entries: [], issues: [], hasMarker: false };
   const plan = { config, milestones, cards, evidence, gateEvidence, friction, submodules: submodulePaths(root), issues };
   issues.push(...validatePlan(plan), ...friction.issues);
   return plan;
