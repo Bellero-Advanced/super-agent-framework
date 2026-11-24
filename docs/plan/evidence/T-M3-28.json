@@ -7,29 +7,29 @@
     "base": "13da6fa2b383b410e4bea3d4c43958c1fedaaf9b",
     "dirty": {}
   },
-  "attempts": 4,
+  "attempts": 5,
   "lane": 2,
   "branch": "card/T-M3-28",
   "worktree": ".claude/worktrees/T-M3-28",
   "verified": {
-    "at": "2026-11-24T08:57:11.844Z",
-    "head": "94c0182e4e19825e3c1c440cea501ff35abfb160",
+    "at": "2026-11-24T09:05:31.136Z",
+    "head": "898f1fe8514f1bad0a592582a600e91310d8c069",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/role-lanes.test.mjs test/unit/setup-choices.test.mjs test/unit/setup-choices-facts.test.mjs test/unit/lane-caps.test.mjs test/unit/config.test.mjs",
         "exit": 0,
-        "ms": 3108,
+        "ms": 5358,
         "tail": [
           "ok 36 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 1.060625",
+          "  duration_ms: 1.984167",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "ok 37 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 0.996917",
+          "  duration_ms: 1.316625",
           "  type: 'test'",
           "  ...",
           "1..37",
@@ -40,13 +40,13 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 3048.381042"
+          "# duration_ms 5252.313458"
         ]
       },
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 375,
+        "ms": 601,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -73,7 +73,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 359,
+        "ms": 425,
         "tail": [
           "✓ check-secrets: <redacted> findings in 540 scanned file(s)"
         ]
@@ -81,7 +81,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 280,
+        "ms": 372,
         "tail": [
           "✓ docs:check passed — 270 markdown file(s) · 245 local link(s) · 72 command(s) in agent docs · 5 agent(s)"
         ]
@@ -89,17 +89,17 @@
       {
         "cmd": "node --test 'test/unit/role-lanes.test.mjs'",
         "exit": 0,
-        "ms": 1816,
+        "ms": 3039,
         "tail": [
           "ok 8 - RLANE-AC-06 choices --group 6 prints role-lanes in en and th within FIELD_MAX, role-lanes is asked and in questions.md, and the movable roles say 'by default'",
           "  ---",
-          "  duration_ms: 133.719542",
+          "  duration_ms: 166.3245",
           "  type: 'test'",
           "  ...",
           "# Subtest: RLANE-AC-07 roles.md and config-reference.md name roles.lanes, and the locked roles roles.md lists equal the laneLocked roles of ROLE_LIBRARY",
           "ok 9 - RLANE-AC-07 roles.md and config-reference.md name roles.lanes, and the locked roles roles.md lists equal the laneLocked roles of ROLE_LIBRARY",
           "  ---",
-          "  duration_ms: 0.921916",
+          "  duration_ms: 1.167583",
           "  type: 'test'",
           "  ...",
           "1..9",
@@ -110,7 +110,7 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 1763.167875"
+          "# duration_ms 2927.397791"
         ]
       }
     ],
@@ -129,15 +129,15 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "docs/card-lifecycle.md": "bdfcaf964aa3c3e9f9ea8e0f4fe5b0c5c7262a9f",
+        "docs/card-lifecycle.md": "e4fc7680c210c9dbe1d83f58ed4de194c93141c3",
         "docs/config-reference.md": "c0c54d1f7754dd7815b59dfdcb65cbf7d8c3ca76",
-        "docs/roles.md": "587dc8536b0c890af81858b665670dfb20e9dbc0",
+        "docs/roles.md": "79d7f12bb9967a1e6a7942762b3912d507d15a92",
         "docs/setup-questions.md": "fae2cefafe0f8fa0cd5c01626a241f9c1fbd679f",
-        "kit/claude/skills/saf-setup/questions.md": "07c548d6929ae6739a15cb6e06a5e9a8cb906d6b",
-        "kit/tools-saf/lib/choices.mjs": "40b41930eb5a1065c65e77a3ef91d68ea67e1586",
-        "kit/tools-saf/lib/config.mjs": "a15974ccb5407c741eb43fdebb9551892fbdaaef",
+        "kit/claude/skills/saf-setup/questions.md": "a08c533736cddf9fd05c7e96b7d5e9f3bfacd34d",
+        "kit/tools-saf/lib/choices.mjs": "ab86d85af728ec5ed3bf6e9547f208ddfa677df4",
+        "kit/tools-saf/lib/config.mjs": "0dc6c7f09a017d4ae1827cdbe7d71dc00abfc36a",
         "kit/tools-saf/schema/saf.config.schema.json": "42f4dab44f16d75f0fb90d8112a842350d2f8982",
-        "test/unit/role-lanes.test.mjs": "a098fa9d5deed750b0fe55aaa27b01988436b5cd"
+        "test/unit/role-lanes.test.mjs": "e3753d56428486fbf8175fdf6f64f98a686a65b2"
       }
     },
     "scenarios": {
@@ -155,11 +155,11 @@
     "size": {
       "size": "S",
       "code": {
-        "lines": 91,
+        "lines": 94,
         "cap": 150
       },
       "test": {
-        "lines": 155,
+        "lines": 159,
         "cap": 250
       },
       "over": []
