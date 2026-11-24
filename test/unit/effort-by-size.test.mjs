@@ -55,7 +55,7 @@ test("EFFORT-AC-01 cardEffort follows rules 3 and 4 in both modes, with and with
   assert.deepEqual([cardEffort(outside, { role: "art-producer", size: "S" }).effort, cardEffort(outside, { role: "art-producer", size: "S" }).agent], [ROLE_LIBRARY["art-producer"].effort, "art-producer"]);
 });
 
-test("EFFORT-AC-02 by-size planning writes one variant file per differing effort with the name, effort, model, tools and description of rule 7; fixed writes none", () => {
+test("EFFORT-AC-02 by-size planning writes one variant file per differing effort with the name, effort, model, tools, description and base body of rule 7; fixed writes none", () => {
   const fixed = project({ effort: "fixed" });
   assert.ok(agentFiles(fixed).every((f) => !/-(low|medium|high|xhigh|max)\.md$/.test(f)), "no variant in fixed mode");
   const root = project({ effort: "by-size" });
@@ -72,6 +72,9 @@ test("EFFORT-AC-02 by-size planning writes one variant file per differing effort
     assert.equal(got.tools, base.tools);
     assert.ok(got.description.startsWith(`Same as ${v.role} at ${v.effort} effort — use it only when task:start names it. `));
     assert.ok(got.description.endsWith(base.description), "followed by the base description");
+    const body = (f) => read(root, `.claude/agents/${f}.md`).split(/\r?\n---\r?\n/).slice(1).join("\n---\n");
+    assert.ok(body(v.role).length > 100, "the base body is not empty");
+    assert.equal(body(v.name), body(v.role), "the body stays the base agent's");
   }
   assert.deepEqual(variantAgents(cfg({ overrides: { implementer: { effort: "low" } } })).map((v) => v.name), ["designer-medium"], "an effort override gets no variant");
   assert.deepEqual(variantAgents(cfg({ effort: "fixed" })), []);
@@ -97,6 +100,25 @@ test("EFFORT-AC-03 upgrade after by-size to fixed removes the unedited variant, 
   write(root, "saf.config.json", raw);
   assert.ok(refreshKitFiles(root).written.includes(".claude/agents/implementer-medium.md"));
   assert.ok(existsSync(join(root, ".claude/agents/implementer-medium.md")));
+  const again = refreshKitFiles(root);
+  assert.deepEqual([again.written, again.removed, again.kept], [[], [], [".claude/agents/designer-medium.md"]], "a second upgrade changes nothing for variants (the edited one stays kept)");
+});
+
+test("EFFORT-AC-03 upgrade leaves the base file of a custom role named like a role at its own effort (implementer-high) alone", () => {
+  const root = gitRepo();
+  generate(root, { ...BASE, models: { effort: "by-size" }, roles: { custom: [{ name: "implementer-high", description: "A custom role" }] } });
+  const file = ".claude/agents/implementer-high.md";
+  const before = read(root, file);
+  const raw = JSON.parse(read(root, "saf.config.json"));
+  raw.models.preset = "economy";
+  write(root, "saf.config.json", raw);
+  const report = refreshKitFiles(root);
+  assert.equal(read(root, file), before, "the base agent file is setup-only, even after a model change");
+  assert.ok(!report.written.includes(file) && !report.removed.includes(file));
+  raw.roles.custom = [];
+  write(root, "saf.config.json", raw);
+  assert.ok(!refreshKitFiles(root).removed.includes(file), "a dropped custom role's base file is not a variant either");
+  assert.ok(existsSync(join(root, file)));
 });
 
 test("EFFORT-AC-04 docs:check accepts valid variants, fails an effort or name mismatch and a variant of a disabled role; a custom role named like a variant is a config error", () => {
@@ -129,7 +151,7 @@ test("EFFORT-AC-05 a local by-size over a tracked fixed gives mode by-size, sour
   assert.deepEqual([r.agent, r.effort, r.mode, r.source], ["implementer", "high", "by-size", "local"]);
   assert.match(r.warning, /setup/);
   assert.match(r.warning, /by-size/);
-  assert.equal(cardEffort(c, { role: "implementer", size: "M" }).warning, undefined, "no warning when the base agent is the right one");
+  assert.equal(cardEffort(c, { role: "implementer", size: "M" }).warning, undefined, "warns only when the wanted effort differs from the base agent's");
   const tracked = tmp();
   write(tracked, "saf.config.json", { version: 1, ...BASE, models: { effort: "by-size" } });
   const t = loadConfig(tracked, {});

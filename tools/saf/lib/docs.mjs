@@ -28,6 +28,7 @@ export const LINE_LIMITS = [
   [/(^|\/)CLAUDE\.md$/, 200],
 ];
 const AGENT_DIRS = [".claude/rules/", ".claude/agents/", ".claude/commands/"];
+const VARIANT_FILE = new RegExp(`^\\.claude/agents/(.+)-(${EFFORTS.join("|")})\\.md$`);
 const READ_TOOLS = new Set(["Read", "Grep", "Glob"]);
 export const FULL_MODEL_ID = /^claude-[a-z]+(?:-\d+)+$/;
 const SETTINGS_FILE = /(^|\/)\.claude\/settings(\.[\w-]+)?\.json$/;
@@ -174,7 +175,7 @@ export function runDocsCheck(input) {
 
   const enabledNames = new Set(roles.map((r) => r.name));
   for (const file of input.files) {
-    const m = file.match(/^\.claude\/agents\/(.+)-(low|medium|high|xhigh|max)\.md$/);
+    const m = file.match(VARIANT_FILE);
     if (!m || enabledNames.has(`${m[1]}-${m[2]}`)) continue;
     const [, role, effort] = m;
     if (!enabledNames.has(role)) {

@@ -37,7 +37,7 @@ detection (say what you detected instead):
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")
 
-Test mode and the two lane caps are per-machine choices. The untracked `saf.config.local.json` may hold `workflow.testMode`,
+Test mode and the two lane caps are per-machine choices, and so is the effort mode. The untracked `saf.config.local.json` may hold `workflow.testMode`,
 `workflow.lanes.code`, `workflow.sideLanes.max` and `models.effort` and nothing else (the engine refuses anything outside `LOCAL_KEYS`,
 `$schema` and `workflow.lanes.main` included). When the person says their machine is slow (or fast), offer to write the
 test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
@@ -89,7 +89,7 @@ already know, instead of forcing them into options.
    - Adjust a setting that was not asked: ask for the keys and values in one plain message (dotted keys from the list above),
      add them to the answers you write to `.saf/setup-answers.json` in Step 3, and ask again. `setup` still checks them
      against the schema. The per-machine block of the list is not a setup answer: for `SAF_TEST_MODE` or
-     `saf.config.local.json` follow the paragraph about per-machine choices under Step 1 (the file holds only the three keys named there).
+     `saf.config.local.json` follow the paragraph about per-machine choices under Step 1 (the file holds only the four keys named there).
 
 ## Step 3 — generate
 

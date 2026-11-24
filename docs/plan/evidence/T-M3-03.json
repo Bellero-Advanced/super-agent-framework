@@ -7,19 +7,19 @@
     "base": "2779c314424821af72d59dbc41d19c4946b4248e",
     "dirty": {}
   },
-  "attempts": 5,
+  "attempts": 7,
   "lane": 1,
   "branch": "card/T-M3-03",
   "worktree": ".claude/worktrees/T-M3-03",
   "verified": {
-    "at": "2026-11-24T17:16:16.526Z",
-    "head": "d258ae3e1be54cb8c780a6ac9170e7f6bec9c38c",
+    "at": "2026-11-24T17:23:09.382Z",
+    "head": "524d0e36c1ab7026ff214d184123d97192f3d942",
     "pass": true,
     "commands": [
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 389,
+        "ms": 373,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -46,44 +46,44 @@
       {
         "cmd": "node --test test/unit/effort-by-size.test.mjs test/unit/setup-choices.test.mjs test/unit/config.test.mjs test/unit/generate.test.mjs",
         "exit": 0,
-        "ms": 2712,
+        "ms": 2582,
         "tail": [
-          "ok 36 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
+          "ok 37 - SETUP-AC-08 SKILL.md runs choices --group before each group in Step 1 and choices --not-asked with the adjust option in Step 2",
           "  ---",
-          "  duration_ms: 0.930958",
+          "  duration_ms: 0.849458",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
-          "ok 37 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
+          "ok 38 - SETUP-AC-09 SKILL.md asks the adopt question in Step 1 and passes exactly one adopt flag in Step 3; questions.md recommends yes outside the Key tables",
           "  ---",
-          "  duration_ms: 1.110834",
+          "  duration_ms: 1.087667",
           "  type: 'test'",
           "  ...",
-          "1..37",
-          "# tests 37",
+          "1..38",
+          "# tests 38",
           "# suites 0",
-          "# pass 37",
+          "# pass 38",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 2661.717333"
+          "# duration_ms 2532.091125"
         ]
       },
       {
         "cmd": "node --test test/unit/test-mode-config.test.mjs test/unit/lane-caps-docs.test.mjs",
         "exit": 0,
-        "ms": 259,
+        "ms": 248,
         "tail": [
           "ok 10 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
           "  ---",
-          "  duration_ms: 75.450375",
+          "  duration_ms: 72.694167",
           "  type: 'test'",
           "  ...",
           "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
           "ok 11 - this repo pins targeted with a testFiles command and ignores the local file",
           "  ---",
-          "  duration_ms: 0.25925",
+          "  duration_ms: 0.2655",
           "  type: 'test'",
           "  ...",
           "1..11",
@@ -94,13 +94,13 @@
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 202.501916"
+          "# duration_ms 194.225125"
         ]
       },
       {
         "cmd": "npm run saf:refresh -- --check",
         "exit": 0,
-        "ms": 316,
+        "ms": 259,
         "tail": [
           "> super-agent-framework@0.1.0 saf:refresh",
           "> node scripts/refresh-copies.mjs --check",
@@ -110,13 +110,13 @@
       {
         "cmd": "node -e \"const s=JSON.parse(require('fs').readFileSync('kit/tools-saf/schema/saf.config.schema.json','utf8'));if(!s.properties.models.properties.effort)process.exit(1)\"",
         "exit": 0,
-        "ms": 42,
+        "ms": 43,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 305,
+        "ms": 287,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -126,7 +126,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 346,
+        "ms": 345,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -136,28 +136,28 @@
       {
         "cmd": "node --test 'test/unit/effort-by-size.test.mjs' 'test/unit/lane-caps-docs.test.mjs' 'test/unit/test-mode-config.test.mjs'",
         "exit": 0,
-        "ms": 386,
+        "ms": 432,
         "tail": [
-          "ok 15 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
+          "ok 16 - TMODE-AC-04 generated files are byte-equal with and without a local file; .gitignore lists it",
           "  ---",
-          "  duration_ms: 69.460416",
+          "  duration_ms: 70.718584",
           "  type: 'test'",
           "  ...",
           "# Subtest: this repo pins targeted with a testFiles command and ignores the local file",
-          "ok 16 - this repo pins targeted with a testFiles command and ignores the local file",
+          "ok 17 - this repo pins targeted with a testFiles command and ignores the local file",
           "  ---",
-          "  duration_ms: 0.337208",
+          "  duration_ms: 0.259416",
           "  type: 'test'",
           "  ...",
-          "1..16",
-          "# tests 16",
+          "1..17",
+          "# tests 17",
           "# suites 0",
-          "# pass 16",
+          "# pass 17",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 331.660542"
+          "# duration_ms 380.648458"
         ]
       }
     ],
@@ -187,18 +187,18 @@
         "docs/card-lifecycle.md": "1f5b7f0f03a2ffcecd82a7d28962630e98957d9b",
         "docs/config-reference.md": "6bc388424b3af434bfbb9fb921ce7ca1442fb074",
         "docs/plan/README.md": "29918505162d98f568a3daa5362dec38b8817b88",
-        "docs/specs/effort-by-size.md": "04360478107c4b70eb2f4e1e3d6db84695e3113e",
-        "kit/claude/skills/saf-setup/SKILL.md": "56aff4e59634a9c24f34f2dda70e71ceb0334a85",
-        "kit/claude/skills/saf-setup/questions.md": "292b5c73569344fad3064a9bcccc3e5b8e4e160e",
-        "kit/tools-saf/lib/choices.mjs": "63162f031180d73ed8c58189ca7e175fd48c439b",
+        "docs/specs/effort-by-size.md": "e11e405232d6e47e03605b5bc12d438eaf37ba73",
+        "kit/claude/skills/saf-setup/SKILL.md": "a562e3b0ca3f9bceda6f89ff5cb1f2e2f950b825",
+        "kit/claude/skills/saf-setup/questions.md": "6063448b8db6c4959d7f7f20e7451c9f1ec6d232",
+        "kit/tools-saf/lib/choices.mjs": "7e1ef3b66fd121a12cd992840cb5962a66b28077",
         "kit/tools-saf/lib/config.mjs": "6cd087b46a41f7389ae4f8b68f1b5bc8c431c10e",
-        "kit/tools-saf/lib/docs.mjs": "613d32faeb6ec0d15340e8d7755517b49023cb56",
+        "kit/tools-saf/lib/docs.mjs": "7fa3b661191a478aca24d0454ffc17e371dc2657",
         "kit/tools-saf/lib/effort.mjs": "61f6729e79aeffa7c804ab7b52e2cdff9929083d",
-        "kit/tools-saf/lib/generate.mjs": "1382957e5363838e0d263b2af507d4eee626a98b",
+        "kit/tools-saf/lib/generate.mjs": "1a24f432e4080bba501af6a7fbf349322389ad5e",
         "kit/tools-saf/schema/saf.config.schema.json": "1026a75eb1d31f8d094c2e8f556f0351799f339b",
         "kit/tools-saf/templates/en/docs/plan/README.md": "d75a3111e72cd265acfb3888f71ce6e53f63f09f",
         "kit/tools-saf/templates/th/docs/plan/README.md": "a457cd7f19c50aa04b051f4bc581e290b68c6a21",
-        "test/unit/effort-by-size.test.mjs": "6ac8c93860e7cb201cf0c4ea54c2cc436834d806",
+        "test/unit/effort-by-size.test.mjs": "66422fad0c1c0ae68f94b5dd3513e2c62926c6c7",
         "test/unit/lane-caps-docs.test.mjs": "e3c4104a27b098226135bc927abf7d647894211d",
         "test/unit/test-mode-config.test.mjs": "07dae9231efcfbaf5e7d8c38bab62319813d1527"
       }
@@ -216,11 +216,11 @@
     "size": {
       "size": "M",
       "code": {
-        "lines": 195,
+        "lines": 203,
         "cap": 400
       },
       "test": {
-        "lines": 148,
+        "lines": 170,
         "cap": 600
       },
       "over": []

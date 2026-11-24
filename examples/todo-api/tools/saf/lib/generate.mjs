@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, posix, relative } from "node:path";
-import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, ROLE_LIBRARY, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig } from "./config.mjs";
+import { CONFIG_FILE, ConfigError, CORE_SKILLS, ENGINE_SCRIPTS, LOCAL_CONFIG_FILE, MODEL_PRESETS, ROLE_LIBRARY, SAF_DIR, resolveConfig, roleTable, scriptCommand, validateConfig, variantNames } from "./config.mjs";
 import { detectProject } from "./detect.mjs";
 import { unifiedDiff } from "./diff.mjs";
 import { scriptOf } from "./docs.mjs";
@@ -275,11 +275,11 @@ function variantFiles(config, data) {
   return out;
 }
 
-/** Whether `rel` is a variant agent file of a role of this project (`.claude/agents/<role>-<effort>.md`). */
-const isVariantDest = (rel, config) => {
-  const m = rel.match(/^\.claude\/agents\/(.+)-(low|medium|high|xhigh|max)\.md$/);
-  return !!m && (Object.hasOwn(ROLE_LIBRARY, m[1]) || config.roles.custom.some((r) => r.name === m[1]));
-};
+/** Every variant agent file name the table can produce for the library roles, whatever the project (`variantNames` without overrides). */
+const VARIANT_DESTS = new Set(variantNames(Object.keys(ROLE_LIBRARY)).map((v) => `.claude/agents/${v.name}.md`));
+
+/** Whether `rel` is a variant agent file SAF owns: a name of the table, and not the base file of an enabled role (a custom role may be named `implementer-high`). */
+const isVariantDest = (rel, config) => VARIANT_DESTS.has(rel) && !roleTable(config).some((r) => rel === `.claude/agents/${r.name}.md`);
 
 /** Skill files rendered with the project's data (commands, languages) — core skills + chosen packs. */
 function skillFiles(config, data) {
