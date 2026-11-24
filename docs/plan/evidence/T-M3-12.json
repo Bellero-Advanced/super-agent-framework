@@ -13,31 +13,31 @@
       "source": "repo"
     }
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-12",
   "worktree": ".claude/worktrees/T-M3-12",
   "verified": {
-    "at": "2026-11-24T20:57:54.847Z",
-    "head": "d6e73ecce636704dd491d5bc6e2465e9d291ddcd",
+    "at": "2026-11-24T21:03:52.505Z",
+    "head": "41131959b7cbfb449681a42cf01c3ae850bf5389",
     "pass": true,
     "commands": [
       {
         "cmd": "node -e \"const s=require('fs').readFileSync('CHANGELOG.md','utf8');const u=s.split(/^## /m).find(x=>x.startsWith('Unreleased'))||'';for(const w of ['task:culprit','task:friction','task:review','task:release','saf choices','package.json'])if(!u.includes(w))process.exit(1)\"",
         "exit": 0,
-        "ms": 52,
+        "ms": 51,
         "tail": []
       },
       {
         "cmd": "node --input-type=module -e \"import { readFileSync } from 'node:fs'; import { readChangelog, nextVersion } from './tools/saf/lib/release.mjs'; const v = nextVersion('0.1.0', readChangelog(readFileSync('CHANGELOG.md','utf8'))); if (v !== '0.2.0') { console.error(v); process.exit(1) }\"",
         "exit": 0,
-        "ms": 64,
+        "ms": 67,
         "tail": []
       },
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 500,
+        "ms": 303,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -52,7 +52,7 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "CHANGELOG.md": "ae803dff07b96a1b243ca26bcf214003bf358426"
+        "CHANGELOG.md": "f4f349d6a8ad04cdc6c5e9a92080507dd883ef84"
       }
     },
     "scenarios": {
