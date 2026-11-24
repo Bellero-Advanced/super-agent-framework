@@ -115,7 +115,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it — passed 2026-11-24 05:51 (5 commands) · full suite deferred to gate
 - [x] T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json — passed 2026-11-24 05:53 (6 commands) · full suite deferred to gate
 - [x] T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate
-- [ ] T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units
+- [ ] T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units — started 2026-11-24 06:08 · not verified yet · lane 1 · .claude/worktrees/T-M2-28
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the
