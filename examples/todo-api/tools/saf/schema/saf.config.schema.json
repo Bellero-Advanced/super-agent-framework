@@ -205,7 +205,17 @@
         "ownerOnlyPaths": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "externalServices": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "noTimeEstimates": { "type": "boolean" },
-        "evidenceRequired": { "type": "boolean" }
+        "evidenceRequired": { "type": "boolean" },
+        "release": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "auto": { "enum": ["off", "on"] },
+            "packages": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+            "versionFiles": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+            "ciWorkflow": { "type": "string", "minLength": 1 }
+          }
+        }
       }
     },
     "tokenSaving": {

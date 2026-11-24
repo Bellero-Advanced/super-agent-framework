@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { CONFIG_FILE, LOCAL_CONFIG_FILE, LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SIZE_CAPS, SKILL_PACKS, TEST_MODE_ENV, findRoot, loadSchema } from "./config.mjs";
+import { CONFIG_FILE, LOCAL_CONFIG_FILE, LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SIZE_CAPS, SKILL_PACKS, TEST_MODE_ENV, findRoot, loadSchema, resolveConfig } from "./config.mjs";
 import { EXIT_BUSY } from "./measure.mjs";
 import { STOP_HOOK_ENV } from "./task.mjs";
 import { LANGUAGES } from "./text.mjs";
@@ -240,6 +240,7 @@ export const CHOICES = [
 ];
 
 const ns = (en, th) => ({ en, th });
+const RELEASE_DEFAULTS = resolveConfig().policies.release;
 /** Settings no question sets: key → one-line summary. */
 export const NOT_ASKED = {
   "models.overrides": ns('Change the model or effort of single roles, e.g. {"qa-runner": {"effort": "low"}}; agent files and CLAUDE.md change when setup runs again, the /saf command also on upgrade; a model change fails docs:check until setup runs again', 'เปลี่ยนโมเดลหรือ effort ของ role ใด role หนึ่ง เช่น {"qa-runner": {"effort": "low"}} ไฟล์ agent และ CLAUDE.md เปลี่ยนเมื่อรัน setup ใหม่ (/saf-setup) คำสั่ง /saf เปลี่ยนตอน upgrade ด้วย ถ้าเปลี่ยนโมเดล docs:check จะไม่ผ่านจนกว่าจะรัน setup ใหม่'),
@@ -257,6 +258,10 @@ export const NOT_ASKED = {
   "policies.secrets.extraPatterns": ns("Extra regular expressions that check-secrets treats as secrets", "regular expression เพิ่มเติมที่ check-secrets ถือว่าเป็นความลับ"),
   "policies.noTimeEstimates": ns("Records the rule 'no time estimates, use gates'; keep it true (the engine does not read it today)", "บันทึกกฎ 'ไม่ประเมินเวลา ใช้ gate แทน' ควรเป็น true (engine ยังไม่อ่านค่านี้)"),
   "policies.evidenceRequired": ns("Records the rule 'done needs a real run'; keep it true (the engine does not read it today)", "บันทึกกฎ 'ต้องมีผลรันจริงจึงถือว่าเสร็จ' ควรเป็น true (engine ยังไม่อ่านค่านี้)"),
+  "policies.release.auto": ns(`On lets SAF push the release branch, create a tag and trigger publishing when every release guard holds (task:release), and turning it off on the release branch stops it; ${RELEASE_DEFAULTS.auto} by default`, `on ให้ SAF push branch ที่ปล่อย สร้าง tag และสั่งให้ publish ได้เมื่อ guard ของการปล่อยผ่านครบ (task:release) และถ้าปิดเป็น off บน branch ที่ปล่อย การปล่อยจะหยุด ค่าเริ่มต้น ${RELEASE_DEFAULTS.auto}`),
+  "policies.release.packages": ns(`Folders whose package.json are released together under one version (default ${JSON.stringify(RELEASE_DEFAULTS.packages)}, the project root)`, `โฟลเดอร์ที่มี package.json ซึ่งปล่อยพร้อมกันด้วยเวอร์ชันเดียว (ค่าเริ่มต้น ${JSON.stringify(RELEASE_DEFAULTS.packages)} คือรากโปรเจกต์)`),
+  "policies.release.versionFiles": ns("Text files that hold only the version number and move with every release (default none)", "ไฟล์ข้อความที่มีแต่เลขเวอร์ชันและเปลี่ยนไปพร้อมทุกการปล่อย (ค่าเริ่มต้น ไม่มี)"),
+  "policies.release.ciWorkflow": ns(`File name of the CI workflow that must have succeeded on the release commit before a tag (default ${RELEASE_DEFAULTS.ciWorkflow})`, `ชื่อไฟล์ workflow ของ CI ที่ต้องรันสำเร็จบน commit ของการปล่อยก่อนสร้าง tag (ค่าเริ่มต้น ${RELEASE_DEFAULTS.ciWorkflow})`),
 };
 /** Per-machine settings: the LOCAL_KEYS keys and the environment variables. */
 export const MACHINE_SWITCHES = {

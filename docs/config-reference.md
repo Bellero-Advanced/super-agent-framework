@@ -121,6 +121,9 @@ the file; generated files never do and show the project's caps from `saf.config.
 | `forbiddenPaths` · `ownerOnlyPaths` | [] — copied into each card's `dont_touch` and CLAUDE.md |
 | `externalServices` | [] |
 | `noTimeEstimates` · `evidenceRequired` | true · true |
+| `release`: `auto` · `packages` · `versionFiles` · `ciWorkflow` | `off` · `["."]` · [] · `ci.yml` (`auto` may also be `on`) |
+
+`release.auto` is off by default and is never a per-machine setting (it is not in the `saf.config.local.json` keys): `task:release <M>` shows every release guard and the next version without changing anything, and exits 1 with its G-switch guard failed unless `auto` is `on` at HEAD and on the release branch of the remote.
 
 ## tokenSaving
 

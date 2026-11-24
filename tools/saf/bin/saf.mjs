@@ -14,6 +14,7 @@ import { EXIT_REFUSED, lockPathFor, measureStatus, runMeasured } from "../lib/me
 import { LANE_NAME, laneOf, pickParallel, sideIds, startableCards } from "../lib/parallel.mjs";
 import { CARD_ID, MILESTONE_ID, activeCards, activeMilestone, cardStatus, formatTime, isSideCard, loadPlan, titleOf } from "../lib/plan.mjs";
 import { prerunCard } from "../lib/prerun.mjs";
+import { commandRunner, runRelease } from "../lib/release.mjs";
 import { renderReport, reportPath } from "../lib/report.mjs";
 import { writeReviewDiff } from "../lib/reviewdiff.mjs";
 import { REVIEW_KINDS, listRounds, recordReview, reviewsPath } from "../lib/reviews.mjs";
@@ -61,6 +62,7 @@ import {
  *     (runs those commands like task:verify does — same runner, folder and time limit, guards are not run — and writes no evidence, STATE.md or mirror (the commands themselves may write, as at task:verify) · main folder or lane)
  *   task diff <id>   write the reviewer's diff of a started card to .saf/memory/review/<id>.diff (exit 0 written · 1 git failed · 2 usage or refused)
  *     (exactly the files task:verify counts as the card's · a lane card is read and written in its worktree · prints the absolute path)
+ *   task release <M>   the release dry run: every release guard and the plan, nothing is changed (exit 0 every guard holds · 1 one fails · 2 usage; --prepare and --tag are not built yet)
  *   hook session-start · hook check-stop    (Claude Code hooks)
  *   docs-check · spec-matrix [--check] [--complete=a,b] · check-secrets
  *   measure <name> -- <command…> · measure --status
@@ -299,6 +301,21 @@ async function task(sub, rest) {
       out(`  ${r.files} file(s) · ${r.lines} line(s) · code ${r.size.code.lines} · test ${r.size.test.lines} changed lines${r.lane ? " · lane worktree" : ""}`);
       return 0;
     }
+    case "release": {
+      const steps = rest.filter((a) => a === "--prepare" || a === "--tag");
+      const bad = rest.filter((a) => a.startsWith("-") && !steps.includes(a));
+      const words = rest.filter((a) => !a.startsWith("-"));
+      const usage = `usage: ${c("task:release", "<M>")} (for example ${c("task:release", "M1")})`;
+      if (bad.length || words.length !== 1 || !MILESTONE_ID.test(words[0]) || steps.length > 1) {
+        err(`✗ ${bad.length ? `unknown option ${bad[0]}` : words.length > 1 ? `unexpected argument "${words[1]}"` : words.length ? (steps.length > 1 ? "give one of --prepare and --tag" : `"${words[0]}" is not a milestone id`) : "give a milestone id"} — ${usage}`);
+        return 2;
+      }
+      if (steps.length) {
+        err(`✗ ${steps[0]} is not built yet (T-M3-10) — ${c("task:release", words[0])} is the dry run`);
+        return 2;
+      }
+      return runRelease({ root, config, run: commandRunner(root, { timeoutMs: config.workflow.commandTimeoutMs }) }, words[0], { out });
+    }
     case "culprit": {
       const mid = requireId();
       if (!MILESTONE_ID.test(mid)) {
@@ -310,7 +327,7 @@ async function task(sub, rest) {
       return r.exit;
     }
     default:
-      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction|prerun|diff — see docs/plan/README.md");
+      err("usage: task start|verify|abandon|merge|review|state|next|probe|env|report|culprit|friction|prerun|diff|release — see docs/plan/README.md");
       return 2;
   }
 }
@@ -627,7 +644,7 @@ async function main() {
   }
 }
 
-const refusesWith2 = argv[0] === "task" && ["prerun", "diff"].includes(argv[1]); // prerun: exit 1 means "some command passes" · diff: exit 1 means a git call failed
+const refusesWith2 = argv[0] === "task" && ["prerun", "diff", "release"].includes(argv[1]); // prerun: exit 1 means "some command passes" · diff: exit 1 means a git call failed · release: exit 1 means a guard failed
 
 main().then(
   (code) => {

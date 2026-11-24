@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 29/37
+## M3 SAF builds itself — cards done 30/37
 
-- In progress: **T-M3-09** task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off — started 2026-11-24 19:29 · not verified yet · lane 1 · .claude/worktrees/T-M3-09
-- Next: no card can start yet — T-M3-10 waits for T-M3-09 · T-M3-11 waits for T-M3-09 · T-M3-12 waits for T-M3-10, T-M3-11 · T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
+- In progress: none
+- Next: T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit · T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -38,7 +38,7 @@
 | [T-M3-35](tasks/M3/T-M3-35.md) | Card sizes are M and L: task:verify warns above the cap and fails above twice it, old S cards count as M, and every generated file shows the new caps | ✓ passed | [T-M3-35.json](evidence/T-M3-35.json) · passed 2026-11-24 18:52 (10 commands) · full suite deferred to gate |
 | [T-M3-36](tasks/M3/T-M3-36.md) | Setup explanations and the user docs describe sizes M and L, the hard stop and legacy S cards, in English and Thai, true to the code | ✓ passed | [T-M3-36.json](evidence/T-M3-36.json) · passed 2026-11-24 19:08 (8 commands) · full suite deferred to gate |
 | [T-M3-37](tasks/M3/T-M3-37.md) | An L card lists its steps: the plan check demands them, task:diff splits the review diff by step commit, and the agents build and review step by step | ✓ passed | [T-M3-37.json](evidence/T-M3-37.json) · passed 2026-11-24 19:25 (9 commands) · full suite deferred to gate |
-| [T-M3-09](tasks/M3/T-M3-09.md) | task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off | ▶ in progress | [T-M3-09.json](evidence/T-M3-09.json) · started 2026-11-24 19:29 · not verified yet |
+| [T-M3-09](tasks/M3/T-M3-09.md) | task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off | ✓ passed | [T-M3-09.json](evidence/T-M3-09.json) · passed 2026-11-24 19:54 (6 commands) · full suite deferred to gate |
 | [T-M3-10](tasks/M3/T-M3-10.md) | task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit | · not started | – |
 | [T-M3-11](tasks/M3/T-M3-11.md) | A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again | · not started | – |
 | [T-M3-12](tasks/M3/T-M3-12.md) | CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 | · not started | – |
@@ -60,7 +60,7 @@
 
 ## Latest evidence
 
-- T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off — started 2026-11-24 19:29 · not verified yet
+- T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off — passed 2026-11-24 19:54 (6 commands) · full suite deferred to gate
 - T-M3-37 An L card lists its steps: the plan check demands them, task:diff splits the review diff by step commit, and the agents build and review step by step — passed 2026-11-24 19:25 (9 commands) · full suite deferred to gate
 - T-M3-36 Setup explanations and the user docs describe sizes M and L, the hard stop and legacy S cards, in English and Thai, true to the code — passed 2026-11-24 19:08 (8 commands) · full suite deferred to gate
 - T-M3-35 Card sizes are M and L: task:verify warns above the cap and fails above twice it, old S cards count as M, and every generated file shows the new caps — passed 2026-11-24 18:52 (10 commands) · full suite deferred to gate
