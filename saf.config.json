@@ -89,6 +89,7 @@
     },
     "laneDb": "",
     "mergeChecks": [
+      "npm run saf:refresh -- --check",
       "npm test",
       "npm run check-secrets",
       "npm run docs:check"
