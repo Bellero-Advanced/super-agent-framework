@@ -4,8 +4,8 @@
 
 ## M3 SAF builds itself — cards done 5/31
 
-- In progress: none
-- Next: T-M3-30 The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass
+- In progress: **T-M3-30** The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass — started 2026-11-24 09:14 · not verified yet · lane 1 · .claude/worktrees/T-M3-30
+- Next: no card can start yet — T-M3-31 waits for T-M3-30 · T-M3-16 waits for T-M3-31 · T-M3-17 waits for T-M3-16 · T-M3-18 waits for T-M3-31 · T-M3-19 waits for T-M3-17 · T-M3-20 waits for T-M3-18 · T-M3-21 waits for T-M3-17 · T-M3-22 waits for T-M3-31 · T-M3-23 waits for T-M3-31 · T-M3-24 waits for T-M3-21 · T-M3-25 waits for T-M3-20 · T-M3-03 waits for T-M3-21 · T-M3-04 waits for T-M3-03, T-M3-19, T-M3-20, T-M3-22, T-M3-23 · T-M3-05 waits for T-M3-03, T-M3-23 · T-M3-06 waits for T-M3-04, T-M3-05 · T-M3-07 waits for T-M3-04 · T-M3-08 waits for T-M3-06, T-M3-07 · T-M3-09 waits for T-M3-08 · T-M3-10 waits for T-M3-09 · T-M3-11 waits for T-M3-09 · T-M3-12 waits for T-M3-10, T-M3-11 · T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -14,7 +14,7 @@
 | [T-M3-27](tasks/M3/T-M3-27.md) | npm run saf:refresh refreshes this repository and the example in one step and puts back the example files the card does not own; --check reports stale copies in a second | ✓ passed | [T-M3-27.json](evidence/T-M3-27.json) · passed 2026-11-24 08:55 (5 commands) · full suite deferred to gate |
 | [T-M3-28](tasks/M3/T-M3-28.md) | A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai | ✓ passed | [T-M3-28.json](evidence/T-M3-28.json) · passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate |
 | [T-M3-29](tasks/M3/T-M3-29.md) | The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists | ✓ passed | [T-M3-29.json](evidence/T-M3-29.json) · passed 2026-11-24 09:12 (5 commands) · full suite deferred to gate |
-| [T-M3-30](tasks/M3/T-M3-30.md) | The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass | · not started | – |
+| [T-M3-30](tasks/M3/T-M3-30.md) | The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass | ▶ in progress | [T-M3-30.json](evidence/T-M3-30.json) · started 2026-11-24 09:14 · not verified yet |
 | [T-M3-31](tasks/M3/T-M3-31.md) | task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path | · not started | – |
 | [T-M3-16](tasks/M3/T-M3-16.md) | Setup leaves same files byte-identical, never forgets a kept file, stops on a broken manifest, and never replaces a scripts value it cannot read | · not started | – |
 | [T-M3-17](tasks/M3/T-M3-17.md) | Setup reads the plan without copying it to a temp folder, and an edited task template gets format updates | · not started | – |
@@ -54,11 +54,11 @@
 
 ## Latest evidence
 
+- T-M3-30 The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass — started 2026-11-24 09:14 · not verified yet
 - T-M3-29 The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists — passed 2026-11-24 09:12 (5 commands) · full suite deferred to gate
 - T-M3-28 A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai — passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate
 - T-M3-27 npm run saf:refresh refreshes this repository and the example in one step and puts back the example files the card does not own; --check reports stale copies in a second — passed 2026-11-24 08:55 (5 commands) · full suite deferred to gate
 - T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — passed 2026-11-24 08:09 (6 commands) · full suite deferred to gate
-- T-M3-01 Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count — passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate
 
 ## Other milestones
 
