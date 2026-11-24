@@ -127,3 +127,6 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-20 (strict CLI args) — non-blocking
 - saf.mjs:591-594 bare catch reports unreadable/EISDIR config as "not valid JSON". text.mjs:264 Thai viewer wraps an English-only fallback reason (make reasons text keys?). Spec test-mode rule 13 does not say which cause wins when several apply (code: command, placeholder, files).
+
+## T-M3-17 (setup reads plan, no temp copy) — non-blocking from round 1
+- setup-rerun.test.mjs:73-74 (RERUN-AC-01) copies the old isLiving and asserts _template.md is living (contradicts rule 33; outside touch → later card). readFriction in friction.mjs now used only by its test. setup-plan-read.test.mjs:85 missing semicolon.
