@@ -37,10 +37,13 @@ detection (say what you detected instead):
 7. **Policies** — push · deploy (target, exceptions) · protected / auto-deploy branches · forbidden and owner-only paths · external services allowed · env file names
 8. **Token saving** and **first milestone goal** (free text: "what should work at the end of the first milestone?")
 
-Test mode is also a per-machine choice. When the person says their machine is slow (or fast), offer to write an untracked
-`saf.config.local.json` with only `{ "workflow": { "testMode": "<mode>" } }` — never other keys (the engine refuses
-anything outside `LOCAL_KEYS`, `$schema` included). The installer already git-ignores that file. `SAF_TEST_MODE` does the
-same for one shell. Neither changes generated files.
+Test mode and the two lane caps are per-machine choices. The untracked `saf.config.local.json` may hold `workflow.testMode`,
+`workflow.lanes.code` and `workflow.sideLanes.max` and nothing else (the engine refuses anything outside `LOCAL_KEYS`,
+`$schema` and `workflow.lanes.main` included). When the person says their machine is slow (or fast), offer to write the
+test mode there, for example `{ "workflow": { "testMode": "<mode>" } }`; when they say it is weak or strong, offer to write a
+code-lane cap (`workflow.lanes.code`, at most `LANE_CEILING` in `config.mjs`) or a side-card cap (`workflow.sideLanes.max`)
+there. The installer already git-ignores that file, so it is also absent inside a lane worktree. `SAF_TEST_MODE` sets the
+test mode for one shell; lane caps have no environment variable (sessions in different shells must count the same caps). The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart. None of this changes generated files.
 
 **Before each group**, run `node tools/saf/bin/saf.mjs choices --group <g> --lang <chat language>` (`<g>` is `1` to `8`;
 `<chat language>` is `en` or `th`, the language the person picked). Group 1 starts with the bilingual chat-language
@@ -79,7 +82,7 @@ already know, instead of forcing them into options.
    - Adjust a setting that was not asked: ask for the keys and values in one plain message (dotted keys from the list above),
      add them to the answers you write to `.saf/setup-answers.json` in Step 3, and ask again. `setup` still checks them
      against the schema. The per-machine block of the list is not a setup answer: for `SAF_TEST_MODE` or
-     `saf.config.local.json` follow the paragraph about test mode under Step 1 (the file holds only `workflow.testMode`).
+     `saf.config.local.json` follow the paragraph about per-machine choices under Step 1 (the file holds only the three keys named there).
 
 ## Step 3 — generate
 

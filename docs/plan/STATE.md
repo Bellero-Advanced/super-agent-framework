@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 23/25
+## M2 Roadmap: next — cards done 24/25
 
-- In progress: **T-M2-26** Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — started 2026-11-24 05:58 · not verified yet · lane 1 · .claude/worktrees/T-M2-26
-- Next: no card can start yet — T-M2-28 waits for T-M2-26 must pass first
+- In progress: none
+- Next: T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -32,7 +32,7 @@
 | [T-M2-01](tasks/M2/T-M2-01.md) | A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning | ✓ passed | [T-M2-01.json](evidence/T-M2-01.json) · passed 2026-11-24 05:27 (5 commands) · full suite deferred to gate |
 | [T-M2-27](tasks/M2/T-M2-27.md) | Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it | ✓ passed | [T-M2-27.json](evidence/T-M2-27.json) · passed 2026-11-24 05:51 (5 commands) · full suite deferred to gate |
 | [T-M2-25](tasks/M2/T-M2-25.md) | Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json | ✓ passed | [T-M2-25.json](evidence/T-M2-25.json) · passed 2026-11-24 05:53 (6 commands) · full suite deferred to gate |
-| [T-M2-26](tasks/M2/T-M2-26.md) | Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one | ▶ in progress | [T-M2-26.json](evidence/T-M2-26.json) · started 2026-11-24 05:58 · not verified yet |
+| [T-M2-26](tasks/M2/T-M2-26.md) | Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one | ✓ passed | [T-M2-26.json](evidence/T-M2-26.json) · passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate |
 | [T-M2-28](tasks/M2/T-M2-28.md) | Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
@@ -45,7 +45,7 @@
 
 ## Latest evidence
 
-- T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — started 2026-11-24 05:58 · not verified yet
+- T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate
 - T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json — passed 2026-11-24 05:53 (6 commands) · full suite deferred to gate
 - T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it — passed 2026-11-24 05:51 (5 commands) · full suite deferred to gate
 - T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning — passed 2026-11-24 05:27 (5 commands) · full suite deferred to gate

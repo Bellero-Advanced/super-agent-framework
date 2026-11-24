@@ -31,7 +31,7 @@
 ความถี่ที่ test **ทั้งชุด** รันคือ `workflow.testMode` (`every-card` · `targeted` · `milestone` · ค่าเริ่มต้น `milestone`) ·
 ในโหมดที่เลื่อน การ์ดพิสูจน์ตัวเองด้วย test ของมันเอง หลักฐานจะมีคำว่า "full suite deferred to gate" (เลื่อนไปที่ประตู) · ในโหมด `milestone`
 ประตูออกรัน test ทั้งชุดเสมอ ส่วนในโหมด `targeted` test ทั้งชุดรันตอนรวมการ์ดสาย (ถ้าประตูล้ม `{{cmd.taskCulprit}}` หาการ์ดที่ทำให้ล้ม) · แต่ละคนเปลี่ยนโหมดในเครื่องตัวเองได้ด้วย `SAF_TEST_MODE` หรือไฟล์ `saf.config.local.json`
-ที่ git ไม่ track (ใส่ได้เฉพาะ `workflow.testMode` · key `$schema` ในไฟล์นี้ถูกปฏิเสธ)
+ที่ git ไม่ track (ใส่ได้ `workflow.testMode` · `workflow.lanes.code` · `workflow.sideLanes.max` · key อื่นรวมถึง `$schema` ถูกปฏิเสธ) · เพดาน lane ไม่มีตัวแปรสภาพแวดล้อม (ทุก session ต้องนับเพดานเดียวกัน) และตั้งได้ไม่เกิน `LANE_CEILING` ใน `tools/saf/lib/config.mjs`
 
 ## 2. รูปแบบการ์ด
 
@@ -74,7 +74,7 @@ side_cards: [T-M3-01]
 - การ์ดสายข้างเริ่ม · ตรวจ · รวม · ผ่านผู้ตรวจ แบบเดียวกับการ์ดอื่นทุกอย่าง — สเปก · `touch` · `depends` · เพดานขนาด · หลักฐานเท่าเดิม
 - milestone ที่ active มาก่อนเสมอ: `{{cmd.taskNext}}` ไล่การ์ดของมันก่อนการ์ดสายข้าง (มีป้าย `[สายข้าง M<n>]`)
   และการ์ดสายข้างเริ่มได้เฉพาะในที่ว่างที่ milestone ที่ active เหลือไว้
-- การ์ดสายข้างที่กำลังทำพร้อมกันได้ไม่เกิน {{workflow.sideLanes.max}} ใบ (`workflow.sideLanes` ใน `saf.config.json`)
+- การ์ดสายข้างที่กำลังทำพร้อมกันได้ไม่เกิน {{workflow.sideLanes.max}} ใบ (`workflow.sideLanes` ใน `saf.config.json` — เพดานของโปรเจกต์ · แต่ละเครื่องตั้ง `workflow.sideLanes.max` ของตัวเองได้ใน `saf.config.local.json` และไม่เพิ่มช่องเกินที่เพดาน lane เหลือ · ไม่เกิน `LANE_CEILING` ไม่มีตัวแปรสภาพแวดล้อม)
 - การ์ดสายข้าง depends ได้เฉพาะการ์ดที่เสร็จแล้วหรือเริ่มได้เอง
 - `docs/plan/STATE.md` และสรุปตอนเปิด session แสดงสายข้างเป็นบล็อกของตัวเอง · การ์ดสายข้างไม่นับในจำนวนเสร็จและประตูออกของ
   milestone ที่ active — นับเมื่อ milestone ของมันเองเป็น active
@@ -92,7 +92,7 @@ side_cards: [T-M3-01]
 การ์ดของบทบาทที่ทำงานใน **สายโค้ด** ({{#each roles}}{{#eq .lane "code"}}`{{.name}}` {{/eq}}{{/each}}) ทำขนานได้ แต่ละใบอยู่ใน
 git worktree ของตัวเองใต้ `{{workflow.worktreeDir}}/` บน branch `{{workflow.branchPrefix}}<id>` · การ์ดอื่นทำในโฟลเดอร์หลักทีละใบ
 
-- `{{cmd.taskNext}}` บอกชุดการ์ดที่เริ่มพร้อมกันได้ (`touch` ไม่ทับกัน · เพดาน: สายโค้ด {{workflow.lanes.code}} · โฟลเดอร์หลัก {{workflow.lanes.main}}{{#if workflow.solo}} · path ที่ต้องทำเดี่ยว {{workflow.solo}}{{/if}}) และเหตุผลของใบที่ต้องรอ
+- `{{cmd.taskNext}}` บอกชุดการ์ดที่เริ่มพร้อมกันได้ (`touch` ไม่ทับกัน · เพดาน: สายโค้ด {{workflow.lanes.code}} · โฟลเดอร์หลัก {{workflow.lanes.main}}{{#if workflow.solo}} · path ที่ต้องทำเดี่ยว {{workflow.solo}}{{/if}}) และเหตุผลของใบที่ต้องรอ — เพดานเหล่านี้เป็นของโปรเจกต์ แต่ละเครื่องตั้ง `workflow.lanes.code` ของตัวเองได้ใน `saf.config.local.json` · (ไม่เกิน `LANE_CEILING` ใน `tools/saf/lib/config.mjs` และไม่มีตัวแปรสภาพแวดล้อมสำหรับเพดาน) · โฟลเดอร์หลักยังทำทีละใบ เพราะ `{{cmd.taskVerify}}` นับทุกไฟล์ที่เปลี่ยนในโฟลเดอร์ตั้งแต่ commit ตอนเริ่มเป็นของการ์ดนั้น จึงแยกการ์ดสองใบไม่ได้
 - `{{cmd.taskStartLane}}` เปิดสาย: ไฟล์การ์ดต้อง commit แล้ว · หลักฐานถูก commit บน branch หลัก ·
   ขั้น 3–5 ล้ม = exit 6 — แก้ต้นเหตุแล้วรันใหม่ด้วย `--resume`
 - ในสาย: ทำงาน แล้ว `{{cmd.taskVerify}}` (เขียนหลักฐานบน branch ของสายเท่านั้น) · `{{cmd.taskEnv}}` บอกพอร์ตของสาย

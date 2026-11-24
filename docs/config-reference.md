@@ -64,12 +64,12 @@ See [roles.md](roles.md).
 | `sizes` · `testCaps` | from rigor | `{ "S": 150, "M": 400 }` changed code lines |
 | `review` | from rigor | m-cards · every-card · every-card+security |
 | `worktrees` | true | parallel lanes; with worktrees off all cards run in the main folder |
-| `lanes`: `code` · `main` | 3 · 1 | how many cards may run at once in the code lane and in the main lane |
-| `sideLanes`: `enabled` · `max` | true · 1 | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` in progress at once — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
+| `lanes`: `code` · `main` | 3 · 1 | how many cards may run at once in the code lane (0 to `LANE_CEILING` in `lib/config.mjs`, now 32) and in the main lane. `main` is fixed at 1 because that lane works in one folder and `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder could not be told apart (`task:start` also refuses a second main-folder card: "one folder works one card at a time"). Each code lane is a worktree plus the `laneInstall` step and uses CPU, memory and disk while it builds and tests; `code: 0` runs every card in the main folder. A machine may set its own `code` in [`saf.config.local.json`](#safconfiglocaljson) |
+| `sideLanes`: `enabled` · `max` | true · 1 | side cards (`side_cards:` of a planned milestone) may run beside the active milestone; `max` (1 to `LANE_CEILING`) in progress at once; side cards only use lane slots the active milestone leaves free, so `max` never adds slots; a machine may set its own `max` in [`saf.config.local.json`](#safconfiglocaljson) — [card-lifecycle.md](card-lifecycle.md#side-lanes) |
 | `worktreeDir` · `branchPrefix` | `.claude/worktrees` · `card/` | |
 | `solo` | [] | globs whose cards run alone in the code lane (e.g. migrations) |
 | `laneInstall` | from the package manager | run in a new lane (`npm ci`, `pnpm install --frozen-lockfile`, …) |
-| `lanePorts`: `base` · `step` · `env` | 3000 · 10 · `["PORT"]` | `task:env` exports each variable named in `env` as `base+step×lane` (`PORT=base+step×lane` by default) |
+| `lanePorts`: `base` · `step` · `env` | 3000 · 10 · `["PORT"]` | `task:env` exports each variable named in `env` as `base+step×lane` (`PORT=base+step×lane` by default); with worktrees on, `env` not empty and `lanes.code` ≥ 1, loading the config fails when `base+step×lanes.code` is above 65535 |
 | `laneDb` | "" | test database pattern, `{n}` = lane, `{name}` = project name |
 | `mergeChecks` | from rigor + check-secrets + docs:check | commands `task:merge` runs before committing |
 | `mergeInstall` | from the package manager | `{ cmd, files }` — reinstall when these files change in a merge |
@@ -85,15 +85,26 @@ See [roles.md](roles.md).
 ## `saf.config.local.json`
 
 An optional file in the project root, **not tracked by git** (the installer adds it to `.gitignore`), for choices that belong
-to one machine. Today it may hold only `workflow.testMode`:
+to one machine. It may hold three keys: `workflow.testMode`, `workflow.lanes.code` and `workflow.sideLanes.max`:
 
 ```json
-{ "workflow": { "testMode": "every-card" } }
+{ "workflow": { "testMode": "every-card", "lanes": { "code": 8 }, "sideLanes": { "max": 2 } } }
 ```
 
-Any other key is an error that names the key — including `$schema`, so leave it out. The file is checked with the same schema
-as `saf.config.json`. The test mode is the first source that sets it: environment variable `SAF_TEST_MODE` → this file →
-`saf.config.json` → the default. Only engine runs (`task:*`) read it; generated files never do.
+Any other key is an error that names the key — including `$schema` and `workflow.lanes.main`, so leave them out. The file is
+checked with the same schema as `saf.config.json`, so a cap above `LANE_CEILING` (32, in `lib/config.mjs`) is an error. Each key
+takes the first source that sets it: the test mode from environment variable `SAF_TEST_MODE` → this file → `saf.config.json` →
+the default; each lane cap from this file → `saf.config.json` → the default. There is no environment variable for lane caps:
+`task:next --parallel`, `task:start` and `task:merge` run in different shells and sessions, and every one of them must count
+the same caps. The right cap is the machine's CPU, memory and disk; the ceiling is only a guard against typing mistakes.
+When a cap from this file stops a card, the reason names `this machine: saf.config.local.json`: `task:next --parallel` and the code-cap check of `task:start` end with `(this machine: saf.config.local.json)`, and `task:start`'s side-cap refusal has it inside the text. The error "no free lane number" does not name the file.
+
+With `lanes.code` 0 in this file, every card on this machine runs in the main folder. After the file is applied the port check
+runs on the result: with worktrees on, `lanePorts.env` not empty and `lanes.code` ≥ 1, `lanePorts.base + lanePorts.step ×
+lanes.code` must be at most 65535, or loading fails with an error that names the keys and the file the cap came from. The file
+is git-ignored, so a lane worktree does not have it: if the repo's own `lanes.code` breaks the port check and only this file
+lowers it, engine commands inside a lane fail until the repo's value or `lanePorts` is fixed. Only engine runs (`task:*`) read
+the file; generated files never do and show the project's caps from `saf.config.json`.
 
 ## policies
 

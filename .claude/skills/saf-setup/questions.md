@@ -80,8 +80,8 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 
 | Question | Key | Options | Recommended |
 |---|---|---|---|
-| Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom caps) · off | on for standard/strict, off for light |
-| Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time) · off | on, 1 at a time |
+| Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom code cap; the main lane stays 1) · off | on for standard/strict, off for light |
+| Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time; never more than the lane caps leave free) · off | on, 1 at a time |
 | Paths that only one card may touch at a time? | `workflow.solo` | globs | none (lock files are handled automatically) |
 | Ports per lane for dev servers? | `workflow.lanePorts.base` · `workflow.lanePorts.step` · `workflow.lanePorts.env` | base · step · env names | base 3000 · step 10 · `PORT` |
 | Test database name per lane? | `workflow.laneDb` | pattern with `{n}` | empty; with a database: `<name>_lane{n}_test` |
@@ -96,9 +96,13 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 
 The four lines for each mode (what it is · good for · cost · pick it when) come from `node tools/saf/bin/saf.mjs choices --group 6 --lang <chat language>`, shown as printed — this file keeps no copy. Recommended: `milestone`. How each mode behaves (deferred evidence, the exit gate, the per-machine override) is in the SAF repository's docs/card-lifecycle.md, section Test mode.
 
-Each person can override the repo's choice on their own machine, without changing a tracked file: the environment variable
-`SAF_TEST_MODE`, or an untracked `saf.config.local.json` that holds only `workflow.testMode` (any other key is refused,
-including `$schema`). Order: env, then local file, then `saf.config.json`, then the default (`milestone`).
+Each person can override the repo's choice on their own machine, without changing a tracked file. The test mode: the environment
+variable `SAF_TEST_MODE`, or an untracked `saf.config.local.json`; order: env, then local file, then `saf.config.json`, then the
+default (`milestone`). The two caps (`workflow.lanes.code`, `workflow.sideLanes.max`): the local file, then `saf.config.json`, then
+the default — there is no environment variable for lane caps, so every session on a machine counts the same caps. The local file
+may hold only those three keys (any other key is refused, including `$schema` and `workflow.lanes.main`). When the person says
+the machine is weak or strong, offer to write the caps there. The main-folder lane stays one card because `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder cannot be told apart; the code cap is at most
+`LANE_CEILING` (`config.mjs`).
 
 ## 7. Policies
 

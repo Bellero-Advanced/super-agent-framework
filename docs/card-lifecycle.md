@@ -81,7 +81,16 @@ data-engineer, builder custom roles) can run side by side:
   conflict · **5** a merge check failed — 4 and 5 are rolled back completely.
 
 Roles in the main-folder lane (designer, spec-reviewer, art-producer, release-operator, …) and submodule cards run in the main
-folder, one at a time. With lanes off, every card runs in the main folder, one at a time.
+folder, one at a time. With lanes off, every card runs in the main folder, one at a time. The main lane is fixed at one card
+(`workflow.lanes.main` stays 1) because it works in one folder and `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder could not be told apart; `task:start` also refuses a second main-folder card.
+
+Each code lane costs a worktree (a full checkout) plus the lane install step, and uses CPU, memory and disk while it builds and
+tests. The code cap is at most `LANE_CEILING` (`lib/config.mjs`); a machine may set its own in `saf.config.local.json`
+(`workflow.lanes.code`, 0 = every card in the main folder on that machine; no environment variable — all sessions must count
+the same caps). Lane evidence (`docs/plan/evidence/*.json`) is tracked in git, so on a shared branch a machine counts the open lane cards started
+elsewhere toward its own cap and skips their lane numbers (`task:start` also skips the lane labels in its own worktree folder): a
+machine with a lower cap can see "code lane is full" because of cards another machine started. Ports matter only per machine
+([config-reference.md](config-reference.md#safconfiglocaljson)).
 
 ## Side lanes
 
@@ -100,8 +109,9 @@ side_cards: [T-M3-01]          # must also be in cards
 - **The active milestone comes first.** `task:next` (all forms) walks the active milestone's cards first, then side cards
   in `cards` order, tagged `[side lane M3]`; `--json` adds `side: [...]`. `task:start` of a side card succeeds only in
   capacity the active milestone leaves free — with lanes off (one folder), a side card starts only when no active card can.
-- **A cap.** At most `workflow.sideLanes.max` side cards in progress (default 1). `workflow.sideLanes.enabled: false` turns
-  the feature off (`side_cards` is then ignored).
+- **A cap.** At most `workflow.sideLanes.max` side cards in progress (default 1; a machine may set its own in
+  `saf.config.local.json`). It never adds slots: side cards only use lane slots the active milestone leaves free.
+  `workflow.sideLanes.enabled: false` turns the feature off (`side_cards` is then ignored).
 - **Plan checks.** `task:state --check` fails when `side_cards` lists a card that is not in `cards`, or when a side card
   depends on a card that can never start (not done, not in the active milestone, not a side card).
 - **Status.** `STATE.md` shows a "Side lane M3" block after the active milestone (only side cards, counted separately);
@@ -134,8 +144,8 @@ passes without a real test run when its "Done when" names one; the mode only mov
   Exit **0** found · **2** already failing before the first card · **3** passes at HEAD (flaky, or already fixed) · **1** error
   (for example no card of the milestone has started). `--cmd "<command>"` picks another command.
 - **Per machine.** Pick a mode for your own machine without touching tracked files: `SAF_TEST_MODE=<mode>` for one shell, or an
-  untracked `saf.config.local.json` holding only `workflow.testMode` ([config-reference.md](config-reference.md#safconfiglocaljson)).
-  Order: env, local file, `saf.config.json`, default. Generated files never depend on either.
+  untracked `saf.config.local.json` (it may also hold `workflow.lanes.code` and `workflow.sideLanes.max`; [config-reference.md](config-reference.md#safconfiglocaljson)).
+  Mode order: env, local file, `saf.config.json`, default. Generated files never depend on either.
 
 Which mode to pick (what it is, good for, cost, pick when) is in the setup question:
 [questions.md](../kit/claude/skills/saf-setup/questions.md#test-mode--explain-each-choice-before-asking). SAF's own repository

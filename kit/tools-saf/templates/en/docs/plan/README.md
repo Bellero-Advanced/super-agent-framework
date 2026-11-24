@@ -31,7 +31,7 @@ files outside `touch` · files in `dont_touch` · scenarios without a test).
 How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default `milestone`).
 In the deferred modes a card proves itself with its own tests, its evidence says "full suite deferred to gate", and the
 in `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card merges (when the gate fails, `{{cmd.taskCulprit}}` finds the card that broke it). Each person can override the mode with `SAF_TEST_MODE` or an untracked
-`saf.config.local.json` (only `workflow.testMode`; a `$schema` key there is refused).
+`saf.config.local.json` (it may hold `workflow.testMode`, `workflow.lanes.code` and `workflow.sideLanes.max`; any other key, including `$schema`, is refused). Lane caps have no environment variable (every session must count the same caps) and are at most `LANE_CEILING` in `tools/saf/lib/config.mjs`.
 
 ## 2. Card format
 
@@ -74,7 +74,7 @@ side_cards: [T-M3-01]
 - side cards start, verify, merge and get reviewed exactly like other cards — same spec, `touch`, `depends`, size caps and evidence
 - the active milestone always comes first: `{{cmd.taskNext}}` lists its cards before side cards (tagged `[side lane M<n>]`),
   and a side card starts only in capacity the active milestone leaves free
-- at most {{workflow.sideLanes.max}} side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json`)
+- at most {{workflow.sideLanes.max}} side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json` — the project's cap; a machine may set its own `workflow.sideLanes.max` in `saf.config.local.json`, and it never adds slots the lane caps do not leave; at most `LANE_CEILING`, no environment variable)
 - a side card may depend only on cards that are done or can start themselves
 - `docs/plan/STATE.md` and the session summary show each side lane in its own block; side cards never count toward the
   active milestone's done count or its exit gates — they count when their own milestone becomes active
@@ -94,7 +94,7 @@ Cards whose role works in a **code lane** ({{#each roles}}{{#eq .lane "code"}}`{
 parallel, each in its own git worktree under `{{workflow.worktreeDir}}/` on branch `{{workflow.branchPrefix}}<id>`.
 Other cards run in the main folder, one at a time.
 
-- `{{cmd.taskNext}}` lists cards that can start together (no `touch` overlap · caps: code {{workflow.lanes.code}} · main {{workflow.lanes.main}}{{#if workflow.solo}} · solo paths {{workflow.solo}}{{/if}}) and why others wait
+- `{{cmd.taskNext}}` lists cards that can start together (no `touch` overlap · caps: code {{workflow.lanes.code}} · main {{workflow.lanes.main}}{{#if workflow.solo}} · solo paths {{workflow.solo}}{{/if}}) and why others wait — these are the project's caps; a machine may set its own `workflow.lanes.code` in `saf.config.local.json`, (at most `LANE_CEILING` in `tools/saf/lib/config.mjs`; there is no environment variable for caps). The main-folder lane stays one card because `{{cmd.taskVerify}}` counts every file changed in the folder since a card's start commit as that card's, so two cards there cannot be told apart
 - `{{cmd.taskStartLane}}` opens the lane: the card files must be committed first; evidence is committed on the main branch.
   If steps 3–5 fail it exits 6 — fix the cause, then re-run with `--resume`
 - inside the lane: work, then `{{cmd.taskVerify}}` (writes evidence on the lane branch only) · `{{cmd.taskEnv}}` prints the lane's ports
