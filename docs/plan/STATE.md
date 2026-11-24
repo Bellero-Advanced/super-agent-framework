@@ -4,8 +4,8 @@
 
 ## M3 SAF builds itself — cards done 32/37
 
-- In progress: none
-- Next: T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0
+- In progress: **T-M3-12** CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 — started 2026-11-24 20:56 · not verified yet · lane 1 · .claude/worktrees/T-M3-12
+- Next: no card can start yet — T-M3-13 waits for T-M3-12 · T-M3-14 waits for T-M3-13 · T-M3-15 waits for T-M3-14 · T-M3-26 waits for T-M3-14 must pass first
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -41,7 +41,7 @@
 | [T-M3-09](tasks/M3/T-M3-09.md) | task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off | ✓ passed | [T-M3-09.json](evidence/T-M3-09.json) · passed 2026-11-24 19:54 (6 commands) · full suite deferred to gate |
 | [T-M3-10](tasks/M3/T-M3-10.md) | task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit | ✓ passed | [T-M3-10.json](evidence/T-M3-10.json) · passed 2026-11-24 20:52 (6 commands) · full suite deferred to gate |
 | [T-M3-11](tasks/M3/T-M3-11.md) | A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again | ✓ passed | [T-M3-11.json](evidence/T-M3-11.json) · passed 2026-11-24 20:30 (7 commands) · full suite deferred to gate |
-| [T-M3-12](tasks/M3/T-M3-12.md) | CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 | · not started | – |
+| [T-M3-12](tasks/M3/T-M3-12.md) | CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 | ▶ in progress | [T-M3-12.json](evidence/T-M3-12.json) · started 2026-11-24 20:56 · not verified yet |
 | [T-M3-13](tasks/M3/T-M3-13.md) | A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it | · not started | – |
 | [T-M3-14](tasks/M3/T-M3-14.md) | Setup and upgrade install skill packs named in skills.external only when their content hash matches | · not started | – |
 | [T-M3-15](tasks/M3/T-M3-15.md) | /saf-setup asks for skill packs from a folder, shows what each would install, and installs only after an explicit yes | · not started | – |
@@ -60,11 +60,11 @@
 
 ## Latest evidence
 
+- T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 — started 2026-11-24 20:56 · not verified yet
 - T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit — passed 2026-11-24 20:52 (6 commands) · full suite deferred to gate
 - T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again — passed 2026-11-24 20:30 (7 commands) · full suite deferred to gate
 - T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off — passed 2026-11-24 19:54 (6 commands) · full suite deferred to gate
 - T-M3-37 An L card lists its steps: the plan check demands them, task:diff splits the review diff by step commit, and the agents build and review step by step — passed 2026-11-24 19:25 (9 commands) · full suite deferred to gate
-- T-M3-36 Setup explanations and the user docs describe sizes M and L, the hard stop and legacy S cards, in English and Thai, true to the code — passed 2026-11-24 19:08 (8 commands) · full suite deferred to gate
 
 ## Other milestones
 
