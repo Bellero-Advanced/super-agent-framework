@@ -76,8 +76,8 @@ id appears in a test file). `spec:matrix --check` fails when a started card has 
 
 ## Parallel lanes
 
-With `workflow.worktrees` on, cards whose role works in the **code lane** (implementer, qa-runner, db-guardian,
-data-engineer, builder custom roles) can run side by side:
+With `workflow.worktrees` on, cards whose role works in the **code lane** (by default implementer, qa-runner, db-guardian,
+data-engineer, builder custom roles; `roles.lanes` can move a role, see [roles.md](roles.md#moving-a-role-to-the-other-lane)) can run side by side:
 
 - `task:next --parallel` lists a safe set: no `touch` overlap (unsure = overlap), caps per lane, solo paths alone, one card
   per submodule — and explains why other cards wait. `--json` for scripts.
@@ -90,8 +90,8 @@ data-engineer, builder custom roles) can run side by side:
   the merge checks and refreshes status. Exit **3** refused (not passed, dirty folder, changed after verification) · **4**
   conflict · **5** a merge check failed — 4 and 5 are rolled back completely.
 
-Roles in the main-folder lane (designer, spec-reviewer, art-producer, release-operator, …) and submodule cards run in the main
-folder, one at a time. With lanes off, every card runs in the main folder, one at a time. The main lane is fixed at one card
+By default the roles of the main-folder lane (designer, spec-reviewer, art-producer, release-operator, …) run in the main
+folder, one at a time, and so do submodule cards, which cannot move; `roles.lanes` can move a library role other than designer, spec-reviewer and release-operator to the code lane ([roles.md](roles.md#moving-a-role-to-the-other-lane)). With lanes off, every card runs in the main folder, one at a time. The main lane is fixed at one card
 (`workflow.lanes.main` stays 1) because it works in one folder and `task:verify` counts every file changed in the folder since a card's start commit as that card's, so two cards in one folder could not be told apart; `task:start` also refuses a second main-folder card.
 
 Each code lane costs a worktree (a full checkout) plus the lane install step, and uses CPU, memory and disk while it builds and

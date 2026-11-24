@@ -45,15 +45,16 @@ export const MODEL_PRESETS = {
 /**
  * Role library. tier → model tier · lane → where cards of this role run in parallel mode
  * (code = own worktree lane · main = main folder, one at a time) · readOnly roles get a fixed tool list.
+ * `roles.lanes` may move a role to the other lane unless `laneLocked` (docs/specs/role-lanes.md).
  */
 export const ROLE_LIBRARY = {
-  designer: { core: true, tier: "planner", lane: "main", effort: "high", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "Writes milestone plans, cards and specs. Never edits product code." },
-  "spec-reviewer": { core: true, tier: "planner", lane: "main", effort: "high", tools: "Read, Grep, Glob", readOnly: true, summary: "Read-only. Compares a finished card with its spec and reports every mismatch." },
+  designer: { core: true, tier: "planner", lane: "main", laneLocked: true, effort: "high", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "Writes milestone plans, cards and specs. Never edits product code." },
+  "spec-reviewer": { core: true, tier: "planner", lane: "main", laneLocked: true, effort: "high", tools: "Read, Grep, Glob", readOnly: true, summary: "Read-only. Compares a finished card with its spec and reports every mismatch." },
   implementer: { core: true, tier: "builder", lane: "code", effort: "high", tools: "", summary: "Takes one card, writes code and tests, runs task:verify until it passes." },
   "qa-runner": { core: true, tier: "builder", lane: "code", effort: "medium", tools: "Read, Grep, Glob, Bash", summary: "Runs real tests (e2e, load, perf, screenshots) and reports real numbers. Never fixes code to pass." },
   "art-producer": { core: false, tier: "builder", lane: "main", effort: "medium", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "Produces images and media from approved briefs; logs every asset." },
   "db-guardian": { core: false, tier: "builder", lane: "code", effort: "high", tools: "", summary: "Writes and rehearses schema migrations, access rules and data fixes. Never applies to production." },
-  "release-operator": { core: false, tier: "builder", lane: "main", effort: "medium", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "The only role that touches live systems — only on an explicit owner order, dry run first, logged." },
+  "release-operator": { core: false, tier: "builder", lane: "main", laneLocked: true, effort: "medium", tools: "Read, Grep, Glob, Write, Edit, Bash", summary: "The only role that touches live systems — only on an explicit owner order, dry run first, logged." },
   "security-auditor": { core: false, tier: "planner", lane: "main", effort: "high", tools: "Read, Grep, Glob, Bash", summary: "Audits code and config for security issues and reports by severity. Never fixes outside a card." },
   "data-engineer": { core: false, tier: "builder", lane: "code", effort: "high", tools: "", summary: "Builds data pipelines, evaluations and model integrations with measured results." },
   "content-writer": { core: false, tier: "builder", lane: "main", effort: "medium", tools: "Read, Grep, Glob, Write, Edit", summary: "Writes user-facing copy and translations through the project's i18n system." },
@@ -98,7 +99,7 @@ const DEFAULTS = {
     submodules: false,
   },
   models: { preset: "balanced", planner: "", builder: "", sessionDefault: "", overrides: {} },
-  roles: { enabled: [...CORE_ROLES], custom: [], reportLanguage: "en" },
+  roles: { enabled: [...CORE_ROLES], custom: [], reportLanguage: "en", lanes: {} },
   skills: { packs: null },
   workflow: {
     sizes: null,
@@ -222,7 +223,7 @@ export function resolveConfig(raw = {}) {
 export function roleTable(c) {
   const out = [];
   for (const name of c.roles.enabled) {
-    const lib = ROLE_LIBRARY[name];
+    const lib = Object.hasOwn(ROLE_LIBRARY, name) ? ROLE_LIBRARY[name] : undefined;
     const custom = c.roles.custom.find((r) => r.name === name);
     const base = lib ?? custom;
     if (!base) continue;
@@ -232,7 +233,7 @@ export function roleTable(c) {
       name,
       custom: !lib,
       tier,
-      lane: base.lane ?? (tier === "planner" ? "main" : "code"),
+      lane: (Object.hasOwn(c.roles.lanes ?? {}, name) ? c.roles.lanes[name] : undefined) ?? base.lane ?? (tier === "planner" ? "main" : "code"),
       effort: o.effort ?? base.effort ?? "medium",
       model: o.model ?? (tier === "planner" ? c.models.planner : c.models.builder),
       tools: base.tools ?? "",
@@ -250,7 +251,21 @@ export function loadSchema() {
 
 /** Validate a raw (possibly partial) config/answers object. @returns {string[]} */
 export function validateConfig(raw) {
-  return validate(loadSchema(), raw);
+  return [...validate(loadSchema(), raw), ...laneKeyErrors(raw)];
+}
+
+/** One error per key of `roles.lanes` that names no movable role (the values are checked by the schema). */
+function laneKeyErrors(raw) {
+  const lanes = raw?.roles?.lanes;
+  if (!isObj(lanes)) return [];
+  const customNames = Array.isArray(raw.roles.custom) ? raw.roles.custom.map((r) => r?.name) : [];
+  return Object.keys(lanes).flatMap((name) => {
+    const lib = Object.hasOwn(ROLE_LIBRARY, name) ? ROLE_LIBRARY[name] : undefined;
+    if (lib?.laneLocked) return [`$.roles.lanes.${name}: the lane of ${name} is fixed (main folder) and cannot be moved`];
+    if (lib) return [];
+    if (customNames.includes(name)) return [`$.roles.lanes.${name}: ${name} is a custom role — set its lane in roles.custom[].lane`];
+    return [`$.roles.lanes.${name}: ${name} is not a role of the library (movable: ${Object.keys(ROLE_LIBRARY).filter((r) => !ROLE_LIBRARY[r].laneLocked).join(", ")})`];
+  });
 }
 
 export class ConfigError extends Error {}

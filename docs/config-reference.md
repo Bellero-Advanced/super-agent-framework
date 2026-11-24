@@ -50,6 +50,7 @@ See [roles.md](roles.md).
 | `enabled` | the core roles | optional library roles to add; the core roles are always on |
 | `custom` | [] | your own roles, each with `name` and `description` |
 | `reportLanguage` | `en` | `en` or `th`; the language agents report in |
+| `lanes` | {} | role name → `code` or `main`: moves a library role to the other lane, e.g. `{"art-producer": "code"}` runs its cards in a worktree beside other cards. `designer`, `spec-reviewer` and `release-operator` are fixed, a custom role sets `lane` in `custom`, any other name is refused; no effect with `workflow.worktrees` off or `workflow.lanes.code` 0 — [roles.md](roles.md#moving-a-role-to-the-other-lane) |
 
 ## skills
 

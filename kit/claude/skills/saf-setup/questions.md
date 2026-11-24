@@ -82,6 +82,7 @@ the same name. Leaving `skills.packs` out uses the recommendation above.
 |---|---|---|---|
 | Run cards in parallel lanes (git worktrees)? | `workflow.worktrees` · `workflow.lanes.code` · `workflow.lanes.main` | on (code 3 · main 1) · on (custom code cap; the main lane stays 1) · off | on for standard/strict, off for light |
 | Side lanes — let cards of a later (planned) milestone run beside the active one, e.g. a landing page? | `workflow.sideLanes.enabled` · `workflow.sideLanes.max` | on (1 at a time) · on (more at a time; never more than the lane caps leave free) · off | on, 1 at a time |
+| Move a role to the other lane — e.g. image or copy cards into a worktree beside other cards? Ask only when worktree lanes are on (not `off`, code cap above 0) | `roles.lanes` | role → `code` or `main` for any library role except designer · spec-reviewer · release-operator (their lane is fixed); a custom role sets its own `lane` in `roles.custom`; none | leave empty (every role keeps its default lane) |
 | Paths that only one card may touch at a time? | `workflow.solo` | globs | none (lock files are handled automatically) |
 | Ports per lane for dev servers? | `workflow.lanePorts.base` · `workflow.lanePorts.step` · `workflow.lanePorts.env` | base · step · env names | base 3000 · step 10 · `PORT` |
 | Test database name per lane? | `workflow.laneDb` | pattern with `{n}` | empty; with a database: `<name>_lane{n}_test` |

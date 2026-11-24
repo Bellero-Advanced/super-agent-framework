@@ -2,17 +2,17 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 3/31
+## M3 SAF builds itself — cards done 4/31
 
-- In progress: **T-M3-28** A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai — started 2026-11-24 08:45 · not verified yet · lane 2 · .claude/worktrees/T-M3-28
-- Next: T-M3-29 The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists
+- In progress: none
+- Next: T-M3-29 The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists · T-M3-30 The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
 | [T-M3-01](tasks/M3/T-M3-01.md) | Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count | ✓ passed | [T-M3-01.json](evidence/T-M3-01.json) · passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate |
 | [T-M3-02](tasks/M3/T-M3-02.md) | The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds | ✓ passed | [T-M3-02.json](evidence/T-M3-02.json) · passed 2026-11-24 08:09 (6 commands) · full suite deferred to gate |
 | [T-M3-27](tasks/M3/T-M3-27.md) | npm run saf:refresh refreshes this repository and the example in one step and puts back the example files the card does not own; --check reports stale copies in a second | ✓ passed | [T-M3-27.json](evidence/T-M3-27.json) · passed 2026-11-24 08:55 (5 commands) · full suite deferred to gate |
-| [T-M3-28](tasks/M3/T-M3-28.md) | A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai | ▶ in progress | [T-M3-28.json](evidence/T-M3-28.json) · started 2026-11-24 08:45 · not verified yet |
+| [T-M3-28](tasks/M3/T-M3-28.md) | A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai | ✓ passed | [T-M3-28.json](evidence/T-M3-28.json) · passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate |
 | [T-M3-29](tasks/M3/T-M3-29.md) | The implementer and spec-reviewer agents carry the checks every prompt used to repeat: failing-first tests, evidence size, sentence-to-code lists, Windows-safe tests, and per-type review checklists | · not started | – |
 | [T-M3-30](tasks/M3/T-M3-30.md) | The designer runs every new Done-when command against the current code before handing a card over, and task:prerun <id> shows which commands already pass | · not started | – |
 | [T-M3-31](tasks/M3/T-M3-31.md) | task:diff <id> writes the reviewer's diff file with exactly the card's files, and the /saf review step hands the reviewer the card id, review types and that path | · not started | – |
@@ -54,8 +54,8 @@
 
 ## Latest evidence
 
+- T-M3-28 A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai — passed 2026-11-24 09:05 (5 commands) · full suite deferred to gate
 - T-M3-27 npm run saf:refresh refreshes this repository and the example in one step and puts back the example files the card does not own; --check reports stale copies in a second — passed 2026-11-24 08:55 (5 commands) · full suite deferred to gate
-- T-M3-28 A project can move a role to the other lane with roles.lanes, so image or copy cards can run in a worktree beside other cards; setup explains it in English and Thai — started 2026-11-24 08:45 · not verified yet
 - T-M3-02 The main session records every spec review with task:review, a failed review reopens the card, and the report shows rounds — passed 2026-11-24 08:09 (6 commands) · full suite deferred to gate
 - T-M3-01 Agents log where the workflow got in the way in docs/plan/friction.md, and every session starts with the open count — passed 2026-11-24 07:36 (8 commands) · full suite deferred to gate
 - T-M2-30 Setup never overwrites a local env value or spreads a string env into index keys: an env block it cannot merge is archived, a colliding key keeps the local value — passed 2026-11-24 06:51 (5 commands) · full suite deferred to gate
