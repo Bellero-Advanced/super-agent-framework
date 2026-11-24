@@ -342,6 +342,11 @@ const SETTINGS_LOCAL = ".claude/settings.local.json";
 /** Unreadable: not valid JSON (`undefined` here) or valid JSON whose root is not an object. */
 const unreadable = (json) => json === undefined || json === null || typeof json !== "object" || Array.isArray(json);
 const NOT_READ = Symbol("not-read");
+/** Why a settings file is unreadable, by reason: `warn` follows the file name in a warning, `line` is the dry-run line's reason. */
+const UNREADABLE = {
+  json: { warn: "is not valid JSON", line: "not valid JSON" },
+  root: { warn: "is not a JSON object", line: "root is not a JSON object" },
+};
 /** An `env` value setup can merge: a plain JSON object. */
 const mergeable = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 
@@ -351,14 +356,16 @@ function planSettings(root, taken, report) {
   const read = readJson(file, existsSync(file) ? NOT_READ : {});
   const cur = read === NOT_READ ? undefined : read;
   let archivedTo = null;
+  let archivedWhy = null;
   if (existsSync(file) && unreadable(cur)) {
-    report.warnings.push(`${SETTINGS} is not valid JSON — archived and replaced`);
     archivedTo = archiveDest(root, SETTINGS, taken);
+    const why = UNREADABLE[cur === undefined ? "json" : "root"];
+    archivedWhy = why.line;
+    report.warnings.push(`${SETTINGS} ${why.warn} — archived to ${archivedTo} and replaced`);
   }
   const s = unreadable(cur) ? {} : cur;
   let localText = null;
   let localArchivedTo = null;
-  let archivedWhy = archivedTo ? "not valid JSON" : null;
   let localArchivedWhy = null;
   if (Object.hasOwn(s, "env") && !mergeable(s.env)) {
     archivedTo ??= archiveDest(root, SETTINGS, taken);
@@ -370,8 +377,9 @@ function planSettings(root, taken, report) {
     let local = readJson(localFile, existsSync(localFile) ? NOT_READ : {});
     if (local === NOT_READ || unreadable(local)) {
       localArchivedTo = archiveDest(root, SETTINGS_LOCAL, taken);
-      localArchivedWhy = "not valid JSON";
-      report.warnings.push(`${SETTINGS_LOCAL} is not valid JSON — archived to ${localArchivedTo} and replaced by the moved env block`);
+      const why = UNREADABLE[local === NOT_READ ? "json" : "root"];
+      localArchivedWhy = why.line;
+      report.warnings.push(`${SETTINGS_LOCAL} ${why.warn} — archived to ${localArchivedTo} and replaced by the moved env block`);
       local = {};
     } else if (Object.hasOwn(local, "env") && !mergeable(local.env)) {
       localArchivedTo = archiveDest(root, SETTINGS_LOCAL, taken);
@@ -476,7 +484,7 @@ export function mergeScriptsText(text, want) {
     } else if (pkg.scripts[name] !== value) kept.push(name);
   }
   if (!added.length) return { text: null, added, kept, scripts: pkg.scripts, invalid: false };
-  const indent = body.match(/^([ \t]+)\S/m)?.[1] ?? 2;
+  const indent = body.match(/^([ \t]+)\S/m)?.[1]; // no indented line: a minified file stays minified
   const eol = body.includes("\r\n") ? "\r\n" : "\n";
   const tail = /\r?\n$/.test(body) ? eol : "";
   return { text: `${bom}${JSON.stringify(pkg, null, indent).replace(/\n/g, eol)}${tail}`, added, kept, scripts: pkg.scripts, invalid: false };
@@ -750,7 +758,7 @@ const PAD = 15;
 /** The dry run's text: one line per path (action · path · reason), then the merges. */
 export function planLines(plan) {
   const m = plan.merges;
-  const lines = plan.actions.map((a) => `${a.action.padEnd(PAD)} ${a.path}  ${a.reason}`);
+  const lines = plan.actions.map((a) => `${a.action.padEnd(PAD)} ${a.path}  ${a.reason}${a.action === "replace-edited" && a.to ? ` → ${a.to}` : ""}`);
   for (const a of m.adopt) lines.push(`${"adopt".padEnd(PAD)} ${a.path}  ${a.reason} → ${a.to}`);
   lines.push("", "merges:");
   lines.push(`  .gitignore: ${m.gitignore.add.length ? `add ${m.gitignore.add.join(" ")}` : "nothing to add"}`);

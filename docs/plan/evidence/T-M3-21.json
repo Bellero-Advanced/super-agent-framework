@@ -1,14 +1,244 @@
 {
   "id": "T-M3-21",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T16:52:48.800Z",
     "base": "a8a63fb59ce8a6ac957244b8fe86447abd6c6850",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 2,
   "branch": "card/T-M3-21",
-  "worktree": ".claude/worktrees/T-M3-21"
+  "worktree": ".claude/worktrees/T-M3-21",
+  "verified": {
+    "at": "2026-11-24T16:55:06.129Z",
+    "head": "032b871e87003aa07756049348f309a246b8dce4",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/setup-messages.test.mjs test/unit/settings-archive.test.mjs test/unit/settings-env-merge.test.mjs test/unit/setup-dry-run.test.mjs test/unit/upgrade-scripts.test.mjs",
+        "exit": 0,
+        "ms": 4153,
+        "tail": [
+          "ok 43 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+          "  ---",
+          "  duration_ms: 1191.854458",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "ok 44 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+          "  ---",
+          "  duration_ms: 1.635625",
+          "  type: 'test'",
+          "  ...",
+          "1..44",
+          "# tests 44",
+          "# suites 0",
+          "# pass 44",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 4079.255709"
+        ]
+      },
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 571,
+        "tail": [
+          "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:161 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:162 | T-M2-09 (done) | test/unit/culprit-robust.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (not started) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:66 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:67 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:68 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:69 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:70 | T-M2-18 (done) · T-M3-24 (not started) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:71 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-07 | upgrade-scripts:72 | T-M3-16 (done) | test/unit/setup-keeps.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-08 | upgrade-scripts:73 | T-M3-21 (failed) | test/unit/setup-messages.test.mjs +2 | ✓ 3 test(s) |",
+          "174 scenario(s) in 19 spec(s) · with test 143 · gaps 31 · gaps of started cards 0 · started in another folder 2"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 407,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 585 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 308,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 275 markdown file(s) · 270 local link(s) · 87 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/settings-archive.test.mjs' 'test/unit/setup-messages.test.mjs'",
+        "exit": 0,
+        "ms": 1514,
+        "tail": [
+          "ok 15 - UPG-AC-08 a pretty package.json keeps its indent; an indent of 2 or tabs is not squeezed",
+          "  ---",
+          "  duration_ms: 0.159167",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: UPG-AC-08 upgrade adds task:culprit to a minified package.json and the file is still one line",
+          "ok 16 - UPG-AC-08 upgrade adds task:culprit to a minified package.json and the file is still one line",
+          "  ---",
+          "  duration_ms: 181.4555",
+          "  type: 'test'",
+          "  ...",
+          "1..16",
+          "# tests 16",
+          "# suites 0",
+          "# pass 16",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1453.818375"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/generate.mjs",
+        "test/unit/settings-archive.test.mjs",
+        "test/unit/setup-messages.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/generate.mjs": "3ed851c3897eb136ad2522996d056c450dee7bcd",
+        "test/unit/settings-archive.test.mjs": "850e24e8dddd5770624f8ea12a2e056a8a647bc0",
+        "test/unit/setup-messages.test.mjs": "21af3d3420213f4005f3e6a6df0940656aae0dae"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RERUN-AC-20",
+        "UPG-AC-08"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "S",
+      "code": {
+        "lines": 20,
+        "cap": 150
+      },
+      "test": {
+        "lines": 105,
+        "cap": 250
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/settings-archive.test.mjs",
+        "test/unit/setup-messages.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T16:54:26.458Z",
+      "head": "032b871e87003aa07756049348f309a246b8dce4",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/setup-messages.test.mjs test/unit/settings-archive.test.mjs test/unit/settings-env-merge.test.mjs test/unit/setup-dry-run.test.mjs test/unit/upgrade-scripts.test.mjs",
+          "exit": 1,
+          "ms": 3711,
+          "tail": [
+            "  duration_ms: 0.408",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-08 a pretty package.json keeps its indent; an indent of 2 or tabs is not squeezed",
+            "ok 37 - UPG-AC-08 a pretty package.json keeps its indent; an indent of 2 or tabs is not squeezed",
+            "  ---",
+            "  duration_ms: 0.135667",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-08 upgrade adds task:culprit to a minified package.json and the file is still one line",
+            "ok 38 - UPG-AC-08 upgrade adds task:culprit to a minified package.json and the file is still one line",
+            "  ---",
+            "  duration_ms: 262.964833",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "ok 39 - UPG-AC-01 upgrade adds the missing task:culprit and nothing else",
+            "  ---",
+            "  duration_ms: 261.572958",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "ok 40 - UPG-AC-02 a different existing script is kept and listed, the missing one is added",
+            "  ---",
+            "  duration_ms: 388.650709",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-03 nothing missing → package.json is byte-identical",
+            "ok 41 - UPG-AC-03 nothing missing → package.json is byte-identical",
+            "  ---",
+            "  duration_ms: 335.1455",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "ok 42 - UPG-AC-04 indentation (4 spaces, tab), CRLF and trailing newline are kept when adding",
+            "  ---",
+            "  duration_ms: 1437.792834",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "ok 43 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+            "  ---",
+            "  duration_ms: 789.149042",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "ok 44 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+            "  ---",
+            "  duration_ms: 0.764709",
+            "  type: 'test'",
+            "  ...",
+            "1..44",
+            "# tests 44",
+            "# suites 0",
+            "# pass 42",
+            "# fail 2",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 3653.10575"
+          ]
+        }
+      ]
+    }
+  ]
 }
