@@ -83,13 +83,14 @@ Show the {{owner}}, in {{chatLanguageName}}:
 in the **active** milestone without waiting for the {{owner}}'s Go — at most {{selfFixCap}} such cards per milestone
 (`SELF_FIX_LIMITS.perMilestone` in `tools/saf/lib/friction.mjs`). The engine checks every condition (`{{cmd.taskStateCheck}}`).
 
-1. `{{cmd.taskFriction}} draft` prints a draft with `self_fix: <F-id>`. Fill `touch` (a test file included) and "Done when"
-   (a command that runs that test file), and save it as the card file.
+1. `{{cmd.taskFrictionDraft}}` prints a draft with `self_fix: <F-id>`. Replace `T-M<n>-??` with the next free card id, fill
+   `touch` (a test file included) and "Done when" (a command that runs that test file), and save it as the card file.
 2. Append the card id to `cards:` of the active milestone — only that one line of the milestone file.
 3. Run `{{cmd.taskFrictionCarded}}`.
 4. Run the normal card loop with the test written first and failing before the fix (the `tdd` skill); the `spec-reviewer`
    checks that the test exercises the friction's evidence. When the card passes `{{cmd.taskVerify}}`{{#if lanesOn}} (a lane card: `{{cmd.taskMerge}}`){{/if}},
-   the engine closes the entry as fixed.
+   the engine closes the entry as fixed in `docs/plan/friction.md`: commit that file alone right after (an uncommitted main
+   folder refuses the next merge).
 
 Anything else — another kind, size M, no test, the cap reached — waits for `designer` and the {{owner}}'s Go (`/saf-plan`).
 {{/if}}

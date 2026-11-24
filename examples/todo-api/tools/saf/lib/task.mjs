@@ -28,7 +28,7 @@ import {
   submoduleReady,
   topLevel,
 } from "./git.mjs";
-import { FRICTION_FILE, FrictionError, appendClose } from "./friction.mjs";
+import { FRICTION_FILE, appendClose, readFriction } from "./friction.mjs";
 import { globToRegExp, toGlob } from "./glob.mjs";
 import { laneOf, pickParallel } from "./parallel.mjs";
 import {
@@ -551,18 +551,20 @@ function planVerifyRun(ctx, card, ev, filesBase, inLane) {
 }
 
 /**
- * Rule 21: a passed self-fix card closes its friction entry as fixed in the main folder's log. Never throws — a log that
- * refuses the line (entry already closed) is reported, the card result stands.
+ * Rule 21: a passed self-fix card closes its friction entry as fixed in the main folder's log. Never throws, whatever the log
+ * does (refuses the line, cannot be read or written) — the evidence and the merge are already done, so the failure is
+ * reported and the card result stands. An entry already fixed by this card (verify again after a failed review) is left alone.
  */
 function closeSelfFix(ctx, plan, card) {
   if (!card.selfFix) return;
   try {
+    const entry = readFriction(ctx.root).entries.find((e) => e.id === card.selfFix);
+    if (entry?.status === "fixed" && entry.closes[entry.closes.length - 1]?.ref === card.id) return;
     const today = formatTime(nowIso(ctx), ctx.config.people.timeZone).slice(0, 10);
     appendClose(ctx.root, card.selfFix, "fixed", card.id, { today, cards: (x) => plan.cards.has(x) });
     ctx.log?.(`  ${card.selfFix} → fixed (${card.id}) in ${FRICTION_FILE} — not committed`);
   } catch (e) {
-    if (!(e instanceof FrictionError)) throw e;
-    ctx.log?.(`  ! ${card.selfFix} was not closed as fixed: ${e.message}`);
+    ctx.log?.(`  ! ${card.selfFix} was not closed as fixed: ${errText(e)}`);
   }
 }
 

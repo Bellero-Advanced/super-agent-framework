@@ -120,6 +120,9 @@ export function alignShellComments(md) {
   });
 }
 
+/** The word that joins two alternatives in generated text, per document language. */
+const OR_WORD = { en: "or", th: "หรือ" };
+
 export function templateData(config, detected, opts = {}) {
   const pm = config.stack.packageManager;
   const c = (s, a) => scriptCommand(pm, s, a);
@@ -176,7 +179,7 @@ export function templateData(config, detected, opts = {}) {
     reviewSecurity: config.workflow.review === "every-card+security",
     selfFixOn: config.workflow.selfFix === "on",
     selfFixCap: SELF_FIX_LIMITS.perMilestone,
-    selfFixKinds: SELF_FIX_KINDS.map((k) => `\`${k}\``).join(" or "),
+    selfFixKinds: SELF_FIX_KINDS.map((k) => `\`${k}\``).join(` ${OR_WORD[dl] ?? OR_WORD.en} `),
     lanesOn: config.workflow.worktrees && config.workflow.lanes.code > 0,
     sideOn: config.workflow.sideLanes.enabled,
     measureOn: config.workflow.measure.enabled,
@@ -211,6 +214,7 @@ export function templateData(config, detected, opts = {}) {
       taskFriction: c("task:friction"),
       taskFrictionAdd: c("task:friction", "add --kind <kind> --area <area> --evidence <text> <summary>"),
       taskFrictionClose: c("task:friction", "close <F-id> carded|fixed|dropped <card id or reason>"),
+      taskFrictionDraft: c("task:friction", "draft"),
       taskFrictionCarded: c("task:friction", "close <F-id> carded <card id>"),
       docsCheck: c("docs:check"),
       specMatrix: c("spec:matrix"),

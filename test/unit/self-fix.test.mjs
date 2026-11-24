@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import fs, { readFileSync, existsSync } from "node:fs";
+import { syncBuiltinESMExports } from "node:module";
 import { join } from "node:path";
 import { after, test } from "node:test";
 import { cleanup, commitAll, fakeCtx, git, gitRepo, lib, planRepo, write, card } from "../helpers.mjs";
@@ -10,6 +11,7 @@ const task = await lib("task.mjs");
 const { loadPlan, parseCard } = await lib("plan.mjs");
 const { loadConfig, resolveConfig, validateConfig } = await lib("config.mjs");
 const { generate } = await lib("generate.mjs");
+const { NOT_ASKED } = await lib("choices.mjs");
 after(cleanup);
 
 const FILE = fr.FRICTION_FILE;
@@ -207,6 +209,76 @@ test("the generated /saf command has the Self-fix section only when workflow.sel
     const on = saf(language, "on");
     assert.doesNotMatch(on, /\{\{|\}\}/);
     for (const part of [language === "en" ? "Self-fix" : "แก้ตัวเอง", "friction draft", "self_fix", "cards:", "friction close <F-id> carded", "SELF_FIX_LIMITS.perMilestone", "tdd"]) assert.ok(on.includes(part), `${language}: ${part}`);
+    assert.ok(on.includes(language === "en" ? "`command-failed` or `doc-drift`" : "`command-failed` หรือ `doc-drift`"), `${language}: the kinds are joined in the language`);
+    assert.ok(on.includes("task friction draft`") && !on.includes("`task:friction draft`"), `${language}: the draft command is the project's runnable command`);
     assert.match(on, language === "en" ? /waits for `designer` and the owner's Go/ : /รอ `designer` และ Go ของ/, `${language}: rule 22`);
   }
+});
+
+test("the th not-asked line says the engine refuses anything else and bigger things wait for the owner", () => {
+  assert.ok(NOT_ASKED["workflow.selfFix"].th.includes("engine ไม่ยอมรับอย่างอื่น เรื่องที่ใหญ่กว่านี้จึงยังต้องรอเจ้าของ"));
+});
+
+/** Every append to the friction log fails (a full disk, a read-only file) while `fn` runs. */
+async function appendsFail(fn) {
+  const real = fs.appendFileSync;
+  fs.appendFileSync = (file, ...rest) => {
+    if (String(file).endsWith("friction.md")) throw Object.assign(new Error("EACCES: permission denied, open 'friction.md'"), { code: "EACCES" });
+    return real(file, ...rest);
+  };
+  syncBuiltinESMExports();
+  try {
+    return await fn();
+  } finally {
+    fs.appendFileSync = real;
+    syncBuiltinESMExports();
+  }
+}
+const NOT_CLOSED = /! F-001 was not closed as fixed: EACCES/;
+
+test("FRIC-AC-11 a log that cannot be written does not undo a passed verify: the evidence is done, STATE.md is rebuilt, the line says it was not closed", async () => {
+  const { root, config } = await selfFixRepo();
+  const logs = [];
+  const ctx = fakeCtx(root, config, { now: NOW, log: (m) => logs.push(m) });
+  task.startCard(ctx, "T-M1-01");
+  write(root, "src/a.mjs", "x\n");
+  const before = log(root);
+  const ev = await appendsFail(() => task.verifyCard(ctx, "T-M1-01"));
+  assert.equal(ev.status, "done");
+  assert.equal(log(root), before);
+  assert.ok(logs.some((l) => NOT_CLOSED.test(l)), logs.join("\n"));
+  assert.deepEqual(task.stateCheck(ctx).stale, [], "STATE.md matches the evidence");
+});
+
+test("FRIC-AC-11 a log that cannot be written does not leave a merged lane behind: the merge commit stands, the worktree is removed, the line says it was not closed", async () => {
+  const { root, config } = await selfFixRepo({ lanes: true });
+  const logs = [];
+  const ctx = fakeCtx(root, config, { now: NOW, log: (m) => logs.push(m) });
+  const ev = task.startCard(ctx, "T-M1-01", { worktree: true });
+  const lane = join(root, ev.worktree);
+  write(lane, "src/a.mjs", "x\n");
+  await task.verifyCard(fakeCtx(lane, loadConfig(lane), { now: NOW }), "T-M1-01");
+  commitAll(lane, "T-M1-01 work");
+  const before = log(root);
+  await appendsFail(() => task.mergeCard(ctx, "T-M1-01", { checks: [] }));
+  assert.match(git(root, "log", "-1", "--format=%s"), /merge\(M1\): T-M1-01/);
+  assert.equal(existsSync(lane), false, "the lane worktree is cleaned up");
+  assert.equal(log(root), before);
+  assert.ok(logs.some((l) => NOT_CLOSED.test(l)), logs.join("\n"));
+});
+
+test("FRIC-AC-11 verify again after a failed review does not log a misleading warning when the entry is already fixed by this card", async () => {
+  const { root, config } = await selfFixRepo();
+  const logs = [];
+  const ctx = fakeCtx(root, config, { now: NOW, log: (m) => logs.push(m) });
+  task.startCard(ctx, "T-M1-01");
+  write(root, "src/a.mjs", "x\n");
+  await task.verifyCard(ctx, "T-M1-01");
+  const closed = log(root);
+  assert.ok(closed.endsWith(FIXED));
+  task.reopenCard(ctx, "T-M1-01", 1);
+  logs.length = 0;
+  assert.equal((await task.verifyCard(ctx, "T-M1-01")).status, "done");
+  assert.equal(log(root), closed, "no second closing line");
+  assert.deepEqual(logs.filter((l) => /not closed/.test(l)), []);
 });
