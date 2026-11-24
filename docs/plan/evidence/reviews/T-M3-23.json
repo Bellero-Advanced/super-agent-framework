@@ -12,6 +12,16 @@
       "head": "956a51126f49d10568ac655228f27141a97df310",
       "verifyAttempts": 2,
       "verifyAt": "2026-11-24T16:34:54.060Z"
+    },
+    {
+      "round": 2,
+      "at": "2026-11-24T16:39:51.453Z",
+      "result": "pass",
+      "kinds": [],
+      "note": "",
+      "head": "2062301834fe95fcbf9b50077b5235927c1f774a",
+      "verifyAttempts": 3,
+      "verifyAt": "2026-11-24T16:39:07.847Z"
     }
   ]
 }
