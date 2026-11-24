@@ -1,0 +1,18 @@
+{
+  "id": "T-M3-13",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T21:18:14.740Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "pack show: one message prints a pack folder name without safe(); requested tools can be hidden (51st tool, non-list allowed-tools)",
+      "head": "13a4f86ff9e80c2fec8d6d284db23656390fb45c",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T21:13:49.546Z"
+    }
+  ]
+}
