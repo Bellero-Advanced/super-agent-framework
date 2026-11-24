@@ -74,13 +74,17 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - **Before the exit gate** (owner order 2026-11-24): T-M2-27 fixes real data loss found by the review of T-M2-02 (note
   F1): an unreadable `.claude/settings.local.json` was overwritten with the moved `env` block and no archive; now it is
   archived to a git-ignored path ([spec rules 19–22](../../specs/setup-rerun.md#settings-files-are-never-lost-plansettings-in-generatemjs)).
-  T-M2-25 → T-M2-26 ([spec](../../specs/lane-caps.md), D-018 proposed): the code-lane and side-lane caps rise to
+  T-M2-25 → T-M2-26 ([spec](../../specs/lane-caps.md), D-018 decided): the code-lane and side-lane caps rise to
   `LANE_CEILING` and each machine may set them in `saf.config.local.json`; then the explanations and docs say what a
   lane costs and why the main lane stays one. T-M2-26 waits for T-M2-25 (both touch `choices.mjs`); T-M2-27 shares no
   `touch` file with them and may run beside T-M2-25. T-M2-28 (owner order, [spec rules 24–25](../../specs/setup-choices.md#explanations-match-the-code))
   corrects setup explanations that do not match the code (review notes 13/4 · 13/7, plus 13/5 · 13/6 · 13/8 · 13/9 ·
-  12/2 · 12/4); it waits for T-M2-26 (`choices.mjs`) and shares no `touch` file with T-M2-27. The other open review notes are triaged in
-  [M2-review-notes.md](../notes/M2-review-notes.md#triage-for-the-m2-exit-gate)
+  12/2 · 12/4); it waits for T-M2-26 (`choices.mjs`) and shares no `touch` file with T-M2-27. T-M2-29 (triage notes
+  21/2 and 18/5, [spec rules 15 and 23](../../specs/setup-rerun.md#2-rules)) refuses a `--keep` the CLI cannot read
+  (`--keep=<path>`, an empty list) and makes `saf upgrade` stop with one error line before writing anything when
+  `saf.config.json` is not valid JSON; it runs after T-M2-27 and T-M2-28 (`generate.mjs`, the last merged cards). The
+  other open review notes are triaged in [M2-review-notes.md](../notes/M2-review-notes.md#triage-for-the-m2-exit-gate)
+  and carried to [M3](M3.md#carried-to-m3)
 - Every new card that changes `kit/` runs `npm run saf:refresh` and the example upgrade, then restores
   `examples/todo-api/.claude` and `examples/todo-api/package.json` (the stale example skill copy is review note C,
   batched for milestone end)
@@ -116,6 +120,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [x] T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json — passed 2026-11-24 05:53 (6 commands) · full suite deferred to gate
 - [x] T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one — passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate
 - [x] T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units — passed 2026-11-24 06:19 (7 commands) · full suite deferred to gate
+- [ ] T-M2-29 setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the

@@ -1,6 +1,6 @@
 # Spec — review rounds (every spec review is recorded per card)
 
-Decision: [D-017](../DECISIONS.md) (proposed), measurement for [D-016](../DECISIONS.md). Card: T-M3-02; the report
+Decision: [D-017](../DECISIONS.md) (decided), measurement for [D-016](../DECISIONS.md). Card: T-M3-02; the report
 by size and effort is T-M3-04 ([effort-by-size.md](effort-by-size.md) rules 11–12).
 
 ## 1. Purpose

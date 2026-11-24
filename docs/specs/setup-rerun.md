@@ -1,6 +1,6 @@
 # Spec — setup re-run: see what changes first, and never lose your edits
 
-Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22 · T-M2-27 (rules 19–22). Builds on
+Decision: [D-011](../DECISIONS.md) (decided). Cards: T-M2-20 · T-M2-02 · T-M2-21 · T-M2-22 · T-M2-27 (rules 19–22) · T-M2-29 (rules 15, 23). Builds on
 [upgrade-scripts.md](upgrade-scripts.md) (D-010) for the `package.json` rules.
 
 ## 1. Purpose
@@ -31,7 +31,8 @@ replacing it.
    `replace-edited` (edited; archived to `docs/archive/pre-saf/` then written — today's behaviour) ·
    `keep-edited` (edited and kept: not written, not archived).
 5. On a re-run an edited living file is always `keep-edited`. An unedited living file is updated as before.
-6. A file the person names with `--keep <path>` is `keep-edited` whatever its state (edited or not).
+6. A file the person names with `--keep <path>` is `keep-edited` whatever its state (edited or not), as long as it
+   exists on disk. A planned file that is missing on disk has nothing to keep: exit 2 naming the path.
 7. A `keep-edited` file keeps the manifest entry it had (or none), so the next run still sees it as edited.
 8. Files SAF wrote earlier under its agent folders that are no longer planned: `remove` when unedited, `keep-unplanned`
    when edited (today's `retireUnplanned` behaviour, now part of the list).
@@ -62,9 +63,13 @@ replacing it.
     headers, hunks with context lines) for every `update`, `replace-edited` and `keep-edited` file and for
     `saf.config.json`. "a" is the file on disk, "b" what setup would write. A file over the line limit prints one line
     with both line counts instead. Context and limit live in `DIFF_LIMITS` in `kit/tools-saf/lib/diff.mjs` (no
-    dependency; the diff is computed in the engine).
+    dependency; the diff is computed in the engine). The diff prints whatever the files hold — what the person wrote in
+    `CLAUDE.md` and the other rendered files reaches the terminal and, through the skill (rule 16), the chat: secret
+    values never belong in those files (`docs/upgrade.md` says so in one line).
 15. `--keep <path>` may repeat or take a comma-separated list. A path that is not a planned rendered file → exit 2
-    naming it. `--diff` without `--dry-run` → exit 2 with the usage line.
+    naming it. `--diff` without `--dry-run` → exit 2 with the usage line. `--keep=<path>` (the `=` form) and a `--keep`
+    value that holds no path after splitting on commas and trimming (`","`, `" , "`, `""`) → exit 2 with the usage line
+    and nothing written: a keep request the CLI cannot read is never ignored.
 
 ### The interview (`kit/claude/skills/saf-setup/SKILL.md`)
 
@@ -94,6 +99,14 @@ replacing it.
     readable or not. An unreadable `settings.json` whose root is valid JSON but not an object is archived like invalid
     JSON (today only a parse failure is).
 
+### Upgrade with a broken config (`upgrade()` in `src/install.mjs`)
+
+23. When `saf.config.json` exists but is not valid JSON, or its root is not an object, `saf upgrade` writes nothing — no
+    engine copy, no skill, no command, no `package.json` change, no manifest — and prints one error line naming
+    `saf.config.json` and saying nothing was changed, then exits 1. The check runs before the first write.
+    `refreshKitFiles` (`generate.mjs`) never renders with default settings in place of an unreadable `saf.config.json`:
+    it adds a warning naming the file and refreshes nothing. A missing `saf.config.json` keeps today's behaviour.
+
 ## 3. Data
 
 - `LIVING_FILES`, `planSetup`, the package-script merge function: `kit/tools-saf/lib/generate.mjs`
@@ -108,6 +121,11 @@ replacing it.
 - A file that is a folder on disk where SAF plans a file → error naming the path (unchanged)
 - Keeping `CLAUDE.md` while settings changed leaves it out of date (for example a new model id); `docs:check` then
   reports it — expected, the person chose to keep it
+- `--keep` of a planned file that is missing on disk → exit 2 ("nothing to keep"), rule 6
+- A path that contains a comma cannot be kept: the comma always splits the list (no planned file has one)
+- An absolute `--keep` path is made relative to the project root; a form that names the same place differently (a
+  Windows 8.3 short name, macOS `/var/…` while the root is `/private/var/…`) becomes a `../` path and exits 2 as not
+  planned — safe, nothing is written; pass the path relative to the project root
 
 ## 5. Acceptance
 
@@ -122,11 +140,12 @@ replacing it.
 | RERUN-AC-07 | `SKILL.md` and `docs/upgrade.md` | the docs test runs | the skill's re-run step runs `--dry-run`, offers take new · keep mine · show the diff, and passes kept files with `--keep`; both files say edited living files are kept | unit |
 | RERUN-AC-08 | `settings.json` with an `env` block; `settings.local.json` holding `{ nope` (then `[]`, then `null`) | `planSetup` + `setup --dry-run`; then `generate` | the plan and the dry-run line name the archive target; after the real run the archive is byte-identical to the old local file, the new local file holds exactly the moved `env`, `report.archived` and a warning name both paths, no `env` value appears in the output, and `git check-ignore` matches the archive path with the generated `.gitignore` | unit |
 | RERUN-AC-09 | `settings.json` without `env` and an invalid `settings.local.json`; `settings.json` holding `[]` | `generate` | the local file is byte-identical and nothing is archived for it; the `[]` settings file is archived (target in the dry run and `report.archived`) and replaced by an object with the SAF hooks | unit |
+| RERUN-AC-10 | a re-run with an edited `CLAUDE.md` | `setup --keep=CLAUDE.md`, `--keep ","`, `--keep " , "`, `--keep ""` (each without and with `--dry-run`) | each exits 2 with the usage line; `CLAUDE.md` is byte-identical, nothing is archived and the manifest is unchanged | unit |
+| RERUN-AC-11 | a set-up project whose `saf.config.json` holds `{ nope` (then `[]`); the engine copy, a `/saf` command file and `package.json` recorded byte for byte | `saf upgrade` (`node bin/cli.mjs upgrade --dir …`) | exit 1; one error line names `saf.config.json`; no stack trace; every recorded file is byte-identical and `tools/saf/` is the old copy; `refreshKitFiles` called directly on that project warns naming the file and writes nothing | unit |
 
 ## 6. Out of scope
 
 - A three-way merge of the person's edits into the new template — the diff shows the change; porting is by hand
 - `saf upgrade` regenerating project docs (it still never touches them)
 - Changing the first-run adopt behaviour
-- Other files read with a silent default (`.saf/manifest.json`, `saf.config.json` in `refreshKitFiles`) — listed in
-  T-M2-27's Why and the M2 review-notes triage
+- `.saf/manifest.json` read with a silent default — listed in T-M2-27's Why and carried to M3 (setup hardening)

@@ -47,7 +47,10 @@ JavaScript and adds no dependency.
 - A milestone with no evidence at all → the page lists every card as not started and every gate as not checked
 - Broken evidence JSON → `loadPlan` reports it as today; the card shows as not started
 - An output tail with control characters or very long lines → escaped and wrapped by CSS, never truncated further
-- The page may hold whatever the evidence tails hold — `check-secrets` scans tracked files, the HTML included
+- The page may hold whatever the evidence tails hold — `check-secrets` scans tracked files, the HTML included. That
+  scan is a safety net with a gap: a secret pattern that needs a literal `"` (the Claude Code env value pattern in
+  `secrets.mjs`) cannot match in the HTML, where rule 4 turns `"` into `&quot;`. The earlier guard is `run.mjs`, which
+  passes output through `redactSecrets` when it captures it, before evidence is written
 
 ## 5. Acceptance
 

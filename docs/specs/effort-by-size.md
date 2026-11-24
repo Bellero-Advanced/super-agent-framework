@@ -1,6 +1,6 @@
 # Spec — effort by card size
 
-Decision: [D-016](../DECISIONS.md) (proposed, amends D-002). Cards: T-M3-03 (setting, variant agents, docs:check) ·
+Decision: [D-016](../DECISIONS.md) (decided, amends D-002). Cards: T-M3-03 (setting, variant agents, docs:check) ·
 T-M3-04 (task:start names the agent, evidence, summary, report) · T-M3-05 (setup question and explanations) ·
 T-M3-06 (this repository uses it). Measurement: [review-rounds.md](review-rounds.md).
 

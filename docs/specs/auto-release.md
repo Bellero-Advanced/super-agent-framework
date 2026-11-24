@@ -1,6 +1,6 @@
 # Spec — automatic release (guarded, with a kill switch)
 
-Decision: [D-015](../DECISIONS.md) (proposed, amends D-004). Cards: T-M3-09 (`task:release` dry run and guards) ·
+Decision: [D-015](../DECISIONS.md) (decided, amends D-004). Cards: T-M3-09 (`task:release` dry run and guards) ·
 T-M3-10 (`--prepare` and `--tag`) · T-M3-11 (release workflow with npm trusted publishing, `release-check`, docs).
 **Security-relevant:** every card of this spec is built and reviewed with the `security-review` skill — it pushes to
 `main`, creates tags and publishes packages.

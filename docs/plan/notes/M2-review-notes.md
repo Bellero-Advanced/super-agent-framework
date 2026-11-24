@@ -260,3 +260,35 @@ N4. `model-preset` max/balanced/economy `what` (unchanged) "Planner roles use th
 N6 THAI (owner gate 13/15): literal calques — `custom-models` "id ที่ตั้งไว้ชนะทุก preset" → "ใช้แทนโมเดลของทุก preset", "models.overrides ยังชนะสำหรับ role เดียว" → "ยังมาก่อนสำหรับ role ที่ระบุ", "id วางแผน" → "id ฝั่งวางแผน"; `api` th `what` folds the UI clause into the server list; `several` th `good` "pack การแปลต่อ" awkward; `strict` th `cost` English "Definition of done" → add "(นิยามเสร็จ)"; the same block says both "ตรวจรวมที่ gate" and "ประตูออก milestone" — pick one
 N7. the card template suggested `i18n` as a shared test token but rule 8 forbids adjacent digits ("18") — fix the card-writing guidance
 N9. optional: "interview suggests security-auditor / content-writer" asserted only as text, not against questions.md:70
+
+## FINAL TRIAGE (M2 exit gate)
+
+Designer pass 2 2026-11-24, after T-M2-25 … T-M2-28 merged. This section replaces the open lists above; the destination
+of every open note is in [M3.md "Carried to M3"](../milestones/M3.md#carried-to-m3).
+
+### Closed since the first triage
+
+- by cards: 02/F1 (T-M2-27) · 13/4 · 13/5 · 13/6 · 13/7 · 13/8 · 13/9 · 12/2 · 12/4 (T-M2-28) · 26/S3 · 26/a · 27/N1
+  (inside their cards) · lane caps owner order (T-M2-25 · T-M2-26)
+- by T-M2-29 (when it passes): 21/2 (`--keep=` and empty lists refused) · 18/5 and the `refreshKitFiles` `{}` default
+  (upgrade stops before writing on a broken `saf.config.json`) · 21/8 (one synopsis) · 21/9 (caution line in
+  docs/upgrade.md)
+- by spec edits (designer, this pass): 25/N1 (LCAP-AC-04 row) · 25/N2 and 26/S2 (lane-caps rule 7 "names") · 26/S1
+  (two-machine edge case) · 21/1 (setup-rerun rule 6) · 21/3 · 21/4 (setup-rerun §4) · 21/9 (rule 14) · 01/5
+  (doc-languages rules 2 and 7) · 05/N3 (evidence-viewer §4 names the gap; the code is unchanged) · stale "(proposed)"
+  headers of lane-caps, effort-by-size, auto-release, friction-log, review-rounds (D-015 … D-018 are decided)
+- by the exit gate's full suite: 20/N6 · 02/N6 · 21/10 · 25/N9
+- folded into an M3 card: 28/N4 → T-M3-05 (bullet added) · 10/C + 12/8 and 10/D → T-M3-01 (already seeded friction)
+  · 22/effort · 26/effort · 28/effort → T-M3-02 · T-M3-04 · T-M3-06
+
+### Dropped
+
+- 10/F (harmless extra example) · 25/N6 (message acceptable) · 25/N8 (same as lanes off; consistent) · 21/5 (safe
+  direction, no harm) · 28/N2 (follows the precedent of every `good` field) · 28/N7 (guidance was in T-M2-28 only, the
+  card is done; setup-choices rule 8 is the source) · 14/N7 (the explanations already say what `measure` and lane
+  ports do)
+
+### Open → carried to M3
+
+Every other note in this file. Grouped in [M3.md "Carried to M3"](../milestones/M3.md#carried-to-m3) by destination:
+an existing M3 card where one fits, otherwise a proposed M3 card that needs the owner's Go, or an owner decision.

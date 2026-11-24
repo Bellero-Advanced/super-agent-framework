@@ -14,8 +14,8 @@ cover the new language without new text. No third language ships with this spec.
 ## 2. Rules
 
 1. The document languages are the keys of `TEXT` in `kit/tools-saf/lib/text.mjs`, exported as `LANGUAGES`.
-2. Each table has `langName` (the language's own name) and `names` (names of other languages in this language, may be
-   partial). The name of language X in document language D is D's `names[X]`, else English `names[X]`, else X's
+2. Each table has `langName` (the language's own name, required) and may have `names` (names of other languages in this
+   language, optional and may be partial; a table without it reads every name through the fallback below). The name of language X in document language D is D's `names[X]`, else English `names[X]`, else X's
    `langName`.
 3. `textFor(lang)` returns the table merged over `en` key by key, nested objects included, so a partial table works and
    every missing key reads in English. An unknown language → `en`.
@@ -28,7 +28,8 @@ cover the new language without new text. No third language ships with this spec.
    test names any difference. The schema stays a static file so editors keep autocompletion.
 7. Setup choices: the option values of the `chat-language`, `doc-language` and `report-language` questions come from
    `LANGUAGES`. Chat and document language each have one explanation covering every language; report language has an
-   `en` explanation and one covering every other language, worded without naming a language. So a new language needs
+   `en` explanation and one covering every other language, which names no language but English (it says "not
+   English"). So a new language needs
    no new explanation text and SETUP-AC-02, 05 and 06 cover it.
 8. The language of the explanations themselves (`choices --lang`) stays the languages that have explanation text
    (`LANGS` in `choices.mjs`); a chat language outside it reads them in English

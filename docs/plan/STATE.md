@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 25/25
+## M2 Roadmap: next — cards done 25/26
 
 - In progress: none
-- Next: none — all cards done, check the exit gates with npm run task:verify -- M2
+- Next: T-M2-29 setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -34,6 +34,7 @@
 | [T-M2-25](tasks/M2/T-M2-25.md) | Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json | ✓ passed | [T-M2-25.json](evidence/T-M2-25.json) · passed 2026-11-24 05:53 (6 commands) · full suite deferred to gate |
 | [T-M2-26](tasks/M2/T-M2-26.md) | Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one | ✓ passed | [T-M2-26.json](evidence/T-M2-26.json) · passed 2026-11-24 06:08 (6 commands) · full suite deferred to gate |
 | [T-M2-28](tasks/M2/T-M2-28.md) | Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units | ✓ passed | [T-M2-28.json](evidence/T-M2-28.json) · passed 2026-11-24 06:19 (7 commands) · full suite deferred to gate |
+| [T-M2-29](tasks/M2/T-M2-29.md) | setup refuses a --keep it cannot read, and upgrade stops cleanly on a broken saf.config.json before writing anything | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 

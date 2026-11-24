@@ -1,6 +1,6 @@
 # Spec — friction log (the workflow notes where it got in the way)
 
-Decision: [D-017](../DECISIONS.md) (proposed). Cards: T-M3-01 (log, commands, session count) · T-M3-07 (triage in the
+Decision: [D-017](../DECISIONS.md) (decided). Cards: T-M3-01 (log, commands, session count) · T-M3-07 (triage in the
 report, card drafts) · T-M3-08 (self-fix cards). Review rounds that feed it: [review-rounds.md](review-rounds.md).
 
 ## 1. Purpose
