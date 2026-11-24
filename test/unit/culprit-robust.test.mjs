@@ -21,8 +21,8 @@ function evidence(root, id, base, changed = []) {
 }
 
 /** Four card commits after the plan commit; the commit of `breaks` creates marker.txt. */
-async function fourCards({ test = CHECK, breaks = "T-M1-03" } = {}) {
-  const made = await planRepo({ config: cfgWith(test), cards: CARDS });
+async function fourCards({ test = CHECK, breaks = "T-M1-03", install } = {}) {
+  const made = await planRepo({ config: { ...cfgWith(test), ...(install ? { workflow: { laneInstall: install } } : {}) }, cards: CARDS });
   const base = git(made.root, "rev-parse", "HEAD");
   for (const id of IDS) {
     write(made.root, `src/${id}.js`, `export const x = "${id}";\n`);
@@ -42,13 +42,18 @@ const leftovers = (root, config) => {
 const ctxFor = (made, extra = {}) => ({ root: made.root, config: made.config, install: null, log: () => {}, ...extra });
 const cli = (cwd, ...args) => spawnSync(process.execPath, [BIN, "task", ...args], { cwd, encoding: "utf8" });
 
-/** Start the CLI on a test command that sleeps, wait until a run has begun, send `signal`, return how it ended. */
-async function interrupt(signal) {
-  const made = await fourCards({ breaks: "none" });
+/**
+ * Start the CLI on a command that sleeps, wait until it has begun, send `signal`, return how it ended.
+ * `where` "run" = the test command sleeps (the signal goes to the CLI only) · "install" = `workflow.laneInstall` sleeps
+ * (the signal goes to the whole process group, like Ctrl-C in a terminal, so it kills the foreground install too).
+ */
+async function interrupt(signal, where = "run") {
   const pidFile = join(tmp("saf-pid-"), "child.pid");
   const sleeper = `node -e "require('fs').writeFileSync(process.argv[1],String(process.pid));setTimeout(()=>{},60000)" ${JSON.stringify(pidFile)}`;
+  const made = where === "install" ? await fourCards({ breaks: "none", install: sleeper }) : await fourCards({ breaks: "none" });
   const head = git(made.root, "rev-parse", "HEAD");
-  const child = spawn(process.execPath, [BIN, "task", "culprit", "M1", "--cmd", sleeper], { cwd: made.root, stdio: ["ignore", "pipe", "pipe"] });
+  const args = where === "install" ? [] : ["--cmd", sleeper];
+  const child = spawn(process.execPath, [BIN, "task", "culprit", "M1", ...args], { cwd: made.root, detached: where === "install", stdio: ["ignore", "pipe", "pipe"] });
   let stdout = "";
   let stderr = "";
   child.stdout.on("data", (d) => (stdout += d));
@@ -58,25 +63,28 @@ async function interrupt(signal) {
   while (!existsSync(pidFile) && Date.now() < deadline) await new Promise((r) => setTimeout(r, 50));
   assert.ok(existsSync(pidFile), `a run never started\n${stderr}`);
   const sleeperPid = Number(readFileSync(pidFile, "utf8"));
-  child.kill(signal);
+  if (where === "install") process.kill(-child.pid, signal);
+  else child.kill(signal);
   const end = await closed;
   return { made, head, end, stdout, stderr, sleeperPid };
 }
 
-for (const [signal, code] of [["SIGINT", 130], ["SIGTERM", 143]]) {
+for (const [signal, code, where] of [["SIGINT", 130, "run"], ["SIGTERM", 143, "run"], ["SIGINT", 130, "install"], ["SIGTERM", 143, "install"]]) {
   test(
-    `TMODE-AC-17 ${signal} during a run: exit ${code}, one interrupted line, the test command stopped, no culprit worktree left, main folder unchanged`,
+    `TMODE-AC-17 ${signal} during the ${where === "run" ? "test run" : "install step"}: exit ${code}, one interrupted line, the command stopped, no culprit worktree left, main folder unchanged`,
     { skip: process.platform === "win32" ? "POSIX signals: Windows cannot send SIGINT/SIGTERM to a child process" : false },
     async () => {
-      const { made, head, end, stdout, stderr, sleeperPid } = await interrupt(signal);
+      const { made, head, end, stdout, stderr, sleeperPid } = await interrupt(signal, where);
       assert.equal(end.code, code, `${stdout}\n${stderr}`);
       const lines = `${stdout}\n${stderr}`.split("\n").filter((l) => /interrupted/i.test(l));
       assert.equal(lines.length, 1, `${stdout}\n${stderr}`);
+      assert.match(lines[0], new RegExp(`interrupted by ${signal} — the running command was stopped and the temporary worktree removed`));
       assert.deepEqual(leftovers(made.root, made.config), []);
       assert.equal(worktrees(made.root), 1);
       assert.equal(git(made.root, "rev-parse", "HEAD"), head);
       assert.equal(git(made.root, "status", "--porcelain"), "");
-      assert.throws(() => process.kill(sleeperPid, 0), "the sleeping test command is stopped");
+      assert.ok(!/exited \d+ at/.test(`${stdout}${stderr}`), "no install failure is reported");
+      assert.throws(() => process.kill(sleeperPid, 0), "the sleeping command is stopped");
     },
   );
 }

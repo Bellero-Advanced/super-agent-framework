@@ -48,6 +48,9 @@ export function cardOf(ctx, m, plan, sha) {
   return best;
 }
 
+/** Let the event loop deliver a signal that arrived while a synchronous step (git, the install command) was blocking it. */
+const settle = () => new Promise((resolve) => setImmediate(resolve));
+
 /** Thrown inside the search when a signal asked it to stop. */
 class Interrupted extends Error {}
 
@@ -100,6 +103,8 @@ export async function findCulprit(ctx, mid, opts = {}) {
       const code = ctx.runSync ? ctx.runSync(install, dir) : 0;
       if (code !== 0) throw new TaskError(`${install} exited ${code} at ${sha.slice(0, 7)} — cannot judge this commit`);
     }
+    await settle(); // a signal during checkout or install must stop the search before a run starts
+    if (interrupted) throw new Interrupted();
     runs += 1;
     ctx.log?.(`▶ run ${runs}: ${command} @ ${sha.slice(0, 7)}`);
     const r = await run(command, { signal: stopRun.signal });
@@ -127,6 +132,7 @@ export async function findCulprit(ctx, mid, opts = {}) {
     const owner = cardOf(ctx, m, plan, sha);
     return result("found", { sha, subject: commitSubject(ctx.root, sha) ?? "", card: owner?.id ?? null, cardTitle: plan.cards.get(owner?.id)?.title ?? "", by: owner?.by ?? null, tail });
   } catch (e) {
+    await settle(); // Ctrl-C during install also kills it: the install error must not hide the signal
     if (e instanceof Interrupted || interrupted) return result("interrupted", { exit: INTERRUPT_EXIT[interrupted], signal: interrupted });
     throw e;
   } finally {
@@ -137,7 +143,7 @@ export async function findCulprit(ctx, mid, opts = {}) {
 
 /** Plain lines for the CLI. */
 export function culpritLines(r) {
-  if (r.kind === "interrupted") return [`✗ ${r.milestone}: interrupted by ${r.signal} — the test run was stopped and the temporary worktree removed`];
+  if (r.kind === "interrupted") return [`✗ ${r.milestone}: interrupted by ${r.signal} — the running command was stopped and the temporary worktree removed`];
   const used = `${r.runs} run(s) of \`${r.command}\` over ${r.commits} commit(s)`;
   if (r.kind === "passes-at-head") return [`✓ ${r.milestone}: the suite passes at HEAD — flaky or already fixed · no culprit to find (${used})`];
   if (r.kind === "base-fails") return [`✗ ${r.milestone}: the suite is already failing before the first card — not caused by a card (${used})`];
