@@ -13,6 +13,19 @@
       "head": "293b351167201cebe38d2d214e4b92bf9c15343d",
       "verifyAttempts": 2,
       "verifyAt": "2026-11-24T20:11:54.474Z"
+    },
+    {
+      "round": 2,
+      "at": "2026-11-24T20:37:20.282Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "dangling symlink at docs/plan/releases.md is written through (existsSync follows links)",
+      "head": "c37a2f4f0ce5149b65a096fecf2f590f5605579f",
+      "verifyAttempts": 5,
+      "verifyAt": "2026-11-24T20:35:19.948Z"
     }
   ]
 }
