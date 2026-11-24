@@ -134,3 +134,6 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-21 (setup messages) — non-blocking
 - adopt-moved replace-edited lines have no `→` (target only on the adopt line); set `to` from adoptMoves. Multi-line package.json with no indentation collapses to one line when a script is added (spec edge). readJson catch reports EACCES/dir as "not valid JSON" (pre-existing). setup-messages test:136-137 weak check ("is not valid JSON" vs "not valid JSON"). Designer checklist: run the card's Done-when test files against the new rules and list any that must change in `touch` (happened for T-M3-18 and T-M3-21).
+
+## T-M3-19 (gate words in every view) — non-blocking
+- Spec evidence-viewer §4 "no evidence → every gate not checked" contradicts rule 10 (declared gate without run reads manual); fix the §4 line. "Passed" word differs by view (STATE shows time) — decide if literal. bin/saf.mjs:161 task:verify <M> summary decides gate marks itself (outside touch). Still crash on: gate commands entry null (page block()), invalid verified.at (formatTime RangeError in STATE/report) — card title "never crashes" is broader than rules 10–14 → small card. Rule 12 covers only text table (card titles with backticks show literally). Test gaps: undeclared gate commands [] pass false; STATE passed check uses startsWith.
