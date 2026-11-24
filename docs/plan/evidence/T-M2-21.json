@@ -1,14 +1,315 @@
 {
   "id": "T-M2-21",
   "milestone": "M2",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-24T05:05:58.004Z",
     "base": "2985a117f093ee79d1a494d62cb6c9ef0cf3cec9",
     "dirty": {}
   },
-  "attempts": 0,
+  "attempts": 3,
   "lane": 1,
   "branch": "card/T-M2-21",
-  "worktree": ".claude/worktrees/T-M2-21"
+  "worktree": ".claude/worktrees/T-M2-21",
+  "verified": {
+    "at": "2026-11-24T05:09:14.352Z",
+    "head": "1f5b7f82a98e8433f8f2d96eb14f61a1ee290516",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "npm run spec:matrix -- --check",
+        "exit": 0,
+        "ms": 194,
+        "tail": [
+          "| TMODE-AC-04 | test-mode:137 | T-M2-06 (done) | test/unit/test-mode-config.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-05 | test-mode:138 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-06 | test-mode:139 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-07 | test-mode:140 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-08 | test-mode:141 | T-M2-07 (done) | test/unit/test-mode-verify.test.mjs | ✓ 1 test(s) |",
+          "| TMODE-AC-09 | test-mode:142 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-10 | test-mode:143 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-11 | test-mode:144 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
+          "| TMODE-AC-12 | test-mode:145 | T-M2-09 (done) | test/unit/culprit.test.mjs +2 | ✓ 3 test(s) |",
+          "| TMODE-AC-13 | test-mode:146 | T-M2-09 (done) | test/unit/culprit.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-14 | test-mode:147 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +3 | ✓ 4 test(s) |",
+          "| TMODE-AC-15 | test-mode:148 | T-M2-16 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
+          "| TMODE-AC-16 | test-mode:149 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
+          "| UPG-AC-01 | upgrade-scripts:54 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-02 | upgrade-scripts:55 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-03 | upgrade-scripts:56 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-04 | upgrade-scripts:57 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-05 | upgrade-scripts:58 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "| UPG-AC-06 | upgrade-scripts:59 | T-M2-18 (done) | test/unit/upgrade-scripts.test.mjs | ✓ 1 test(s) |",
+          "90 scenario(s) in 11 spec(s) · with test 42 · gaps 48 · gaps of started cards 0"
+        ]
+      },
+      {
+        "cmd": "node --test test/unit/setup-diff.test.mjs test/unit/setup-dry-run.test.mjs",
+        "exit": 0,
+        "ms": 1328,
+        "tail": [
+          "ok 24 - RERUN-AC-04 a first run with --adopt: the status files moved aside are recreated and the plan matches the disk",
+          "  ---",
+          "  duration_ms: 16.315334",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings",
+          "ok 25 - RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings",
+          "  ---",
+          "  duration_ms: 120.300458",
+          "  type: 'test'",
+          "  ...",
+          "1..25",
+          "# tests 25",
+          "# suites 0",
+          "# pass 25",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1293.486958"
+        ]
+      },
+      {
+        "cmd": "node -e \"import('./kit/tools-saf/lib/diff.mjs').then(m=>{if(!m.DIFF_LIMITS||typeof m.diffLines!=='function')process.exit(1)})\"",
+        "exit": 0,
+        "ms": 30,
+        "tail": []
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 208,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 240 markdown file(s) · 165 local link(s) · 64 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/setup-diff.test.mjs'",
+        "exit": 0,
+        "ms": 1330,
+        "tail": [
+          "ok 13 - RERUN-AC-06 --keep nope.md exits 2 naming the path, and writes nothing",
+          "  ---",
+          "  duration_ms: 159.427083",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: RERUN-AC-06 --diff without --dry-run, and --keep without a path, exit 2 with the usage line and write nothing",
+          "ok 14 - RERUN-AC-06 --diff without --dry-run, and --keep without a path, exit 2 with the usage line and write nothing",
+          "  ---",
+          "  duration_ms: 184.099834",
+          "  type: 'test'",
+          "  ...",
+          "1..14",
+          "# tests 14",
+          "# suites 0",
+          "# pass 14",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 1296.177125"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/bin/saf.mjs",
+        "kit/tools-saf/lib/diff.mjs",
+        "kit/tools-saf/lib/generate.mjs",
+        "test/unit/setup-diff.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/bin/saf.mjs": "4c8fd90c9637b741928eeddad04b21e44745705b",
+        "kit/tools-saf/lib/diff.mjs": "4ab876e6c07cd5c921bc3f3c03e55958059b13e8",
+        "kit/tools-saf/lib/generate.mjs": "b4e99da755fb3c0b20071c5ca398669c4d675b69",
+        "test/unit/setup-diff.test.mjs": "11951bbdec26a846de7599e4d68183005ee211f9"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "RERUN-AC-05",
+        "RERUN-AC-06"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 229,
+        "cap": 400
+      },
+      "test": {
+        "lines": 227,
+        "cap": 600
+      },
+      "over": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/setup-diff.test.mjs"
+      ]
+    }
+  },
+  "failures": [
+    {
+      "at": "2026-11-24T05:08:55.627Z",
+      "head": "1f5b7f82a98e8433f8f2d96eb14f61a1ee290516",
+      "attempts": 1,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/setup-diff.test.mjs test/unit/setup-dry-run.test.mjs",
+          "exit": 1,
+          "ms": 1370,
+          "tail": [
+            "  type: 'test'",
+            "  location: '/Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M2-21/test/unit/setup-dry-run.test.mjs:134:1'",
+            "  failureType: 'testCodeFailure'",
+            "  error: |-",
+            "    The input did not match the regular expression /usage: setup --answers <file\\.json> \\[--adopt\\|--no-adopt\\] \\[--dry-run\\]/. Input:",
+            "    'usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run [--diff]] [--keep <path>[,<path>…]]  (--diff needs --dry-run)\\n'",
+            "  code: 'ERR_ASSERTION'",
+            "  name: 'AssertionError'",
+            "  expected:",
+            "  actual: |-",
+            "    usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run [--diff]] [--keep <path>[,<path>…]]  (--diff needs --dry-run)",
+            "  operator: 'match'",
+            "  stack: |-",
+            "    TestContext.<anonymous> (file:///Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M2-21/test/unit/setup-dry-run.test.mjs:137:10)",
+            "    Test.runInAsyncScope (node:async_hooks:214:14)",
+            "    Test.run (node:internal/test_runner/test:1047:25)",
+            "    Test.processPendingSubtests (node:internal/test_runner/test:744:18)",
+            "    Test.postRun (node:internal/test_runner/test:1173:19)",
+            "    Test.run (node:internal/test_runner/test:1101:12)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: RERUN-AC-04 one fixture with every action: the plan's actions match the real run, list for list",
+            "ok 21 - RERUN-AC-04 one fixture with every action: the plan's actions match the real run, list for list",
+            "  ---",
+            "  duration_ms: 86.898375",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-04 the plan's merges and status files are what the real run leaves on disk",
+            "ok 22 - RERUN-AC-04 the plan's merges and status files are what the real run leaves on disk",
+            "  ---",
+            "  duration_ms: 17.111542",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-04 an invalid package.json and invalid settings.json are planned the way the real run treats them",
+            "ok 23 - RERUN-AC-04 an invalid package.json and invalid settings.json are planned the way the real run treats them",
+            "  ---",
+            "  duration_ms: 16.079459",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-04 a first run with --adopt: the status files moved aside are recreated and the plan matches the disk",
+            "ok 24 - RERUN-AC-04 a first run with --adopt: the status files moved aside are recreated and the plan matches the disk",
+            "  ---",
+            "  duration_ms: 16.5985",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings",
+            "ok 25 - RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings",
+            "  ---",
+            "  duration_ms: 125.924542",
+            "  type: 'test'",
+            "  ...",
+            "1..25",
+            "# tests 25",
+            "# suites 0",
+            "# pass 24",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 1334.9385"
+          ]
+        }
+      ]
+    },
+    {
+      "at": "2026-11-24T05:09:06.911Z",
+      "head": "1f5b7f82a98e8433f8f2d96eb14f61a1ee290516",
+      "attempts": 2,
+      "commands": [
+        {
+          "cmd": "node --test test/unit/setup-diff.test.mjs test/unit/setup-dry-run.test.mjs",
+          "exit": 1,
+          "ms": 1369,
+          "tail": [
+            "  type: 'test'",
+            "  location: '/Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M2-21/test/unit/setup-dry-run.test.mjs:134:1'",
+            "  failureType: 'testCodeFailure'",
+            "  error: |-",
+            "    The input did not match the regular expression /usage: setup --answers <file\\.json> \\[--adopt\\|--no-adopt\\] \\[--dry-run\\]/. Input:",
+            "    'usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run [--diff]] [--keep <path>[,<path>…]]  (--diff needs --dry-run)\\n'",
+            "  code: 'ERR_ASSERTION'",
+            "  name: 'AssertionError'",
+            "  expected:",
+            "  actual: |-",
+            "    usage: setup --answers <file.json> [--adopt|--no-adopt] [--dry-run [--diff]] [--keep <path>[,<path>…]]  (--diff needs --dry-run)",
+            "  operator: 'match'",
+            "  stack: |-",
+            "    TestContext.<anonymous> (file:///Users/macbookaair/Projects/bellerox_workspace/super-agent-framework/.claude/worktrees/T-M2-21/test/unit/setup-dry-run.test.mjs:137:10)",
+            "    Test.runInAsyncScope (node:async_hooks:214:14)",
+            "    Test.run (node:internal/test_runner/test:1047:25)",
+            "    Test.processPendingSubtests (node:internal/test_runner/test:744:18)",
+            "    Test.postRun (node:internal/test_runner/test:1173:19)",
+            "    Test.run (node:internal/test_runner/test:1101:12)",
+            "    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)",
+            "  ...",
+            "# Subtest: RERUN-AC-04 one fixture with every action: the plan's actions match the real run, list for list",
+            "ok 21 - RERUN-AC-04 one fixture with every action: the plan's actions match the real run, list for list",
+            "  ---",
+            "  duration_ms: 77.831125",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-04 the plan's merges and status files are what the real run leaves on disk",
+            "ok 22 - RERUN-AC-04 the plan's merges and status files are what the real run leaves on disk",
+            "  ---",
+            "  duration_ms: 16.876709",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-04 an invalid package.json and invalid settings.json are planned the way the real run treats them",
+            "ok 23 - RERUN-AC-04 an invalid package.json and invalid settings.json are planned the way the real run treats them",
+            "  ---",
+            "  duration_ms: 16.676209",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-04 a first run with --adopt: the status files moved aside are recreated and the plan matches the disk",
+            "ok 24 - RERUN-AC-04 a first run with --adopt: the status files moved aside are recreated and the plan matches the disk",
+            "  ---",
+            "  duration_ms: 17.020084",
+            "  type: 'test'",
+            "  ...",
+            "# Subtest: RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings",
+            "ok 25 - RERUN-AC-03 a link under docs/plan does not break the plan, and the dry run lists the warnings",
+            "  ---",
+            "  duration_ms: 123.972375",
+            "  type: 'test'",
+            "  ...",
+            "1..25",
+            "# tests 25",
+            "# suites 0",
+            "# pass 24",
+            "# fail 1",
+            "# cancelled 0",
+            "# skipped 0",
+            "# todo 0",
+            "# duration_ms 1334.360541"
+          ]
+        }
+      ]
+    }
+  ]
 }
