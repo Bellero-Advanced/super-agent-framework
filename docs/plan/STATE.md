@@ -4,8 +4,8 @@
 
 ## M2 Roadmap: next — cards done 19/21
 
-- In progress: none
-- Next: T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff · T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning
+- In progress: **T-M2-22** /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — started 2026-11-24 05:13 · not verified yet · lane 1 · .claude/worktrees/T-M2-22
+- Next: T-M2-01 A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -28,7 +28,7 @@
 | [T-M2-05](tasks/M2/T-M2-05.md) | task:report <M> --html writes one self-contained HTML page of the milestone's evidence | ✓ passed | [T-M2-05.json](evidence/T-M2-05.json) · passed 2026-11-24 04:52 (5 commands) · full suite deferred to gate |
 | [T-M2-02](tasks/M2/T-M2-02.md) | saf setup --dry-run lists, per file, what a setup run would do — and writes nothing | ✓ passed | [T-M2-02.json](evidence/T-M2-02.json) · passed 2026-11-24 05:05 (5 commands) · full suite deferred to gate |
 | [T-M2-21](tasks/M2/T-M2-21.md) | saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it | ✓ passed | [T-M2-21.json](evidence/T-M2-21.json) · passed 2026-11-24 05:09 (5 commands) · full suite deferred to gate |
-| [T-M2-22](tasks/M2/T-M2-22.md) | /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff | · not started | – |
+| [T-M2-22](tasks/M2/T-M2-22.md) | /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff | ▶ in progress | [T-M2-22.json](evidence/T-M2-22.json) · started 2026-11-24 05:13 · not verified yet |
 | [T-M2-01](tasks/M2/T-M2-01.md) | A document language is added with one text-table entry and a template folder; missing templates fall back to English with a warning | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
@@ -41,11 +41,11 @@
 
 ## Latest evidence
 
+- T-M2-22 /saf-setup on a re-run shows what would change and asks per edited file: take the new version, keep mine, or show the diff — started 2026-11-24 05:13 · not verified yet
 - T-M2-21 saf setup --dry-run --diff shows each change as a diff, and --keep keeps an edited file instead of replacing it — passed 2026-11-24 05:09 (5 commands) · full suite deferred to gate
 - T-M2-02 saf setup --dry-run lists, per file, what a setup run would do — and writes nothing — passed 2026-11-24 05:05 (5 commands) · full suite deferred to gate
 - T-M2-05 task:report <M> --html writes one self-contained HTML page of the milestone's evidence — passed 2026-11-24 04:52 (5 commands) · full suite deferred to gate
 - T-M2-20 A setup re-run keeps your edited decision log, index and plan files, and leaves package.json alone unless a script is missing — passed 2026-11-24 04:40 (5 commands) · full suite deferred to gate
-- T-M2-19 The release-operator agent says pushing is allowed when policies.push is allowed, and the push explanation says so — passed 2026-11-23 21:34 (4 commands) · full suite deferred to gate
 
 ## Other milestones
 
