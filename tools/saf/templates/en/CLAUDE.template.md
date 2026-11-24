@@ -80,7 +80,7 @@ npm passes arguments after `--`: `npm run task:verify -- T-M1-01`.
 ## Unbreakable rules
 
 - **Secrets:** never commit {{envFilesText}} or any secret value · never print values to the screen or logs · inspect env files by counting key names only
-- **git:** commit locally in stages · {{#if pushOwner}}push only when the {{owner}} orders it{{else}}push is allowed{{/if}}{{#if policies.noForcePush}} · never force-push or rewrite history{{/if}}{{#if policies.protectedBranches}} · protected branches: {{policies.protectedBranches}}{{/if}}{{#if policies.autoDeployBranches}} · pushing {{policies.autoDeployBranches}} deploys automatically{{/if}}
+- **git:** commit locally in stages · {{#if pushOwner}}push only when the {{owner}} orders it{{else}}push is allowed{{#if policies.autoDeployBranches}} except to {{policies.autoDeployBranches}} (deploys automatically){{/if}}{{/if}}{{#if policies.noForcePush}} · never force-push or rewrite history{{/if}}{{#if policies.protectedBranches}} · protected branches: {{policies.protectedBranches}}{{/if}}{{#if pushOwner}}{{#if policies.autoDeployBranches}} · pushing {{policies.autoDeployBranches}} deploys automatically{{/if}}{{/if}}
 - **Deploy:** {{#if deployNone}}this project does not deploy{{else}}{{#if deployOwner}}only when the {{owner}} orders it{{else}}allowed{{/if}}{{#if policies.deploy.target}} · target: {{policies.deploy.target}}{{/if}}{{#if policies.deploy.exceptions}} · exceptions: {{policies.deploy.exceptions}}{{/if}}{{/if}}
 - **Cards:** work happens through cards in `docs/plan/` · a card is "done" only when `{{cmd.taskVerify}}` passes · never hand-edit `docs/plan/STATE.md`, `.saf/plan.md` or `docs/plan/evidence/`
 - **Evidence:** "done" needs a real run attached — never report done from ticked boxes or guesses

@@ -80,7 +80,7 @@ npm ส่งอาร์กิวเมนต์หลัง `--`: `npm run tas
 ## กฎที่ห้ามละเมิด
 
 - **ค่าลับ:** ห้าม commit {{envFilesText}} หรือค่าลับใดๆ · ห้ามพิมพ์ค่าลงจอ/log · ตรวจไฟล์ env ด้วยการนับชื่อ key เท่านั้น
-- **git:** commit ในเครื่องทีละ stage ได้ · {{#if pushOwner}}push เมื่อ{{owner}}สั่งเท่านั้น{{else}}push ได้{{/if}}{{#if policies.noForcePush}} · ห้าม force-push / rewrite history{{/if}}{{#if policies.protectedBranches}} · branch ที่ป้องกัน: {{policies.protectedBranches}}{{/if}}{{#if policies.autoDeployBranches}} · push {{policies.autoDeployBranches}} = deploy อัตโนมัติ{{/if}}
+- **git:** commit ในเครื่องทีละ stage ได้ · {{#if pushOwner}}push เมื่อ{{owner}}สั่งเท่านั้น{{else}}push ได้{{#if policies.autoDeployBranches}} ยกเว้น {{policies.autoDeployBranches}} (deploy อัตโนมัติ){{/if}}{{/if}}{{#if policies.noForcePush}} · ห้าม force-push / rewrite history{{/if}}{{#if policies.protectedBranches}} · branch ที่ป้องกัน: {{policies.protectedBranches}}{{/if}}{{#if pushOwner}}{{#if policies.autoDeployBranches}} · push {{policies.autoDeployBranches}} = deploy อัตโนมัติ{{/if}}{{/if}}
 - **deploy:** {{#if deployNone}}โปรเจคนี้ไม่ deploy{{else}}{{#if deployOwner}}เมื่อ{{owner}}สั่งเท่านั้น{{else}}ทำได้{{/if}}{{#if policies.deploy.target}} · ปลายทาง: {{policies.deploy.target}}{{/if}}{{#if policies.deploy.exceptions}} · ข้อยกเว้น: {{policies.deploy.exceptions}}{{/if}}{{/if}}
 - **การ์ด:** งานทำผ่านการ์ดใน `docs/plan/` · การ์ด "เสร็จ" เมื่อ `{{cmd.taskVerify}}` ผ่านเท่านั้น · ห้ามแก้ `docs/plan/STATE.md` · `.saf/plan.md` · `docs/plan/evidence/` ด้วยมือ
 - **หลักฐาน:** "เสร็จ" ต้องมีผลรันจริงแนบ — ห้ามรายงานว่าเสร็จจากการติ๊กช่องหรือคาดเดา
