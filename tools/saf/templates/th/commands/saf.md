@@ -34,7 +34,7 @@ argument-hint: <สิ่งที่คุณต้องการ เป็น
 | เริ่ม | session หลัก | `{{cmd.taskStart}}`{{#if lanesOn}} (บทบาทสายโค้ด → `{{cmd.taskStartLane}}`){{/if}} |
 | ลงมือ | agent ที่ `{{cmd.taskStart}}` ระบุ | แตะเฉพาะไฟล์ใน `touch` |
 | ตรวจ | agent เดิม | `{{cmd.taskVerify}}` จนผ่าน |
-| เทียบสเปก | `spec-reviewer` (อ่านอย่างเดียว){{#unless reviewEvery}} — การ์ดขนาด M · การ์ด S ตรวจรวมที่ประตูออก{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}` แล้วให้ {{/if}}รหัสการ์ด · ประเภทการรีวิว{{#if tokenSaving.reviewerDiff}} · path ของไฟล์ diff{{/if}} |
+| เทียบสเปก | `spec-reviewer` (อ่านอย่างเดียว){{#unless reviewEvery}} — การ์ดขนาด M และ L · การ์ด S เดิมตรวจรวมที่ประตูออก{{/unless}} | {{#if tokenSaving.reviewerDiff}}`{{cmd.taskDiff}}` แล้วให้ {{/if}}รหัสการ์ด · ประเภทการรีวิว{{#if tokenSaving.reviewerDiff}} · path ของไฟล์ diff{{/if}} |
 | ทดสอบจริง | `qa-runner` | เมื่อการ์ดแตะ UI · multiplayer · ประสิทธิภาพ |
 | ลงงาน | session หลัก | commit{{#if lanesOn}} · การ์ดสาย → `{{cmd.taskMerge}}`{{/if}} |
 
@@ -78,7 +78,7 @@ commit ไฟล์รอบรีวิว `docs/plan/evidence/reviews/<id>.jso
 
 ## 5. แก้ตัวเอง (SAF แก้บั๊กของตัวเองที่พิสูจน์แล้ว)
 
-`workflow.selfFix` เป็น `on`: รายการ friction ชนิด {{selfFixKinds}} ที่การ์ดขนาด S ใบเดียวพร้อม test แก้ได้ กลายเป็นการ์ด
+`workflow.selfFix` เป็น `on`: รายการ friction ชนิด {{selfFixKinds}} ที่การ์ดขนาด M ใบเดียวพร้อม test แก้ได้ กลายเป็นการ์ด
 ใน milestone ที่ **active** ได้โดยไม่ต้องรอ Go ของ{{owner}} — ไม่เกิน {{selfFixCap}} ใบต่อ milestone
 (`SELF_FIX_LIMITS.perMilestone` ใน `tools/saf/lib/friction.mjs`) engine ตรวจทุกเงื่อนไข (`{{cmd.taskStateCheck}}`)
 
@@ -90,5 +90,5 @@ commit ไฟล์รอบรีวิว `docs/plan/evidence/reviews/<id>.jso
    เมื่อการ์ดผ่าน `{{cmd.taskVerify}}`{{#if lanesOn}} (การ์ด lane: `{{cmd.taskMerge}}`){{/if}} engine ปิดรายการเป็น fixed ให้ใน
    `docs/plan/friction.md` ให้ commit ไฟล์นั้นลำพังทันที (โฟลเดอร์หลักที่ยังไม่ commit จะทำให้ merge ครั้งถัดไปถูกปฏิเสธ)
 
-อย่างอื่น — ชนิดอื่น ขนาด M ไม่มี test เกินเพดาน — รอ `designer` และ Go ของ{{owner}} (`/saf-plan`)
+อย่างอื่น — ชนิดอื่น ขนาด L (การ์ดแก้ตัวเองเป็นขนาด M) ไม่มี test เกินเพดาน — รอ `designer` และ Go ของ{{owner}} (`/saf-plan`)
 {{/if}}

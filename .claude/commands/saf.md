@@ -79,7 +79,7 @@ Show the owner, in Thai:
 
 ## 5. Self-fix (SAF fixes its own proven bugs)
 
-`workflow.selfFix` is `on`: a friction entry of kind `command-failed` or `doc-drift` that one size S card with a test can fix becomes a card
+`workflow.selfFix` is `on`: a friction entry of kind `command-failed` or `doc-drift` that one size M card with a test can fix becomes a card
 in the **active** milestone without waiting for the owner's Go — at most 3 such cards per milestone
 (`SELF_FIX_LIMITS.perMilestone` in `tools/saf/lib/friction.mjs`). The engine checks every condition (`npm run task:state -- --check`).
 
@@ -92,4 +92,4 @@ in the **active** milestone without waiting for the owner's Go — at most 3 suc
    the engine closes the entry as fixed in `docs/plan/friction.md`: commit that file alone right after (an uncommitted main
    folder refuses the next merge).
 
-Anything else — another kind, size M, no test, the cap reached — waits for `designer` and the owner's Go (`/saf-plan`).
+Anything else — another kind, size L (a self-fix card is size M), no test, the cap reached — waits for `designer` and the owner's Go (`/saf-plan`).
