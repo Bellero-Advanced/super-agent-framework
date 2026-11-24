@@ -164,7 +164,9 @@ passes without a real test run when its "Done when" names one; the mode only mov
   (for example no card of the milestone has started). `--cmd "<command>"` picks another command.
 - **Per machine.** Pick a mode for your own machine without touching tracked files: `SAF_TEST_MODE=<mode>` for one shell, or an
   untracked `saf.config.local.json` (it may also hold `workflow.lanes.code` and `workflow.sideLanes.max`; [config-reference.md](config-reference.md#safconfiglocaljson)).
-  Mode order: env, local file, `saf.config.json`, default. Generated files never depend on either.
+  Mode order: env, local file, `saf.config.json`, default. Generated files never depend on either. `saf.config.local.json` is
+  git-ignored, so it is absent inside a lane worktree: engine commands run there, such as a lane card's `task:verify`, use
+  the repository's test mode and lane caps unless `SAF_TEST_MODE` is set.
 
 Which mode to pick (what it is, good for, cost, pick when) is in the setup question:
 [questions.md](../kit/claude/skills/saf-setup/questions.md#test-mode--explain-each-choice-before-asking). SAF's own repository

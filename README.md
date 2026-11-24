@@ -51,7 +51,8 @@ Without npm's `create` step: `npx github:Bellero-Advanced/super-agent-framework 
 - **Roles** with fixed models and effort: `designer` and `spec-reviewer` plan and judge; `implementer` and `qa-runner`
   build and test — plus optional roles (release, security, database, art, data, content) and your own
 - **Gates** per milestone: commands that must pass plus manual checks, recorded as evidence
-- **Test mode**: choose how often the full test suite runs (every card, targeted, or once at the milestone gate — the default); `task:culprit` finds the card that broke the suite
+- **Test mode**: choose how often the full test suite runs (every card, targeted, or once at the milestone gate — the
+  default); `task:culprit` finds the card that broke the suite
 - **Lanes**: independent cards run side by side in worktrees; `task:next --parallel` tells you which are safe together
 - **A SessionStart hook** tells every new session the milestone, the card in progress and its criteria — so it does not
   start from zero or wander off the plan

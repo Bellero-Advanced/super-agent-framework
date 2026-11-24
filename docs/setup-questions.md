@@ -11,8 +11,10 @@ The interview `/saf-setup` runs, grouped in this order — each question shows a
 4. **Models** — preset (Max · Balanced · Economy · Custom) · default session model ([model-presets.md](model-presets.md))
 5. **Roles and skills** — optional library roles · a custom role · report language ([roles.md](roles.md)) · optional skill
    packs (ui-frontend · db-migrations · performance · i18n · mobile · game — [skills.md](skills.md))
-6. **Workflow** — parallel lanes and caps · side lanes (on/off, how many at a time) · moving a role to the other lane (only with lanes on) · solo paths · ports and test database per lane · test mode (how often the full suite runs — `every-card` · `targeted` · `milestone`, recommended `milestone`) and the command that runs only some test files · measure lock · performance budgets ·
-   card size caps · merge checks
+6. **Workflow** — parallel lanes and caps · side lanes (on/off, how many at a time) · moving a role to the other lane
+   (only with lanes on) · solo paths · ports and test database per lane · test mode (how often the full suite runs —
+   `every-card` · `targeted` · `milestone`, recommended `milestone`) and the command that runs only some test files ·
+   measure lock · performance budgets · card size caps · merge checks
 7. **Policies** — push · deploy (target, exceptions) · protected and auto-deploy branches · no force-push · env files ·
    forbidden and owner-only paths · external services
 8. **Token saving and the first milestone** — token-saving mode · the goal of M1

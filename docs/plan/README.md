@@ -28,10 +28,13 @@ owner says Go on a milestone
 A card is **done** only when `task:verify` passes. A failed verify keeps the card open and records why (failed commands ·
 files outside `touch` · files in `dont_touch` · scenarios without a test).
 
-How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default `milestone`).
-In the deferred modes a card proves itself with its own tests, its evidence says "full suite deferred to gate", and the
-in `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card merges (when the gate fails, `npm run task:culprit -- <M>` finds the card that broke it). Each person can override the mode with `SAF_TEST_MODE` or an untracked
-`saf.config.local.json` (only `workflow.testMode`; a `$schema` key there is refused).
+How often the **full** test suite runs is `workflow.testMode` (`every-card` · `targeted` · `milestone`; default
+`milestone`). In the deferred modes a card proves itself with its own tests and its evidence says "full suite deferred to
+gate". In `milestone` mode the exit gate always runs the full suite, and in `targeted` mode it runs when a lane card
+merges (when the gate fails, `npm run task:culprit -- <M>` finds the card that broke it). Each person can override the mode with
+`SAF_TEST_MODE` or an untracked `saf.config.local.json` (it may hold `workflow.testMode`, `workflow.lanes.code` and
+`workflow.sideLanes.max`; any other key, including `$schema`, is refused). Lane caps have no environment variable (every
+session must count the same caps) and are at most `LANE_CEILING` in `tools/saf/lib/config.mjs`.
 
 ## 2. Card format
 
@@ -55,7 +58,7 @@ The "Done when" section: every list item is one command (a leading backticked co
 
 A milestone file has `status: planned | active | paused | done`, a `cards:` list (order = work order) and `gates:`.
 Each gate has `id`, `text` and optional `run:` commands — a gate without commands is a manual check by the owner.
-`npm run task:verify -- <M>` runs every gate and writes `docs/plan/evidence/<M>.json`; `npm run task:report -- <M>` writes the report.
+`npm run task:verify -- <M>` runs every gate and writes `docs/plan/evidence/<M>.json`; `npm run task:report -- <M>` writes the report (`--html` also writes a page for people who do not read JSON).
 
 Only the owner moves a milestone to `active` ("Go") or `done`.
 
@@ -73,7 +76,7 @@ side_cards: [T-M3-01]
 - side cards start, verify, merge and get reviewed exactly like other cards — same spec, `touch`, `depends`, size caps and evidence
 - the active milestone always comes first: `npm run task:next -- --parallel` lists its cards before side cards (tagged `[side lane M<n>]`),
   and a side card starts only in capacity the active milestone leaves free
-- at most 1 side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json`)
+- at most 1 side card(s) in progress at a time (`workflow.sideLanes` in `saf.config.json` — the project's cap; a machine may set its own `workflow.sideLanes.max` in `saf.config.local.json`, and it never adds slots the lane caps do not leave; at most `LANE_CEILING`, no environment variable)
 - a side card may depend only on cards that are done or can start themselves
 - `docs/plan/STATE.md` and the session summary show each side lane in its own block; side cards never count toward the
   active milestone's done count or its exit gates — they count when their own milestone becomes active
@@ -91,11 +94,11 @@ Cards whose role works in a **code lane** (`implementer` `qa-runner` ) can run i
 parallel, each in its own git worktree under `.claude/worktrees/` on branch `card/<id>`.
 Other cards run in the main folder, one at a time.
 
-- `npm run task:next -- --parallel` lists cards that can start together (no `touch` overlap · caps: code 3 · main 1) and why others wait
+- `npm run task:next -- --parallel` lists cards that can start together (no `touch` overlap · caps: code 3 · main 1) and why others wait — these are the project's caps; a machine may set its own `workflow.lanes.code` in `saf.config.local.json`, (at most `LANE_CEILING` in `tools/saf/lib/config.mjs`; there is no environment variable for caps). The main-folder lane stays one card because `npm run task:verify -- <id>` counts every file changed in the folder since a card's start commit as that card's, so two cards there cannot be told apart
 - `npm run task:start -- <id> --worktree` opens the lane: the card files must be committed first; evidence is committed on the main branch.
   If steps 3–5 fail it exits 6 — fix the cause, then re-run with `--resume`
 - inside the lane: work, then `npm run task:verify -- <id>` (writes evidence on the lane branch only) · `npm run task:env` prints the lane's ports
-- back in the main folder: `npm run task:merge -- <id>` merges one card, runs the merge checks (`npm test` · `npm run check-secrets` · `npm run docs:check`) and refreshes status.
+- back in the main folder: `npm run task:merge -- <id>` merges one card, runs the merge checks (`npm run saf:refresh -- --check` · `npm test` · `npm run check-secrets` · `npm run docs:check`) and refreshes status.
   Exit 3 = refused (not passed / dirty main) · 4 = conflict (merge rolled back) · 5 = merge checks failed (merge rolled back)
 - with `workflow.testMode` = `milestone` the merge checks skip the full test suite (the gate runs it); when the gate fails,
   `npm run task:culprit -- <M>` finds the card that broke it
