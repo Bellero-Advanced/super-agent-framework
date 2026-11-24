@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { roleTable, scriptCommand } from "./config.mjs";
+import { SIZES, roleTable, scriptCommand } from "./config.mjs";
 import { FRICTION_FILE, countByStatus, parseFriction, selfFixIssues } from "./friction.mjs";
 import { submodulePaths } from "./git.mjs";
 import { codeSpans, findSection, frontmatter, scanLines, sections } from "./markdown.mjs";
@@ -32,7 +32,6 @@ export const ROOT_REPO = ".";
 
 export const CARD_ID = /^T-(M\d+)-\d{2,3}$/;
 export const MILESTONE_ID = /^M\d+$/;
-const SIZES = ["S", "M"];
 const MILESTONE_STATUS = ["planned", "active", "paused", "done"];
 
 export const CRITERIA_HEADINGS = ["Done when", "Pass criteria", "Criteria", "เกณฑ์ผ่าน"];
@@ -85,7 +84,6 @@ export function parseCard(src, file, roles) {
   }
   if (!title) issues.push(`${file}: no title`);
   const size = str(data.size) || undefined;
-  if (size && !SIZES.includes(size)) issues.push(`${file}: size must be ${SIZES.join("/")} (bigger → split the card)`);
   const role = str(data.role) || undefined;
   if (role && roles && !roles.includes(role)) issues.push(`${file}: role must be one of ${roles.join(", ")}`);
   const touch = strList(data.touch);
@@ -218,6 +216,15 @@ export function repoIssues(c, submodules) {
   return issues;
 }
 
+/** Rule 10 of docs/specs/card-sizes.md: M or L; S or no size only in a started milestone or on a card with evidence (counted as M). */
+function sizeIssues(plan, c) {
+  if (SIZES.includes(c.size)) return [];
+  const m = plan.milestones.find((x) => x.id === c.milestone);
+  if ((c.size === "S" || !c.size) && (["active", "paused", "done"].includes(m?.status) || plan.evidence.has(c.id))) return [];
+  if (c.size === "S") return [`${c.file}: size S is retired — use M or L (docs/specs/card-sizes.md)`];
+  return [`${c.file}: ${c.size ? "size must be M or L (bigger than L → split the card)" : "needs size M or L"}`];
+}
+
 /** Consistency across files (legacy commit checks need git and live in task.mjs). */
 export function validatePlan(plan) {
   const issues = [];
@@ -240,7 +247,7 @@ export function validatePlan(plan) {
     if (!ids.has(c.milestone)) issues.push(`${c.file}: milestone ${c.milestone} does not exist`);
     else if (listed.get(c.id) !== c.milestone) issues.push(`${c.file}: not listed in cards of ${c.milestone}`);
     for (const d of c.depends) if (!known(d)) issues.push(`${c.file}: depends on a card that does not exist (${d})`);
-    issues.push(...repoIssues(c, plan.submodules ?? []));
+    issues.push(...repoIssues(c, plan.submodules ?? []), ...sizeIssues(plan, c));
   }
   // side lanes: side_cards ⊆ cards · a side card may only depend on cards that are done or can start themselves
   for (const m of plan.milestones.filter((x) => x.status === "planned")) {

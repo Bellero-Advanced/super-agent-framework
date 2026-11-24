@@ -45,7 +45,7 @@
 | `id` · `milestone` · `title` | `T-M1-01` · `M1` · หนึ่งบรรทัด · ชื่อไฟล์ = id · โฟลเดอร์ = milestone |
 | `spec` | ไฟล์สเปกที่การ์ดนี้ทำ (`docs/specs/…`) |
 | `depends` | การ์ดที่ต้องผ่านก่อน |
-| `size` | `S` (≤ {{sizeS}} บรรทัดโค้ด · test ≤ {{testS}}) หรือ `M` (≤ {{sizeM}} · test ≤ {{testM}}) — ใหญ่กว่านี้แตก |
+| `size` | `M` (≤ {{sizeM}} บรรทัดโค้ด · test ≤ {{testM}}) หรือ `L` (≤ {{sizeL}} · test ≤ {{testL}}) — `task:verify` ล้มเมื่อเกิน {{hardStop}} เท่าของเพดาน → แตกการ์ด |
 | `role` | ใครทำ: {{roleNames}} |
 | `repo` | `.` (ค่าเริ่มต้น) หรือ path ของ git submodule — หนึ่ง submodule ต่อการ์ด |
 | `touch` | glob ของไฟล์ที่การ์ดแก้ได้ (บังคับ) |

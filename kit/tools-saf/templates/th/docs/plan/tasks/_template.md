@@ -5,7 +5,7 @@ title: หนึ่งบรรทัด — อะไรเปลี่ยน�
 spec:
   - docs/specs/example.md
 depends: []
-size: S
+size: M
 role: implementer
 touch:
   - src/feature/**
@@ -18,7 +18,7 @@ scenarios:
 # T-M1-01 — หนึ่งบรรทัด — อะไรเปลี่ยนสำหรับผู้ใช้
 
 คัดลอกไฟล์นี้ไปที่ `docs/plan/tasks/M<n>/T-M<n>-<nn>.md` (ไฟล์ที่ขึ้นต้นด้วย `_` เครื่องมือข้าม)
-ขนาด S ≤ {{sizeS}} บรรทัดโค้ดที่เปลี่ยน (test ≤ {{testS}}) · M ≤ {{sizeM}} (test ≤ {{testM}}) — ใหญ่กว่านี้แตก
+ขนาด M ≤ {{sizeM}} บรรทัดโค้ดที่เปลี่ยน (test ≤ {{testM}}) · L ≤ {{sizeL}} (test ≤ {{testL}}) — `task:verify` เตือนเมื่อเกินเพดาน และล้มเมื่อเกิน {{hardStop}} เท่าของเพดาน: แตกการ์ด
 
 ## ทำไม
 

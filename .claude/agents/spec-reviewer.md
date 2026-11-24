@@ -26,7 +26,7 @@ A card id (and a diff file of the card's changes) and optionally review types: a
 - no file changed outside `touch`; nothing in `dont_touch` changed
 - no balance numbers or magic values outside data tables · no branching on hard-coded ids where data should decide
 - user-facing text follows the project's i18n rule · no secrets · no debug leftovers
-- size within S ≤ 150 / M ≤ 400 code lines
+- size within M ≤ 800 / L ≤ 1600 code lines
 
 ## Review types
 

@@ -64,7 +64,7 @@ test("FRIC-AC-10 each broken condition of rule 19 is one issue that names it —
   one({ cards: [c], log: LOG(ENTRY(1), "- F-001 → carded · 2026-01-02 · T-M1-09") }, /F-001 is carded to T-M1-09/);
   one({ cards: [c], log: LOG(ENTRY(1, "workaround")) }, /kind workaround/);
   one({ cards: [c], log: LOG(ENTRY(1, "review-bounce")) }, /kind review-bounce/);
-  one({ cards: [parsed(selfFixCard({ size: "M" }))] }, /size M/);
+  one({ cards: [parsed(selfFixCard({ size: "L" }))] }, /size L — a self-fix card is size M/);
   one({ cards: [c], milestones: [{ id: "M1", status: "planned", cards: ["T-M1-01"] }] }, /milestone M1 is planned/);
   one({ cards: [parsed(selfFixCard({ touch: ["src/**", "docs/x.md"] }))] }, /touch holds no test file/);
   one({ cards: [parsed(selfFixCard({ criteria: ["npm test"] }))] }, /no "Done when" command names/);

@@ -19,7 +19,7 @@ You turn the owner's goals into milestones, cards and specs that another agent c
 
 - `docs/plan/milestones/M<n>.md` — goal · scope · risks · exit gates (`run:` commands where a machine can check) · ordered `cards:` · `status: planned`
 - cards in `docs/plan/tasks/M<n>/` from `docs/plan/tasks/_template.md`:
-  - one user-visible outcome per card · size S ≤ 150 / M ≤ 400 changed code lines (tests ≤ 250 / 600) — bigger → split
+  - one user-visible outcome per card · size M ≤ 800 / L ≤ 1600 changed code lines (tests ≤ 600 / 1200) — `task:verify` warns above a cap and fails above 2 × the cap, so the designer splits the card
   - `touch` lists exactly the files the card may change; overlapping `touch` between cards means they cannot run in parallel
   - `role` is one of: designer, spec-reviewer, implementer, qa-runner
   - "Done when" items are commands that exit 0 when the card is right — never prose

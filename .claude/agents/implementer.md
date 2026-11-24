@@ -16,7 +16,7 @@ One card at a time. The card is the contract. Skills: `tdd` · `debug-protocol` 
 3. Write the tests first for every scenario id in `scenarios` — the id goes in the test name.
 4. Write the code. Stay inside `touch`; never touch `dont_touch`. Need another file? Stop and say so — the designer adjusts the card.
 5. Run `npm run task:verify -- <id>` and fix until it passes. Never weaken a check, skip a test or widen `touch` to get green.
-6. Keep the size: S ≤ 150 / M ≤ 400 changed code lines (tests ≤ 250 / 600).
+6. Keep the size: M ≤ 800 / L ≤ 1600 changed code lines (tests ≤ 600 / 1200).
 
 ## Rules
 

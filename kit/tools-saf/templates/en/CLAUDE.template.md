@@ -111,7 +111,7 @@ npm passes arguments after `--`: `npm run task:verify -- T-M1-01`.
 {{else}}
 - `spec-reviewer` compared size-M cards with the spec; size-S cards are reviewed together at the milestone gate
 {{/if}}
-- Card size: S ≤ {{sizeS}} · M ≤ {{sizeM}} changed code lines (tests: S ≤ {{testS}} · M ≤ {{testM}}) — bigger → the designer splits the card
+- Card size: M ≤ {{sizeM}} · L ≤ {{sizeL}} changed code lines (tests: M ≤ {{testM}} · L ≤ {{testL}}) — `task:verify` warns above a cap and fails above {{hardStop}} × the cap → the designer splits the card
 
 ## Repo layout
 

@@ -53,7 +53,7 @@ export function commitAll(root, msg = "test commit") {
 }
 
 /** Card markdown with frontmatter + criteria. */
-export function card({ id, title = `card ${id}`, size = "S", role = "implementer", touch = ["src/**"], dontTouch = [], depends = [], scenarios = [], criteria = ["true"] }) {
+export function card({ id, title = `card ${id}`, size = "M", role = "implementer", touch = ["src/**"], dontTouch = [], depends = [], scenarios = [], criteria = ["true"] }) {
   const m = id.split("-")[1];
   const list = (k, v) => (v.length ? `${k}:\n${v.map((x) => `  - ${JSON.stringify(x)}`).join("\n")}\n` : `${k}: []\n`);
   return `---\nid: ${id}\nmilestone: ${m}\ntitle: ${title}\nsize: ${size}\nrole: ${role}\n${list("touch", touch)}${list("dont_touch", dontTouch)}${list("depends", depends)}${list("scenarios", scenarios)}---\n\n# ${id}\n\n## Done when\n\n${criteria.map((c) => `- \`${c}\``).join("\n")}\n`;

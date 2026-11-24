@@ -17,7 +17,7 @@ When two sources disagree, the higher one wins:
 |---|---|---|---|
 | D-001 | {{today}} | Work runs through the SAF card system: milestones → cards → `task:verify` evidence → review → commit/merge. The {{owner}} says "Go" per milestone. | decided (setup) |
 | D-002 | {{today}} | Model preset {{presetName}}: planner/reviewer roles `{{models.planner}}` · builder roles `{{models.builder}}` · effort fixed per role. | decided (setup) |
-| D-003 | {{today}} | Rigor level **{{project.rigor}}**: cards S ≤ {{sizeS}} / M ≤ {{sizeM}} code lines · merge checks {{mergeChecksText}}. | decided (setup) |
+| D-003 | {{today}} | Rigor level **{{project.rigor}}**: cards M ≤ {{sizeM}} / L ≤ {{sizeL}} code lines · merge checks {{mergeChecksText}}. | decided (setup) |
 | D-004 | {{today}} | git: {{#if pushOwner}}push only on {{owner}} order{{else}}push allowed{{/if}}{{#if policies.noForcePush}} · no force-push or history rewrite{{/if}}. Deploy: {{#if deployNone}}none{{else}}{{#if deployOwner}}only on {{owner}} order{{else}}allowed{{/if}}{{#if policies.deploy.target}} ({{policies.deploy.target}}){{/if}}{{/if}}. | decided (setup) |
 | D-005 | {{today}} | Documents in {{docLanguageName}} · chat in {{chatLanguageName}} · agents report in {{reportLanguageName}} · UI languages {{uiLanguagesText}}. | decided (setup) |
 | D-006 | {{today}} | No time estimates — progress is measured by gates, not dates. "Done" needs real run evidence. | decided (setup) |

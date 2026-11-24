@@ -92,7 +92,7 @@ test("FRIC-AC-09 task:friction draft prints one draft for the recurring group an
   assert.equal(r.stdout.match(/^id: /gm).length, 1, r.stdout);
   assert.equal(field(r.stdout, "id"), "T-M1-??");
   assert.equal(field(r.stdout, "milestone"), "M1");
-  assert.equal(field(r.stdout, "size"), "S");
+  assert.equal(field(r.stdout, "size"), "M");
   assert.ok(!r.stdout.includes("self_fix"), "selfFix is off by default");
   assert.match(r.stdout, /## Why[\s\S]*F-001[\s\S]*first hand step[\s\S]*F-002[\s\S]*newest hand step/);
   assert.match(r.stdout, /touch:\n  - TODO/);

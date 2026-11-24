@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { CONFIG_FILE, LOCAL_CONFIG_FILE, LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SKILL_PACKS, TEST_MODE_ENV, findRoot, loadSchema } from "./config.mjs";
+import { CONFIG_FILE, LOCAL_CONFIG_FILE, LOCAL_KEYS, MODEL_PRESETS, RIGOR, ROLE_LIBRARY, SIZE_CAPS, SKILL_PACKS, TEST_MODE_ENV, findRoot, loadSchema } from "./config.mjs";
 import { EXIT_BUSY } from "./measure.mjs";
 import { STOP_HOOK_ENV } from "./task.mjs";
 import { LANGUAGES } from "./text.mjs";
@@ -268,8 +268,8 @@ export const MACHINE_SWITCHES = {
   [`${STOP_HOOK_ENV}=off`]: ns("Environment variable: turns off the Stop-hook reminder about a card that has not passed", "ตัวแปรสภาพแวดล้อม: ปิดการเตือนของ Stop hook เรื่องการ์ดที่ยังไม่ผ่าน"),
 };
 export const LABELS = {
-  en: { head: "Settings the interview does not ask", where: `Change them in ${CONFIG_FILE} (check: node tools/saf/bin/saf.mjs config --check, or re-run /saf-setup).`, machine: `Per machine (${LOCAL_CONFIG_FILE}, not tracked by git, or an environment variable)`, setting: "Setting", fields: ["What it is", "Good for", "Cost", "Pick it when"], sizes: "Card size S / M (changed code lines)", caps: "Test caps S / M (changed test lines)", review: "Review", reviewWords: { "m-cards": "spec review of size M cards; S cards together at the milestone gate", "every-card": "spec review of every card", "every-card+security": "spec review of every card, and a security-auditor review of each milestone" }, merge: "Merge checks", planner: "Planner model", builder: "Builder model" },
-  th: { head: "การตั้งค่าที่ตอนสัมภาษณ์ไม่ได้ถาม", where: `แก้ได้ใน ${CONFIG_FILE} (ตรวจด้วย node tools/saf/bin/saf.mjs config --check หรือรัน /saf-setup ใหม่)`, machine: `ตั้งเฉพาะเครื่อง (${LOCAL_CONFIG_FILE} ไม่ถูกเก็บใน git หรือใช้ตัวแปรสภาพแวดล้อม)`, setting: "การตั้งค่า", fields: ["คืออะไร", "เหมาะกับ", "ข้อเสีย", "เลือกเมื่อ"], sizes: "ขนาดการ์ด S / M (บรรทัดโค้ดที่เปลี่ยน)", caps: "เพดานเทสต์ S / M (บรรทัดเทสต์ที่เปลี่ยน)", review: "การตรวจ", reviewWords: { "m-cards": "ตรวจเทียบ spec การ์ดขนาด M ส่วนการ์ด S ตรวจรวมที่ประตูออก milestone", "every-card": "ตรวจเทียบ spec ทุกการ์ด", "every-card+security": "ตรวจเทียบ spec ทุกการ์ด และ security-auditor ตรวจทุก milestone" }, merge: "เช็กตอน merge", planner: "โมเดลฝั่งวางแผน", builder: "โมเดลฝั่งลงมือ" },
+  en: { head: "Settings the interview does not ask", where: `Change them in ${CONFIG_FILE} (check: node tools/saf/bin/saf.mjs config --check, or re-run /saf-setup).`, machine: `Per machine (${LOCAL_CONFIG_FILE}, not tracked by git, or an environment variable)`, setting: "Setting", fields: ["What it is", "Good for", "Cost", "Pick it when"], sizes: "Card size M / L (changed code lines)", caps: "Test caps M / L (changed test lines)", review: "Review", reviewWords: { "m-cards": "spec review of size M cards; S cards together at the milestone gate", "every-card": "spec review of every card", "every-card+security": "spec review of every card, and a security-auditor review of each milestone" }, merge: "Merge checks", planner: "Planner model", builder: "Builder model" },
+  th: { head: "การตั้งค่าที่ตอนสัมภาษณ์ไม่ได้ถาม", where: `แก้ได้ใน ${CONFIG_FILE} (ตรวจด้วย node tools/saf/bin/saf.mjs config --check หรือรัน /saf-setup ใหม่)`, machine: `ตั้งเฉพาะเครื่อง (${LOCAL_CONFIG_FILE} ไม่ถูกเก็บใน git หรือใช้ตัวแปรสภาพแวดล้อม)`, setting: "การตั้งค่า", fields: ["คืออะไร", "เหมาะกับ", "ข้อเสีย", "เลือกเมื่อ"], sizes: "ขนาดการ์ด M / L (บรรทัดโค้ดที่เปลี่ยน)", caps: "เพดานเทสต์ M / L (บรรทัดเทสต์ที่เปลี่ยน)", review: "การตรวจ", reviewWords: { "m-cards": "ตรวจเทียบ spec การ์ดขนาด M ส่วนการ์ด S ตรวจรวมที่ประตูออก milestone", "every-card": "ตรวจเทียบ spec ทุกการ์ด", "every-card+security": "ตรวจเทียบ spec ทุกการ์ด และ security-auditor ตรวจทุก milestone" }, merge: "เช็กตอน merge", planner: "โมเดลฝั่งวางแผน", builder: "โมเดลฝั่งลงมือ" },
 };
 
 /** Dotted path of every schema leaf: a property that is not an object with its own `properties`. */
@@ -299,7 +299,7 @@ export function notAskedText(lang) {
 
 /** Values an option derives, appended by the renderer so no number or model id lives in the text (rule 8). */
 const derived = {
-  "project-rigor": (v, L) => RIGOR[v] && `${L.sizes}: ${RIGOR[v].sizes.S} / ${RIGOR[v].sizes.M} · ${L.caps}: ${RIGOR[v].testCaps.S} / ${RIGOR[v].testCaps.M} · ${L.review}: ${L.reviewWords[RIGOR[v].review]} · ${L.merge}: ${RIGOR[v].merge.join(" · ")}`,
+  "project-rigor": (v, L) => RIGOR[v] && `${L.sizes}: ${SIZE_CAPS.M.code} / ${SIZE_CAPS.L.code} · ${L.caps}: ${SIZE_CAPS.M.test} / ${SIZE_CAPS.L.test} · ${L.review}: ${L.reviewWords[RIGOR[v].review]} · ${L.merge}: ${RIGOR[v].merge.join(" · ")}`,
   "model-preset": (v, L) => MODEL_PRESETS[v] && `${L.planner}: ${MODEL_PRESETS[v].planner} · ${L.builder}: ${MODEL_PRESETS[v].builder}`,
 };
 

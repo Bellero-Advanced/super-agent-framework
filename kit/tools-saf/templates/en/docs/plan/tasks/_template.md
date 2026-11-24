@@ -5,7 +5,7 @@ title: One line — what changes for the user
 spec:
   - docs/specs/example.md
 depends: []
-size: S
+size: M
 role: implementer
 touch:
   - src/feature/**
@@ -18,7 +18,7 @@ scenarios:
 # T-M1-01 — One line — what changes for the user
 
 Copy this file to `docs/plan/tasks/M<n>/T-M<n>-<nn>.md` (files starting with `_` are ignored by the engine).
-Size S ≤ {{sizeS}} changed code lines (tests ≤ {{testS}}) · M ≤ {{sizeM}} (tests ≤ {{testM}}) — bigger → split.
+Size M ≤ {{sizeM}} changed code lines (tests ≤ {{testM}}) · L ≤ {{sizeL}} (tests ≤ {{testL}}) — `task:verify` warns above a cap and fails above {{hardStop}} × the cap: split the card.
 
 ## Why
 

@@ -40,14 +40,31 @@ export const EFFORT_MODES = ["fixed", "by-size"];
 export const DEFAULT_EFFORT_MODE = "fixed";
 /** The efforts an agent file may carry (the schema `effort` enum). */
 export const EFFORTS = ["low", "medium", "high", "xhigh", "max"];
-/** Decision D-016: per role, the effort of size S and size M cards in by-size mode. Roles not listed keep their role effort. */
+/** Decisions D-016 and D-021: per role, the effort of size M and size L cards in by-size mode. Roles not listed keep their role effort. */
 export const EFFORT_BY_SIZE = {
-  implementer: { S: "medium", M: "high" },
-  designer: { S: "medium", M: "medium" },
-  "spec-reviewer": { S: "high", M: "high" },
-  "qa-runner": { S: "medium", M: "medium" },
-  "release-operator": { S: "medium", M: "medium" },
+  implementer: { M: "medium", L: "high" },
+  designer: { M: "medium", L: "high" },
+  "spec-reviewer": { M: "high", L: "high" },
+  "qa-runner": { M: "medium", L: "medium" },
+  "release-operator": { M: "medium", L: "medium" },
 };
+
+/** Card sizes (docs/specs/card-sizes.md, D-021). S is retired: a card that says S is counted as M. */
+export const SIZES = ["M", "L"];
+/** Per size, the warning caps of changed code lines and of changed test lines — one table for every rigor. */
+export const SIZE_CAPS = { M: { code: 800, test: 600 }, L: { code: 1600, test: 1200 } };
+/** `task:verify` fails when a count is above this multiple of its cap. */
+export const HARD_STOP_FACTOR = 2;
+
+/** The size a card is counted as (rule 4): { size, note? }. The card file is never rewritten. */
+export function countedSize(card) {
+  if (card?.size === "M" || card?.size === "L") return { size: card.size };
+  if (card?.size === "S") return { size: "M", note: "legacy S counted as M" };
+  return { size: "M", note: "no size — counted as M" };
+}
+
+/** The line printed for a `workflow.sizes` / `workflow.testCaps` value of the retired { S, M } shape (rule 3). */
+export const legacySizeLine = (key) => `! workflow.${key} uses the retired S/M shape and is ignored — the size table applies (write { "M": …, "L": … } or remove it)`;
 
 /** Planner/reviewer roles get `planner`; builder roles get `builder`. Effort is set per role, not per preset. */
 export const MODEL_PRESETS = {
@@ -76,9 +93,9 @@ export const ROLE_LIBRARY = {
 export const CORE_ROLES = Object.keys(ROLE_LIBRARY).filter((r) => ROLE_LIBRARY[r].core);
 
 export const RIGOR = {
-  light: { sizes: { S: 200, M: 500 }, testCaps: { S: 300, M: 800 }, review: "m-cards", merge: ["test"] },
-  standard: { sizes: { S: 150, M: 400 }, testCaps: { S: 250, M: 600 }, review: "every-card", merge: ["typecheck", "lint", "test"] },
-  strict: { sizes: { S: 100, M: 300 }, testCaps: { S: 200, M: 500 }, review: "every-card+security", merge: ["typecheck", "lint", "test", "build"] },
+  light: { review: "m-cards", merge: ["test"] },
+  standard: { review: "every-card", merge: ["typecheck", "lint", "test"] },
+  strict: { review: "every-card+security", merge: ["typecheck", "lint", "test", "build"] },
 };
 
 /** Skills every project gets. Optional packs add one skill each (same name as the pack). */
@@ -206,8 +223,12 @@ export function resolveConfig(raw = {}) {
   const c = deepMerge(structuredClone(DEFAULTS), structuredClone(raw ?? {}));
   const rigor = RIGOR[c.project.rigor] ?? RIGOR.standard;
   const pm = c.stack.packageManager;
-  c.workflow.sizes ??= { ...rigor.sizes };
-  c.workflow.testCaps ??= { ...rigor.testCaps };
+  c.workflow.sizesLegacy = [];
+  for (const [key, kind] of [["sizes", "code"], ["testCaps", "test"]]) {
+    const v = c.workflow[key];
+    if (v && Object.hasOwn(v, "S")) c.workflow.sizesLegacy.push(key);
+    c.workflow[key] = v && !Object.hasOwn(v, "S") ? { ...v } : Object.fromEntries(SIZES.map((s) => [s, SIZE_CAPS[s][kind]]));
+  }
   c.workflow.review ??= rigor.review;
   const preset = MODEL_PRESETS[c.models.preset];
   if (preset) {

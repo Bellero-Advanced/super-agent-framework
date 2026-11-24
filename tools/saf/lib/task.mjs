@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, normalize, sep } from "node:path";
-import { CONFIG_FILE, LOCAL_CONFIG_FILE, roleTable, scriptCommand } from "./config.mjs";
+import { CONFIG_FILE, HARD_STOP_FACTOR, LOCAL_CONFIG_FILE, countedSize, legacySizeLine, roleTable, scriptCommand } from "./config.mjs";
 import { cardEffort } from "./effort.mjs";
 import {
   changedSince,
@@ -80,9 +80,9 @@ function startEffort(config, card) {
 /** The lines `task:start` prints about the agent: rule 11's line, the legacy-size note and the missing-variants warning. */
 export function effortLines(config, card, ev) {
   const e = ev.started?.effort;
-  if (!e) return [];
-  const size = card.size ? card.size : "M (the card has no size — counted as M)";
-  const out = [`  agent ${e.agent} · effort ${e.effort} · size ${size} · models.effort ${e.mode} (${e.source})`];
+  const { size, note } = countedSize(card);
+  if (!e) return note ? [`  size ${size} (${note})`] : [];
+  const out = [`  agent ${e.agent} · effort ${e.effort} · size ${size}${note ? ` (${note})` : ""} · models.effort ${e.mode} (${e.source})`];
   const warning = cardEffort(config, card).warning;
   if (warning) out.push(`  warning: ${warning}`);
   return out;
@@ -482,22 +482,25 @@ export function cardFiles(ctx, card, ev, filesBase = ev.started.base) {
 const TEST_DIR = /(?:^|\/)(?:tests?|__tests__)\//;
 const isTestPath = (f) => isTestFile(f) || TEST_DIR.test(f);
 
-/** Changed lines (added + removed) of the card's files, code and test apart, against the caps of its size in the config. */
+/**
+ * Changed lines (added + removed) of the card's files, code and test apart, against the caps of its counted size
+ * (docs/specs/card-sizes.md rule 5): `stop` = HARD_STOP_FACTOR × cap, `over` = kinds above the cap, `stopped` = above the stop.
+ */
 export function cardSize(ctx, card, files, filesBase) {
   const stats = lineStats(ctx.root, filesBase, files.changed);
-  let code = 0;
-  let test = 0;
-  for (const f of files.changed) {
-    if (isTestPath(f)) test += stats[f] ?? 0;
-    else code += stats[f] ?? 0;
-  }
-  const size = card.size ?? null;
-  const cap = { code: ctx.config.workflow.sizes?.[size] ?? null, test: ctx.config.workflow.testCaps?.[size] ?? null };
-  const over = ["code", "test"].filter((k) => cap[k] !== null && { code, test }[k] > cap[k]);
-  return { size, code: { lines: code, cap: cap.code }, test: { lines: test, cap: cap.test }, over };
+  const lines = { code: 0, test: 0 };
+  for (const f of files.changed) lines[isTestPath(f) ? "test" : "code"] += stats[f] ?? 0;
+  const { size, note } = countedSize(card);
+  const caps = { code: ctx.config.workflow.sizes[size], test: ctx.config.workflow.testCaps[size] };
+  const part = (k) => ({ lines: lines[k], cap: caps[k], stop: caps[k] * HARD_STOP_FACTOR });
+  const out = { size, ...(note ? { note } : {}), code: part("code"), test: part("test") };
+  return { ...out, over: KINDS.filter((k) => out[k].lines > out[k].cap), stopped: KINDS.filter((k) => out[k].lines > out[k].stop) };
 }
 
-const sizeWarning = (id, s) => `  ⚠ ${id} is over the size cap (${s.size}): ${s.over.map((k) => `${k} ${s[k].lines} > ${s[k].cap}`).join(" · ")} changed lines — not a failure, the reviewer decides (or the designer splits the card)`;
+const KINDS = ["code", "test"];
+const sizeWarning = (id, s) => `  ⚠ ${id} is over the size cap (${s.size}): ${s.over.map((k) => `${k} ${s[k].lines} > ${s[k].cap}`).join(" · ")} changed lines — not a failure up to ${HARD_STOP_FACTOR} × the cap; the reviewer decides (or the designer splits the card)`;
+/** Rule 7: the hard-stop line; `after` = counted again after the commands ran. */
+export const sizeStopLine = (id, s, after = false) => `  ✗ ${id} is over the hard stop (${s.size}): ${s.stopped.map((k) => `${k} ${s[k].lines} > ${s[k].stop}`).join(" · ")} changed lines (${HARD_STOP_FACTOR} × the cap) — ${after ? "the card fails" : "no command ran"}; the designer splits the card`;
 
 export function cardScenarios(root, ids) {
   if (!ids.length) return { required: [], missing: [] };
@@ -568,6 +571,18 @@ function closeSelfFix(ctx, plan, card) {
   }
 }
 
+/** Rule 7: the size is above a hard stop before any command — no command runs, the attempt is recorded as failed. */
+function stopCard(ctx, lane, ev, card, size, files, head) {
+  ctx.log?.(sizeStopLine(ev.id, size));
+  const { reviewFailed: _reopened, ...kept } = ev;
+  const scenarios = cardScenarios(ctx.root, card.scenarios);
+  const mode = { mode: ctx.config.workflow.testMode ?? null, source: ctx.config.workflow.testModeSource ?? null };
+  const next = { ...kept, status: "failed", attempts: ev.attempts + 1, verified: { at: nowIso(ctx), head, pass: false, commands: [], files, scenarios, size, testMode: mode } };
+  writeJson(ctx.root, evidencePath(ev.id), next);
+  if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));
+  return next;
+}
+
 export async function verifyCard(ctx, id) {
   const plan = loadPlan(ctx.root, ctx.config);
   const lane = laneFolder(ctx.root, plan);
@@ -580,6 +595,10 @@ export async function verifyCard(ctx, id) {
   if (ev.status === "done" && !lane) throw new TaskError(`${id} already passed (${verifySummary(plan, ev)}) — to check again start counting anew: ${cmd(ctx.config, "task:start", `${id} --restart`)}`);
   const filesBase = lane ? laneFilesBase(ctx.root, ev) : ev.started.base;
   const head = resolveCommit(ctx.root, "HEAD") ?? "";
+  for (const key of ctx.config.workflow.sizesLegacy ?? []) ctx.log?.(`  ${legacySizeLine(key)}`);
+  const first = cardFiles(ctx, card, ev, filesBase);
+  const before = cardSize(ctx, card, first, filesBase);
+  if (before.stopped.length) return stopCard(ctx, lane, ev, card, before, first, head);
   const { run, deferred, targeted } = planVerifyRun(ctx, card, ev, filesBase, !!lane);
   const mode = { mode: ctx.config.workflow.testMode ?? null, source: ctx.config.workflow.testModeSource ?? null };
   if (deferred.length) ctx.log?.(`  ! full suite deferred to gate (test mode ${mode.mode} from ${mode.source}): ${deferred.join(" · ")}`);
@@ -589,7 +608,7 @@ export async function verifyCard(ctx, id) {
   const files = cardFiles(ctx, card, ev, filesBase);
   const scenarios = cardScenarios(ctx.root, card.scenarios);
   const size = cardSize(ctx, card, files, filesBase);
-  const pass = commands.every((c) => c.exit === 0) && !files.outside.length && !files.forbidden.length && !scenarios.missing.length;
+  const pass = commands.every((c) => c.exit === 0) && !size.stopped.length && !files.outside.length && !files.forbidden.length && !scenarios.missing.length;
   const at = nowIso(ctx);
   const attempts = ev.attempts + 1;
   const failed = commands.filter((c) => c.exit !== 0);
@@ -599,7 +618,8 @@ export async function verifyCard(ctx, id) {
   if (pass && failures?.length) {
     ctx.log?.(`  ! passed after failing ${failures.length} time(s) (attempt ${failures.map((f) => f.attempts).join(", ")}) — flaky? ${[...new Set(failures.flatMap((f) => f.commands.map((c) => c.cmd)))].join(" · ")}`);
   }
-  if (size.over.length) ctx.log?.(sizeWarning(id, size));
+  if (size.stopped.length) ctx.log?.(sizeStopLine(id, size, true));
+  else if (size.over.length) ctx.log?.(sizeWarning(id, size));
   writeJson(ctx.root, evidencePath(id), next);
   if (pass && !lane) closeSelfFix(ctx, plan, card);
   if (!lane) writeGenerated(ctx.root, loadPlan(ctx.root, ctx.config));

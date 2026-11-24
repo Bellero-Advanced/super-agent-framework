@@ -45,7 +45,7 @@ Copy [tasks/_template.md](tasks/_template.md). Frontmatter fields:
 | `id` · `milestone` · `title` | `T-M1-01` · `M1` · one line; the file name equals the id, the folder equals the milestone |
 | `spec` | spec files this card implements (`docs/specs/…`) |
 | `depends` | cards that must pass first |
-| `size` | `S` (≤ {{sizeS}} code lines, tests ≤ {{testS}}) or `M` (≤ {{sizeM}}, tests ≤ {{testM}}) — bigger → split |
+| `size` | `M` (≤ {{sizeM}} code lines, tests ≤ {{testM}}) or `L` (≤ {{sizeL}}, tests ≤ {{testL}}) — `task:verify` fails above {{hardStop}} × the cap → split the card |
 | `role` | who does it: {{roleNames}} |
 | `repo` | `.` (default) or a git submodule path — one submodule per card |
 | `touch` | globs of files the card may change (required) |

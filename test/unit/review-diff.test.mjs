@@ -7,6 +7,7 @@ import { REPO, cleanup, commitAll, fakeCtx, git, gitRepo, lib, planRepo, write }
 
 const task = await lib("task.mjs");
 const { generate } = await lib("generate.mjs");
+const { SIZE_CAPS } = await lib("config.mjs");
 after(cleanup);
 
 const BIN = join(REPO, "kit", "tools-saf", "bin", "saf.mjs");
@@ -32,7 +33,7 @@ const none = (root) => assert.equal(existsSync(join(root, ".saf", "memory", "rev
 const repo = (extra = {}) =>
   planRepo({
     config: extra.config,
-    cards: [{ id: ID, title: "the card", touch: TOUCH, size: extra.size ?? "S" }],
+    cards: [{ id: ID, title: "the card", touch: TOUCH, size: extra.size ?? "M" }],
     files: { "src/mod.ts": "one\ntwo\nthree\n", "src/gone.ts": "bye\nbye\n", "src/crlf.txt": "a\r\nb\r\n", "src/img.bin": Buffer.from([0, 1, 2, 3]).toString("latin1"), "dirty.txt": "base\n", "engine/lib.mjs": "old\n", ...extra.files },
   });
 
@@ -59,7 +60,7 @@ test("RDIFF-AC-01 the diff holds the changed, new and deleted card files and not
   assert.deepEqual(filesIn(text), ["-lead.txt", "src/a[1].ts", "src/crlf.txt", "src/gone.ts", "src/img.bin", "src/mod.ts", "src/new file ü.ts", "src/new.bin"]);
   assert.ok(!text.includes("diff --git a/dirty.txt"), "a file dirty before the start and untouched");
   assert.ok(!/diff --git a\/(docs|\.saf)\//.test(text), "no evidence, STATE.md, mirror or review file");
-  assert.match(text, /^# T-M1-01 the card\n# base [0-9a-f]{40} · HEAD [0-9a-f]{40}\n# files 8\n# size S: code \d+\/150 · test 0\/250 changed lines\n/);
+  assert.match(text, new RegExp(`^# T-M1-01 the card\\n# base [0-9a-f]{40} · HEAD [0-9a-f]{40}\\n# files 8\\n# size M: code \\d+/${SIZE_CAPS.M.code} · test 0/${SIZE_CAPS.M.test} changed lines\\n`));
   const block = (f) => text.split("diff --git ").find((b) => b.startsWith(`a/${f} `));
   const lines = (b) => b.split("\n").filter((l) => /^[+-]/.test(l) && !/^(\+\+\+|---) /.test(l));
   assert.match(block("src/new file ü.ts"), /new file mode/);
@@ -107,7 +108,7 @@ test("RDIFF-AC-01 a change inside a submodule card is read from the submodule ag
   commitAll(sub, "sub");
   const { root, config } = await planRepo({ cards: [{ id: ID, touch: ["libs/sub/lib/**"] }] });
   git(root, "-c", "protocol.file.allow=always", "submodule", "add", "-q", sub, "libs/sub");
-  write(root, "docs/plan/tasks/M1/T-M1-01.md", read(root, "docs/plan/tasks/M1/T-M1-01.md").replace("size: S\n", "size: S\nrepo: libs/sub\n"));
+  write(root, "docs/plan/tasks/M1/T-M1-01.md", read(root, "docs/plan/tasks/M1/T-M1-01.md").replace("size: M\n", "size: M\nrepo: libs/sub\n"));
   const ctx = fakeCtx(root, config);
   git(root, "add", "-A");
   git(root, "commit", "-q", "-m", "submodule + repo card");
@@ -203,7 +204,7 @@ test("RDIFF-AC-05 a started card with no changed files: the header and 'no chang
   const r = cli(root, ID);
   assert.equal(r.status, 0, r.stderr);
   const text = read(root);
-  assert.match(text, /^# T-M1-01 the card\n# base [0-9a-f]{40} · HEAD [0-9a-f]{40}\n# files 0\n# size M: code 0\/400 · test 0\/600 changed lines\nno changed files\n/);
+  assert.match(text, new RegExp(`^# T-M1-01 the card\\n# base [0-9a-f]{40} · HEAD [0-9a-f]{40}\\n# files 0\\n# size M: code 0/${SIZE_CAPS.M.code} · test 0/${SIZE_CAPS.M.test} changed lines\\nno changed files\\n`));
   assert.equal(filesIn(text).length, 0);
   assert.match(r.stdout, /0 file\(s\)/);
 });

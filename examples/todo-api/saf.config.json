@@ -55,14 +55,6 @@
     "packs": []
   },
   "workflow": {
-    "sizes": {
-      "S": 150,
-      "M": 400
-    },
-    "testCaps": {
-      "S": 250,
-      "M": 600
-    },
     "review": "every-card",
     "lanes": {
       "code": 3,

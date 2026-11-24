@@ -26,7 +26,7 @@ A card id (and{{#if tokenSaving.reviewerDiff}} a diff file of the card's changes
 - no file changed outside `touch`; nothing in `dont_touch` changed
 - no balance numbers or magic values outside data tables · no branching on hard-coded ids where data should decide
 - user-facing text follows the project's i18n rule · no secrets · no debug leftovers
-- size within S ≤ {{sizeS}} / M ≤ {{sizeM}} code lines
+- size within M ≤ {{sizeM}} / L ≤ {{sizeL}} code lines
 
 ## Review types
 
