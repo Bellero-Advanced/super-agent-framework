@@ -143,7 +143,7 @@ GitHub by the engine behind guards and a kill switch. The skill-pack chain defer
 - [x] T-M3-35 Card sizes are M and L: task:verify warns above the cap and fails above twice it, old S cards count as M, and every generated file shows the new caps — passed 2026-11-24 18:52 (10 commands) · full suite deferred to gate
 - [x] T-M3-36 Setup explanations and the user docs describe sizes M and L, the hard stop and legacy S cards, in English and Thai, true to the code — passed 2026-11-24 19:08 (8 commands) · full suite deferred to gate
 - [x] T-M3-37 An L card lists its steps: the plan check demands them, task:diff splits the review diff by step commit, and the agents build and review step by step — passed 2026-11-24 19:25 (9 commands) · full suite deferred to gate
-- [ ] T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off
+- [ ] T-M3-09 task:release <M> shows every release guard and the next version without changing anything, and stops when the kill switch is off — started 2026-11-24 19:29 · not verified yet · lane 1 · .claude/worktrees/T-M3-09
 - [ ] T-M3-10 task:release --prepare commits and pushes the version bump with the CHANGELOG and release log, and --tag pushes the tag only after every CI job is green on that commit
 - [ ] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again
 - [ ] T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0
