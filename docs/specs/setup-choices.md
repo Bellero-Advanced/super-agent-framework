@@ -1,6 +1,6 @@
 # Spec — setup choices (what each option means, and every setting the interview does not ask)
 
-Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15, T-M2-19. Builds on the test-mode questions that
+Decision: [D-009](../DECISIONS.md) (decided). Cards: T-M2-12 … T-M2-15, T-M2-19, T-M2-28. Builds on the test-mode questions that
 T-M2-10 adds to the interview.
 
 ## 1. Purpose
@@ -108,6 +108,24 @@ the CLI and the tests all read the same words.
     rewrite stay forbidden in both. The `push` explanations in `CHOICES` describe what the generated files say, so no
     explanation says the release-operator file forbids a push that the chosen option allows.
 
+### Explanations match the code
+
+24. Every explanation sentence is true of the code for every answer combination the interview can produce, not only
+    the common one. In particular (each checked in `generate.mjs` `ruleSet` / `config.mjs` `resolveConfig` and
+    `roleTable` / the CLAUDE.md template):
+    - a project type without its own UI rule (`api` and the others outside the UI types) still gets the UI rule when
+      translation is required (`people.i18nRequired`); the `api` and `ui-languages` texts say so, and `several` says
+      the interview then suggests the content-writer role and the translation pack
+    - `models.planner` / `models.builder`, when set, win over **any** preset (an empty one falls back to the preset's
+      model, Balanced's for Custom); planner-tier roles — the planner roles of `ROLE_LIBRARY` and custom roles marked
+      planner — use the planner id, the others the builder id; `models.overrides` wins for a single role
+    - `strict` rigor makes the generated Definition of done require a security-auditor review of each milestone even
+      when that role is not enabled, and the interview suggests the role (a planner-tier role)
+    - not-asked keys that only reach generated files (`workflow.review`, `models.overrides`) say they apply after setup
+      runs again; a number another module owns (the measure exit code) is interpolated from its constant, not typed
+25. The rigor values appended by rule 12 name their unit (changed code lines, changed test lines) and show the review
+    level as words in the chosen language, not the raw `RIGOR` ids.
+
 ## 3. Data
 
 - `QUESTIONS` · `CHOICES` · `NOT_ASKED` · `INTERNAL_KEYS` · `MACHINE_SWITCHES` · `LABELS` · `FIELD_MAX` · `DOCS_URL` —
@@ -143,6 +161,7 @@ the CLI and the tests all read the same words.
 | SETUP-AC-08 | `kit/claude/skills/saf-setup/SKILL.md` | the docs test runs | Step 1 runs `choices --group` before each group and Step 2 runs `choices --not-asked` and offers "Adjust a setting that was not asked" | unit |
 | SETUP-AC-09 | `SKILL.md` and `questions.md` | the docs test runs | Step 1 asks the adopt question when `detect` reports an existing project; Step 3 names both `--adopt` (for "yes") and `--no-adopt` (for "no" or a skipped question); `questions.md` gives the adopt question a recommended default outside the Key-column tables | unit |
 | SETUP-AC-10 | a config with `policies.push: "owner-order"`, then `"allowed"`, with the release-operator role enabled | `generate` renders the agent files | owner-order: `.claude/agents/release-operator.md` forbids pushing without the owner's order; allowed: it says pushing is allowed and contains no "Never push"; both forbid force-push; the en and th `push: allowed` explanations no longer say the file forbids pushing | unit |
+| SETUP-AC-11 | configs rendered by `generate`: `api` with and without `i18nRequired`; `library-cli` with `i18nRequired`; preset `balanced` with `models.planner` set; a custom role with tier `planner`; `models.overrides` for one role; rigor `strict` without the security-auditor role | the facts test reads the rules, the role table and the generated CLAUDE.md, then the en and th explanations | the UI rule is present exactly when the type has one or i18n is required; the set planner id is used under `balanced`, the custom planner role gets it, the override wins; the strict CLAUDE.md names a security-auditor review; the `api`, `several`, `custom-models` and `strict` explanations (en and th) name these effects; `choices --group 2` shows the rigor review as words and the size unit | unit |
 
 ## 6. Out of scope
 

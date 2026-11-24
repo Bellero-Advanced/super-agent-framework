@@ -2,7 +2,7 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M2 Roadmap: next — cards done 21/24
+## M2 Roadmap: next — cards done 21/25
 
 - In progress: none
 - Next: T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it · T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json
@@ -33,6 +33,7 @@
 | [T-M2-27](tasks/M2/T-M2-27.md) | Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it | · not started | – |
 | [T-M2-25](tasks/M2/T-M2-25.md) | Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json | · not started | – |
 | [T-M2-26](tasks/M2/T-M2-26.md) | Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one | · not started | – |
+| [T-M2-28](tasks/M2/T-M2-28.md) | Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units | · not started | – |
 
 ### Exit gates of M2 (checked with `npm run task:verify -- M2`)
 

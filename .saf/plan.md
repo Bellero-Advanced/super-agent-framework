@@ -77,7 +77,9 @@ order 2026-11-24) a setup interview that explains every option and shows every s
   T-M2-25 → T-M2-26 ([spec](../../specs/lane-caps.md), D-018 proposed): the code-lane and side-lane caps rise to
   `LANE_CEILING` and each machine may set them in `saf.config.local.json`; then the explanations and docs say what a
   lane costs and why the main lane stays one. T-M2-26 waits for T-M2-25 (both touch `choices.mjs`); T-M2-27 shares no
-  `touch` file with them and may run beside T-M2-25. The other open review notes are triaged in
+  `touch` file with them and may run beside T-M2-25. T-M2-28 (owner order, [spec rules 24–25](../../specs/setup-choices.md#explanations-match-the-code))
+  corrects setup explanations that do not match the code (review notes 13/4 · 13/7, plus 13/5 · 13/6 · 13/8 · 13/9 ·
+  12/2 · 12/4); it waits for T-M2-26 (`choices.mjs`) and shares no `touch` file with T-M2-27. The other open review notes are triaged in
   [M2-review-notes.md](../notes/M2-review-notes.md#triage-for-the-m2-exit-gate)
 - Every new card that changes `kit/` runs `npm run saf:refresh` and the example upgrade, then restores
   `examples/todo-api/.claude` and `examples/todo-api/package.json` (the stale example skill copy is review note C,
@@ -113,6 +115,7 @@ order 2026-11-24) a setup interview that explains every option and shows every s
 - [ ] T-M2-27 Setup archives an unreadable .claude/settings.local.json (git-ignored) instead of silently overwriting it
 - [ ] T-M2-25 Lane caps go up to a high ceiling and each machine can set its own in saf.config.local.json
 - [ ] T-M2-26 Setup explanations and docs say what a lane costs, that caps can be set per machine, and why the main lane stays one
+- [ ] T-M2-28 Setup explanations say what the code really does: the UI rule with i18n, model ids with any preset, strict's security review, rigor values with units
 
 ## Risks
 - **Re-run behaviour changes** (T-M2-20): a person who expected an edited `DECISIONS.md` to be replaced by the
