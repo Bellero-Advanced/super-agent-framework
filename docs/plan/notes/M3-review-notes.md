@@ -111,3 +111,7 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 ## T-M3-22 (release-operator text) — non-blocking from round 1
 - N1 choices.mjs:205 deploy:allowed cost text still says the agent "describes an order step" (false now; needs a card, rule 24 en+th). N2 config.mjs:57 role summary "only on an explicit owner order" ignores deploy:allowed (also docs/roles.md:14).
 - N4 multiple auto-deploy branches read "that push"; N6 spec: what "except to main" means under deploy:allowed; N7 owner-order push text changed when auto-deploy branches exist.
+
+## T-M3-16 (setup keeps) — non-blocking
+- K1 "nothing was changed" is false after `saf init --answers` on a broken manifest (copyKit/.gitignore run before generate throws); check before copyKit or scope the sentence; maybe with T-M3-26.
+- K2 setup report counts `same` files as written ("generated N file(s)"). K3 duplicate helper isObject vs mergeable. K4 upgrade prints a kept path twice. K5 UPG-AC-07 does not run dry-run CLI. K6 no direct test for keep-unplanned in refresh.
