@@ -1,0 +1,18 @@
+{
+  "id": "T-M3-10",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T20:17:14.863Z",
+      "result": "fail",
+      "kinds": [
+        "spec-mismatch",
+        "missing-test"
+      ],
+      "note": "tag push lacks --no-follow-tags; --prepare has no HEAD-moved check; fetch uses bare branch name; push-rejected advice wrong",
+      "head": "293b351167201cebe38d2d214e4b92bf9c15343d",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-24T20:11:54.474Z"
+    }
+  ]
+}
