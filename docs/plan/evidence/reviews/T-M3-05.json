@@ -1,0 +1,17 @@
+{
+  "id": "T-M3-05",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-24T17:37:32.753Z",
+      "result": "fail",
+      "kinds": [
+        "docs"
+      ],
+      "note": "questions.md:65 'decision D-016' points to nothing in user projects; docs/roles.md who-uses-it omits /saf-plan use of the designer variant",
+      "head": "8c27f79791ad75cf7f02357dc30ceeb0a3ebfe22",
+      "verifyAttempts": 3,
+      "verifyAt": "2026-11-24T17:32:44.423Z"
+    }
+  ]
+}
