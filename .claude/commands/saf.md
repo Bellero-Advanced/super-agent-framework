@@ -79,8 +79,16 @@ Show the owner, in Thai:
 
 ## 5. Releases
 
-`policies.release.auto` is `off`: a release (a version bump pushed, a tag, a publish) happens only when the owner orders it.
-`npm run task:release -- <M>` is always safe to run — it only shows every guard and the next version.
+`policies.release.auto` is `on`: when the owner has closed a milestone (`status: done`), run its release yourself, one step at a
+time, and stop at the first step that is refused.
+
+1. `npm run task:release -- <M>` — the dry run: every guard and the plan, nothing is changed.
+2. `npm run task:release -- <M> --prepare` — commits the version bump with the CHANGELOG and the release log, then pushes that commit.
+3. Wait until every CI job has finished green on that exact commit (`npm run task:release -- <M>` shows it as `G-ci`).
+4. `npm run task:release -- <M> --tag` — tags the release commit and pushes the tag; it refuses while any CI job is not green.
+5. Report in Thai: the version, the commit, the tag, and every guard that refused.
+
+Never force a push, move or delete a tag, or publish by hand — a refused guard is reported to the owner, not worked around.
 
 ## 6. Self-fix (SAF fixes its own proven bugs)
 
