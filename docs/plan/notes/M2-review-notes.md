@@ -251,3 +251,12 @@ a. card-lifecycle: "Per machine" line mentions lane caps then "Order: env, local
 b. config-reference "now 32" (line ~67) and "65535" (lines ~72, ~104) are not pinned to `LANE_CEILING` / `MAX_PORT` by the test (only line ~95 is)
 c. the per-machine test mode from saf.config.local.json does not reach lane verifies (the file is git-ignored → absent in a lane worktree): lanes use the repo mode unless `SAF_TEST_MODE` is set — say so in card-lifecycle "Per machine" and SKILL.md (predates the card)
 d. T-M2-26 Thai check for lanes `on` accepts the text without the file name; Thai template line ~97 reads long
+
+## T-M2-28 (review PASS at the first round; 1 inexact claim fixed before merge) — notes for the designer
+
+EFFORT DATA (D-016): first text-for-users S card run at implementer effort HIGH with a mandatory sentence→code list → passed review at round 1 (the four text cards at `medium` before it bounced 3 of 4 at round 1). Candidate rule for T-M3-03/04: text-for-users cards default to `high`, code-first S cards to `medium`.
+N2. `custom-models` `good` prints a fact list under "Good for" (rule 4 defines it as "good for") — follows precedent, reads oddly
+N4. `model-preset` max/balanced/economy `what` (unchanged) "Planner roles use the top model…" stops being true once ids are set under that preset (rule 24 "every combination")
+N6 THAI (owner gate 13/15): literal calques — `custom-models` "id ที่ตั้งไว้ชนะทุก preset" → "ใช้แทนโมเดลของทุก preset", "models.overrides ยังชนะสำหรับ role เดียว" → "ยังมาก่อนสำหรับ role ที่ระบุ", "id วางแผน" → "id ฝั่งวางแผน"; `api` th `what` folds the UI clause into the server list; `several` th `good` "pack การแปลต่อ" awkward; `strict` th `cost` English "Definition of done" → add "(นิยามเสร็จ)"; the same block says both "ตรวจรวมที่ gate" and "ประตูออก milestone" — pick one
+N7. the card template suggested `i18n` as a shared test token but rule 8 forbids adjacent digits ("18") — fix the card-writing guidance
+N9. optional: "interview suggests security-auditor / content-writer" asserted only as text, not against questions.md:70
