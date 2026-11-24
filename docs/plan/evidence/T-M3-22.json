@@ -7,46 +7,46 @@
     "base": "1e67f5e937c68d316915e43d5cefbe3eb4e8fb30",
     "dirty": {}
   },
-  "attempts": 1,
+  "attempts": 2,
   "lane": 2,
   "branch": "card/T-M3-22",
   "worktree": ".claude/worktrees/T-M3-22",
   "verified": {
-    "at": "2026-11-24T16:24:02.059Z",
-    "head": "6b78f3775f9ea3aa7ad2e01374a52e9385c6de64",
+    "at": "2026-11-24T16:28:01.416Z",
+    "head": "64a71e782e698a3c5ea092a679ba4726f52d3646",
     "pass": true,
     "commands": [
       {
         "cmd": "node --test test/unit/release-operator-text.test.mjs test/unit/generate.test.mjs",
         "exit": 0,
-        "ms": 993,
+        "ms": 975,
         "tail": [
-          "ok 16 - SETUP-AC-14 push: allowed with protectedBranches - the push rule names main",
+          "ok 17 - SETUP-AC-14 push: allowed with protectedBranches - the push rule names main",
           "  ---",
-          "  duration_ms: 36.262458",
+          "  duration_ms: 35.962833",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
-          "ok 17 - SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
+          "ok 18 - SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
           "  ---",
-          "  duration_ms: 77.82025",
+          "  duration_ms: 74.446375",
           "  type: 'test'",
           "  ...",
-          "1..17",
-          "# tests 17",
+          "1..18",
+          "# tests 18",
           "# suites 0",
-          "# pass 17",
+          "# pass 18",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 926.814583"
+          "# duration_ms 914.177875"
         ]
       },
       {
         "cmd": "npm run spec:matrix -- --check",
         "exit": 0,
-        "ms": 402,
+        "ms": 367,
         "tail": [
           "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
           "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -73,7 +73,7 @@
       {
         "cmd": "npm run check-secrets",
         "exit": 0,
-        "ms": 350,
+        "ms": 357,
         "tail": [
           "> super-agent-framework@0.1.0 check-secrets",
           "> node tools/saf/bin/saf.mjs check-secrets",
@@ -83,7 +83,7 @@
       {
         "cmd": "npm run docs:check",
         "exit": 0,
-        "ms": 298,
+        "ms": 285,
         "tail": [
           "> super-agent-framework@0.1.0 docs:check",
           "> node tools/saf/bin/saf.mjs docs-check",
@@ -93,28 +93,28 @@
       {
         "cmd": "node --test 'test/unit/release-operator-text.test.mjs'",
         "exit": 0,
-        "ms": 433,
+        "ms": 463,
         "tail": [
-          "ok 4 - SETUP-AC-14 push: allowed with protectedBranches - the push rule names main",
+          "ok 5 - SETUP-AC-14 push: allowed with protectedBranches - the push rule names main",
           "  ---",
-          "  duration_ms: 37.074375",
+          "  duration_ms: 34.395333",
           "  type: 'test'",
           "  ...",
           "# Subtest: SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
-          "ok 5 - SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
+          "ok 6 - SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git line says allowed except to main",
           "  ---",
-          "  duration_ms: 67.000625",
+          "  duration_ms: 67.771542",
           "  type: 'test'",
           "  ...",
-          "1..5",
-          "# tests 5",
+          "1..6",
+          "# tests 6",
           "# suites 0",
-          "# pass 5",
+          "# pass 6",
           "# fail 0",
           "# cancelled 0",
           "# skipped 0",
           "# todo 0",
-          "# duration_ms 379.683542"
+          "# duration_ms 412.37"
         ]
       }
     ],
@@ -128,10 +128,10 @@
       "outside": [],
       "forbidden": [],
       "hashes": {
-        "kit/tools-saf/templates/agents/release-operator.md": "9bb044173a6745b4dbc9f62f60f6f00e3d9d09d7",
-        "kit/tools-saf/templates/en/CLAUDE.template.md": "b5c1884ed41b57f5069188a2fa873eea476be4a0",
-        "kit/tools-saf/templates/th/CLAUDE.template.md": "a7fec9885164297bb60810d558ffaaeccbe9b9ab",
-        "test/unit/release-operator-text.test.mjs": "482a150de407c9079ccf3bc33689871e3b45559c"
+        "kit/tools-saf/templates/agents/release-operator.md": "55483ee0b7058179178b106cb5df2e4446266775",
+        "kit/tools-saf/templates/en/CLAUDE.template.md": "9e9068b0472e8c721559979e7b0d2c0b09810825",
+        "kit/tools-saf/templates/th/CLAUDE.template.md": "3d5efd544c2f71895c9b328de7a2cdcb0abcfc41",
+        "test/unit/release-operator-text.test.mjs": "eca696fa3a4b25c5cd1a0e4b84f567c6d9c2b08e"
       }
     },
     "scenarios": {
@@ -147,7 +147,7 @@
         "cap": 150
       },
       "test": {
-        "lines": 63,
+        "lines": 72,
         "cap": 250
       },
       "over": []

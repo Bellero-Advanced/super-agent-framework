@@ -22,7 +22,7 @@ test("SETUP-AC-14 deploy: allowed - the description and the steps ask for no own
   const { agent } = render({ deploy: { mode: "allowed", target: "staging", exceptions: "production" } });
   assert.doesNotMatch(description(agent), ORDER);
   assert.doesNotMatch(steps(agent), ORDER);
-  assert.match(steps(agent), /deploy policy/);
+  assert.match(steps(agent), /deploy policy above — the target, when one is set, and the exceptions —/);
   assert.match(agent.join("\n"), /target: staging · exceptions: production/);
 });
 
@@ -33,14 +33,23 @@ test("SETUP-AC-14 deploy: owner-order - the description and step 1 still ask for
   assert.match(steps(agent), /No order → stop/);
 });
 
+test("SETUP-AC-14 deploy: none - the description says it is never used for releases here and step 1 stops and tells the owner, with no target / exceptions text", () => {
+  const { agent } = render({ deploy: { mode: "none", target: "", exceptions: "" } });
+  assert.match(description(agent), /this project does not deploy, so it is never used for releases here/);
+  assert.doesNotMatch(description(agent), ORDER);
+  assert.doesNotMatch(description(agent), /deploy policy allows/);
+  assert.match(steps(agent), /^1\. This project does not deploy → stop and tell the owner\./);
+  assert.doesNotMatch(steps(agent), /deploy policy above|exceptions/);
+});
+
 test("SETUP-AC-14 push: allowed with autoDeployBranches - one sentence says allowed except to main, in the agent file and the CLAUDE.md git line", () => {
   const { agent, claude } = render({ push: "allowed", autoDeployBranches: ["main"] });
   const rule = agent.filter((l) => l.startsWith("- ") && /push/i.test(l));
   assert.equal(rule.length, 1, "one push rule line, no separate auto-deploy bullet");
-  assert.match(rule[0], /Pushing is allowed, except to main — that push deploys automatically and counts as a release/);
+  assert.match(rule[0], /Pushing is allowed \(protected branches: main\), except to main — that push deploys automatically and counts as a release/);
   assert.doesNotMatch(agent.join("\n"), /treat that push as a release/);
   const git = claude.find((l) => l.startsWith("- **git:**"));
-  assert.match(git, /push is allowed except to main \(deploys automatically\)/);
+  assert.match(git, /push is allowed except to main \(deploys automatically and counts as a release\)/);
   assert.doesNotMatch(git, /· pushing main deploys automatically/);
 });
 
@@ -58,6 +67,6 @@ test("SETUP-AC-14 push: owner-order keeps its text, and the Thai CLAUDE.md git l
   assert.match(rule, /^- Never push without the owner's order \(pushing main deploys automatically and counts as a release\); never force-push/);
   assert.match(claude.find((l) => l.startsWith("- **git:**")), /push only when the owner orders it · never force-push.*· pushing main deploys automatically/);
   const th = render({ push: "allowed", autoDeployBranches: ["main"] }, "th").claude.find((l) => l.startsWith("- **git:**"));
-  assert.match(th, /push ได้ ยกเว้น/);
+  assert.match(th, /push ได้ ยกเว้น main \(deploy อัตโนมัติ นับเป็นการ release\)/);
   assert.doesNotMatch(th, /· push main = deploy อัตโนมัติ/);
 });
