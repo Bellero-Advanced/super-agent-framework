@@ -130,3 +130,4 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-17 (setup reads plan, no temp copy) — non-blocking from round 1
 - setup-rerun.test.mjs:73-74 (RERUN-AC-01) copies the old isLiving and asserts _template.md is living (contradicts rule 33; outside touch → later card). readFriction in friction.mjs now used only by its test. setup-plan-read.test.mjs:85 missing semicolon.
+- T-M3-17 round 2 (pass): parity helper in setup-plan-read test compares default io with itself (real proof = fixed expected values); setup now skips a friction.md that is a folder (old threw EISDIR; outside rule 32); on Windows os.tmpdir() ignores TMPDIR so the tmpdir check may flake.
