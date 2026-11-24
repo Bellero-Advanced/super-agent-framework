@@ -57,6 +57,8 @@ export const POLICY = {
   release: /gh release create "\$TAG" --verify-tag\b/,
   after: ["release-check.mjs npm", "release-check.mjs release"],
   wait: { tries: 12, delayMs: 10000 }, // registry wait after a publish
+  maxTimeoutMinutes: 60, // the job's `timeout-minutes` must be a whole number from 1 to this
+  commandTimeoutMs: 120000, // one git, gh or npm call started by a check
 };
 
 const oneLine = (s) => String(s ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim();
@@ -107,10 +109,18 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
     if (Object.keys(doc?.jobs ?? {}).join() !== POLICY.jobName) return "the file must hold exactly one job named publish";
     if (job.environment !== POLICY.environment) return `environment is not ${POLICY.environment}`;
     if (!POLICY.runner.test(String(job["runs-on"]))) return "runs-on is not a GitHub-hosted ubuntu runner";
-    if (job.if !== undefined) return "the job must not have an `if`";
     return null;
   });
-  rule("the job asks for contents: write and id-token: write, nothing more", () => (sameMap(job?.permissions, POLICY.jobPermissions) ? null : "job permissions differ (id-token: write is how npm trusts the run)"));
+  rule("no step or job has a condition (`if`): every step runs, none can be skipped", () => {
+    if (job?.if !== undefined) return "the job has an `if`";
+    const i = steps.findIndex((s) => s.if !== undefined);
+    return i >= 0 ? `step ${i + 1} has an \`if\`` : null;
+  });
+  rule("the job has a time limit", () => {
+    const t = job?.["timeout-minutes"];
+    return /^\d+$/.test(String(t)) && Number(t) >= 1 && Number(t) <= POLICY.maxTimeoutMinutes ? null : `timeout-minutes must be a whole number from 1 to ${POLICY.maxTimeoutMinutes}`;
+  });
+  rule("the job asks for contents: write, id-token: write and actions: read, nothing more", () => (sameMap(job?.permissions, POLICY.jobPermissions) ? null : "job permissions differ (id-token: write is how npm trusts the run)"));
   rule("no npm token, secrets, force flags, unpublish, deprecate or pull_request_target", () => {
     const m = src.match(POLICY.forbidden);
     return m ? `found "${m[0]}"` : null;
@@ -154,7 +164,6 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
     const g = at(POLICY.guardsStep);
     if (g < 0) return "no `node scripts/release-check.mjs guards \"$TAG\"` step";
     if (steps.some((s) => s["continue-on-error"] !== undefined)) return "a step has continue-on-error";
-    if (steps[g].if !== undefined) return "the guards step has an `if`";
     const early = [...publishes.map((p) => p.i), at(POLICY.release)].filter((i) => i >= 0 && i < g);
     if (early.length) return "a publish or release step comes before the guards step";
     const own = runs[g].indexOf("release-check.mjs workflow");
@@ -184,7 +193,7 @@ export function checkWorkflow(src, { packages = ["."] } = {}) {
 // ── guards: the release workflow checks the tag again (spec rule 17) ─────────
 
 /** What the guards read: the project root, the checked config and the runner (`run(cmd, args)` → `{ code, out, err }`). A config that is missing, not JSON or invalid is `error` — never a silent default. */
-export function makeContext(root, run = commandRunner(root)) {
+export function makeContext(root, run = commandRunner(root, { timeoutMs: POLICY.commandTimeoutMs })) {
   const file = join(root, CONFIG_FILE);
   if (!existsSync(file)) return { root, run, error: `${CONFIG_FILE} is missing` };
   let raw;

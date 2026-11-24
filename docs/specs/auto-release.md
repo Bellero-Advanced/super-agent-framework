@@ -11,7 +11,9 @@ SAF should ship its own fixes without waiting for a person to type release comma
 that cannot be undone (npm versions are immutable). So the engine releases only when every guard holds, writes down
 what it did before it does it, and stops when the kill switch is off. The engine's part (`task:release`) is generic
 and ships to every project, off by default; the npm publish runs only in this repository's GitHub workflow, on a tag
-the engine created, through npm trusted publishing (no stored token).
+the engine created, through npm trusted publishing (no stored token). The workflow and its guards run from the tagged
+commit, so a hand-pushed tag stops before publishing only while that commit's workflow and checks are unchanged —
+the owner's tag ruleset is what stops the rest (rule 21).
 
 ## 2. Rules
 
@@ -87,7 +89,8 @@ the engine created, through npm trusted publishing (no stored token).
     `origin/main`. Reuses `nextVersion`, the CHANGELOG reader and the release-log reader from
     `tools/saf/lib/release.mjs` (no copy). The policy is read from the tag commit's `saf.config.json`: when that file
     is missing, is not valid JSON or fails schema validation, `guards` fails with that reason — never a silent
-    default.
+    default. These checks stop a hand-pushed tag only when the tagged commit's own `release.yml` and
+    `scripts/release-check.mjs` are unchanged (rule 21).
 18. Publish order: `super-agent-framework`, then wait until `npm view super-agent-framework@<version>` answers (bounded
     retries), then `create-saf`. Before each publish the step runs `node scripts/release-check.mjs published <dir>
     <version>`, whose own exit code decides: 0 (that exact version is on npm) → that publish is skipped (safe re-run
@@ -105,7 +108,14 @@ the engine created, through npm trusted publishing (no stored token).
 21. Honest limits written in `docs/releasing.md`: SAF cannot set up the trusted publisher or the GitHub environment
     (owner, web UI); cannot push or tag without the git and `gh` credentials of the machine running it; cannot tell a
     breaking change nobody wrote under `### Breaking`; cannot undo a publish; cannot release while CI is red or
-    GitHub/npm are down.
+    GitHub/npm are down; cannot stop a tag on a commit whose workflow was changed: GitHub runs the `release.yml` of
+    the tagged commit, which runs that commit's own `scripts/release-check.mjs`, and npm trusted publishing binds only
+    repository + workflow file name + environment (not the ref), while the environment rule `v*` accepts any `v*`
+    tag — so anyone with write access could push a branch whose workflow or checks skip the guards, tag it, and
+    publish through OIDC (the `origin/main` ancestry and kill-switch checks do not help, because that commit's script
+    runs). Only the owner's GitHub tag ruleset stops this — restrict creations of `v*` tags with a bypass only for the
+    account or role that runs `task:release --tag`, restrict updates and deletions, no other bypass — and, optionally,
+    required reviewers on the environment `npm`.
 
 ## 3. Data
 

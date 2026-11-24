@@ -89,8 +89,14 @@ Names must match exactly; npm says all fields are case-sensitive. Source: [npm t
 3. GitHub → repository → **Settings** → **Environments** → New environment `npm` → **Deployment branches and tags** →
    *Selected branches and tags* → add a **tag** rule `v*`. Create the environment **before** the first tag: GitHub says a workflow that references an environment that does not exist "will create an environment with the referenced name" without protection rules or secrets ([GitHub: managing environments](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)), so the tag rule would be missing. Add *required reviewers* only if you want a person to approve every
    release (it breaks full automation).
-4. GitHub → **Settings** → **Rules** → **Rulesets** → new **tag** ruleset for `v*`: restrict updates and deletions, no bypass —
-   a release tag then can never move.
+4. GitHub → **Settings** → **Rules** → **Rulesets** → two new **tag** rulesets for `v*`, both with enforcement *Active*
+   (owner check: the exact wording in the GitHub screen; a bypass list belongs to a whole ruleset, which is why there are two):
+   - ruleset one: *restrict creations*, with a bypass **only** for the role, team or app that runs `task:release --tag`
+     (owner check: which kinds of actor the bypass list accepts depends on your GitHub plan);
+   - ruleset two: *restrict updates* and *restrict deletions*, **no** bypass — SAF never moves or deletes a tag, and then
+     nobody can.
+
+   This step is what makes the guards mean something: without it anyone who can push a tag can publish (see "What SAF cannot do").
 5. After the first automatic release works: each package → **Settings** → **Publishing access** → *Require two-factor
    authentication and disallow tokens*. Delete old publish tokens you no longer need (npmjs.com → Account → Access Tokens).
 6. The machine that runs `task:release`: `gh auth login` done, `git push` to origin works, Node 20 or newer.
@@ -108,11 +114,18 @@ account a bypass for this one push, or keep `auto` at `off` and release by hand.
 - Tell that a change is breaking when nobody wrote it under `### Breaking`
 - Undo a publish — a bad release is fixed by the next patch version
 - Release while CI is red, or while GitHub or npm is down
+- Protect the workflow from a changed copy of itself. GitHub runs the `release.yml` of the **tagged commit**, and that commit's
+  own `scripts/release-check.mjs`; npm trusted publishing trusts the repository, the workflow file name and the environment, not
+  the branch or the tag (the fields of [npm's setup page](https://docs.npmjs.com/trusted-publishers)); and the environment rule `v*` accepts any `v*` tag. So the guards stop a hand-made tag on the real
+  release code, but not a tag on a commit whose workflow or script was changed to skip them. Only the tag ruleset of step 4
+  (nobody but the releasing account can create a `v*` tag) and, if you want a person in the loop, *required reviewers* on the
+  environment `npm` stop that
 
 ## When a run fails
 
 - **The workflow failed before it published:** fix the cause, then use GitHub's **Re-run jobs**. Never move or delete the tag.
 - **One package published, the other did not:** re-run the job. The published one is skipped, the other is published.
 - **Everything published but the GitHub release failed:** re-run the job. Both publishes are skipped, the release is created.
-- **The guards step fails:** the message names the guard. A tag pushed by hand, a missing CHANGELOG section or a switch turned
-  off after tagging all stop here, before anything is published.
+- **The guards step fails:** the message names the guard. A tag pushed by hand on the real release code, a missing CHANGELOG
+  section or a switch turned off after tagging all stop here, before anything is published. (A tag on a commit whose workflow was
+  changed does not stop here: see "What SAF cannot do".)

@@ -40,6 +40,12 @@ test("REL-AC-08 a workflow checked out with CRLF line endings passes too", () =>
 const G = '          node scripts/release-check.mjs guards "$TAG"\n';
 const PUB = "npm publish . --provenance";
 const MUTATIONS = [
+  ["a condition on a publish step", (w) => mutate(w, "      - name: Publish create-saf\n", "      - name: Publish create-saf\n        if: ${{ github.ref_name != 'v0.0.0' }}\n"), /no step or job has a condition/],
+  ["a condition on the checkout step", (w) => mutate(w, "      - uses: actions/checkout@v4\n", "      - uses: actions/checkout@v4\n        if: always()\n"), /no step or job has a condition/],
+  ["a condition on the job", (w) => mutate(w, "    environment: npm\n", "    environment: npm\n    if: always()\n"), /no step or job has a condition|one job/],
+  ["a missing timeout", (w) => mutate(w, /    timeout-minutes: \d+\n/.exec(w)[0], ""), /timeout-minutes/],
+  ["a timeout that is far too long", (w) => mutate(w, /timeout-minutes: \d+/.exec(w)[0], "timeout-minutes: 360"), /timeout-minutes/],
+  ["a timeout that is not a number", (w) => mutate(w, /timeout-minutes: \d+/.exec(w)[0], "timeout-minutes: soon"), /timeout-minutes/],
   ["a missing actions: read", (w) => mutate(w, "      actions: read\n", ""), /job asks for/],
   ["one more permission than the three", (w) => mutate(w, "      actions: read\n", "      actions: read\n      packages: write\n"), /job asks for/],
   ["the GitHub token in the job env", (w) => mutate(w, "      GH_REPO:", "      GH_TOKEN: ${{ github.token }}\n      GH_REPO:"), /GitHub token/],
@@ -94,6 +100,20 @@ for (const [name, edit, label, id = "REL-AC-08"] of MUTATIONS) {
   });
 }
 
+test("REL-AC-08 the commands release-check starts are cut off after a time limit (a hung gh or npm cannot hold the job)", () => {
+  assert.ok(Number.isInteger(POLICY.commandTimeoutMs) && POLICY.commandTimeoutMs > 0);
+  const was = POLICY.commandTimeoutMs;
+  POLICY.commandTimeoutMs = 100;
+  try {
+    const started = Date.now();
+    const r = makeContext(REPO).run(process.execPath, ["-e", "setTimeout(() => {}, 20000)"]);
+    assert.notEqual(r.code, 0);
+    assert.ok(Date.now() - started < 10000, "stopped long before the 20 s the command wanted");
+  } finally {
+    POLICY.commandTimeoutMs = was;
+  }
+});
+
 test("REL-AC-08 fails when the publish order differs from policies.release.packages, and for unreadable text", () => {
   assert.ok(failed(checkWorkflow(WORKFLOW, { packages: [...PACKAGES].reverse() })).some((l) => /published with provenance/.test(l)));
   assert.ok(failed(checkWorkflow("name: x\njobs:\n  a: [unclosed", { packages: PACKAGES })).length >= 1);
@@ -104,7 +124,7 @@ test("REL-AC-08 the command line fails for a mutated copy of the file and for a 
   write(dir, "release.yml", mutate(WORKFLOW, "      id-token: write\n", ""));
   const bad = cli("workflow", join(dir, "release.yml"));
   assert.equal(bad.status, 1);
-  assert.match(bad.stdout, /✗ the job asks for contents: write and id-token: write/);
+  assert.match(bad.stdout, /✗ the job asks for contents: write, id-token: write and actions: read/);
   assert.equal(cli("workflow", join(dir, "absent.yml")).status, 1);
   const usage = cli("bogus");
   assert.equal(usage.status, 2);
