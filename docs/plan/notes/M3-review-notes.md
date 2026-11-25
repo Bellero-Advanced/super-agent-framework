@@ -209,3 +209,6 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
   in saf.config.json … before you add the entry", but in 0.2.0 the config check refuses `skills.external` (`$.skills:
   unknown setting "external"`). `docs/skills.md` now says not to add the entry yet; the CLI text is code — T-M4-01
   makes it true by adding the key (no separate card needed if M4 runs before the next release).
+
+## T-M3-38 (review notes, non-blocking)
+- The review saw the 0 ms timer version; round 2 replaced it by two immediates after a 1-in-6 flake on Node 20 (reviewer note 2). Comment wording follows note 3. Note 4: the in-process test checks leftovers only, process tests cover git worktree list.
