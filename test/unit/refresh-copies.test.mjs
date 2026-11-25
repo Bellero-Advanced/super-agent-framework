@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join, relative } from "node:path";
 import { spawnSync } from "node:child_process";
 import { after, test } from "node:test";
 import { REPO, cleanup, fakeCtx, git, lib, planRepo, tmp, write } from "../helpers.mjs";
@@ -221,8 +221,8 @@ const rendered = (root) => planSetup(join(root, EX), readJson(root, `${EX}/saf.c
 /** A copy of the real example in a card repository: everything fresh, then CLAUDE.md and implementer older (unedited), designer edited. */
 async function exampleCopy() {
   const { root, config } = await planRepo({ cards: [{ id: "T-M1-01", touch: ["scripts/**"] }] });
-  cpSync(join(REPO, EX), join(root, EX), { recursive: true, filter: (src) => !/^(node_modules|tools)$/.test(relative(join(REPO, EX), src).split(sep)[0]) });
-  rmSync(join(root, EX, ".git"), { recursive: true, force: true });
+  cpSync(join(REPO, EX), join(root, EX), { recursive: true, filter: (src) => !/^(node_modules|tools)$/.test(relative(join(REPO, EX), src).split(/[\\/]/)[0]) });
+  for (const dir of ["tools", "node_modules", ".git"]) rmSync(join(root, EX, dir), { recursive: true, force: true });
   const manifestPath = `${EX}/.saf/manifest.json`;
   const manifest = readJson(root, manifestPath);
   const want = new Map();
