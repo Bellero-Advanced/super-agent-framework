@@ -1,7 +1,7 @@
 {
   "id": "T-M3-39",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-25T17:04:55.342Z",
     "base": "0f2715c02ff3e45df92d082406f7c70a332e2f47",
@@ -13,8 +13,125 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 1,
   "lane": 1,
   "branch": "card/T-M3-39",
-  "worktree": ".claude/worktrees/T-M3-39"
+  "worktree": ".claude/worktrees/T-M3-39",
+  "verified": {
+    "at": "2026-11-25T17:05:27.577Z",
+    "head": "53c8226e4ef16b68f87ffc269d597d928622cd92",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/refresh-copies.test.mjs",
+        "exit": 0,
+        "ms": 3812,
+        "tail": [
+          "ok 14 - COPIES-AC-10 an example whose saf.config.json is invalid stops at the re-render, restores, exits 1 naming the step",
+          "  ---",
+          "  duration_ms: 308.571833",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed",
+          "ok 15 - COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed",
+          "  ---",
+          "  duration_ms: 0.254042",
+          "  type: 'test'",
+          "  ...",
+          "1..15",
+          "# tests 15",
+          "# suites 0",
+          "# pass 15",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3752.829208"
+        ]
+      },
+      {
+        "cmd": "PATH=\"$HOME/.nvm/versions/node/v20.17.0/bin:$PATH\" node --test test/unit/refresh-copies.test.mjs",
+        "exit": 0,
+        "ms": 3971,
+        "tail": [
+          "  ...",
+          "# Subtest: COPIES-AC-10 an example whose saf.config.json is invalid stops at the re-render, restores, exits 1 naming the step",
+          "ok 14 - COPIES-AC-10 an example whose saf.config.json is invalid stops at the re-render, restores, exits 1 naming the step",
+          "  ---",
+          "  duration_ms: 302.694",
+          "  ...",
+          "# Subtest: COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed",
+          "ok 15 - COPIES-AC-12 every example file SAF owns, and the root manifest, is in workflow.alwaysAllowed",
+          "  ---",
+          "  duration_ms: 0.39925",
+          "  ...",
+          "1..15",
+          "# tests 15",
+          "# suites 0",
+          "# pass 15",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 3813.134042"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 372,
+        "tail": [
+          "> super-agent-framework@0.1.0 docs:check",
+          "> node tools/saf/bin/saf.mjs docs-check",
+          "✓ docs:check passed — 285 markdown file(s) · 328 local link(s) · 108 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 355,
+        "tail": [
+          "> super-agent-framework@0.1.0 check-secrets",
+          "> node tools/saf/bin/saf.mjs check-secrets",
+          "✓ check-secrets: <redacted> findings in 656 scanned file(s)"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "test/unit/refresh-copies.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "test/unit/refresh-copies.test.mjs": "22d1d8403c3ae6ca4c1b3b7cd299609311560f8b"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "COPIES-AC-10",
+        "COPIES-AC-11"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 0,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 6,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    }
+  }
 }
