@@ -34,3 +34,4 @@ Earlier record, from before this log existed: [notes/M2-review-notes.md](notes/M
 - F-017 → fixed · 2026-11-25 · T-M3-38
 - F-018 · 2026-11-25 · command-failed · T-M3-33 · test/unit/refresh-copies.test.mjs · exampleCopy() in refresh-copies.test.mjs copies the real example engine into the test project on Windows with Node 20 (cpSync filter does not exclude tools), so COPIES-AC-10/11 fail only there · evidence: CI run 45659704061 windows-latest node 20 only: COPIES-AC-10 and COPIES-AC-11 fail, check lists every file of the real examples/todo-api/tools/saf as extra although exampleCopy() filters the example's tools folder; node 22 and Linux/macOS pass; same failure in run 45560880247 and on re-run
 - F-018 → carded · 2026-11-25 · T-M3-39
+- F-018 → fixed · 2026-11-25 · T-M3-39
