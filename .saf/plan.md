@@ -153,6 +153,7 @@ T-M4-03).
 - [x] T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 — passed 2026-11-24 21:03 (3 commands)
 - [x] T-M3-13 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it — passed 2026-11-24 21:22 (6 commands) · full suite deferred to gate
 - [x] T-M3-38 task:culprit still reports an interrupt (exit 130 / 143) when Ctrl-C arrives during the blocking install step on Node 20 — passed 2026-11-25 16:55 (6 commands) · full suite deferred to gate
+- [ ] T-M3-39 The COPIES-AC-10 and -11 test fixture no longer depends on how cpSync filters paths, so it passes on Windows with Node 20
 
 ## Risks
 - **Releasing is irreversible:** npm versions are immutable; a bad release is fixed by a new patch, never by
