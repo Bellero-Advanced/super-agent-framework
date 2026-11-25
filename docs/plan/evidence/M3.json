@@ -2,8 +2,8 @@
   "id": "M3",
   "kind": "milestone",
   "verified": {
-    "at": "2026-11-24T23:23:12.482Z",
-    "head": "a0bca3b0d0cd0c39a97f8b1043fd430c1426c494",
+    "at": "2026-11-25T16:58:17.775Z",
+    "head": "39e97a30d7af4a49945affe47f494f39b2b6837a",
     "testMode": {
       "mode": "targeted",
       "source": "repo"
@@ -41,7 +41,8 @@
       "T-M3-09",
       "T-M3-10",
       "T-M3-11",
-      "T-M3-13"
+      "T-M3-13",
+      "T-M3-38"
     ],
     "gates": [
       {
@@ -56,7 +57,7 @@
           {
             "cmd": "npm run spec:matrix -- --check",
             "exit": 0,
-            "ms": 445,
+            "ms": 419,
             "tail": [
               "| TMODE-AC-10 | test-mode:159 | T-M2-08 (done) | test/unit/test-mode-gate.test.mjs +3 | ✓ 4 test(s) |",
               "| TMODE-AC-11 | test-mode:160 | T-M2-09 (done) | test/unit/culprit.test.mjs +5 | ✓ 6 test(s) |",
@@ -65,7 +66,7 @@
               "| TMODE-AC-14 | test-mode:163 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +5 | ✓ 6 test(s) |",
               "| TMODE-AC-15 | test-mode:164 | T-M2-16 (done) · T-M3-25 (done) | test/unit/test-mode-gate-coverage.test.mjs +1 | ✓ 2 test(s) |",
               "| TMODE-AC-16 | test-mode:165 | T-M2-17 (done) | test/unit/test-mode-gate-views.test.mjs +3 | ✓ 4 test(s) |",
-              "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
+              "| TMODE-AC-17 | test-mode:166 | T-M3-18 (done) · T-M3-38 (done) | test/unit/culprit-robust.test.mjs +1 | ✓ 2 test(s) |",
               "| TMODE-AC-18 | test-mode:167 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs +3 | ✓ 4 test(s) |",
               "| TMODE-AC-19 | test-mode:168 | T-M3-18 (done) | test/unit/culprit-robust.test.mjs | ✓ 1 test(s) |",
               "| TMODE-AC-20 | test-mode:169 | T-M3-20 (done) | test/unit/cli-strict.test.mjs | ✓ 1 test(s) |",
@@ -89,7 +90,7 @@
           {
             "cmd": "node scripts/release-check.mjs workflow",
             "exit": 0,
-            "ms": 70,
+            "ms": 68,
             "tail": [
               "✓ runs only when a v* tag is pushed",
               "✓ top-level permissions are contents: read only",
@@ -118,28 +119,28 @@
           {
             "cmd": "npm test",
             "exit": 0,
-            "ms": 93095,
+            "ms": 79771,
             "tail": [
-              "ok 583 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
+              "ok 584 - UPG-AC-05 packageManager none, no package.json and invalid JSON leave package.json alone",
               "  ---",
-              "  duration_ms: 1476.275667",
+              "  duration_ms: 1248.309583",
               "  type: 'test'",
               "  ...",
               "# Subtest: UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
-              "ok 584 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
+              "ok 585 - UPG-AC-06 examples/todo-api/package.json has every script the engine wants",
               "  ---",
-              "  duration_ms: 2.281917",
+              "  duration_ms: 2.584042",
               "  type: 'test'",
               "  ...",
-              "1..584",
-              "# tests 584",
+              "1..585",
+              "# tests 585",
               "# suites 0",
-              "# pass 582",
+              "# pass 583",
               "# fail 0",
               "# cancelled 0",
               "# skipped 2",
               "# todo 0",
-              "# duration_ms 92810.850875"
+              "# duration_ms 79509.701834"
             ]
           }
         ]
