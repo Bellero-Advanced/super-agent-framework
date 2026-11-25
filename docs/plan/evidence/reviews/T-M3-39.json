@@ -1,0 +1,15 @@
+{
+  "id": "T-M3-39",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-25T17:06:35.384Z",
+      "result": "pass",
+      "kinds": [],
+      "note": "non-blocking notes batched; F-018 proven only by windows node 20 CI",
+      "head": "a4dc4117a15b23b3cfcd8e783bdbfab823c098c8",
+      "verifyAttempts": 1,
+      "verifyAt": "2026-11-25T17:05:27.577Z"
+    }
+  ]
+}
