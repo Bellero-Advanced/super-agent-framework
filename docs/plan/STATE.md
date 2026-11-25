@@ -2,10 +2,10 @@
 
 > Written by `npm run task:state` · `npm run task:start` · `npm run task:verify` from the files in `docs/plan/` · a card becomes "done" only through `npm run task:verify -- <id>` · how it works: [README.md](README.md)
 
-## M3 SAF builds itself — cards done 34/34
+## M3 SAF builds itself — cards done 34/35
 
 - In progress: none
-- Next: none — all cards done, check the exit gates with npm run task:verify -- M3
+- Next: T-M3-38 task:culprit still reports an interrupt (exit 130 / 143) when Ctrl-C arrives during the blocking install step on Node 20
 
 | Card | Work | Status | Evidence |
 |---|---|---|---|
@@ -43,6 +43,7 @@
 | [T-M3-11](tasks/M3/T-M3-11.md) | A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again | ✓ passed | [T-M3-11.json](evidence/T-M3-11.json) · passed 2026-11-24 20:30 (7 commands) · full suite deferred to gate |
 | [T-M3-12](tasks/M3/T-M3-12.md) | CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 | ✓ passed | [T-M3-12.json](evidence/T-M3-12.json) · passed 2026-11-24 21:03 (3 commands) |
 | [T-M3-13](tasks/M3/T-M3-13.md) | A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it | ✓ passed | [T-M3-13.json](evidence/T-M3-13.json) · passed 2026-11-24 21:22 (6 commands) · full suite deferred to gate |
+| [T-M3-38](tasks/M3/T-M3-38.md) | task:culprit still reports an interrupt (exit 130 / 143) when Ctrl-C arrives during the blocking install step on Node 20 | · not started | – |
 
 ### Exit gates of M3 (checked with `npm run task:verify -- M3`)
 
