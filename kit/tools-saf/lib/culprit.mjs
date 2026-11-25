@@ -49,7 +49,7 @@ export function cardOf(ctx, m, plan, sha) {
 }
 
 /** Let the event loop deliver a signal that arrived while a synchronous step (git, the install command) was blocking it. */
-const settle = () => new Promise((resolve) => setImmediate(resolve));
+const settle = () => new Promise((resolve) => setImmediate(() => setTimeout(resolve, 0))); // Node 20 delivers the signal only after one timer turn
 
 /** Thrown inside the search when a signal asked it to stop. */
 class Interrupted extends Error {}
