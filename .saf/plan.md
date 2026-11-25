@@ -152,7 +152,7 @@ T-M4-03).
 - [x] T-M3-11 A v* tag publishes both npm packages through trusted publishing and creates the GitHub release, after release-check confirms every guard again — passed 2026-11-24 20:30 (7 commands) · full suite deferred to gate
 - [x] T-M3-12 CHANGELOG Unreleased lists every user-visible change since 0.1.0, so the first automatic release computes 0.2.0 — passed 2026-11-24 21:03 (3 commands)
 - [x] T-M3-13 A documented skill-pack format, and saf pack show <path> lists everything a pack would install before anyone trusts it — passed 2026-11-24 21:22 (6 commands) · full suite deferred to gate
-- [ ] T-M3-38 task:culprit still reports an interrupt (exit 130 / 143) when Ctrl-C arrives during the blocking install step on Node 20
+- [ ] T-M3-38 task:culprit still reports an interrupt (exit 130 / 143) when Ctrl-C arrives during the blocking install step on Node 20 — started 2026-11-25 16:48 · not verified yet · lane 1 · .claude/worktrees/T-M3-38
 
 ## Risks
 - **Releasing is irreversible:** npm versions are immutable; a bad release is fixed by a new patch, never by
