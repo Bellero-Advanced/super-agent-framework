@@ -212,3 +212,7 @@ R8. the script re-implements sha1 instead of reusing setup's `sha` (generate.mjs
 
 ## T-M3-38 (review notes, non-blocking)
 - The review saw the 0 ms timer version; round 2 replaced it by two immediates after a 1-in-6 flake on Node 20 (reviewer note 2). Comment wording follows note 3. Note 4: the in-process test checks leftovers only, process tests cover git worktree list.
+
+## T-M3-39 (review notes, non-blocking)
+- The fixture still copies the example node_modules before removing it if the filter misfires (time cost; symlink EPERM risk on Windows if node_modules ever holds symlinks).
+- F-018 is proven fixed only when windows-latest node 20 is green on the merged commit.
