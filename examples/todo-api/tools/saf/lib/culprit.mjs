@@ -49,7 +49,8 @@ export function cardOf(ctx, m, plan, sha) {
 }
 
 /** Let the event loop deliver a signal that arrived while a synchronous step (git, the install command) was blocking it. */
-const settle = () => new Promise((resolve) => setImmediate(resolve));
+// two immediates: the second runs on a later loop turn, after a poll phase has read a signal that arrived while a synchronous step blocked the loop (one immediate or a 0 ms timer is not enough on Node 20)
+const settle = () => new Promise((resolve) => setImmediate(() => setImmediate(resolve)));
 
 /** Thrown inside the search when a signal asked it to stop. */
 class Interrupted extends Error {}

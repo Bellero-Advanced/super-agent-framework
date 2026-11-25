@@ -89,6 +89,19 @@ for (const [signal, code, where] of [["SIGINT", 130, "run"], ["SIGTERM", 143, "r
   );
 }
 
+test(
+  "TMODE-AC-17 a signal that arrives while the blocking install runs is reported as interrupted, not as an install failure (in process)",
+  { skip: process.platform === "win32" ? "POSIX signals: Windows cannot send SIGINT to a process" : false },
+  async () => {
+    const made = await fourCards({ breaks: "none" });
+    const ctx = ctxFor(made, { install: "fake-install", runSync: () => { process.kill(process.pid, "SIGINT"); return 1; } });
+    const r = await culprit.findCulprit(ctx, "M1");
+    assert.equal(r.kind, "interrupted");
+    assert.equal(r.exit, 130);
+    assert.deepEqual(leftovers(made.root, made.config), []);
+  },
+);
+
 test("TMODE-AC-18 a plan with a problem is refused with the plan error before any worktree is made", async () => {
   const made = await planRepo({ config: cfgWith(CHECK), cards: CARDS, gates: [{ id: "full-suite", text: "reserved id", run: ["echo hi"] }] });
   await assert.rejects(culprit.findCulprit(ctxFor(made), "M1"), /the plan has problems/);

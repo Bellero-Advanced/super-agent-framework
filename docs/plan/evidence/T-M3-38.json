@@ -1,7 +1,7 @@
 {
   "id": "T-M3-38",
   "milestone": "M3",
-  "status": "in_progress",
+  "status": "done",
   "started": {
     "at": "2026-11-25T16:48:26.587Z",
     "base": "0df641b76aeb127222cbfa1e7f2db46fb573b3e7",
@@ -13,8 +13,165 @@
       "source": "repo"
     }
   },
-  "attempts": 0,
+  "attempts": 2,
   "lane": 1,
   "branch": "card/T-M3-38",
-  "worktree": ".claude/worktrees/T-M3-38"
+  "worktree": ".claude/worktrees/T-M3-38",
+  "verified": {
+    "at": "2026-11-25T16:55:03.565Z",
+    "head": "83bf9e9259b6f2e2a7aadc62a691ca5de3a6b6ad",
+    "pass": true,
+    "commands": [
+      {
+        "cmd": "node --test test/unit/culprit-robust.test.mjs",
+        "exit": 0,
+        "ms": 7340,
+        "tail": [
+          "ok 10 - TMODE-AC-19 the run output reaches onOutput while each run goes on; the tail is RUN_LIMITS.culpritTail lines; rule 33 words",
+          "  ---",
+          "  duration_ms: 815.750625",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-13 no culprit hint when the full suite fails but no card deferred it (deferredCards is empty)",
+          "ok 11 - TMODE-AC-13 no culprit hint when the full suite fails but no card deferred it (deferredCards is empty)",
+          "  ---",
+          "  duration_ms: 268.920416",
+          "  type: 'test'",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 7273.532834"
+        ]
+      },
+      {
+        "cmd": "PATH=\"$HOME/.nvm/versions/node/v20.17.0/bin:$PATH\" node --test test/unit/culprit-robust.test.mjs",
+        "exit": 0,
+        "ms": 8143,
+        "tail": [
+          "  ...",
+          "# Subtest: TMODE-AC-19 the run output reaches onOutput while each run goes on; the tail is RUN_LIMITS.culpritTail lines; rule 33 words",
+          "ok 10 - TMODE-AC-19 the run output reaches onOutput while each run goes on; the tail is RUN_LIMITS.culpritTail lines; rule 33 words",
+          "  ---",
+          "  duration_ms: 854.713583",
+          "  ...",
+          "# Subtest: TMODE-AC-13 no culprit hint when the full suite fails but no card deferred it (deferredCards is empty)",
+          "ok 11 - TMODE-AC-13 no culprit hint when the full suite fails but no card deferred it (deferredCards is empty)",
+          "  ---",
+          "  duration_ms: 286.089625",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 7971.610083"
+        ]
+      },
+      {
+        "cmd": "npm run saf:refresh -- --check",
+        "exit": 0,
+        "ms": 387,
+        "tail": [
+          "check: 3 copies equal kit/"
+        ]
+      },
+      {
+        "cmd": "npm run docs:check",
+        "exit": 0,
+        "ms": 320,
+        "tail": [
+          "✓ docs:check passed — 284 markdown file(s) · 326 local link(s) · 108 command(s) in agent docs · 5 agent(s)"
+        ]
+      },
+      {
+        "cmd": "npm run check-secrets",
+        "exit": 0,
+        "ms": 447,
+        "tail": [
+          "✓ check-secrets: <redacted> findings in 653 scanned file(s)"
+        ]
+      },
+      {
+        "cmd": "node --test 'test/unit/culprit-robust.test.mjs'",
+        "exit": 0,
+        "ms": 7769,
+        "tail": [
+          "ok 10 - TMODE-AC-19 the run output reaches onOutput while each run goes on; the tail is RUN_LIMITS.culpritTail lines; rule 33 words",
+          "  ---",
+          "  duration_ms: 835.374625",
+          "  type: 'test'",
+          "  ...",
+          "# Subtest: TMODE-AC-13 no culprit hint when the full suite fails but no card deferred it (deferredCards is empty)",
+          "ok 11 - TMODE-AC-13 no culprit hint when the full suite fails but no card deferred it (deferredCards is empty)",
+          "  ---",
+          "  duration_ms: 295.042666",
+          "  type: 'test'",
+          "  ...",
+          "1..11",
+          "# tests 11",
+          "# suites 0",
+          "# pass 11",
+          "# fail 0",
+          "# cancelled 0",
+          "# skipped 0",
+          "# todo 0",
+          "# duration_ms 7714.571417"
+        ]
+      }
+    ],
+    "files": {
+      "changed": [
+        "kit/tools-saf/lib/culprit.mjs",
+        "test/unit/culprit-robust.test.mjs"
+      ],
+      "outside": [],
+      "forbidden": [],
+      "hashes": {
+        "kit/tools-saf/lib/culprit.mjs": "e301dbf632bc04e5afc4239a0695502ba75654ae",
+        "test/unit/culprit-robust.test.mjs": "2788773808af1c4377f6884ba5906c7e92fe871b"
+      }
+    },
+    "scenarios": {
+      "required": [
+        "TMODE-AC-17"
+      ],
+      "missing": []
+    },
+    "size": {
+      "size": "M",
+      "code": {
+        "lines": 3,
+        "cap": 800,
+        "stop": 1600
+      },
+      "test": {
+        "lines": 13,
+        "cap": 600,
+        "stop": 1200
+      },
+      "over": [],
+      "stopped": []
+    },
+    "testMode": {
+      "mode": "targeted",
+      "source": "repo"
+    },
+    "deferred": [
+      "npm test"
+    ],
+    "targeted": {
+      "files": [
+        "test/unit/culprit-robust.test.mjs"
+      ]
+    }
+  }
 }
