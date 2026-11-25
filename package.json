@@ -1,6 +1,6 @@
 {
   "name": "super-agent-framework",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A card-and-milestone workflow for Claude Code: proof before \"done\", a reviewer that is not the builder, and plans that big work cannot drift from.",
   "keywords": [
     "claude",

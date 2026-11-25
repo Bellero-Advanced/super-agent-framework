@@ -5,6 +5,8 @@ and the project uses [Semantic Versioning](https://semver.org/).
 
 ## Unreleased
 
+## 0.2.0 — 2026-11-25
+
 ### Breaking
 
 - **Card sizes are now M and L; size S is retired.** M is one self-contained subsystem (warning above 800 changed code
