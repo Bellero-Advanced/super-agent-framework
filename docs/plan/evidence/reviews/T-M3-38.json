@@ -1,0 +1,15 @@
+{
+  "id": "T-M3-38",
+  "rounds": [
+    {
+      "round": 1,
+      "at": "2026-11-25T16:55:08.839Z",
+      "result": "pass",
+      "kinds": [],
+      "note": "reviewer notes 2-4 batched; note 2 (timer race) fixed in round 2 with two immediates, 12/12 runs green on Node 20.17",
+      "head": "0a1a5c2df7a20e4d0cc316c0e32355dabf7a8361",
+      "verifyAttempts": 2,
+      "verifyAt": "2026-11-25T16:55:03.565Z"
+    }
+  ]
+}
